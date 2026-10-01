@@ -8,25 +8,25 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfile.mpd
     container_name: mpd
-    image: phoniebox/mpd
+    image: lauschkiste/mpd
     environment:
       - PULSE_SERVER=tcp:host.docker.internal:4713
     restart: unless-stopped
     volumes:
-      - ../shared/audiofolders:/root/RPi-Jukebox-RFID/shared/audiofolders
+      - ../shared/audiofolders:/root/lauschkiste/shared/audiofolders
       - ../shared/playlists:/root/.config/mpd/playlists
       - ./config/docker.mpd.conf:/root/.config/mpd/mpd.conf
 
-  jukebox:
+  lauschkiste:
     build:
       args:
         - UID=0
         - USER=root
         - HOME=/root
       context: ../
-      dockerfile: ./docker/Dockerfile.jukebox
-    container_name: jukebox
-    image: phoniebox/jukebox
+      dockerfile: ./docker/Dockerfile.lauschkiste
+    container_name: lauschkiste
+    image: lauschkiste/server
     depends_on:
       - mpd
     environment:
@@ -36,24 +36,24 @@ services:
     restart: unless-stopped
     tty: true
     volumes:
-      - ../packages/lauschkiste:/root/RPi-Jukebox-RFID/packages/lauschkiste
-      - ../packages/cli:/root/RPi-Jukebox-RFID/packages/cli
-      - ../packages/webapp/public/cover-cache:/root/RPi-Jukebox-RFID/packages/webapp/build/cover-cache
-      - ../shared:/root/RPi-Jukebox-RFID/shared
+      - ../packages/lauschkiste:/root/lauschkiste/packages/lauschkiste
+      - ../packages/cli:/root/lauschkiste/packages/cli
+      - ../packages/webapp/public/cover-cache:/root/lauschkiste/packages/webapp/build/cover-cache
+      - ../shared:/root/lauschkiste/shared
       - ./config/docker.mpd.conf:/root/.config/mpd/mpd.conf
-    command: jukebox run
+    command: lauschkiste
 
   webapp:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile.webapp
     container_name: webapp
-    image: phoniebox/webapp
+    image: lauschkiste/webapp
     depends_on:
-      - jukebox
+      - lauschkiste
     environment:
       - CHOKIDAR_USEPOLLING=true
-      - API_PROXY_TARGET=http://jukebox:5556
+      - API_PROXY_TARGET=http://lauschkiste:5556
     ports:
       - 3000:3000
     restart: unless-stopped

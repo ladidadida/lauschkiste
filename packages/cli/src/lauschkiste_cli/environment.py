@@ -8,7 +8,7 @@ from typing import Optional
 import lauschkiste
 
 #: Where releases (wheels) are published
-DEFAULT_REPO = 'ladidadida/RPi-Jukebox-RFID'
+DEFAULT_REPO = 'ladidadida/lauschkiste'
 
 
 def checkout() -> Optional[Path]:

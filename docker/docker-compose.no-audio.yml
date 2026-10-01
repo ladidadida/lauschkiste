@@ -10,7 +10,7 @@ services:
     volumes:
       - ./config/docker.mpd.no-audio.conf:/root/.config/mpd/mpd.conf
 
-  jukebox:
+  lauschkiste:
     environment:
       - PULSE_SERVER=
     volumes:

@@ -344,14 +344,14 @@ upstream already flagged in `roadmap-plugins-and-packaging.md` for their own (no
 **Update:** `requirements.txt` / `requirements-excluded.txt` are gone too now. The real Pi installer
 (`migrate_to_cli/installation/routines/setup_jukebox_core.sh`) and both Dockerfiles were migrated to `uv sync`
 against `pyproject.toml` directly (bootstrapping `uv` itself via the official install script if not
-already present). One gotcha caught by actually building `docker/Dockerfile.jukebox` and importing
+already present). One gotcha caught by actually building `docker/Dockerfile.lauschkiste` and importing
 `zmq` inside the built image: PyZMQ must keep coming from the `python3-zmq` apt package (via
 `--system-site-packages`, using the system libzmq) rather than a PyPI wheel -- `uv sync
 --no-install-package pyzmq` on all three call sites keeps that true, otherwise every install would
 silently reintroduce the exact "draft-enabled PyZMQ shadowing the system package" problem the
 installer already has one-time cleanup logic for. (PyZMQ has since been removed entirely.)
 
-**armv7 verified under QEMU** (no real Pi hardware yet): `docker/armv7/jukebox.Dockerfile` (rebased
+**armv7 verified under QEMU** (no real Pi hardware yet): `docker/armv7/lauschkiste.Dockerfile` (rebased
 from buster -- Python 3.7, below `requires-python` -- to trixie) builds and `jukebox run` serves
 the API on armv7l. The installer's `_jukebox_core_install_python_requirements` was run in the
 `ci/ci-debian.Dockerfile` base (Raspbian trixie repos, `packages-core.txt`) on armv7l as user `pi`,

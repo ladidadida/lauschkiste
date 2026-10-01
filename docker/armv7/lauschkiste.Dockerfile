@@ -1,5 +1,5 @@
 # 32-bit Raspberry Pi OS equivalent (armhf userland on an armv7 CPU). Build on a non-ARM host via
-# QEMU binfmt: docker build --platform linux/arm/v7 -f docker/armv7/jukebox.Dockerfile .
+# QEMU binfmt: docker build --platform linux/arm/v7 -f docker/armv7/lauschkiste.Dockerfile .
 FROM --platform=linux/arm/v7 debian:trixie-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ARG UID=1000
 ARG USER=pi
 ARG HOME=/home/${USER}
-ENV INSTALLATION_PATH=${HOME}/RPi-Jukebox-RFID
+ENV INSTALLATION_PATH=${HOME}/lauschkiste
 
 RUN useradd -m -u "${UID}" "${USER}" && usermod -aG pulse "${USER}"
 
@@ -39,4 +39,4 @@ RUN uv sync --no-dev --frozen
 
 EXPOSE 5556
 
-CMD ["jukebox", "run"]
+CMD ["lauschkiste"]

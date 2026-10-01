@@ -8,12 +8,12 @@ services:
     environment:
       - PULSE_SERVER=unix:/tmp/pulse-sock
     volumes:
-      - ../shared/audiofolders:/home/pi/RPi-Jukebox-RFID/shared/audiofolders
+      - ../shared/audiofolders:/home/pi/lauschkiste/shared/audiofolders
       - ../shared/playlists:/home/pi/.config/mpd/playlists
       - ./config/docker.mpd.conf:/home/pi/.config/mpd/mpd.conf
       - $XDG_RUNTIME_DIR/pulse/native:/tmp/pulse-sock
 
-  jukebox:
+  lauschkiste:
     build:
       args:
         - UID=${UID:-1000}
@@ -22,6 +22,6 @@ services:
     environment:
       - PULSE_SERVER=unix:/tmp/pulse-sock
     volumes:
-      - ../shared:/home/pi/RPi-Jukebox-RFID/shared
+      - ../shared:/home/pi/lauschkiste/shared
       - ./config/docker.mpd.conf:/home/pi/.config/mpd/mpd.conf
       - $XDG_RUNTIME_DIR/pulse/native:/tmp/pulse-sock

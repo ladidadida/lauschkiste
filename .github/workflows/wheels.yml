@@ -35,15 +35,15 @@ jobs:
       - name: Build wheels
         run: SKIP_WEBAPP_BUILD=1 ci/build_wheels.sh dist
 
-      - name: Install the wheels into a fresh environment and start the jukebox
+      - name: Install the wheels into a fresh environment and start Lauschkiste
         run: |
           sudo apt-get update && sudo apt-get install -y libportaudio2
           uv venv /tmp/wheelenv
           uv pip install --python /tmp/wheelenv/bin/python dist/*.whl
-          export JUKEBOX_HOME=/tmp/jukebox-home
+          export LAUSCHKISTE_HOME=/tmp/lauschkiste-home
           cd /tmp
-          /tmp/wheelenv/bin/jukebox home
-          /tmp/wheelenv/bin/jukebox run &
+          /tmp/wheelenv/bin/lauschctl home
+          /tmp/wheelenv/bin/lauschkiste &
           for i in $(seq 1 60); do curl -fsS localhost:5556/api/v1/health && break; sleep 1; done
           curl -fsS localhost:5556/ | grep -q '<div id="root">'
           curl -fsS localhost:5556/api/v1/modules
@@ -71,7 +71,7 @@ jobs:
           name: wheels
           path: dist
 
-      - name: Install from the wheels in a fresh Debian container and start the jukebox
+      - name: Install from the wheels in a fresh Debian container and start Lauschkiste
         run: ci/test_install.sh ${{ matrix.codename }} --wheels dist
 
   install-source:
@@ -83,7 +83,7 @@ jobs:
       - name: Build Web App
         uses: ./.github/actions/build-webapp
 
-      - name: Install from this checkout in a fresh Debian container and start the jukebox
+      - name: Install from this checkout in a fresh Debian container and start Lauschkiste
         run: ci/test_install.sh trixie --source
 
   release:

@@ -1,33 +1,33 @@
 #!/usr/bin/env bash
-# Installs the jukebox and runs `jukebox setup`.
+# Installs Lauschkiste and runs `lauschctl setup`.
 #
-#   curl -fsSL https://raw.githubusercontent.com/ladidadida/RPi-Jukebox-RFID/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash
 #   curl -fsSL .../install.sh | bash -s -- --source
 #
 # Options:
-#   --source [DIR]     install from a git checkout (default DIR: ~/RPi-Jukebox-RFID) instead of
+#   --source [DIR]     install from a git checkout (default DIR: ~/lauschkiste) instead of
 #                      the release wheels
 #   --branch NAME      branch to check out with --source (default: main)
 #   --version TAG      release to install (default: the latest release)
 #   --wheels DIR       install the wheels in DIR instead of downloading a release
-#   --repo OWNER/NAME  GitHub repository (default: ladidadida/RPi-Jukebox-RFID)
-#   --home DIR         JUKEBOX_HOME (default: ~/jukebox on a Raspberry Pi, ~/.local/share/jukebox
-#                      elsewhere, DIR/shared with --source)
-#   --yes              don't ask, use defaults (also passed to `jukebox setup`)
-#   --no-setup         only install, don't run `jukebox setup`
+#   --repo OWNER/NAME  GitHub repository (default: ladidadida/lauschkiste)
+#   --home DIR         LAUSCHKISTE_HOME (default: ~/lauschkiste on a Raspberry Pi -- or an existing
+#                      ~/jukebox --, ~/.local/share/lauschkiste elsewhere, DIR/shared with --source)
+#   --yes              don't ask, use defaults (also passed to `lauschctl setup`)
+#   --no-setup         only install, don't run `lauschctl setup`
 
 set -euo pipefail
 
-REPO="ladidadida/RPi-Jukebox-RFID"
+REPO="ladidadida/lauschkiste"
 MODE=package
-SOURCE_DIR="${HOME}/RPi-Jukebox-RFID"
+SOURCE_DIR="${HOME}/lauschkiste"
 BRANCH=main
 VERSION=latest
 WHEELS=""
-JUKEBOX_HOME_DIR=""
+HOME_DIR=""
 ASSUME_YES=false
 RUN_SETUP=true
-MARKER="# jukebox (added by install.sh)"
+MARKER="# lauschkiste (added by install.sh)"
 
 log() { printf '\033[1m==> %s\033[0m\n' "$*"; }
 warn() { printf '\033[33mWarning: %s\033[0m\n' "$*" >&2; }
@@ -43,7 +43,7 @@ parse_args() {
             --version) VERSION="$2"; shift ;;
             --wheels) WHEELS="$(cd "$2" && pwd)"; shift ;;
             --repo) REPO="$2"; shift ;;
-            --home) JUKEBOX_HOME_DIR="$2"; shift ;;
+            --home) HOME_DIR="$2"; shift ;;
             --yes|-y) ASSUME_YES=true ;;
             --no-setup) RUN_SETUP=false ;;
             -h|--help) echo "See the comment at the top of install.sh for the options."; exit 0 ;;
@@ -124,9 +124,13 @@ install_package() {
     for wheel in "$wheels"/*.whl; do
         [[ "$wheel" == "$cli" ]] || with+=(--with "$wheel")
     done
-    log "Installing the jukebox package"
+    if uv tool list 2>/dev/null | grep -q '^jukebox-cli '; then
+        log "Removing the installation from before the renaming (jukebox-cli); your data stays"
+        uv tool uninstall jukebox-cli
+    fi
+    log "Installing the Lauschkiste package"
     uv tool install --force --python python3 "$cli" "${with[@]}"
-    JUKEBOX_BIN="$(uv tool dir --bin)/jukebox"
+    CTL="$(uv tool dir --bin)/lauschctl"
 }
 
 install_source() {
@@ -149,34 +153,42 @@ install_source() {
             VERSION=latest download_release_wheels "$tmp"
             python3 - "$tmp" "${SOURCE_DIR}/packages/webapp/build" <<'PYTHON'
 import glob, pathlib, sys, zipfile
-wheel = glob.glob(f"{sys.argv[1]}/jukebox-*.whl")[0]
+wheel = glob.glob(f"{sys.argv[1]}/lauschkiste-*.whl")[0]
 with zipfile.ZipFile(wheel) as archive:
     for name in archive.namelist():
-        if name.startswith("jukebox/webapp/") and not name.endswith("/"):
-            target = pathlib.Path(sys.argv[2], name[len("jukebox/webapp/"):])
+        if name.startswith("lauschkiste/webapp/") and not name.endswith("/"):
+            target = pathlib.Path(sys.argv[2], name[len("lauschkiste/webapp/"):])
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(archive.read(name))
 PYTHON
         fi
     fi
     mkdir -p "${HOME}/.local/bin"
-    ln -sf "${SOURCE_DIR}/.venv/bin/jukebox" "${HOME}/.local/bin/jukebox"
-    JUKEBOX_BIN="${SOURCE_DIR}/.venv/bin/jukebox"
+    local command
+    for command in lauschkiste lauschctl; do
+        ln -sf "${SOURCE_DIR}/.venv/bin/${command}" "${HOME}/.local/bin/${command}"
+    done
+    CTL="${SOURCE_DIR}/.venv/bin/lauschctl"
 }
 
 choose_home() {
-    if [[ -z "$JUKEBOX_HOME_DIR" ]]; then
+    if [[ -z "$HOME_DIR" ]]; then
         if [[ "$MODE" == source ]]; then
-            JUKEBOX_HOME_DIR="${SOURCE_DIR}/shared"
+            HOME_DIR="${SOURCE_DIR}/shared"
         elif is_raspberry_pi; then
-            JUKEBOX_HOME_DIR="${HOME}/jukebox"
+            # Installations from before the renaming keep their data where it is
+            if [[ -d "${HOME}/jukebox" && ! -d "${HOME}/lauschkiste" ]]; then
+                HOME_DIR="${HOME}/jukebox"
+            else
+                HOME_DIR="${HOME}/lauschkiste"
+            fi
         else
             return 0
         fi
     fi
-    JUKEBOX_HOME_DIR="$(mkdir -p "$JUKEBOX_HOME_DIR" && cd "$JUKEBOX_HOME_DIR" && pwd)"
-    export JUKEBOX_HOME="$JUKEBOX_HOME_DIR"
-    add_to_shell_profile "export JUKEBOX_HOME=\"${JUKEBOX_HOME_DIR}\""
+    HOME_DIR="$(mkdir -p "$HOME_DIR" && cd "$HOME_DIR" && pwd)"
+    export LAUSCHKISTE_HOME="$HOME_DIR"
+    add_to_shell_profile "export LAUSCHKISTE_HOME=\"${HOME_DIR}\""
 }
 
 # Everything runs from main, so a partially downloaded script does nothing
@@ -186,7 +198,7 @@ main() {
     if [[ "$(id -u)" -ne 0 ]]; then
         SUDO=sudo
     else
-        warn "running as root; the jukebox will run as root too"
+        warn "running as root; Lauschkiste will run as root too"
     fi
 
     install_system_packages
@@ -196,22 +208,22 @@ main() {
     add_to_shell_profile 'export PATH="$HOME/.local/bin:$PATH"'
     choose_home
 
-    "$JUKEBOX_BIN" home
+    "$CTL" home
 
     if [[ "$RUN_SETUP" == true ]]; then
         log "Setting up this machine"
         if [[ "$ASSUME_YES" == true ]]; then
-            "$JUKEBOX_BIN" setup --yes
+            "$CTL" setup --yes
         elif [[ -t 0 ]]; then
-            "$JUKEBOX_BIN" setup
+            "$CTL" setup
         elif (: < /dev/tty) 2>/dev/null; then
-            "$JUKEBOX_BIN" setup < /dev/tty
+            "$CTL" setup < /dev/tty
         else
-            "$JUKEBOX_BIN" setup --yes
+            "$CTL" setup --yes
         fi
     fi
 
-    log "Done. Open a new shell (or 'source ~/.profile') to use the 'jukebox' command."
+    log "Done. Open a new shell (or 'source ~/.profile') to use the 'lauschctl' command."
 }
 
 main "$@"

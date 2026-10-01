@@ -3,6 +3,6 @@ services:
     volumes:
       - ~/.config/pulse:/root/.config/pulse
 
-  jukebox:
+  lauschkiste:
     volumes:
       - ~/.config/pulse:/root/.config/pulse

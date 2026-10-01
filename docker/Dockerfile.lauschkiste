@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 ARG UID
 ARG USER
 ARG HOME
-ENV INSTALLATION_PATH=${HOME}/RPi-Jukebox-RFID
+ENV INSTALLATION_PATH=${HOME}/lauschkiste
 
 # The base/macOS Compose configuration runs as root; Linux maps the host UID.
 RUN case "${UID}" in \
@@ -32,8 +32,8 @@ RUN case "${UID}" in \
        fi \
     && usermod -aG pulse "${USER}"
 
-# Jukebox
-# Install all Jukebox dependencies
+# Lauschkiste
+# Install all Lauschkiste dependencies
 RUN apt-get update && apt-get install -qq -y \
     --allow-downgrades --allow-remove-essential --allow-change-held-packages \
     build-essential at wget \
@@ -56,7 +56,7 @@ RUN mkdir -p /tmp/lg && cd /tmp/lg \
 
 # uv (package manager), used below to install Python dependencies as $USER. Installed via the
 # official script rather than `COPY --from=ghcr.io/astral-sh/uv:latest` since that image has no
-# armv7 build (see docker/armv7/jukebox.Dockerfile), and this way both Dockerfiles stay consistent.
+# armv7 build (see docker/armv7/lauschkiste.Dockerfile), and this way both Dockerfiles stay consistent.
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 RUN UV_INSTALL_DIR=/usr/local/bin sh /uv-installer.sh && rm /uv-installer.sh
 
