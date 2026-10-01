@@ -13,6 +13,8 @@ BUILD_PACKAGES = ['build-essential', 'python3-dev', 'libffi-dev']
 RUNTIME_PACKAGES = ['alsa-utils', 'espeak', 'libportaudio2']
 #: A desktop brings its own sound server; a Pi Lite image does not
 AUDIO_PACKAGES = ['pipewire', 'pipewire-pulse', 'pipewire-audio', 'wireplumber', 'libspa-0.2-bluetooth']
+#: piwheels' `av` (32-bit ARM) links against the system's ffmpeg libraries instead of bundling them
+PIWHEELS_ARCHITECTURES = ('armv6', 'armv7')
 
 
 class PackagesStep(Step):
@@ -26,8 +28,10 @@ class PackagesStep(Step):
         return ctx.system.is_debian()
 
     def packages(self, ctx):
-        audio = AUDIO_PACKAGES if ctx.system.is_raspberry_pi() else []
-        return [*BUILD_PACKAGES, *RUNTIME_PACKAGES, *audio]
+        pi = ctx.system.is_raspberry_pi()
+        audio = AUDIO_PACKAGES if pi else []
+        ffmpeg = ['ffmpeg'] if pi and ctx.system.architecture() in PIWHEELS_ARCHITECTURES else []
+        return [*BUILD_PACKAGES, *RUNTIME_PACKAGES, *audio, *ffmpeg]
 
     def apply(self, ctx):
         pass

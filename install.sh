@@ -76,6 +76,18 @@ install_system_packages() {
     $SUDO env DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends "${packages[@]}"
 }
 
+# 32-bit Raspberry Pi OS: PyPI has no armv6/armv7 wheels for several dependencies (pydantic-core,
+# av, ...), piwheels has. uv doesn't read /etc/pip.conf, so it gets its own configuration.
+configure_piwheels() {
+    case "$(uname -m)" in armv6l|armv7l) ;; *) return 0 ;; esac
+    is_raspberry_pi || return 0
+    local config="${XDG_CONFIG_HOME:-${HOME}/.config}/uv/uv.toml"
+    grep -qs piwheels "$config" && return 0
+    log "Using piwheels for prebuilt ARM packages (${config})"
+    mkdir -p "$(dirname "$config")"
+    printf '\n[[index]]\nname = "piwheels"\nurl = "https://www.piwheels.org/simple"\n' >> "$config"
+}
+
 install_uv() {
     export PATH="${HOME}/.local/bin:${PATH}"
     if command -v uv >/dev/null; then return; fi
@@ -179,6 +191,7 @@ main() {
 
     install_system_packages
     install_uv
+    configure_piwheels
     if [[ "$MODE" == source ]]; then install_source; else install_package; fi
     add_to_shell_profile 'export PATH="$HOME/.local/bin:$PATH"'
     choose_home

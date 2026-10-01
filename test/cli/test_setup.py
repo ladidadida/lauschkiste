@@ -202,3 +202,12 @@ def test_existing_sound_card_is_the_default(tmp_path, home, extras):
     assert failed == 0
     assert ctx.answers['sound_card'] == 'hifiberry-dacplus'
     assert not system.exists('/boot/firmware/config.txt.backup')
+
+
+@pytest.mark.parametrize('architecture, expected', [('armv6', True), ('armv7', True), ('arm64', False)])
+def test_ffmpeg_libraries_for_piwheels(tmp_path, home, extras, monkeypatch, architecture, expected):
+    from jukebox_cli.setup.steps.system import PackagesStep
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    monkeypatch.setattr(system, 'architecture', lambda: architecture)
+    ctx = Context(system=system, config_path=home / 'settings' / 'jukebox.yaml')
+    assert ('ffmpeg' in PackagesStep().packages(ctx)) is expected
