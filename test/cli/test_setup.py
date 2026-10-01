@@ -90,9 +90,9 @@ def test_pc_setup_installs_packages_and_service(tmp_path, home, extras):
     failed, ctx = setup_run(system, home)
     assert failed == 0
     assert any('install' in c and 'espeak' in c for c in system.commands)
-    unit = system.read('~/.config/systemd/user/jukebox-daemon.service')
+    unit = system.read('~/.config/systemd/user/lauschkiste.service')
     assert f'Environment=LAUSCHKISTE_HOME={home}' in unit
-    assert 'jukebox-daemon.service' in system.enabled_user
+    assert 'lauschkiste.service' in system.enabled_user
     assert not system.exists('/var/lib/systemd/linger/pi')
     assert ctx.enabled_plugins() == {}
     assert extras == []
@@ -121,8 +121,8 @@ def test_pi_setup(tmp_path, home, extras):
     assert 'bluetooth.service' not in system.enabled
     assert 'static ip_address=192.168.1.50/24' in system.read('/etc/dhcpcd.conf')
     smb = system.read('/etc/samba/smb.conf')
-    assert f'path={home}' in smb and smb.count('## Jukebox Samba Config') == 1
-    assert system.exists('/etc/update-motd.d/99-rpi-jukebox-rfid-welcome')
+    assert f'path={home}' in smb and smb.count('## Lauschkiste Samba Config') == 1
+    assert system.exists('/etc/update-motd.d/99-lauschkiste-welcome')
 
 
 def test_answers_are_stored_without_secrets(tmp_path, home, extras):
@@ -158,10 +158,10 @@ def test_mpd_and_hotspot(tmp_path, home, extras):
     failed, ctx = setup_run(system, home, answers={'mpd': True, 'autohotspot': True})
     assert failed == 0
     assert 'mpd' in ctx.enabled_plugins()
-    assert 'mpd.service' in system.read('~/.config/systemd/user/jukebox-daemon.service')
+    assert 'mpd.service' in system.read('~/.config/systemd/user/lauschkiste.service')
     assert str(home / 'audiofolders') in system.read('~/.config/mpd/mpd.conf')
     script = system.read('/usr/bin/autohotspot')
-    assert "ap_ssid='Phoniebox_Hotspot_jukebox'" in script and "wdev0='wlan0'" in script
+    assert "ap_ssid='Lauschkiste_jukebox'" in script and "wdev0='wlan0'" in script
     assert 'autohotspot.timer' in system.enabled
     assert not system.exists('/etc/dhcpcd.conf')
 
@@ -211,3 +211,23 @@ def test_ffmpeg_libraries_for_piwheels(tmp_path, home, extras, monkeypatch, arch
     monkeypatch.setattr(system, 'architecture', lambda: architecture)
     ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml')
     assert ('ffmpeg' in PackagesStep().packages(ctx)) is expected
+
+
+def test_blocks_and_service_from_before_the_renaming(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    system.write('/boot/firmware/config.txt', 'dtparam=audio=on\n\n## Jukebox Boot Config\ndisable_splash=1\n')
+    system.write('/etc/samba/smb.conf', f'[global]\n\n## Jukebox Samba Config\n[jukebox]\n  path={home}\n')
+    system.outputs[('pdbedit', '-L')] = 'pi:1000:'
+    system.write('~/.config/systemd/user/jukebox-daemon.service', '[Unit]\n')
+    system.enabled_user.add('jukebox-daemon.service')
+    system.write('/etc/update-motd.d/99-rpi-jukebox-rfid-welcome', 'old')
+
+    failed, _ = setup_run(system, home, answers={'samba': True})
+    assert failed == 0
+    assert 'Lauschkiste Boot Config' not in system.read('/boot/firmware/config.txt')
+    assert 'Lauschkiste Samba Config' not in system.read('/etc/samba/smb.conf')
+    assert not system.exists('~/.config/systemd/user/jukebox-daemon.service')
+    assert 'jukebox-daemon.service' not in system.enabled_user
+    assert 'lauschkiste.service' in system.enabled_user
+    assert not system.exists('/etc/update-motd.d/99-rpi-jukebox-rfid-welcome')
+    assert system.exists('/etc/update-motd.d/99-lauschkiste-welcome')

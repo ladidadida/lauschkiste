@@ -13,6 +13,16 @@ import typer
 PathLike = Union[str, Path]
 
 
+#: Marker prefix in system files; blocks written before the renaming start with the legacy one
+MARKER_PREFIX = '## Lauschkiste'
+LEGACY_MARKER_PREFIX = '## Jukebox'
+
+
+def has_marker(text: str, marker: str) -> bool:
+    """``marker`` or its pre-renaming form occurs in ``text``."""
+    return marker in text or marker.replace(MARKER_PREFIX, LEGACY_MARKER_PREFIX, 1) in text
+
+
 class SetupError(Exception):
     pass
 
@@ -59,7 +69,7 @@ class System:
     def append_block(self, path: PathLike, marker: str, block: str, root: bool = False) -> bool:
         """Append ``marker`` + ``block`` unless the file already contains ``marker``."""
         current = self.read(path) or ''
-        if marker in current:
+        if has_marker(current, marker):
             return False
         separator = '' if not current or current.endswith('\n') else '\n'
         self.write(path, f"{current}{separator}\n{marker}\n{block.rstrip()}\n", root=root)

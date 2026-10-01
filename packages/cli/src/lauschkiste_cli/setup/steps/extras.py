@@ -8,7 +8,7 @@ import typer
 import lauschkiste.cfghandler
 import lauschkiste.paths
 from lauschkiste_cli.setup.base import Question, Step
-from lauschkiste_cli.setup.system import SetupError, StepSkipped
+from lauschkiste_cli.setup.system import SetupError, StepSkipped, has_marker
 
 
 class MpdStep(Step):
@@ -28,8 +28,8 @@ class MpdStep(Step):
 
     def conf(self) -> str:
         template = lauschkiste.paths.resource('default-settings', 'mpd.default.conf').read_text()
-        return (template.replace('%%JUKEBOX_AUDIOFOLDERS_PATH%%', str(lauschkiste.paths.resolve('audiofolders')))
-                .replace('%%JUKEBOX_PLAYLISTS_PATH%%', str(lauschkiste.paths.resolve('playlists'))))
+        return (template.replace('%%LAUSCHKISTE_AUDIOFOLDERS_PATH%%', str(lauschkiste.paths.resolve('audiofolders')))
+                .replace('%%LAUSCHKISTE_PLAYLISTS_PATH%%', str(lauschkiste.paths.resolve('playlists'))))
 
     def check(self, ctx):
         system = ctx.system
@@ -65,7 +65,7 @@ class SambaStep(Step):
                  when=lambda a: a.get('samba')),
     )
     CONF = '/etc/samba/smb.conf'
-    MARKER = '## Jukebox Samba Config'
+    MARKER = '## Lauschkiste Samba Config'
 
     def wanted(self, ctx):
         return bool(ctx.answer('samba'))
@@ -85,7 +85,7 @@ class SambaStep(Step):
     def check(self, ctx):
         problems = []
         conf = ctx.system.read(self.CONF) or ''
-        if self.MARKER not in conf:
+        if not has_marker(conf, self.MARKER):
             problems.append('no jukebox share in smb.conf')
         elif f'path={lauschkiste.paths.home()}' not in conf.replace(' ', ''):
             problems.append(f'the jukebox share in {self.CONF} does not point to {lauschkiste.paths.home()}; '
@@ -100,8 +100,8 @@ class SambaStep(Step):
             password = ctx.answer('samba_password') or 'raspberry'
             system.run('smbpasswd', '-s', '-a', system.user, root=True, input=f'{password}\n{password}\n')
         system.append_block(self.CONF, self.MARKER, (
-            '[jukebox]\n'
-            '  comment=Jukebox\n'
+            '[lauschkiste]\n'
+            '  comment=Lauschkiste\n'
             f'  path={lauschkiste.paths.home()}\n'
             '  browseable=Yes\n'
             '  writeable=Yes\n'
@@ -119,7 +119,7 @@ class KioskStep(Step):
         Question('kiosk', 'Show the web app full-screen on an attached display after boot?', default=False,
                  help='Installs a minimal X server, openbox and Chromium, not a full desktop.'),
     )
-    MARKER = '## Jukebox Kiosk Mode'
+    MARKER = '## Lauschkiste Kiosk Mode'
     BASHRC = '~/.bashrc'
     AUTOSTART = '/etc/xdg/openbox/autostart'
     AUTOLOGIN = '/etc/systemd/system/getty@tty1.service.d/autologin.conf'
@@ -144,7 +144,7 @@ class KioskStep(Step):
     def check(self, ctx):
         system = ctx.system
         problems = [f'{path} is not set up' for path in (self.BASHRC, self.AUTOSTART, self._update_check_file(ctx))
-                    if self.MARKER not in (system.read(path) or '')]
+                    if not has_marker(system.read(path) or '', self.MARKER)]
         if system.is_raspberry_pi() and not system.exists(self.AUTOLOGIN):
             problems.append('console autologin is not enabled')
         return problems
@@ -188,14 +188,14 @@ class AutohotspotStep(Step):
         Question('autohotspot', 'Open a WiFi hotspot when no known WiFi is in range?', default=False,
                  help='Lets you reach the jukebox without a network. Replaces the static IP option.'),
         Question('autohotspot_ssid', 'Hotspot name (SSID)', kind='text', validate=_validate_ssid,
-                 default=lambda ctx: f"Phoniebox_Hotspot_{ctx.system.output('hostname')}"[:32],
+                 default=lambda ctx: f"Lauschkiste_{ctx.system.output('hostname')}"[:32],
                  when=lambda a: a.get('autohotspot')),
         Question('autohotspot_password', 'Hotspot password', kind='text', default='PlayItLoud!',
                  validate=_validate_password, when=lambda a: a.get('autohotspot')),
         Question('autohotspot_ip', 'Hotspot IP address', kind='text', default='10.0.0.1',
                  validate=_validate_ip, when=lambda a: a.get('autohotspot')),
     )
-    PROFILE = 'Phoniebox_Hotspot'
+    PROFILE = 'Lauschkiste_Hotspot'
     SCRIPT = '/usr/bin/autohotspot'
     SERVICE = 'autohotspot.service'
     TIMER = 'autohotspot.timer'
@@ -282,7 +282,7 @@ class AudioStep(Step):
     def _sinks(self):
         import pulsectl
         try:
-            with pulsectl.Pulse('jukebox-setup') as pulse:
+            with pulsectl.Pulse('lauschkiste-setup') as pulse:
                 return [(sink.name, sink.description) for sink in pulse.sink_list()]
         except pulsectl.PulseError as error:
             raise SetupError(f'no PulseAudio/PipeWire server reachable: {error}') from None

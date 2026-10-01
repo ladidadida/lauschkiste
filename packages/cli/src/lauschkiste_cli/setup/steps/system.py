@@ -7,7 +7,7 @@ import typer
 
 import lauschkiste.paths
 from lauschkiste_cli.setup.base import Context, Question, Step
-from lauschkiste_cli.setup.system import SetupError
+from lauschkiste_cli.setup.system import SetupError, has_marker
 
 BUILD_PACKAGES = ['build-essential', 'python3-dev', 'libffi-dev']
 RUNTIME_PACKAGES = ['alsa-utils', 'espeak', 'libportaudio2']
@@ -130,8 +130,8 @@ class BootStep(Step):
         Question('static_ip', 'Use the current IP address as static address (faster network start)?',
                  default=True, when=lambda a: a.get('optimize_boot') and not a.get('autohotspot')),
     )
-    MARKER = '## Jukebox Boot Config'
-    DHCP_MARKER = '## Jukebox DHCP Config'
+    MARKER = '## Lauschkiste Boot Config'
+    DHCP_MARKER = '## Lauschkiste DHCP Config'
     SERVICES = ['keyboard-setup.service', 'triggerhappy.service', 'triggerhappy.socket', 'raspi-config.service',
                 'apt-daily.service', 'apt-daily-upgrade.service', 'apt-daily.timer', 'apt-daily-upgrade.timer']
     BLUETOOTH = ['hciuart.service', 'bluetooth.service']
@@ -155,7 +155,7 @@ class BootStep(Step):
     def check(self, ctx):
         system = ctx.system
         problems = [f'{unit} is enabled' for unit in self._services(ctx) if system.unit_enabled(unit)]
-        if self.MARKER not in (system.read(system.boot_file('config.txt')) or ''):
+        if not has_marker(system.read(system.boot_file('config.txt')) or '', self.MARKER):
             problems.append('boot splash screen is enabled')
         cmdline = (system.read(system.boot_file('cmdline.txt')) or '').split()
         missing = [option for option in self._cmdline_options(ctx) if option not in cmdline]
@@ -200,7 +200,7 @@ def static_ip_configured(ctx: Context) -> bool:
     if system.unit_enabled('NetworkManager.service'):
         profile = _nm_profile(ctx, current_route(ctx).get('interface', ''))
         return bool(profile) and system.output('nmcli', '-g', 'ipv4.method', 'connection', 'show', profile) == 'manual'
-    return BootStep.DHCP_MARKER in (system.read('/etc/dhcpcd.conf') or '')
+    return has_marker(system.read('/etc/dhcpcd.conf') or '', BootStep.DHCP_MARKER)
 
 
 def configure_static_ip(ctx: Context) -> None:
@@ -222,16 +222,21 @@ def configure_static_ip(ctx: Context) -> None:
 class WelcomeStep(Step):
     name = 'welcome'
     title = 'Login message'
-    TARGET = '/etc/update-motd.d/99-rpi-jukebox-rfid-welcome'
+    TARGET = '/etc/update-motd.d/99-lauschkiste-welcome'
+    LEGACY_TARGET = '/etc/update-motd.d/99-rpi-jukebox-rfid-welcome'
 
     def relevant(self, ctx):
         return ctx.system.is_raspberry_pi()
 
     def _content(self) -> str:
-        return lauschkiste.paths.resource('system', '99-rpi-jukebox-rfid-welcome').read_text()
+        return lauschkiste.paths.resource('system', '99-lauschkiste-welcome').read_text()
 
     def check(self, ctx) -> List[str]:
-        return [] if ctx.system.read(self.TARGET) == self._content() else ['login message not installed']
+        problems = [] if ctx.system.read(self.TARGET) == self._content() else ['login message not installed']
+        if ctx.system.exists(self.LEGACY_TARGET):
+            problems.append(f'old login message {self.LEGACY_TARGET} still installed')
+        return problems
 
     def apply(self, ctx):
         ctx.system.write(self.TARGET, self._content(), root=True, mode=0o755)
+        ctx.system.remove(self.LEGACY_TARGET, root=True)

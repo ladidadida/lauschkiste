@@ -17,7 +17,7 @@ import lauschkiste
 import lauschkiste.cfghandler
 import lauschkiste.player
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
-from lauschkiste.daemon import get_jukebox_daemon
+from lauschkiste.daemon import get_daemon
 
 logger = logging.getLogger('lauschkiste.system')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
@@ -94,7 +94,7 @@ def _read_log(handler_name: str) -> str:
                 return (f"Log file {h.baseFilename} is empty. (Is the RotatingFileHandler configured as "
                         f"handler sink for jb in logger.yaml?)")
             mtime = os.path.getmtime(h.baseFilename)
-            stime = get_jukebox_daemon().start_time
+            stime = get_daemon().start_time
             # 3 seconds tolerance between file creation and recording the start time
             if mtime - stime < -3:
                 return (f"Log file {h.baseFilename} too old for this Jukebox start! "
@@ -149,7 +149,7 @@ class System(CoreModule):
     @query(path='/info')
     def get_info(self) -> SystemInfo:
         """Version, git state and start time of the jukebox."""
-        daemon = get_jukebox_daemon()
+        daemon = get_daemon()
         return SystemInfo(version=lauschkiste.version(), git_state=daemon.git_state,
                           started_at=time.ctime(daemon.start_time))
 
@@ -181,7 +181,7 @@ class System(CoreModule):
     def restart_service(self) -> None:
         """Restart the jukebox systemd user service."""
         try:
-            subprocess.Popen(['systemctl', '--user', 'restart', 'jukebox-daemon'])
+            subprocess.Popen(['systemctl', '--user', 'restart', 'lauschkiste'])
         except OSError as error:
             raise OperationError(501, 'no_systemd', f'systemctl is not available: {error}') from None
 

@@ -57,7 +57,7 @@ def run(
         logger = loggingext.configure_from_file(str(logger_conf))
 
     logger.info(f"Jukebox home '{lauschkiste.paths.home()}', configuration file '{conf}'")
-    from lauschkiste.daemon import get_jukebox_daemon  # heavy (web server); only `run` needs it
+    from lauschkiste.daemon import get_daemon  # heavy (web server); only `run` needs it
 
-    myjukebox = get_jukebox_daemon(str(conf), artifacts)
+    myjukebox = get_daemon(str(conf), artifacts)
     myjukebox.run()

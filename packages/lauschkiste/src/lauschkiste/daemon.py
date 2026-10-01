@@ -21,7 +21,7 @@ import lauschkiste.cfghandler
 logger = logging.getLogger('lauschkiste.daemon')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
-#: Template a missing configuration_file is created from on first run (see JukeBox.__init__).
+#: Template a missing configuration_file is created from on first run (see Daemon.__init__).
 DEFAULT_CONFIG_TEMPLATE = str(lauschkiste.paths.resource('default-settings', 'lauschkiste.default.yaml'))
 
 _SHUTDOWN_SIGNAL: Optional[int] = None
@@ -41,14 +41,14 @@ def log_active_threads():
     logger.debug(f"Active Threads = {threading.enumerate()}")
 
 
-class JukeBox:
+class Daemon:
     def __init__(self, configuration_file: str, write_artifacts: bool):
         # Set up the signal listeners
         signal.signal(signal.SIGINT, self.signal_handler)
         signal.signal(signal.SIGTERM, self.signal_handler)
 
         self._start_time = time.time()
-        logger.info(f"Starting Jukebox Daemon (Version {lauschkiste.version()})")
+        logger.info(f"Starting Lauschkiste (version {lauschkiste.version()})")
 
         self._git_state = lauschkiste.utils.get_git_state()
         logger.info(f"Git state: {self._git_state}")
@@ -62,7 +62,7 @@ class JukeBox:
 
         self.write_artifacts = write_artifacts
 
-        logger.info("Welcome to " + cfg.getn('system', 'box_name', default='Jukebox Version 3'))
+        logger.info("Welcome to " + cfg.getn('system', 'box_name', default='Lauschkiste'))
         logger.info(f"Time of start: {time.ctime(self._start_time)}")
 
     @property
@@ -115,7 +115,7 @@ class JukeBox:
             sys.exit(1)
 
     def exit_gracefully(self, esignal, timeout):
-        msg = f"Closing down JukeBox {cfg.getn('system', 'box_name', default='Unnamed')}"
+        msg = f"Closing down {cfg.getn('system', 'box_name', default='Unnamed')}"
         print(msg)
         logger.info(msg)
         # (1) Stop taking commands
@@ -142,7 +142,7 @@ class JukeBox:
     def run(self):
         time_start = time.time_ns()
 
-        # Imported lazily: core modules import lauschkiste.daemon.get_jukebox_daemon at module level.
+        # Imported lazily: core modules import lauschkiste.daemon.get_daemon at module level.
         from lauschkiste.contract.manager import ModuleManager
         from lauschkiste.core_modules import CORE_MODULES
 
@@ -167,21 +167,21 @@ class JukeBox:
         self.api_server.join()
 
 
-class JukeBoxBuilder:
+class DaemonBuilder:
     def __init__(self):
         self._instance = None
 
     def __call__(self, *args, **kwargs):
         if not self._instance:
-            self._instance = JukeBox(*args, **kwargs)
+            self._instance = Daemon(*args, **kwargs)
         return self._instance
 
 
-_JUKEBOX_BUILDER: Optional[JukeBoxBuilder] = None
+_DAEMON_BUILDER: Optional[DaemonBuilder] = None
 
 
-def get_jukebox_daemon(*args, **kwargs):
-    global _JUKEBOX_BUILDER
-    if _JUKEBOX_BUILDER is None:
-        _JUKEBOX_BUILDER = JukeBoxBuilder()
-    return _JUKEBOX_BUILDER(*args, **kwargs)
+def get_daemon(*args, **kwargs):
+    global _DAEMON_BUILDER
+    if _DAEMON_BUILDER is None:
+        _DAEMON_BUILDER = DaemonBuilder()
+    return _DAEMON_BUILDER(*args, **kwargs)

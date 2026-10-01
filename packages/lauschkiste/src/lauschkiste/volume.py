@@ -104,7 +104,7 @@ class PulseMixer:
                 output.sink_name = default
 
     def _client(self):
-        return self._pulsectl.Pulse('jukebox-volume')
+        return self._pulsectl.Pulse('lauschkiste-volume')
 
     def _limit(self, sink_name: str) -> float:
         for output in self._outputs:

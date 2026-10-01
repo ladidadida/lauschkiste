@@ -17,7 +17,7 @@ from lauschkiste_cli.environment import DEFAULT_REPO, checkout, jukebox_executab
 from lauschkiste_cli.setup.base import Context
 from lauschkiste_cli.setup.system import System
 
-SERVICE = 'jukebox-daemon.service'
+SERVICE = 'lauschkiste.service'
 
 
 class UpdateError(Exception):
