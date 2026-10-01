@@ -2,6 +2,7 @@
 name = "lauschkiste-plugin-raspberry-pi"
 version = "0.1.0"
 description = "Jukebox plugin: Raspberry Pi hardware control (power, GPIO, battery, health)"
+license = "MIT"
 requires-python = ">=3.11"
 dependencies = [
   "lauschkiste",
