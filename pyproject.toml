@@ -13,7 +13,7 @@ dev = [
   "mock",
   "httpx",  # for starlette.testclient (FastAPI API server tests)
   "ruff>=0.6",
-  "pyright>=1.1",
+  "pyright>=1.1.414",
   "pydoc-markdown",
   "bam-tool",
 ]
