@@ -85,9 +85,10 @@ player:
   stopped_prev_action: prev
   # Must be one of: 'none', 'next', 'rewind':
   stopped_next_action: next
-  # Playback volume in percent (0-100). Only used by the local_audio backend -- mpd keeps its
-  # own volume (see mpd_client.setvol), unrelated to this.
-  volume: 80
+  # Playback volume in percent (0-100) of the local_audio backend, on top of the system volume.
+  # Keep it at 100 when PulseAudio/PipeWire controls the volume (volume.mixer). mpd keeps its own
+  # volume (see mpd_client.setvol), unrelated to this.
+  volume: 100
 library:
   # Index of the music library (tags, durations) and extracted cover art. The music itself is in
   # player.music_library_path.

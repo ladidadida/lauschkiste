@@ -59,7 +59,7 @@ class PlayerLocalAudio:
         self._state = 'stop'           # 'play' | 'pause' | 'stop'
         self._random = False
         self._repeat_mode = 'off'      # 'off' | 'repeat' | 'single'
-        self._volume = int(cfg.setndefault('player', 'volume', value=80))
+        self._volume = int(cfg.getn('player', 'volume', default=100))
         self._last_played_folder = self._status_store.get('last_played_folder', '')
 
         self._second_swipe_action_dict = {

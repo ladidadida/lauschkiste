@@ -1,6 +1,6 @@
 """PCM output through sounddevice/PortAudio, shared by the local_audio backend and the jingle."""
 
-import array
+import audioop
 import logging
 
 import av
@@ -17,12 +17,7 @@ def scale_volume(data: bytes, volume: int) -> bytes:
     """Scale packed s16 PCM by volume (0-100). No-op at full volume (the common case)."""
     if volume >= 100:
         return data
-    factor = max(0, volume) / 100.0
-    samples = array.array('h')
-    samples.frombytes(data)
-    for i, s in enumerate(samples):
-        samples[i] = int(s * factor)
-    return samples.tobytes()
+    return audioop.mul(data, 2, max(0, volume) / 100.0)
 
 
 class AudioSink:
