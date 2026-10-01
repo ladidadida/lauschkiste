@@ -103,7 +103,13 @@ download_release_wheels() {
     log "Downloading the wheels of release ${VERSION} from ${REPO}"
     if ! release="$(curl -fsSL "$api" 2>/dev/null)"; then
         # No stable release yet: take the newest pre-release
-        [[ "$VERSION" == latest ]] && release="$(curl -fsSL "${base}?per_page=1" | python3 -c 'import json,sys; r=json.load(sys.stdin); print(json.dumps(r[0]) if r else "")')"
+        [[ "$VERSION" == latest ]] && release="$(curl -fsSL "${base}?per_page=20" | python3 -c '
+import json, sys
+for r in json.load(sys.stdin):
+    if not r.get("draft") and any(a["name"].endswith(".whl") for a in r.get("assets", [])):
+        print(json.dumps(r))
+        break
+')"
         [[ -n "${release:-}" ]] || die "no release ${VERSION} found in ${REPO}"
     fi
     python3 -c '

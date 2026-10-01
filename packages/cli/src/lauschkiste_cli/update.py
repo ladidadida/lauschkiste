@@ -76,11 +76,11 @@ def fetch_release(repo: str, tag: str = 'latest') -> dict:
     base = f'https://api.github.com/repos/{repo}/releases'
     response = requests.get(f'{base}/latest' if tag == 'latest' else f'{base}/tags/{tag}', timeout=30)
     if response.status_code == 404 and tag == 'latest':
-        response = requests.get(base, params={'per_page': 1}, timeout=30)
+        response = requests.get(base, params={'per_page': 20}, timeout=30)
         response.raise_for_status()
-        releases = response.json()
-        if releases:
-            return releases[0]
+        for release in response.json():
+            if not release.get('draft') and any(a['name'].endswith('.whl') for a in release.get('assets', [])):
+                return release
     if response.status_code == 404:
         raise UpdateError(f"no release '{tag}' in {repo}")
     response.raise_for_status()

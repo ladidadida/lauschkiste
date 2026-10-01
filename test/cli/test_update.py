@@ -115,7 +115,8 @@ def test_latest_falls_back_to_the_newest_pre_release(monkeypatch):
         calls.append(url)
         if url.endswith('/latest'):
             return NotFound()
-        return FakeResponse([{'tag_name': 'v0.1.0-alpha.1', 'assets': []}])
+        return FakeResponse([{'tag_name': 'webapp-development', 'assets': [{'name': 'webapp.tar.gz'}]},
+                             {'tag_name': 'v0.1.0-alpha.1', 'assets': [{'name': 'lauschkiste-0.1.0a1-py3-none-any.whl'}]}])
 
     monkeypatch.setattr('requests.get', get)
     assert update.fetch_release('o/r')['tag_name'] == 'v0.1.0-alpha.1'
