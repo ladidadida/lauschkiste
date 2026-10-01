@@ -4,52 +4,13 @@ The Web App sources are located in `packages/webapp`. Installations download and
 serve pre-built static assets, so Node.js and local compilation are not
 required on the target system.
 
-## CI bundles
+## How installations get the Web App
 
-Every Web App bundle is addressed by its source commit:
-`webapp-build-<first 10 commit characters>.tar.gz`. The installer accepts only
-a bundle matching the checked-out commit. It checks the source repository and,
-for forks, the upstream repository:
-
-1. The `webapp-development` prerelease for development installs.
-1. The release matching Lauschkiste version.
-
-There is no fallback to a bundle from another commit. If no exact bundle is
-available, publish or rerun the `Test Build Web App v3` workflow for that
-commit, then rerun the installation. The legacy
-`ENABLE_WEBAPP_PROD_DOWNLOAD=false` local-build mode is unsupported.
-
-Pushes to any version 3 branch retain the exact bundle as a GitHub Actions
-artifact for 14 days and publish it to the `webapp-development` prerelease.
-Branch names are unrestricted: branches created from version 3 inherit this
-workflow, while incompatible legacy branches do not contain it. The workflow
-can also be run manually for a selected branch. Pull request workflows remain
-read-only and do not publish bundles.
-
-For a fork:
-
-1. Open the fork's **Actions** tab and enable workflows. If GitHub lists
-   `Test Build Web App v3` as disabled, enable that workflow as well. If the
-   workflow is not listed, set the fork's default branch to `future3/develop`.
-1. Under **Settings > Actions > General > Workflow permissions**, select
-   **Read and write permissions** so the workflow can publish the bundle.
-1. Push the commit to a branch with any name, or select that branch when
-   starting `Test Build Web App v3` manually.
-1. Wait for the workflow to complete before running the installer.
-
-### Download a CI bundle manually
-
-Signed-in developers can download a retained workflow artifact with the GitHub
-CLI:
-
-```bash
-gh run download RUN_ID \
-  --repo OWNER/lauschkiste \
-  --name webapp-build-0123456789.tar.gz
-```
-
-GitHub Actions artifacts require authentication. The installer uses public
-release or prerelease assets.
+The Web App is built into the `lauschkiste` wheel (`ci/build_wheels.sh`, run by the release
+workflow), so package installations serve it from the package. A source checkout serves
+`packages/webapp/build`: `install.sh --source` builds it with npm if available, else takes it from
+the latest release wheel. The `Test Build Web App v3` workflow only checks the Web App (lint, unit
+and browser tests); it publishes nothing.
 
 ## Develop the Web App
 

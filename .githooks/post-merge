@@ -24,8 +24,7 @@ warn_npm_dependency() {
   echo "For workstation development, update dependencies with:"
   echo " cd packages/webapp && npm ci"
   echo ""
-  echo "On an installed Phoniebox, use the exact CI bundle for:"
-  git rev-parse HEAD
+  echo "then rebuild the web app: npm run build"
   echo "************************************************************"
   echo -e "\n"
 }
@@ -35,9 +34,9 @@ warn_webapp() {
   echo "************************************************************"
   echo "ATTENTION: Web App sources have changed since last pull!"
   echo ""
-  echo "Install the exact CI Web App bundle for:"
-  git rev-parse HEAD
-  echo "See documentation/builders/update.md for instructions."
+  echo "Rebuild it with:"
+  echo " cd packages/webapp && npm run build"
+  echo "('lauschctl update' does this for you if npm is installed)"
   echo "************************************************************"
   echo -e "\n"
 }

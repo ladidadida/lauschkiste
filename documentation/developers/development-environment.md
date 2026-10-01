@@ -23,7 +23,6 @@ We recommend to use at least a Pi 3 or Pi Zero 2 for development. While this har
 
 1. Follow the [installation preperation](../builders/installation.md#install-raspberry-pi-os-lite) steps
 1. [Install](../builders/installation.md#development) your feature/fork branch of Lauschkiste (`install.sh --source --repo <you>/lauschkiste --branch <branch>`).
-1. Wait for the commit's [exact CI bundle](./webapp.md#ci-bundles) before installing it on the Raspberry Pi.
 
 ## Develop on local machine
 
