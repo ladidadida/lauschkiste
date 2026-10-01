@@ -5,7 +5,7 @@
 The Web App automatically searches for cover art for albums and songs. If it finds cover art, it displays it; if not, it shows a placeholder image. However, you may prefer to disable cover art (e.g. in situations where device performance is low; screen space is limited; etc). There are two ways to do this:
 
 1. **Web App Settings**: Go to the "Settings" tab. Under the "General" section, find and toggle the "Show Cover Art" option.
-1. **Configuration File**: Open the `jukebox.yaml` file. Navigate to `webapp` -> `show_covers`. Set this value to `true` to enable or `false` to disable cover art display. If this option does not exist, it assumes `true` as a default.
+1. **Configuration File**: Open the `lauschkiste.yaml` file. Navigate to `webapp` -> `show_covers`. Set this value to `true` to enable or `false` to disable cover art display. If this option does not exist, it assumes `true` as a default.
 
 ## Providing Additional Cover Art
 

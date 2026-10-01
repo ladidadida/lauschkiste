@@ -1,22 +1,51 @@
-# RFID Jukebox Version 3 (aka future3)
+# Lauschkiste
 
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/MiczFlor/RPi-Jukebox-RFID/future3/develop)
+**An open-source RFID audio player for kids.** Put a card on the box and music or an audiobook
+starts. Runs on a Raspberry Pi, managed from any browser.
 
-[![Python + Docs Checks and Tests](https://github.com/MiczFlor/RPi-Jukebox-RFID/actions/workflows/pythonpackage_future3.yml/badge.svg?branch=future3%2Fdevelop)](https://github.com/MiczFlor/RPi-Jukebox-RFID/actions/workflows/pythonpackage_future3.yml) [![Coverage Status](https://coveralls.io/repos/github/MiczFlor/RPi-Jukebox-RFID/badge.svg?branch=future3/develop)](https://coveralls.io/github/MiczFlor/RPi-Jukebox-RFID?branch=future3/develop)
+[![Python checks and tests](https://github.com/ladidadida/lauschkiste/actions/workflows/pythonpackage_future3.yml/badge.svg?branch=main)](https://github.com/ladidadida/lauschkiste/actions/workflows/pythonpackage_future3.yml)
+[![Wheels and install](https://github.com/ladidadida/lauschkiste/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/ladidadida/lauschkiste/actions/workflows/wheels.yml)
 
-[![Matrix chat](https://matrix.to/img/matrix-badge.svg)](https://matrix.to/#/#phoniebox_community:gitter.im)
+*Lauschkiste* is German: *lauschen* means to listen closely, *die Kiste* is the box.
+Say it like "LOWSH-kiss-tuh".
 
-## What is this?
+## Features
 
-The exiting, new **Version 3** of the RPi Jukebox RFID. A complete re-write of the Jukebox.
+- RFID/NFC cards start albums, playlists or actions (volume, timers, shutdown, ...)
+- Web app for the library, cards, settings and playback
+- Built-in player, no extra audio daemon needed; MPD as a plugin
+- Plugins for RFID readers, Raspberry Pi hardware (buttons, encoders, LED, battery) and more
+- One-line installation, setup steps you can re-run safely, updates from the command line
 
-To find out more about the RPi Jukebox RFID
-project check out the [documentation of Version 2](<https://github.com/MiczFlor/RPi-Jukebox-RFID>)
+## Installation
 
-## Where are the Help pages?
+On a Raspberry Pi with Raspberry Pi OS (Lite):
 
-The documentation can be found [here](./documentation/README.md)
+```bash
+curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash
+```
 
-## Installation?
+Then open `http://<your-pi>:5556`. Details: [Installation](documentation/builders/installation.md).
 
-[Install Phoniebox software](documentation/builders/installation.md#install-phoniebox-software)
+```bash
+lauschctl setup --check    # what is set up on this machine
+lauschctl plugin list      # installed plugins
+lauschctl update           # newer version
+```
+
+## Documentation
+
+- [For builders](documentation/builders/README.md): installation, configuration, hardware
+- [For developers](documentation/developers/README.md): architecture, plugins, development setup
+
+## Origin
+
+Lauschkiste grew out of [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID)
+([phoniebox.de](https://phoniebox.de/)), the RFID jukebox started by Micz Flor, and keeps its
+history. Thanks to the Phoniebox community for many years of work and ideas. Lauschkiste
+reworked the core (REST API, plugin system, packaging) and goes its own way since; see
+[the roadmap](documentation/developers/roadmap-core-architecture.md).
+
+## License
+
+MIT, see [LICENSE](LICENSE).

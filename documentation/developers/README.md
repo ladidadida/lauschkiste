@@ -8,7 +8,7 @@
 
 ## Reference
 
-* [Jukebox Apps](./coreapps.md)
+* [Lauschkiste Apps](./coreapps.md)
 * [Web App](./webapp.md)
 * [Player Backends](./player-backends.md)
 * [RFID Readers](./rfid/README.md)

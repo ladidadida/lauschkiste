@@ -1,6 +1,6 @@
 # Development Environment
 
-You have 3 development options. Each option has its pros and cons. To interact with GPIO or other hardware, it's required to develop directly on a Raspberry Pi. For general development of Python code (Jukebox) or JavaScript (Web App), we recommend Docker. Developing on your local machine (Linux, Mac, Windows) works as well and requires all dependencies to be installed locally.
+You have 3 development options. Each option has its pros and cons. To interact with GPIO or other hardware, it's required to develop directly on a Raspberry Pi. For general development of Python code (Lauschkiste) or JavaScript (Web App), we recommend Docker. Developing on your local machine (Linux, Mac, Windows) works as well and requires all dependencies to be installed locally.
 
 - [Development Environment](#development-environment)
   - [Develop in Docker](#develop-in-docker)
@@ -22,12 +22,12 @@ The full setup is running on the RPi and you access files via SSH.
 We recommend to use at least a Pi 3 or Pi Zero 2 for development. While this hardware won\'t be needed in production, it comes in helpful while developing.
 
 1. Follow the [installation preperation](../builders/installation.md#install-raspberry-pi-os-lite) steps
-1. [Install](../builders/installation.md#development) your feature/fork branch of the Jukebox software. The official repository will be set as `upstream`.
+1. [Install](../builders/installation.md#development) your feature/fork branch of Lauschkiste (`install.sh --source --repo <you>/lauschkiste --branch <branch>`).
 1. Wait for the commit's [exact CI bundle](./webapp.md#ci-bundles) before installing it on the Raspberry Pi.
 
 ## Develop on local machine
 
-The jukebox also runs on any Linux machine. The Raspberry Pi specific stuff will not work of course. That is no issue depending our your development area. USB RFID Readers, however, will work. You will have to install and configure [MPD (Music Player Daemon)](https://www.musicpd.org/).
+Lauschkiste also runs on any Linux machine. The Raspberry Pi specific stuff will not work of course. That is no issue depending our your development area. USB RFID Readers, however, will work. You will have to install and configure [MPD (Music Player Daemon)](https://www.musicpd.org/).
 
 Install the runtime and development dependencies with [uv](https://docs.astral.sh/uv/) (project
 metadata and tool config live in `pyproject.toml`):
@@ -36,7 +36,7 @@ metadata and tool config live in `pyproject.toml`):
 uv sync --group dev
 ```
 
-You will have to start Jukebox core application and the WebUI separately. The MPD usually runs as a service.
+You will have to start Lauschkiste core application and the WebUI separately. The MPD usually runs as a service.
 
 ### Using WSL
 

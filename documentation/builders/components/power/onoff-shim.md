@@ -3,7 +3,7 @@
 > [!NOTE]
 > Not ported to the `raspberry_pi` plugin yet; the scripts below are from the previous version.
 
-The OnOff SHIM from Pimorino allows you to savely start and shutdown your Raspberry Pi through a button. While you can switch of your Phoniebox via an RFID Card (through an RPC command), it is difficult to switch it on again without cutting the physical power supply.
+The OnOff SHIM from Pimorino allows you to savely start and shutdown your Raspberry Pi through a button. While you can switch of your Lauschkiste via an RFID Card (through an RPC command), it is difficult to switch it on again without cutting the physical power supply.
 
 ## Installation
 

@@ -1,7 +1,7 @@
-# Phoniebox Development Runbook for Docker environments
+# Lauschkiste Development Runbook for Docker environments
 
 This document describes how to set up a local development environment
-with Docker. It is useful to develop certain parts of the Phoniebox
+with Docker. It is useful to develop certain parts of the Lauschkiste
 application that do not directly require the Raspberry Pi hardware such
 as GPIO. *Raspberry Pi OS* is based on Debian but comes with a lot of
 special packages and a unique graphical interface. It is difficult to
@@ -17,21 +17,21 @@ need to adapt some of those commands to your needs.
 1. Install required software: Docker, Compose and pulseaudio
     * Check installation guide for [Mac](#mac), [Windows](#windows) or [Linux](#linux)
 
-2. Pull the Jukebox repository:
+2. Pull Lauschkiste repository:
 
     ```bash
-    git clone https://github.com/MiczFlor/RPi-Jukebox-RFID.git
+    git clone https://github.com/ladidadida/lauschkiste.git
     ```
 
-3. Create a jukebox.yaml file
-    * Copy the `./resources/default-settings/jukebox.default.yaml` to `./shared/settings` and rename the file to `jukebox.yaml`.
+3. Create a lauschkiste.yaml file
+    * Copy the `./resources/default-settings/lauschkiste.default.yaml` to `./shared/settings` and rename the file to `lauschkiste.yaml`.
 
     ```bash
-    cp ./resources/default-settings/jukebox.default.yaml ./shared/settings/jukebox.yaml
+    cp ./resources/default-settings/lauschkiste.default.yaml ./shared/settings/lauschkiste.yaml
     ```
 
-    * Override/Merge the values from the following [Override file](../../docker/config/jukebox.overrides.yaml) in your `jukebox.yaml`.
-    * **\[Currently required\]** Update all relative paths (`../..`) in to `/home/pi/RPi-Jukebox-RFID`.
+    * Override/Merge the values from the following [Override file](../../docker/config/lauschkiste.overrides.yaml) in your `lauschkiste.yaml`.
+    * **\[Currently required\]** Update all relative paths (`../..`) in to `/home/pi/lauschkiste`.
 
 4. Change directory into the `./shared/audiofolders`
     and copy a set of MP3 files into this folder (for more fun when
@@ -79,7 +79,7 @@ Engine — the legacy `docker-compose` v1 binary is no longer required).
         docker compose -f docker/docker-compose.yml -f docker/docker-compose.mac.yml build
         ```
 
-    1. Run the entire Phoniebox environment
+    1. Run the entire Lauschkiste environment
 
         ```bash
         docker compose -f docker/docker-compose.yml -f docker/docker-compose.mac.yml up
@@ -132,7 +132,7 @@ Engine — the legacy `docker-compose` v1 binary is no longer required).
         docker compose -f docker/docker-compose.yml build
         ```
 
-    1. Run the entire Phoniebox environment
+    1. Run the entire Lauschkiste environment
 
         ```bash
         docker compose -f docker/docker-compose.yml up
@@ -166,7 +166,7 @@ Docker\'s [post-installation guide](https://docs.docker.com/engine/install/linux
         docker compose -f docker/docker-compose.yml -f docker/docker-compose.linux.yml build
         ```
 
-    1. Run the entire Phoniebox environment
+    1. Run the entire Lauschkiste environment
 
         ```bash
         docker compose -f docker/docker-compose.yml -f docker/docker-compose.linux.yml up
@@ -182,19 +182,19 @@ Docker\'s [post-installation guide](https://docs.docker.com/engine/install/linux
 
 ## Test & Develop
 
-The Dockerfile is defined to start all Phoniebox related services.
+The Dockerfile is defined to start all Lauschkiste related services.
 
 Open <http://localhost:3000> in your browser to see the Web App.
 
 While the `webapp` container does not require a reload while working on
-it (hot-reload is enabled), you will have to restart your `jukebox`
+it (hot-reload is enabled), you will have to restart your `lauschkiste`
 container whenever you make a change (in the Python code). Instead of
 stopping and starting the `docker compose` command, you can individually
-restart your `jukebox` container. Update the below path with your
+restart your `lauschkiste` container. Update the below path with your
 specific host environment.
 
 ``` bash
-docker compose -f docker/docker-compose.yml -f docker/docker-compose.[ENVIRONMENT].yml restart jukebox
+docker compose -f docker/docker-compose.yml -f docker/docker-compose.[ENVIRONMENT].yml restart lauschkiste
 ```
 
 ## Known issues
@@ -220,8 +220,8 @@ mpd      | exception: Failed to read mixer for 'Global ALSA->Pulse stream': fail
 ```
 
 ```text
-jukebox  | ERROR    - Ignoring failed package load for 'volume'
-jukebox  | ERROR    - Reason: PulseError: Failed to connect to pulseaudio server
+lauschkiste | ERROR    - Ignoring failed package load for 'volume'
+lauschkiste | ERROR    - Reason: PulseError: Failed to connect to pulseaudio server
 ```
 
 Run the helper script from the project root:
@@ -281,27 +281,27 @@ mpd | alsa_mixer: snd_mixer_handle_events() failed: Input/output error
 mpd | exception: Failed to read mixer for 'My ALSA Device': snd_mixer_handle_events() failed: Input/output error
 ```
 
-#### `jukebox` container
+#### `lauschkiste` container
 
-Many features of the Phoniebox are based on the Raspberry Pi hardware.
+Many features of the Lauschkiste are based on the Raspberry Pi hardware.
 This hardware can\'t be mocked in a virtual Docker environment. As a
 result, a few plugins like RFID or GPIO will throw errors because they
 can\'t start successfully. Docker does not expose the Raspberry Pi
 thermal sensor sysfs, so CPU temperature monitoring is disabled in the
-[Docker configuration override](../../docker/config/jukebox.overrides.yaml).
+[Docker configuration override](../../docker/config/lauschkiste.overrides.yaml).
 Existing Docker configurations that still enable temperature monitoring
 will detect the missing sensor at runtime and leave the timer disabled.
 Unless you want to develop hardware plugins, you will be able to ignore
 the remaining errors. The plugin system is built in a way that the
-Jukebox daemon will come up. If you want to develop plugins that require
+Lauschkiste daemon will come up. If you want to develop plugins that require
 hardware support, you will have to work on the hardware directly.
 
 Typical errors and following exceptions to be ignored in the Docker
-`jukebox` container are:
+`lauschkiste` container are:
 
 ``` bash
-jukebox    | 634:plugs.py           - jb.plugin            - MainThread      - ERROR    - Ignoring failed package load finalizer: 'rfid.finalize()'
-jukebox    | 635:plugs.py           - jb.plugin            - MainThread      - ERROR    - Reason: FileNotFoundError: [Errno 2] No such file or directory: '/home/pi/RPi-Jukebox-RFID/shared/settings/rfid.yaml'
+lauschkiste | 634:plugs.py           - lauschkiste.plugin            - MainThread      - ERROR    - Ignoring failed package load finalizer: 'rfid.finalize()'
+lauschkiste | 635:plugs.py           - lauschkiste.plugin            - MainThread      - ERROR    - Reason: FileNotFoundError: [Errno 2] No such file or directory: '/home/pi/lauschkiste/shared/settings/rfid.yaml'
 ...
 ```
 
@@ -310,37 +310,37 @@ jukebox    | 635:plugs.py           - jb.plugin            - MainThread      - E
 If you encounter the following error, refer to [Pulseaudio issues on Mac](#pulseaudio-issue-on-mac).
 
 ``` bash
-jukebox  | 21.12.2023 08:50:09 -  629:plugs.py           - jb.plugin            - MainThread      - ERROR    - Ignoring failed package load finalizer: 'volume.finalize()'
-jukebox  | 21.12.2023 08:50:09 -  630:plugs.py           - jb.plugin            - MainThread      - ERROR    - Reason: NameError: name 'pulse_control' is not defined
+lauschkiste | 21.12.2023 08:50:09 -  629:plugs.py           - lauschkiste.plugin            - MainThread      - ERROR    - Ignoring failed package load finalizer: 'volume.finalize()'
+lauschkiste | 21.12.2023 08:50:09 -  630:plugs.py           - lauschkiste.plugin            - MainThread      - ERROR    - Reason: NameError: name 'pulse_control' is not defined
 ```
 
 ## Appendix
 
 ### Individual Docker Image
 
-Run an individual Docker container, e.g. `jukebox`. Similarly you could
+Run an individual Docker container, e.g. `lauschkiste`. Similarly you could
 run `mpd` or `webapp`.
 
 The following command can be run on a Mac.
 
 ``` bash
-docker build -f docker/Dockerfile.lauschkiste -t jukebox .
+docker build -f docker/Dockerfile.lauschkiste -t lauschkiste .
 docker run -it --rm \
-    -v $(PWD)/packages/lauschkiste:/home/pi/RPi-Jukebox-RFID/packages/lauschkiste \
-    -v $(PWD)/shared/audiofolders:/home/pi/RPi-Jukebox-RFID/shared/audiofolders \
+    -v $(PWD)/packages/lauschkiste:/home/pi/lauschkiste/packages/lauschkiste \
+    -v $(PWD)/shared/audiofolders:/home/pi/lauschkiste/shared/audiofolders \
     -v ~/.config/pulse:/root/.config/pulse \
     -e PULSE_SERVER=tcp:host.docker.internal:4713 \
-    --name jukebox jukebox
+    --name lauschkiste lauschkiste
 ```
 
 ## Testing ``evdev`` devices in Linux
 
 To test the [event device capabilities](../builders/event-devices.md) in docker, the device needs to be made available to the container.
 
-Mount the device into the container by configuring the appropriate device in a `devices` section of the `jukebox` service in the docker compose file. For example:
+Mount the device into the container by configuring the appropriate device in a `devices` section of the `lauschkiste` service in the docker compose file. For example:
 
 ```yaml
-  jukebox:
+  lauschkiste:
     ...
     devices:
       - /dev/input/event3:/dev/input/event3

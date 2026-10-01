@@ -4,7 +4,7 @@ This component handles the synchronisation of RFID cards (audiofolder
 and card database entries).
 
 It allows to manage card database entries and audiofiles of one to many
-Phonieboxes in a central place (e.g. NAS, primary Phoniebox etc.) in the
+boxes in a central place (e.g. NAS, primary Lauschkiste etc.) in the
 network, but allows to play the audio offline once the data has synced.
 The synchronisation can be initiated with the command `sync-all` and
 optionally on every RFID scan for a particular CardID and its
@@ -15,7 +15,7 @@ dynamic activation or deactivation.
 
 ## Synchronisation
 
-The synchronisation will be FROM a server TO the Phoniebox, overriding
+The synchronisation will be FROM a server TO the Lauschkiste, overriding
 existing files. A local configuration will be lost after the
 synchronization. If you want to make the initial setup e.g. via WebUi
 copy the files and use it as a base for the server.
@@ -40,7 +40,7 @@ audiofolder / -files will remain). To remove not existing items us a
 
 ## Configuration
 
-Set the corresponding setting in `shared\settings\jukebox.yaml` to
+Set the corresponding setting in `shared\settings\lauschkiste.yaml` to
 activate this feature.
 
 ``` yaml

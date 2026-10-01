@@ -2,11 +2,12 @@
 
 ## Table of Contents
 
-* [jukebox](#jukebox)
+* [lauschkiste](#lauschkiste)
 * [lauschkiste.utils](#lauschkiste.utils)
   * [get\_config\_action](#lauschkiste.utils.get_config_action)
   * [get\_git\_state](#lauschkiste.utils.get_git_state)
 * [lauschkiste.jingle](#lauschkiste.jingle)
+  * [sound\_path](#lauschkiste.jingle.sound_path)
   * [Jingle](#lauschkiste.jingle.Jingle)
     * [play](#lauschkiste.jingle.Jingle.play)
 * [lauschkiste.library.index](#lauschkiste.library.index)
@@ -15,6 +16,10 @@
     * [relative](#lauschkiste.library.index.LibraryIndex.relative)
     * [scan](#lauschkiste.library.index.LibraryIndex.scan)
     * [albums](#lauschkiste.library.index.LibraryIndex.albums)
+* [lauschkiste.library.watch](#lauschkiste.library.watch)
+  * [Snapshot](#lauschkiste.library.watch.Snapshot)
+  * [snapshot](#lauschkiste.library.watch.snapshot)
+  * [FolderWatcher](#lauschkiste.library.watch.FolderWatcher)
 * [lauschkiste.library.files](#lauschkiste.library.files)
   * [LibraryError](#lauschkiste.library.files.LibraryError)
   * [resolve\_library\_path](#lauschkiste.library.files.resolve_library_path)
@@ -74,7 +79,7 @@
     * [set\_output](#lauschkiste.volume.Volume.set_output)
     * [toggle\_output](#lauschkiste.volume.Volume.toggle_output)
     * [fade\_out](#lauschkiste.volume.Volume.fade_out)
-* [jukebox.nv\_manager](#lauschkiste.nv_manager)
+* [lauschkiste.nv\_manager](#lauschkiste.nv_manager)
 * [lauschkiste.publishing.bus](#lauschkiste.publishing.bus)
   * [EventBus](#lauschkiste.publishing.bus.EventBus)
     * [publish](#lauschkiste.publishing.bus.EventBus.publish)
@@ -95,9 +100,13 @@
   * [parse\_subscription\_command](#lauschkiste.api.events.parse_subscription_command)
 * [lauschkiste.api](#lauschkiste.api)
 * [lauschkiste.api.fastapi\_server](#lauschkiste.api.fastapi_server)
+  * [default\_webapp\_build\_dir](#lauschkiste.api.fastapi_server.default_webapp_build_dir)
   * [BodySizeLimit](#lauschkiste.api.fastapi_server.BodySizeLimit)
   * [FastApiServer](#lauschkiste.api.fastapi_server.FastApiServer)
+    * [start\_and\_wait](#lauschkiste.api.fastapi_server.FastApiServer.start_and_wait)
 * [lauschkiste.api.webapp\_static](#lauschkiste.api.webapp_static)
+  * [HASHED\_ASSETS\_DIR](#lauschkiste.api.webapp_static.HASHED_ASSETS_DIR)
+  * [CACHE\_NEVER](#lauschkiste.api.webapp_static.CACHE_NEVER)
   * [register\_webapp\_routes](#lauschkiste.api.webapp_static.register_webapp_routes)
 * [lauschkiste.version](#lauschkiste.version)
   * [version](#lauschkiste.version.version)
@@ -125,13 +134,13 @@
     * [start\_timer](#lauschkiste.timers.Timers.start_timer)
     * [cancel](#lauschkiste.timers.Timers.cancel)
     * [toggle](#lauschkiste.timers.Timers.toggle)
-* [jukebox.audio\_output](#lauschkiste.audio_output)
+* [lauschkiste.audio\_output](#lauschkiste.audio_output)
   * [scale\_volume](#lauschkiste.audio_output.scale_volume)
   * [AudioSink](#lauschkiste.audio_output.AudioSink)
   * [PortAudioSink](#lauschkiste.audio_output.PortAudioSink)
   * [play\_file](#lauschkiste.audio_output.play_file)
-* [jukebox.core\_modules](#lauschkiste.core_modules)
-* [jukebox.input\_devices](#lauschkiste.input_devices)
+* [lauschkiste.core\_modules](#lauschkiste.core_modules)
+* [lauschkiste.input\_devices](#lauschkiste.input_devices)
   * [Evdev](#lauschkiste.input_devices.Evdev)
     * [key\_downs](#lauschkiste.input_devices.Evdev.key_downs)
   * [InputDevices](#lauschkiste.input_devices.InputDevices)
@@ -155,15 +164,24 @@
     * [close](#lauschkiste.multitimer.GenericTimerClass.close)
   * [GenericEndlessTimerClass](#lauschkiste.multitimer.GenericEndlessTimerClass)
     * [get\_state](#lauschkiste.multitimer.GenericEndlessTimerClass.get_state)
-* [jukebox.legacy\_actions](#lauschkiste.legacy_actions)
+* [lauschkiste.legacy\_actions](#lauschkiste.legacy_actions)
   * [convert](#lauschkiste.legacy_actions.convert)
   * [bind\_action](#lauschkiste.legacy_actions.bind_action)
+* [lauschkiste.paths](#lauschkiste.paths)
+  * [env\_names](#lauschkiste.paths.env_names)
+  * [getenv](#lauschkiste.paths.getenv)
+  * [home](#lauschkiste.paths.home)
+  * [set\_home](#lauschkiste.paths.set_home)
+  * [strip\_legacy\_prefix](#lauschkiste.paths.strip_legacy_prefix)
+  * [resolve](#lauschkiste.paths.resolve)
+  * [config\_file](#lauschkiste.paths.config_file)
+  * [resource](#lauschkiste.paths.resource)
 * [lauschkiste.daemon](#lauschkiste.daemon)
   * [DEFAULT\_CONFIG\_TEMPLATE](#lauschkiste.daemon.DEFAULT_CONFIG_TEMPLATE)
   * [shutdown\_signal](#lauschkiste.daemon.shutdown_signal)
   * [log\_active\_threads](#lauschkiste.daemon.log_active_threads)
-  * [JukeBox](#lauschkiste.daemon.JukeBox)
-    * [signal\_handler](#lauschkiste.daemon.JukeBox.signal_handler)
+  * [Daemon](#lauschkiste.daemon.Daemon)
+    * [signal\_handler](#lauschkiste.daemon.Daemon.signal_handler)
 * [lauschkiste.misc.simplecolors](#lauschkiste.misc.simplecolors)
   * [Colors](#lauschkiste.misc.simplecolors.Colors)
   * [resolve](#lauschkiste.misc.simplecolors.resolve)
@@ -181,6 +199,7 @@
   * [PubStream](#lauschkiste.misc.loggingext.PubStream)
   * [PubStreamHandler](#lauschkiste.misc.loggingext.PubStreamHandler)
 * [lauschkiste.contract.interfaces](#lauschkiste.contract.interfaces)
+  * [format\_signature](#lauschkiste.contract.interfaces.format_signature)
 * [lauschkiste.contract.declarations](#lauschkiste.contract.declarations)
   * [OperationSpec](#lauschkiste.contract.declarations.OperationSpec)
     * [kind](#lauschkiste.contract.declarations.OperationSpec.kind)
@@ -214,6 +233,7 @@
     * [extra\_routes](#lauschkiste.contract.module.Module.extra_routes)
   * [CoreModule](#lauschkiste.contract.module.CoreModule)
   * [Plugin](#lauschkiste.contract.module.Plugin)
+    * [extras](#lauschkiste.contract.module.Plugin.extras)
 * [lauschkiste.contract.version](#lauschkiste.contract.version)
   * [CONTRACT\_VERSION](#lauschkiste.contract.version.CONTRACT_VERSION)
 * [lauschkiste.contract](#lauschkiste.contract)
@@ -291,9 +311,9 @@
     * [replay](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.replay)
 * [lauschkiste.player.backends](#lauschkiste.player.backends)
 
-<a id="jukebox"></a>
+<a id="lauschkiste"></a>
 
-# jukebox
+# lauschkiste
 
 <a id="lauschkiste.utils"></a>
 
@@ -325,7 +345,7 @@ default otherwise.
 def get_git_state()
 ```
 
-Return git state information for the current branch
+Git state of the checkout Lauschkiste runs from, or a note that it isn't one (package install).
 
 
 <a id="lauschkiste.jingle"></a>
@@ -333,6 +353,17 @@ Return git state information for the current branch
 # lauschkiste.jingle
 
 The jingle core module: startup and shutdown sounds, and playing a sound on demand.
+
+
+<a id="lauschkiste.jingle.sound_path"></a>
+
+#### sound\_path
+
+```python
+def sound_path(value: str, key: str = 'startup_sound') -> Path
+```
+
+``default`` or ``resources/audio/<file>``: a packaged sound; anything else: a path below the home.
 
 
 <a id="lauschkiste.jingle.Jingle"></a>
@@ -355,7 +386,7 @@ Plays the startup sound when ready and the shutdown sound when stopping.
 def play(sound: str) -> None
 ```
 
-Play a sound file (path relative to the jukebox directory or absolute).
+Play a sound file (path relative to the home directory or absolute).
 
 
 <a id="lauschkiste.library.index"></a>
@@ -418,6 +449,44 @@ def albums() -> List[Dict[str, Any]]
 ```
 
 Albums grouped by album artist (falling back to the artist) and album title.
+
+
+<a id="lauschkiste.library.watch"></a>
+
+# lauschkiste.library.watch
+
+Notice changes to the music folder made outside Lauschkiste (Samba, USB stick, scp).
+
+
+<a id="lauschkiste.library.watch.Snapshot"></a>
+
+#### Snapshot
+
+Per folder: its own modification time, the sum of its files' sizes, their newest modification time
+
+
+<a id="lauschkiste.library.watch.snapshot"></a>
+
+#### snapshot
+
+```python
+def snapshot(root: str) -> Snapshot
+```
+
+State of the folder tree below ``root``; growing files count as changes too.
+
+
+<a id="lauschkiste.library.watch.FolderWatcher"></a>
+
+## FolderWatcher Objects
+
+```python
+class FolderWatcher()
+```
+
+Calls ``on_change`` once the tree below ``root()`` changed and then stayed unchanged for one
+
+interval. Polls instead of using inotify, so it works on every file system.
 
 
 <a id="lauschkiste.library.files"></a>
@@ -1079,7 +1148,7 @@ Lower the volume to zero over ``seconds``, stop playback, then restore the volum
 
 <a id="lauschkiste.nv_manager"></a>
 
-# jukebox.nv\_manager
+# lauschkiste.nv\_manager
 
 <a id="lauschkiste.publishing.bus"></a>
 
@@ -1366,6 +1435,19 @@ Handlers run on a multi-worker executor; each module guards itself (see the cont
 model), so a slow call doesn't serialize the rest of the API.
 
 
+<a id="lauschkiste.api.fastapi_server.default_webapp_build_dir"></a>
+
+#### default\_webapp\_build\_dir
+
+```python
+def default_webapp_build_dir() -> Path
+```
+
+``api.webapp_dir``, else ``$LAUSCHKISTE_WEBAPP_DIR``, else the web app shipped in the package,
+
+else the build directory of a source checkout.
+
+
 <a id="lauschkiste.api.fastapi_server.BodySizeLimit"></a>
 
 ## BodySizeLimit Objects
@@ -1388,6 +1470,17 @@ class FastApiServer(threading.Thread)
 Run the browser API on an isolated asyncio event loop.
 
 
+<a id="lauschkiste.api.fastapi_server.FastApiServer.start_and_wait"></a>
+
+#### start\_and\_wait
+
+```python
+def start_and_wait(timeout=120)
+```
+
+The timeout only catches a hung start; slow boards (Pi Zero) need well over 5 s.
+
+
 <a id="lauschkiste.api.webapp_static"></a>
 
 # lauschkiste.api.webapp\_static
@@ -1402,6 +1495,22 @@ missing"/generic-404 fallback page, and a /logs directory listing. Small enough 
 Deliberately matches the old `resources/default-settings/nginx.default` behavior rather than
 adding new behavior (e.g. no SPA deep-link fallback to index.html for unknown paths -- nginx's
 `try_files $uri $uri/ =404` didn't do that either, so neither does this).
+
+
+<a id="lauschkiste.api.webapp_static.HASHED_ASSETS_DIR"></a>
+
+#### HASHED\_ASSETS\_DIR
+
+Vite puts content-hashed files here; a new build gives them new names.
+
+
+<a id="lauschkiste.api.webapp_static.CACHE_NEVER"></a>
+
+#### CACHE\_NEVER
+
+Everything else keeps its name across versions, and packaged files all carry the same
+
+modification time, so neither heuristic caching nor revalidation would notice an update.
 
 
 <a id="lauschkiste.api.webapp_static.register_webapp_routes"></a>
@@ -1428,7 +1537,7 @@ Mount the webapp build's static assets, index.html, a generic 404, and /logs. Ca
 def version()
 ```
 
-Return the Jukebox version as a string
+Return the Lauschkiste version as a string
 
 
 <a id="lauschkiste.version.version_info"></a>
@@ -1439,7 +1548,7 @@ Return the Jukebox version as a string
 def version_info()
 ```
 
-Return the Jukebox version as a tuple of three numbers
+Return the Lauschkiste version as a tuple of three numbers
 
 If this is a development version, an identifier string will be appended after the third integer.
 
@@ -1814,7 +1923,7 @@ Start the timer if it is not running, cancel it otherwise.
 
 <a id="lauschkiste.audio_output"></a>
 
-# jukebox.audio\_output
+# lauschkiste.audio\_output
 
 PCM output through sounddevice/PortAudio, shared by the local_audio backend and the jingle.
 
@@ -1854,6 +1963,9 @@ Real output via sounddevice/PortAudio. Falls back to silent (no-op) if no device
 available -- e.g. the no-audio docker dev stack, or a CI box -- rather than raising and
 killing the daemon.
 
+The stream starts once ``PREFILL_SECONDS`` of audio are decoded, so the slow start of a track
+(opening and probing the file) doesn't empty the device buffer right away.
+
 
 <a id="lauschkiste.audio_output.play_file"></a>
 
@@ -1871,14 +1983,14 @@ Decode ``path`` and play it to the end (or until ``should_stop()``), blocking.
 
 <a id="lauschkiste.core_modules"></a>
 
-# jukebox.core\_modules
+# lauschkiste.core\_modules
 
 The core modules the daemon always starts. Order is irrelevant, ``requires`` decides.
 
 
 <a id="lauschkiste.input_devices"></a>
 
-# jukebox.input\_devices
+# lauschkiste.input\_devices
 
 The input core module: keys of evdev input devices (USB buttons, keyboards, headset buttons) run actions.
 
@@ -2150,7 +2262,7 @@ Return the periodic timer state.
 
 <a id="lauschkiste.legacy_actions"></a>
 
-# jukebox.legacy\_actions
+# lauschkiste.legacy\_actions
 
 Conversion of pre-contract commands to action ids.
 
@@ -2192,6 +2304,114 @@ def bind_action(catalog, entry, where: str,
 A callable running a configured action (either format), or None (logged) if it's invalid.
 
 
+<a id="lauschkiste.paths"></a>
+
+# lauschkiste.paths
+
+Where Lauschkiste keeps its data (``LAUSCHKISTE_HOME``) and its packaged resources.
+
+All runtime data lives below one directory::
+
+    $LAUSCHKISTE_HOME/settings/      configuration, card database, library index, status files
+    $LAUSCHKISTE_HOME/audiofolders/  the music library
+    $LAUSCHKISTE_HOME/logs/  cache/  playlists/
+
+Relative paths in the configuration are resolved against ``LAUSCHKISTE_HOME``. A leading ``shared/``,
+also behind ``../`` (the checkout layout before the home directory existed, relative to the
+repository root or to ``src/jukebox``), is dropped, so old configurations keep working.
+
+Installations from before the renaming keep working: ``JUKEBOX_*`` environment variables, a
+``jukebox`` data directory and ``settings/jukebox.yaml`` are used when the new ones don't exist.
+
+
+<a id="lauschkiste.paths.env_names"></a>
+
+#### env\_names
+
+```python
+def env_names(name: str) -> list
+```
+
+``['LAUSCHKISTE_<name>', 'JUKEBOX_<name>']``, e.g. for typer's ``envvar``.
+
+
+<a id="lauschkiste.paths.getenv"></a>
+
+#### getenv
+
+```python
+def getenv(name: str) -> Optional[str]
+```
+
+``$LAUSCHKISTE_<name>``, else the pre-renaming ``$JUKEBOX_<name>``.
+
+
+<a id="lauschkiste.paths.home"></a>
+
+#### home
+
+```python
+def home() -> Path
+```
+
+The home: set explicitly, else ``$LAUSCHKISTE_HOME``, else ``$XDG_DATA_HOME/lauschkiste``.
+
+
+<a id="lauschkiste.paths.set_home"></a>
+
+#### set\_home
+
+```python
+def set_home(path: Union[str, Path, None]) -> None
+```
+
+Use ``path`` as home (None: determine it again from the environment).
+
+
+<a id="lauschkiste.paths.strip_legacy_prefix"></a>
+
+#### strip\_legacy\_prefix
+
+```python
+def strip_legacy_prefix(path: Path) -> Path
+```
+
+``shared/x`` or ``../../shared/x`` -> ``x``; anything else unchanged.
+
+
+<a id="lauschkiste.paths.resolve"></a>
+
+#### resolve
+
+```python
+def resolve(value: Union[str, Path]) -> Path
+```
+
+A configured path: absolute or ``~`` as given, relative ones below the home.
+
+
+<a id="lauschkiste.paths.config_file"></a>
+
+#### config\_file
+
+```python
+def config_file() -> Path
+```
+
+``settings/lauschkiste.yaml``, or ``settings/jukebox.yaml`` of an older installation.
+
+
+<a id="lauschkiste.paths.resource"></a>
+
+#### resource
+
+```python
+def resource(*parts: str) -> Path
+```
+
+A file shipped with the package (default settings, sounds, service templates).
+
+
 <a id="lauschkiste.daemon"></a>
 
 # lauschkiste.daemon
@@ -2200,9 +2420,7 @@ A callable running a configured action (either format), or None (logged) if it's
 
 #### DEFAULT\_CONFIG\_TEMPLATE
 
-Template a missing configuration_file is created from on first run (see JukeBox.__init__).
-
-Repository-root-relative, same convention as every other path in this codebase.
+Template a missing configuration_file is created from on first run (see Daemon.__init__).
 
 
 <a id="lauschkiste.daemon.shutdown_signal"></a>
@@ -2232,15 +2450,15 @@ evaluate which Threads are still running (and probably shouldn't be)
 This function is registered before all the components and their dependencies are loaded
 
 
-<a id="lauschkiste.daemon.JukeBox"></a>
+<a id="lauschkiste.daemon.Daemon"></a>
 
-## JukeBox Objects
+## Daemon Objects
 
 ```python
-class JukeBox()
+class Daemon()
 ```
 
-<a id="lauschkiste.daemon.JukeBox.signal_handler"></a>
+<a id="lauschkiste.daemon.Daemon.signal_handler"></a>
 
 #### signal\_handler
 
@@ -2425,25 +2643,25 @@ boolean value read from user input
 
 We use a hierarchical Logger structure based on pythons logging module. It can be finely configured with a yaml file.
 
-The top-level logger is called 'jb' (to make it short). In any module you may simple create a child-logger at any hierarchy
-level below 'jb'. It will inherit settings from it's parent logger unless otherwise configured in the yaml file.
+The top-level logger is called 'lauschkiste'. In any module you may simple create a child-logger at any hierarchy
+level below 'lauschkiste'. It will inherit settings from it's parent logger unless otherwise configured in the yaml file.
 Hierarchy separator is the '.'. If the logger already exits, getLogger will return a reference to the same, else it will be
 created on the spot.
 
 Example: How to get logger and log away at your heart's content:
 
     >>> import logging
-    >>> logger = logging.getLogger('jb.awesome_module')
+    >>> logger = logging.getLogger('lauschkiste.awesome_module')
     >>> logger.info('Started general awesomeness aura')
 
-Example: YAML snippet, setting WARNING as default level everywhere and DEBUG for jb.awesome_module:
+Example: YAML snippet, setting WARNING as default level everywhere and DEBUG for lauschkiste.awesome_module:
 
     loggers:
-      jb:
+      lauschkiste:
         level: WARNING
         handlers: [console, debug_file_handler, error_file_handler]
         propagate: no
-      jb.awesome_module:
+      lauschkiste.awesome_module:
         level: DEBUG
 
 
@@ -2536,6 +2754,17 @@ Interface snapshots of modules and the framework contract, and the rules for ver
 A snapshot is a JSON description of everything another module or plugin can rely on. Comparing
 the stored snapshot with the current one tells whether a change is compatible (minor bump) or
 breaking (major bump). See documentation/developers/core-and-plugins.md, "Versioning".
+
+
+<a id="lauschkiste.contract.interfaces.format_signature"></a>
+
+#### format\_signature
+
+```python
+def format_signature(func) -> str
+```
+
+``str(inspect.signature(func))``, but rendering unions the same way on every Python version.
 
 
 <a id="lauschkiste.contract.declarations"></a>
@@ -2815,7 +3044,7 @@ def __init__(core_modules: Sequence[Type[CoreModule]],
 - `cfg`: the main config handler; plugins are enabled under its ``plugins`` key
 - `bus`: the event bus
 - `plugins`: installed plugins by name (default: entry points of ``lauschkiste.plugins``)
-- `strict`: raise instead of log on invalid events (default: ``$JUKEBOX_STRICT``)
+- `strict`: raise instead of log on invalid events (default: ``$LAUSCHKISTE_STRICT``)
 
 <a id="lauschkiste.contract.module"></a>
 
@@ -2874,7 +3103,7 @@ Receives a FastAPI ``APIRouter``; paths should live under ``/api/v1/<name>``.
 class CoreModule(Module)
 ```
 
-Always shipped, always running part of the jukebox.
+Always shipped, always running part of Lauschkiste.
 
 
 <a id="lauschkiste.contract.module.Plugin"></a>
@@ -2886,6 +3115,13 @@ class Plugin(Module)
 ```
 
 Separately installed, opt-in module. Declares which framework contract it targets.
+
+
+<a id="lauschkiste.contract.module.Plugin.extras"></a>
+
+#### extras
+
+Extras of the plugin's own package it needs (installed by `lauschctl plugin enable --with-extras`)
 
 
 <a id="lauschkiste.contract.version"></a>
@@ -3022,7 +3258,7 @@ Published by lauschkiste.misc.loggingext.PubStreamHandler when configured in log
 def get_info() -> SystemInfo
 ```
 
-Version, git state and start time of the jukebox.
+Version, git state and start time of Lauschkiste.
 
 
 <a id="lauschkiste.system.System.get_health"></a>
@@ -3070,7 +3306,7 @@ Speak the IP address (needs espeak).
 def restart_service() -> None
 ```
 
-Restart the jukebox systemd user service.
+Restart the Lauschkiste systemd user service.
 
 
 <a id="lauschkiste.system.System.get_log"></a>

@@ -26,7 +26,7 @@ plugins:
           pin_b: 27
           clockwise: {action: volume.change_volume, args: {step: 2}}
           counter_clockwise: {action: volume.change_volume, args: {step: -2}}
-      status_led: 25               # on while the jukebox runs
+      status_led: 25               # on while Lauschkiste runs
 ```
 
 Any [action](actions.md) can be used. With a `hold_action`, a short press runs `action` when the

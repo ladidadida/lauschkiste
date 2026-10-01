@@ -2,9 +2,9 @@
 
 ## Getting started
 
-* [Installing Phoniebox future3](./installation.md)
+* [Installing Lauschkiste](./installation.md)
 * [Update](./update.md)
-* [Configuring Phoniebox](./configuration.md)
+* [Configuring Lauschkiste](./configuration.md)
 
 ## Features
 

@@ -12,7 +12,7 @@ a bundle matching the checked-out commit. It checks the source repository and,
 for forks, the upstream repository:
 
 1. The `webapp-development` prerelease for development installs.
-1. The release matching the Jukebox version.
+1. The release matching Lauschkiste version.
 
 There is no fallback to a bundle from another commit. If no exact bundle is
 available, publish or rerun the `Test Build Web App v3` workflow for that
@@ -44,7 +44,7 @@ CLI:
 
 ```bash
 gh run download RUN_ID \
-  --repo OWNER/RPi-Jukebox-RFID \
+  --repo OWNER/lauschkiste \
   --name webapp-build-0123456789.tar.gz
 ```
 
@@ -57,13 +57,13 @@ The Web App is a React application built with Vite. Use Node.js 22 and npm 10
 or newer on a workstation or in the provided Docker environment:
 
 ```bash
-cd ~/RPi-Jukebox-RFID/packages/webapp
+cd ~/lauschkiste/packages/webapp
 npm ci
 npm run dev
 ```
 
 The development server listens on port `3000` and proxies `/api/` to
-`http://localhost:5556`. Set `API_PROXY_TARGET` to use another Jukebox API
+`http://localhost:5556`. Set `API_PROXY_TARGET` to use another Lauschkiste API
 server.
 
 ## Backend API

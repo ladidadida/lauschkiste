@@ -3,7 +3,7 @@
 **place-capable**: typically no
 
 This module covers all types of USB-based RFID input readers. If you
-plan to connect multiple USB-based RFID readers to the Jukebox, make
+plan to connect multiple USB-based RFID readers to Lauschkiste, make
 sure to connect all of them before running the [RFID reader configuration tool](../coreapps.md#RFID-Reader).
 
 > [!NOTE]

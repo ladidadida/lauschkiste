@@ -11,7 +11,7 @@ The naming conventions have changed from Version 2 to Version 3. Do use the new 
 
 # Naming conventions
 
-The Jukebox core app is written entirely in Python. Therefore, we follow the [Python Style Guide](https://www.python.org/dev/peps/pep-0008/).
+The Lauschkiste core app is written entirely in Python. Therefore, we follow the [Python Style Guide](https://www.python.org/dev/peps/pep-0008/).
 
 * **Files & folder names**
   * all **lower case**
@@ -32,7 +32,7 @@ The Jukebox core app is written entirely in Python. Therefore, we follow the [Py
 Inside the root folder or the repo, these folders are important:
 
 * `packages/lauschkiste`
-  * contains the Jukebox Core App
+  * contains the Lauschkiste core App
 * `packages/lauschkiste/src/lauschkiste`
   * contains the Python modules/packages explicitly wired up by `lauschkiste.daemon` at start-up
     (player, rfid, publishing, system -- see `documentation/developers/roadmap-core-architecture.md`)
@@ -44,7 +44,7 @@ as local, temporary scratch areas.
 
 # How to contribute
 
-Contributors have played a bigger role over time to keep Phoniebox on the edge of innovation :)
+Contributors have played a bigger role over time to keep Lauschkiste on the edge of innovation :)
 
 Our goal is to make it simple for you to contribute changes that improve functionality in your specific environment.
 To achieve this, we have a set of guidelines that we kindly request contributors to adhere to.
@@ -69,7 +69,7 @@ We eagerly await your contributions! You can review the current [feature list](d
   * Make sure you fill in the earliest version that you know has the issue
 
 The preferred way of code contributions are [pull requests (follow this link for a small howto)](https://www.digitalocean.com/community/tutorials/how-to-create-a-pull-request-on-github).
-And ideally pull requests use the "running code" of your Phoniebox.
+And ideally pull requests use the "running code" of your Lauschkiste.
 Alternatively, feel free to post tweaks, suggestions and snippets in the ["issues" section](https://github.com/MiczFlor/RPi-Jukebox-RFID/issues).
 
 ## Making Changes
@@ -119,7 +119,7 @@ If you touched *any* Python file (even if only for fixing spelling errors), run 
 [bam](https://gitlab.com/cascascade/bam)) in the top-level folder. Config lives in `pyproject.toml`.
 
 ~~~bash
-cd ~/RPi-Jukebox-RFID
+cd ~/lauschkiste
 bam lint
 ~~~
 
@@ -132,7 +132,7 @@ Tests are very few at the moment, but it cannot hurt to run them. If you have te
 them.
 
 ~~~bash
-cd ~/RPi-Jukebox-RFID/
+cd ~/lauschkiste/
 bam test
 ~~~
 
@@ -165,7 +165,7 @@ The original contributor will be notified of the revert.
 
 ## Guidelines
 
-* Phoniebox runs on Raspberry Pi OS.
+* Lauschkiste runs on Raspberry Pi OS.
 * Minimum python version is currently **Python 3.11**.
 
 ## Additional Resources

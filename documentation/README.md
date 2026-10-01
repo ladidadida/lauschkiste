@@ -1,54 +1,31 @@
-# Welcome to RPi Jukebox RFID’s documentation!
+# Lauschkiste documentation
 
-The exciting, new Version 3 of the RPi Jukebox RFID. A complete rewrite of the Jukebox code base.
-
-> [!NOTE]
-> This documentation applies to the Version 3 which is developed in the branches `future3/main` and `future3/develop`. Currently the default Version is 2.x
-
-To find out more about the RPi Jukebox RFID
-project check out the [documentation of Version 2](https://github.com/MiczFlor/RPi-Jukebox-RFID) or [www.phoniebox.de](https://phoniebox.de/).
+Lauschkiste is an RFID audio player for kids on the Raspberry Pi. It grew out of
+[Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) (see [phoniebox.de](https://phoniebox.de/)).
 
 ## Quickstart
 
-* For Builders: Building a Phoniebox
-  * [Installing Phoniebox future3](./builders/installation.md)
-  * [Builder Guides](./builders/README.md)
+* For builders: building a Lauschkiste
+  * [Installation](./builders/installation.md)
+  * [Builder guides](./builders/README.md)
   * [Update](./builders/update.md)
-* For Developers: Add features or fix bugs
-  * [Developer Guides](./developers/README.md)
-  * [Feature Status](./developers/status.md)
-  * [Known Issues](./developers/known-issues.md)
+* For developers: add features or fix bugs
+  * [Developer guides](./developers/README.md)
+  * [Feature status](./developers/status.md)
+  * [Known issues](./developers/known-issues.md)
 
-## future3
+## How it is built
 
-### Why?
+* One Python application: core modules (player, library, volume, cards, RFID, timers, ...) and
+  plugins (RFID reader drivers, Raspberry Pi hardware, MPD, ...) on a common contract
+  ([core and plugins](./developers/core-and-plugins.md))
+* A typed REST API and a WebSocket event stream (FastAPI) for the web app; card actions and
+  REST routes come from the same declarations
+* Installable as a package (`install.sh`, `lauschctl setup`, `lauschctl update`) or run from a
+  source checkout ([packaging and setup](./developers/packaging-and-setup.md))
+* Where it is heading: [roadmap](./developers/roadmap-core-architecture.md)
 
-* Better extensibility, clear architecture allowing for easier integration of new features
-* Higher performance especially on lower end hardware (it's a stretch at the moment)
-* Better maintainability
-* Better observability for debugging
+## Help wanted
 
-### How?
-
-* Jukebox core is a holistic Python3-only application
-* Avoid shell script invocation during runtime wherever possible
-* Provide an HTTP RPC and WebSocket event API to the WebUI via FastAPI -- this fork removed ZeroMQ
-  entirely (see `documentation/developers/roadmap-core-architecture.md`)
-* Implemented a Remote-Procedure-Call (RPC) call shape (`package`, `plugin`, `method`) through which
-  all user function calls pass
-* This fork wires components explicitly at start-up rather than dynamically loading plugins from
-  config; an advanced plugin system is being redesigned from scratch (see roadmap)
-
-### Where are we? Help wanted!
-
-Version 3 has reached a mature state and will soon be the default version.
-However, some features may still be missing. Please check the [Feature Status](./developers/status.md), if YOUR feature is already implemented.
-
-> [!NOTE]
-> If version 3 has all the features you need, we recommend using Version 3.
-
-If there is a feature missing, please open an issue.
-
-Features/files from version 2.X will only be copied/merged once they can be integrated and tested.
-If you don't find your v2.X contributions, it doesn't mean they are obsolete. Things will be integrated step by step.
-And, of course, you are welcome to adapt your previous contributions to this new exiting structure.
+Some features of Phoniebox 2.x are not (yet) back. Check the [feature status](./developers/status.md)
+and open an issue if yours is missing.

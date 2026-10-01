@@ -4,7 +4,7 @@ The setup works for the most common set of HiFiBerry boards but also other "DAC"
 
 ## Automatic setup
 
-`jukebox setup raspi` asks for the sound card: answer with the board identifier, e.g.
+`lauschctl setup raspi` asks for the sound card: answer with the board identifier, e.g.
 `hifiberry-dac` (the question lists all of them). It adds the board's `dtoverlay` to
 `/boot/firmware/config.txt` (replacing another HiFiBerry overlay), disables the on-chip audio and
 keeps a backup of the previous file. Reboot afterwards.

@@ -6,7 +6,7 @@
 
 ## Terms
 
-- **Core** - always shipped as part of the `jukebox` package, always running, not switchable.
+- **Core** - always shipped as part of the `lauschkiste` package, always running, not switchable.
   Everything a jukebox needs to be a jukebox.
 - **Plugin** - a separately installable package. Either *bundled* (lives in this repo, installed
   alongside the core) or *external* (installed from elsewhere via pip/uv). Only active when listed
@@ -19,10 +19,10 @@ They differ only in how they are shipped, loaded and enabled.
 
 ## What belongs in the core
 
-**Core is what makes sense on every machine the jukebox runs on: a regular Linux PC, a Raspberry
+**Core is what makes sense on every machine Lauschkiste runs on: a regular Linux PC, a Raspberry
 Pi, a container.** Platform- or hardware-specific functionality and integrations with external
 systems are plugins. Shutting down is the typical example: on a Pi-based box it is essential, on a
-desktop PC nobody wants the jukebox to power the machine off, so it lives in the `raspberry-pi`
+desktop PC nobody wants Lauschkiste to power the machine off, so it lives in the `raspberry-pi`
 plugin.
 
 ## Split
@@ -33,7 +33,7 @@ plugin.
 | Library (index, metadata, cover art, see below) | Player backend `mpd` |
 | Card database and card action dispatch | RFID reader drivers (one plugin per driver) |
 | Settings / system | MQTT |
-| System info (IP address, disk usage, CPU temperature, restart the jukebox service) | Card synchronisation |
+| System info (IP address, disk usage, CPU temperature, restart Lauschkiste service) | Card synchronisation |
 | Volume (incl. output selection, e.g. speakers vs. Bluetooth) | |
 | Timers | |
 | Jingle (startup/shutdown sound) | |
@@ -47,7 +47,7 @@ its config section:
 - battery monitor (I2C battery HATs, one driver per HAT)
 - health: throttling/undervoltage (`vcgencmd`), HDMI power-down, WLAN power saving
 
-**Autohotspot** is network configuration, not runtime functionality, and moves to `jukebox setup`.
+**Autohotspot** is network configuration, not runtime functionality, and moves to `lauschctl setup`.
 
 ### Library
 
@@ -234,7 +234,7 @@ Passed to `start()`; the only way a module reaches the rest of the system:
 
 ## Loading and enabling
 
-**Core modules** are listed in code in the `jukebox` package. They always start; there is no
+**Core modules** are listed in code in the `lauschkiste` package. They always start; there is no
 switch.
 
 **Plugins** advertise themselves under the entry-point group `lauschkiste.plugins`:
@@ -243,13 +243,13 @@ switch.
 # packages/plugins/mqtt/pyproject.toml
 [project]
 name = "lauschkiste-plugin-mqtt"
-dependencies = ["jukebox", "paho-mqtt"]
+dependencies = ["lauschkiste", "paho-mqtt"]
 
 [project.entry-points."lauschkiste.plugins"]
 mqtt = "lauschkiste_plugin_mqtt:Mqtt"
 ```
 
-and are enabled by listing them in `jukebox.yaml`; their config lives under the same key:
+and are enabled by listing them in `lauschkiste.yaml`; their config lives under the same key:
 
 ```yaml
 plugins:
@@ -269,13 +269,13 @@ plugins:
 - Bundled plugins live under `packages/plugins/<name>/` as uv workspace members. Their
   dependencies move out of the core `pyproject.toml` extras into each plugin package. The installer
   installs the bundled plugins and pre-fills `plugins:` for the ones the user selected.
-- `jukebox plugin list|enable|disable|install` manages this from the command line. A plugin whose
+- `lauschctl plugin list|enable|disable|install` manages this from the command line. A plugin whose
   dependencies are optional extras of its package names them in `extras` (e.g.
-  `extras = ('gpio',)`); `jukebox plugin enable <name> --with-extras` installs them.
+  `extras = ('gpio',)`); `lauschctl plugin enable <name> --with-extras` installs them.
 
 ## Versioning and compatibility
 
-A plugin depends on two things, and both are versioned separately from the `jukebox` package
+A plugin depends on two things, and both are versioned separately from the `lauschkiste` package
 version:
 
 - **Framework contract** - `lauschkiste.contract.CONTRACT_VERSION`: the `Plugin` base class,
@@ -302,7 +302,7 @@ class Mqtt(Plugin):
   action/query arguments and results, event models, extension-point protocols) and the framework
   contract into snapshot files in the repo. A change to a snapshot without the matching version
   bump fails the build: breaking change without major bump, or addition without minor bump.
-- The plugin's `jukebox` package dependency stays a coarse lower bound only.
+- The plugin's `lauschkiste` package dependency stays a coarse lower bound only.
 
 ## Lifecycle and ordering
 
@@ -358,7 +358,7 @@ is about to play) follow the same pattern and are added when a plugin needs them
 ## Card actions
 
 New storage format in `cards.yaml` (also used for `card_removal_action` and `second_swipe_action`
-in `jukebox.yaml`):
+in `lauschkiste.yaml`):
 
 ```yaml
 '0001234567':
@@ -442,7 +442,7 @@ original is kept as `cards.yaml.bak-<timestamp>`:
    settings are still read. The installer enables the plugin and installs the `gpio` extra; the web
    app shows shutdown/reboot only when `raspberry_pi.shutdown` is available. Not carried over: the
    ADS1015 battery driver, the OnOff SHIM script, the idle-shutdown timer and the old `gpio.yaml`
-   format. Autohotspot moves to the installer/`jukebox setup` track instead.
+   format. Autohotspot moves to the installer/`lauschctl setup` track instead.
 
 Each step leaves the daemon runnable and the test suites green.
 

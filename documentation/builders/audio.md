@@ -2,7 +2,7 @@
 
 ## Configuration
 
-The Jukebox supports 2 audio outputs, primary and secondary. The **primary output** is the default output and must
+Lauschkiste supports 2 audio outputs, primary and secondary. The **primary output** is the default output and must
 be available after system boot. This will typically be your sound card or the Pi's built-in headphone output.
 
 The **secondary output** is an optional alternative output where the audio stream can be routed to.
@@ -10,7 +10,7 @@ Stream transfer happens on user input or automatically on the connection of an a
 This is mainly targeted at Bluetooth Headsets/Speakers.
 
 Audio outputs run via PipeWire (with `wireplumber` as the session manager) and the basic configuration should be
-easy. There is a [configuration tool](../developers/coreapps.md#Audio), to setup the configuration for the Jukebox
+easy. There is a [configuration tool](../developers/coreapps.md#Audio), to setup the configuration for Lauschkiste
 Core App.
 
 ### To set up the audio
@@ -91,10 +91,10 @@ The sink name usually looks like this: `bluez_output.C4_FB_20_63_CO_FE.1`.
 Run through the steps above to check whether the output is working or not.
 If it does not work immediately, turn your headset off and on to force a reconnect.
 
-Rerun the config tool to register the Bluetooth device with the Jukebox core app as its secondary audio output.
+Rerun the config tool to register the Bluetooth device with the Lauschkiste core app as its secondary audio output.
 
 ## Additional options
 
-For other audio configuration options, please look at the `jukebox.yaml` for now.
+For other audio configuration options, please look at the `lauschkiste.yaml` for now.
 
-Directly edit `jukebox.yaml` following the steps: [Best practice procedure](configuration.md#best-practice-procedure).
+Directly edit `lauschkiste.yaml` following the steps: [Best practice procedure](configuration.md#best-practice-procedure).

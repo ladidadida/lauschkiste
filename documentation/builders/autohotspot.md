@@ -1,20 +1,20 @@
 # Auto-Hotspot
 
-The Auto-Hotspot function enables the Jukebox to switch its connection between a known WiFi network and an automatically generated hotspot, allowing access via SSH or Web App.
+The Auto-Hotspot function enables Lauschkiste to switch its connection between a known WiFi network and an automatically generated hotspot, allowing access via SSH or Web App.
 
 > [!IMPORTANT]
 > Please configure the WiFi connection to your home access point before enabling this feature!
 
 ## How to connect
 
-When the Jukebox cannot connect to a known WiFi, it will automatically create a hotspot.
+When Lauschkiste cannot connect to a known WiFi, it will automatically create a hotspot.
 You can connect to this hotspot using the password set during installation.
 Afterwards, you can access the Web App or connect via SSH as before, using the IP from the configuration.
 
 The default configuration is
 
 ``` text
-* SSID              : Phoniebox_Hotspot_<hostname>
+* SSID              : Lauschkiste_<hostname>
 * Password          : PlayItLoud!
 * WiFi Country Code : DE
 * IP                : 10.0.0.1
@@ -27,7 +27,7 @@ Auto-Hotspot can be enabled or disabled using the Web App or RPC Commands.
 Disabling the Auto-Hotspot will run the WiFi check again and maintain the last connection state until reboot.
 
 > [!IMPORTANT]
-> If you disable this feature, you will lose access to the Jukebox if you are not near a known WiFi after reboot!
+> If you disable this feature, you will lose access to Lauschkiste if you are not near a known WiFi after reboot!
 
 ## Troubleshooting
 
@@ -45,7 +45,7 @@ and logs
 sudo journalctl -u autohotspot.service -n 50
 ```
 
-### Jukebox is not connecting to the known WiFi
+### Lauschkiste is not connecting to the known WiFi
 
 The script will fall back to the hotspot, ensuring you still have some type of connection.
 

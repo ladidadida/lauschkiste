@@ -5,7 +5,7 @@
 This fork removed ZeroMQ entirely (RPC, pub/sub, and the C CLI client all moved to FastAPI/HTTP --
 see `documentation/developers/roadmap-core-architecture.md`). An installation upgraded from before
 that change may still have `libzmq5`/`python3-zmq` (apt) installed, or -- from even older releases
--- the project's custom libzmq archive under `/usr/local`. None of it is needed by the Jukebox
+-- the project's custom libzmq archive under `/usr/local`. None of it is needed by Lauschkiste
 anymore. First check what's actually installed:
 
 ```bash
@@ -14,7 +14,7 @@ dpkg -l libzmq5 python3-zmq 2>/dev/null
 ```
 
 If a custom `/usr/local` archive is present (only if it's known to have been installed by
-Phoniebox -- do not remove unrelated files from `/usr/local`):
+Lauschkiste -- do not remove unrelated files from `/usr/local`):
 
 ```bash
 sudo rm -f /usr/local/lib/libzmq.so*
@@ -29,7 +29,7 @@ nothing else on the system needs them.
 
 ## Configuration
 
-In `jukebox.yaml` (and all other config files):
-Always use relative path from the repository root (the Jukebox daemon's working directory), but do not use relative paths with `~/`.
+In `lauschkiste.yaml` (and all other config files):
+Always use relative path from the repository root (Lauschkiste daemon's working directory), but do not use relative paths with `~/`.
 
 **Sole** exception is in `playermpd.mpd_conf`.

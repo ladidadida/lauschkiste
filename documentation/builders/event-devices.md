@@ -22,5 +22,5 @@ Key names are evdev names (`KEY_*`, `BTN_*`). To find a device's name and its ke
 The connected devices are listed at `GET /api/v1/input/devices`; every press of a mapped key is
 published as `input.key_pressed`.
 
-The user running the jukebox needs read access to `/dev/input/event*` (usually membership in the
+The user running Lauschkiste needs read access to `/dev/input/event*` (usually membership in the
 `input` group).

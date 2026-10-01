@@ -1,10 +1,10 @@
-# Projektübersicht: RPi-Jukebox-RFID (future3)
+# Projektübersicht: Lauschkiste
 
 Stand: 2026-07-18, Branch `future3/develop`
 
 ## Was ist das Projekt?
 
-Phoniebox / RPi-Jukebox-RFID ist eine RFID-gesteuerte Musikbox für den Raspberry Pi: Man hält
+Lauschkiste (hervorgegangen aus Phoniebox / RPi-Jukebox-RFID) ist eine RFID-gesteuerte Musikbox für den Raspberry Pi: Man hält
 eine RFID-Karte an ein Lesegerät, die Box spielt eine dazu hinterlegte Playlist/ein Album ab —
 ganz ohne Bildschirm oder App-Zwang (die Zielgruppe sind oft Kinder). `future3` ist ein
 kompletter Neuentwurf ("re-write") der älteren Version 2, mit neuen Namenskonventionen und
@@ -19,7 +19,7 @@ Architektur. Es existiert parallel weiter die stabile Version 2 im `main`-Zweig 
 ├── uv.lock                     Gepinnte Dependency-Versionen (uv)
 ├── bam.yaml                    Task-Runner-Config (bam)
 ├── packages/                   uv-Workspace-Member
-│   ├── jukebox/                Python-Kernanwendung ("Jukebox Core"), läuft als Daemon auf dem Pi
+│   ├── lauschkiste/            Python-Kernanwendung ("Lauschkiste core"), läuft als Daemon auf dem Pi
 │   │   ├── pyproject.toml      Echtes [project] (package=true), Runtime-Dependencies, hatchling
 │   │   └── src/lauschkiste/        Das installierbare Package: Component-Registry, FastAPI-API-Bridge
 │   │                           (api/: HTTP + WebSocket + Webapp-Static-Files + /logs, ersetzt
@@ -30,18 +30,18 @@ Architektur. Es existiert parallel weiter die stabile Version 2 im `main`-Zweig 
 │   │                           frühere Komponenten (gpio, mqtt, volume, timers, battery_monitor,
 │   │                           controls, jingle, hostif, synchronisation) wurden entfernt, kommen
 │   │                           später neu gestaltet zurück. Kein ZeroMQ mehr im ganzen Projekt.
-│   ├── cli/                    Jukebox-CLI (lauschkiste-cli): `jukebox run` (Core starten), `home`,
+│   ├── cli/                    Lauschkiste-CLI (lauschkiste-cli): `lauschkiste` (Core starten), `home`,
 │   │                           `plugin ...`, `setup ...` (Maschinen-Setup), `update`,
 │   │                           `debug sniff` (Publishing-Bus-Sniffer).
 │   └── webapp/                 React-Frontend (Touch-/Web-UI), kommuniziert per HTTP/WebSocket mit
 │                                der FastAPI-Bridge (`/api/v1/*`). Kein uv-Workspace-Member
 │                                (npm/Vite-Projekt), liegt aber strukturell neben den Python-Packages.
-├── install.sh                  Installer (curl | bash): Basis-Pakete, uv, Jukebox, `jukebox setup`
+├── install.sh                  Installer (curl | bash): Basis-Pakete, uv, Lauschkiste, `lauschctl setup`
 ├── docker/                     Dockerfiles + docker-compose für eine Nicht-Pi-Entwicklungsumgebung
 ├── resources/                  Default-Settings, systemd-Services, Beispiel-Audio, Autohotspot-Configs
 ├── shared/                     Laufzeitdaten: audiofolders, playlists, settings, logs
 │                                (wird in Docker gemountet, enthält die vom Nutzer editierbare
-│                                 jukebox.yaml)
+│                                 lauschkiste.yaml)
 ├── documentation/               Projektdokumentation
 │   ├── builders/                 Für Endanwender/Installateure (Installation, Konfiguration, GPIO, RFID, …)
 │   └── developers/                Für Mitwirkende (Python, Webapp, Docker, RPC, Architekturkonzepte)
@@ -64,10 +64,10 @@ Punkte. Kurzfassung:
    mehr davor). RFID-Kartenaktionen laufen direkt in-process über die Registry. ZeroMQ ist komplett
    raus: sowohl das Python-RPC-CLI (`run_rpc_tool.py`) als auch der C-Client
    (`src/cli_client/pbc.c`) und der ZMQ-REP-Server wurden entfernt. Es gibt inzwischen eine erste
-   CLI-Iteration (`packages/cli`, `jukebox run`/`jukebox debug sniff`), aber ein dediziertes
+   CLI-Iteration (`packages/cli`, `lauschkiste`/`lauschctl debug sniff`), aber ein dediziertes
    RPC-Tool auf Basis des FastAPI-Endpoints ist noch nicht entworfen.
 3. **In-Process Pub/Sub-Bus** (`lauschkiste.publishing`, `EventBus`) — Status/Events, thread-sicher,
-   kein ZeroMQ mehr. Die Webapp und `jukebox debug sniff` abonnieren über die
+   kein ZeroMQ mehr. Die Webapp und `lauschctl debug sniff` abonnieren über die
    FastAPI-WebSocket-Bridge.
 
 **Player-Backend austauschbar** (erste Stufe des "Advanced plugin system"-Tracks, siehe
@@ -121,7 +121,7 @@ Python-Version: **3.11**.
   Audio-Routing.
 - **Docker & Docker Compose** für eine Pi-unabhängige Entwicklungsumgebung (separate Container für
   Core, MPD, Webapp).
-- **systemd** für die Diensteinrichtung (User-Unit, von `jukebox setup service` erzeugt).
+- **systemd** für die Diensteinrichtung (User-Unit, von `lauschctl setup service` erzeugt).
 - **MQTT** (paho-mqtt) für optionale Smart-Home-/Automatisierungs-Integration.
 - **GitHub Actions** für CI (Python-Tests, Doku-Checks, Installationstests unter Debian/Docker).
 - **Coveralls** für Testabdeckung.
@@ -136,14 +136,14 @@ Es gibt zwei grundsätzliche Wege:
    beim Flashen konfigurieren).
 2. Auf dem Pi einloggen und `install.sh` ausführen (Details in
    `documentation/builders/installation.md`):
-   `curl -fsSL https://raw.githubusercontent.com/ladidadida/RPi-Jukebox-RFID/main/install.sh | bash`.
-   Das Skript installiert Basis-Pakete und uv, dann die Jukebox (Release-Wheels per
-   `uv tool install`, oder mit `--source` als Git-Checkout) und startet `jukebox setup`. Die
+   `curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash`.
+   Das Skript installiert Basis-Pakete und uv, dann die Lauschkiste (Release-Wheels per
+   `uv tool install`, oder mit `--source` als Git-Checkout) und startet `lauschctl setup`. Die
    Setup-Schritte (`packages/cli/src/lauschkiste_cli/setup/`) richten u. a. System-Pakete, den
    systemd-User-Service, MPD, Samba, Kiosk-Modus, Autohotspot, RFID-Reader und
    Boot-Optimierung ein; jeder Schritt prüft zuerst und ändert nur, was fehlt.
-3. Alle Daten liegen in `JUKEBOX_HOME` (auf dem Pi `~/jukebox`): `settings/jukebox.yaml`
-   (Vorlage: `packages/lauschkiste/src/lauschkiste/resources/default-settings/jukebox.default.yaml`),
+3. Alle Daten liegen in `LAUSCHKISTE_HOME` (auf dem Pi `~/lauschkiste`): `settings/lauschkiste.yaml`
+   (Vorlage: `packages/lauschkiste/src/lauschkiste/resources/default-settings/lauschkiste.default.yaml`),
    Musik in `audiofolders/`.
 
 ### 2. Lokale Entwicklungsumgebung (Docker, ohne Pi-Hardware)
@@ -151,9 +151,9 @@ Es gibt zwei grundsätzliche Wege:
 Für Beiträge, die keine GPIO-/RFID-Hardware benötigen — siehe `documentation/developers/docker.md`:
 
 ```bash
-git clone https://github.com/MiczFlor/RPi-Jukebox-RFID.git
-cp ./resources/default-settings/jukebox.default.yaml ./shared/settings/jukebox.yaml
-# jukebox.yaml mit docker/config/jukebox.overrides.yaml zusammenführen
+git clone https://github.com/ladidadida/lauschkiste.git
+cp ./resources/default-settings/lauschkiste.default.yaml ./shared/settings/lauschkiste.yaml
+# lauschkiste.yaml mit docker/config/lauschkiste.overrides.yaml zusammenführen
 # MP3-Testdateien nach ./shared/audiofolders kopieren
 docker-compose -f docker/docker-compose.yml up   # ggf. plattformspezifische Compose-Datei (mac/linux)
 ```
@@ -166,7 +166,7 @@ Docker, Compose und (host-seitig) PulseAudio müssen vorher installiert sein; je
 ```bash
 uv sync --group dev
 # ggf. vorher: sudo apt install libasound2-dev
-uv run jukebox run
+uv run lauschkiste
 ```
 
 Die Webapp wird separat mit npm gebaut/gestartet (`cd packages/webapp && npm start`).
@@ -178,7 +178,7 @@ Task-Runner mit Caching). Die alten `run_*.sh`-Wrapper-Skripte gibt es nicht meh
 
 ```bash
 uv sync --group dev              # .venv anlegen/aktualisieren (Runtime + Dev-Dependencies)
-uv run jukebox run   # Jukebox Core starten
+uv run lauschkiste   # Lauschkiste core starten
 bam lint                         # ruff check (gecached)
 bam format                       # ruff format (Auto-Fix)
 bam test                         # pytest, schreibt .reports/junit.xml
@@ -186,7 +186,7 @@ bam typecheck                    # pyright (aktuell nur informativ, siehe Roadma
 bam docs                         # API-Doku neu generieren (pydoc-markdown)
 bam markdownlint                 # Markdown-Doku linten
 bam ci-checks                    # alles, was auch CI prüft, in einem Kommando
-uv run jukebox debug sniff       # alle Publish-Nachrichten mitlesen
+uv run lauschctl debug sniff       # alle Publish-Nachrichten mitlesen
 ```
 
 ## Sonstiges Erwähnenswertes

@@ -1,6 +1,6 @@
 # Feature Status
 
-**This is where we are in a nutshell:** Playing music from local folders via RFID trigger. We also built a new WebUI to control the Jukebox from a browser.
+**This is where we are in a nutshell:** Playing music from local folders via RFID trigger. We also built a new WebUI to control Lauschkiste from a browser.
 
 There are a few things that are specifically not integrated yet: playing streams, podcasts, or Spotify.
 
@@ -14,7 +14,7 @@ Topics marked _in progress_ are already in the process of implementation by comm
 
 - [Feature Status](#feature-status)
   - [Table of Contents](#table-of-contents)
-  - [Jukebox Core App](#jukebox-core-app)
+  - [Lauschkiste core](#lauschkiste-core)
     - [Base](#base)
     - [Via RPC](#via-rpc)
     - [Config handler](#config-handler)
@@ -35,7 +35,7 @@ Topics marked _in progress_ are already in the process of implementation by comm
   - [Installation Procedure](#installation-procedure)
   - [Documentation](#documentation)
 
-## Jukebox Core App
+## Lauschkiste core
 
 ### Base
 
@@ -64,7 +64,7 @@ Topics marked _in progress_ are already in the process of implementation by comm
 - [ ] Disable Console Stream Handler (or set to warning) when running as a service
 - [x] Log & publish start time
 - [ ] Method to change configuration through WebUI
-  - The difficulty lies in bringing the running Jukebox to accept the changes. There probably won't be a catch-all solution but rather a custom implementation for a select few features
+  - The difficulty lies in bringing the running Lauschkiste to accept the changes. There probably won't be a catch-all solution but rather a custom implementation for a select few features
 - [x] Strategy to post config changes via PubSub: Must be taken care of by the setter function modifying the property
 
 ### Via RPC
@@ -241,7 +241,7 @@ Topics marked _in progress_ are already in the process of implementation by comm
 ## Documentation
 
 - [x] Sphinx / Restructured Text tool flow
-- [ ] What is the Phoniebox
+- [ ] What is the Lauschkiste
 - [x] Artifacts: Generate artifacts (on command line switch only) for
   - [x] loaded plugins and rpc command aliases (to sphinx and shared/artifacts)
   - [x] rpc command aliases (to sphinx and shared/artifacts)

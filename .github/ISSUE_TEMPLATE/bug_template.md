@@ -46,16 +46,13 @@ Otherwise the output of `cat /etc/os-release`
 ### Branch / Release
 
 <!--
-i.e. `master`
-
-the following command will help with that
-`cd ~/RPi-Jukebox-RFID/ && git status | head -2`
+i.e. the version shown in the web app under Settings, or `lauschctl update --check`
 -->
 
 ### Installscript
 
 <!--
-i.e. `scripts/installscripts/buster-install-default.sh`
+i.e. `install.sh` (package) or `install.sh --source`
 -->
 
 ## Hardware
@@ -87,5 +84,5 @@ Can be found in the output of `sudo lsusb -v` when it is connected via USB.
 ### Other notable hardware
 
 <!--
-i.e. post your GPIO pin settings from `RPi-Jukebox-RFID/settings/gpio_settings.ini`:
+i.e. post the relevant part of `settings/lauschkiste.yaml` (see `lauschctl home`):
 -->

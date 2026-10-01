@@ -10,7 +10,7 @@ Debugging your setup runs in several steps
 
 1. Check that [audio output works](audio.md#checking-system-sound-output)
 2. Check that [MPD works](system.md#music-player-daemon-mpd)
-3. Checking log messages from the Jukebox Core App as described below
+3. Checking log messages from the Lauschkiste core App as described below
 
 ## The short answer
 
@@ -34,7 +34,7 @@ http://ip.of.your.box:5556/logs
 
 ## The long answer: A few more details
 
-If started without parameters, the Jukebox checks for the existence of `shared/settings/logger.yaml`
+If started without parameters, Lauschkiste checks for the existence of `shared/settings/logger.yaml`
 and if present, uses that configuration for logging. This file is created by the installation process.
 The default configuration file is also provided in `resources/default-settings/logger.default.yaml`.
 We use Python's logging module to provide the debug messages which is configured through this file.
@@ -60,29 +60,29 @@ For debugging, it is usually very helpful to observe the apps output directly
 on the console log.
 
 ```bash
-# Make sure the Jukebox service is stopped:
-$ systemctl --user stop jukebox-daemon
+# Make sure Lauschkiste service is stopped:
+$ systemctl --user stop lauschkiste
 
-# Start the Jukebox in debug mode:
+# Start Lauschkiste in debug mode:
 # with default logger:
-$ uv run jukebox run
+$ uv run lauschkiste
 # or with custom logger configuration:
-$ uv run jukebox run --logger path/to/custom/logger.yaml
+$ uv run lauschkiste --logger path/to/custom/logger.yaml
 ```
 
 ### Fallback configuration
 
-It is possible to start the Jukebox with a catch-all debug enabler with a logger.yaml.
+It is possible to start Lauschkiste with a catch-all debug enabler with a logger.yaml.
 Attention: This only emits messages to the console and does not write to the log files!
 This is more a fallback features:
 
 ```bash
-$ uv run jukebox run -vv
+$ uv run lauschkiste -vv
 ```
 
 ### Extreme cases
 
-Sometimes, the Jukebox app might crash with an exception and stack trace which is
+Sometimes, Lauschkiste app might crash with an exception and stack trace which is
 neither logged, nor caught and handled.
 
 If run locally from your console, you will see it immediately. No worries!
@@ -93,5 +93,5 @@ gone pear-shaped. Services are restarted automatically when they fail.
 Things are just not behaving as expected? Time to check the system logs:
 
 ```bash
-$ journalctl --user -b -u jukebox-daemon
+$ journalctl --user -b -u lauschkiste
 ```

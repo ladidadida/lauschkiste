@@ -19,9 +19,9 @@ behavior can be deactivated for individual cards.
 ### Place-capable
 
 Some readers give a single event signal when the card is placed on
-the reader. This is sufficient to build a fully-featured Jukebox.
+the reader. This is sufficient to build a fully-featured Lauschkiste.
 Other readers give a continuous signal. They allow both card
-placements and card removals. This can be used to play the Jukebox
+placements and card removals. This can be used to play Lauschkiste
 when a card is placed and to pause it when it's removed.
 
 Generally, **not** all [USB-based RFID readers](genericusb.md) are place-capable.

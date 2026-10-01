@@ -6,12 +6,12 @@ The system consists of
 
 1. [Music Player Daemon (MPD)](system.md#music-player-daemon-mpd) which we use for all music playback (local, stream, podcast, ...)
 2. [Audio (PipeWire)](system.md#audio-pipewire) for flexible audio output support
-3. [Jukebox Core Service](system.md#jukebox-core-service) for controlling MPD and the audio outputs and providing all the features
+3. [Lauschkiste service](system.md#lauschkiste-service) for controlling MPD and the audio outputs and providing all the features
 4. [Web App](system.md#web-app-ui) as User Interface (UI) for a web browser
 5. A set of [Configuration Tools](../developers/coreapps.md#configuration-tools) and a set of [Developer Tools](../developers/coreapps.md#developer-tools)
 
 > [!NOTE]
-> The default install puts everything into the users home folder `~/RPi-Jukebox-RFID`.
+> The default install puts everything into the users home folder `~/lauschkiste`.
 > Another folder might work, but is certainly not tested.
 
 ## Music Player Daemon (MPD)
@@ -56,7 +56,7 @@ The `systemd` service file is located at the default location for user services:
 
 On Pi OS Trixie the audio stack is **PipeWire** with `wireplumber` as its
 session manager and `pipewire-pulse` providing the PulseAudio-protocol socket
-that the Jukebox client (`pulsectl`) and MPD's `output { type "pulse" }`
+that Lauschkiste client (`pulsectl`) and MPD's `output { type "pulse" }`
 connect to. Native CLI tools are `wpctl` (sink management) and
 `pw-play` / `pw-cat` (playback).
 
@@ -64,7 +64,7 @@ We use this stack for a few reasons:
 
 * It is the default audio stack on current Pi OS; no extra setup is required.
 * It is easier to support a wide variety of audio hardware. Over the years,
-  many builders have tried different ways to set up audio on their Jukebox;
+  many builders have tried different ways to set up audio on their Lauschkiste;
   PipeWire is currently the most reliable and compatible option.
 * We can cleanly control and switch between different audio outputs
   independently of the playback software.
@@ -73,43 +73,43 @@ We use this stack for a few reasons:
 
 PipeWire reads its configuration from `/etc/pipewire/` and `~/.config/pipewire/`;
 `wireplumber` adds its own drop-ins under `/etc/wireplumber/` and
-`~/.config/wireplumber/`. The Jukebox installer does not ship custom config —
+`~/.config/wireplumber/`. Lauschkiste installer does not ship custom config —
 the distro defaults are sufficient.
 
 Service control and service configuration file location is identical to MPD.
 
-## Jukebox Core Service
+## Lauschkiste Service
 
-The [Jukebox Core Service](../developers/coreapps.md#Jukebox-Core) runs as a *user-local* service with the name `jukebox-daemon`.
+The [Lauschkiste service](../developers/coreapps.md#lauschkiste-core) runs as a *user-local* service with the name `lauschkiste`.
 Similar to MPD, it's important that it runs as a user service so it can talk to the audio server through the user session.
 
 The service can be controlled with the `systemctl`-command by adding the parameter `--user`
 
 ```bash
-$ systemctl --user start jukebox-daemon
-$ systemctl --user stop jukebox-daemon
+$ systemctl --user start lauschkiste
+$ systemctl --user stop lauschkiste
 ```
 
 Check out the service with
 
 ```bash
-$ systemctl --user status jukebox-daemon
+$ systemctl --user status lauschkiste
 # and if you need to get the full log output
-$ journalctl --user -b -u jukebox-daemon
+$ journalctl --user -b -u lauschkiste
 ```
 
-The `systemd` service file is located at the default location for user services:
+The `systemd` service file is written by `lauschctl setup service` to the user's own unit directory:
 
 ```text
-/usr/lib/systemd/user/jukebox-daemon.service
+~/.config/systemd/user/lauschkiste.service
 ```
 
 Starting and stopping the service can be useful for debugging or configuration checks.
 
 ## Web App (UI)
 
-The [Web App](../developers/webapp.md) is served directly by the Jukebox Core (no separate nginx
-process): `jukebox-daemon` serves the static build alongside `/api/*`. The build is located at
+The [Web App](../developers/webapp.md) is served directly by the Lauschkiste core (no separate nginx
+process): `lauschkiste` serves the static build alongside `/api/*`. The build is located at
 
 ```text
 ./packages/webapp/build

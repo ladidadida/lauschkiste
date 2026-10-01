@@ -5,13 +5,13 @@ delete files or folders in the audio library. Samba is therefore optional and
 disabled by default.
 
 Enable Samba during installation when you want direct network access to the
-complete `./shared/` directory. It is exposed as the `phoniebox` network share
+complete `./shared/` directory. It is exposed as the `lauschkiste` network share
 and includes both the audio library and configuration files.
 
 ## Connect
 
-To access the share open your OS network environment and select your Phoniebox device.
-Alternatively directly access it via url with the file explorer (e.g. Windows `\\<ip-address-of-your-phoniebox>`, MacOS `smb://<ip-address-of-your-phoniebox>`).
+To access the share open your OS network environment and select your Lauschkiste device.
+Alternatively directly access it via url with the file explorer (e.g. Windows `\\<ip-address-of-your-lauschkiste>`, MacOS `smb://<ip-address-of-your-lauschkiste>`).
 
 See also
 
@@ -26,5 +26,5 @@ You can change the password anytime using the command `sudo smbpasswd -a "<your-
 
 Copy albums into the `audiofolders` folder of the share. The library notices new, changed and
 removed files by itself and rescans a few seconds after copying has finished
-(`library.watch` / `library.watch_interval_sec` in `jukebox.yaml`); the refresh button in the web
+(`library.watch` / `library.watch_interval_sec` in `lauschkiste.yaml`); the refresh button in the web
 app's library view starts a rescan right away.
