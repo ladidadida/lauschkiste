@@ -9,8 +9,9 @@
 - Name: **Lauschkiste** (German *lauschen*, to listen closely; *die Kiste*, the box). Tagline in
   English: *Lauschkiste - an open-source RFID audio player for kids*.
 - Main domain `lauschkiste.org`; other endings (`.de`, `.io`) only as redirects.
-- A new, standalone GitHub repository `lauschkiste` with the full history of this fork; the fork is
-  archived with a pointer to the new repository. The MIT license keeps the original copyright
+- A new, standalone GitHub repository [`ladidadida/lauschkiste`](https://github.com/ladidadida/lauschkiste)
+  with the full history of the fork (created 2026-10-01); the fork is archived with a pointer to
+  the new repository. The MIT license keeps the original copyright
   notice; the README names Phoniebox as origin.
 
 ## Naming scheme
@@ -49,8 +50,8 @@ release, then removed):
 
 - Plugins import `lauschkiste.contract` instead of `jukebox.contract`: the framework contract
   becomes **2.0**; module interface versions stay (their actions and events do not change).
-- Package version: the first release of the new name is `4.0.0-alpha.1` (tag `v4.0.0-alpha.1`),
-  continuing the version line of the code base (open, see below).
+- Versions start over at 0: all packages (core, CLI, bundled plugins) become `0.1.0`; the first
+  pre-release is `v0.1.0-alpha.1`. Tags of upstream Phoniebox releases are not carried over.
 
 ## Steps
 
@@ -69,14 +70,12 @@ Each step leaves the tests green and is one commit.
 6. **Documentation:** README (name, tagline, origin and credits, pronunciation), AGENTS.md,
    builder and developer docs. Historic documents (roadmap history, changelog) keep the old names
    where they describe the past.
-7. **Repository:** new repository with full history, `main` = this branch; tags; archive the fork
-   with a pointer. Then the first pre-release `v4.0.0-alpha.1` (wheels via the existing workflow).
+7. **Repository:** the new repository exists (step done early); archive the fork with a pointer. Then the first pre-release `v0.1.0-alpha.1` (wheels via the existing workflow).
 8. **Verification:** install the pre-release with `install.sh` on the test Pi (fresh and as an
    upgrade of the existing test install), full test pass as in the Pi test plan.
 
 ## Open questions
 
 - Short command alias `lausch` in addition to `lauschkiste`?
-- Version line: continue at 4.0.0, or start the new name at 1.0.0 / 0.x?
 - Trademark check (DPMA/EUIPO) and domain registration (by the maintainer).
 - Logo and icons for the web app.
