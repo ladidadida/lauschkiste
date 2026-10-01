@@ -153,10 +153,10 @@ class Library(CoreModule):
         self._ctx = ctx
         path = ctx.config.get('path', default=None)
         root_provider = (lambda: str(jukebox.paths.resolve(path))) if path else jukebox.player.get_music_library_path
-        self._index = LibraryIndex(str(jukebox.paths.resolve(ctx.config.setdefault('index', value=DEFAULT_INDEX))),
+        self._index = LibraryIndex(str(jukebox.paths.resolve(ctx.config.get('index', default=DEFAULT_INDEX))),
                                    root_provider)
-        self._covers = CoverCache(str(jukebox.paths.resolve(ctx.config.setdefault('cover_cache',
-                                                                                  value=DEFAULT_COVER_CACHE))))
+        self._covers = CoverCache(str(jukebox.paths.resolve(ctx.config.get('cover_cache',
+                                                                                  default=DEFAULT_COVER_CACHE))))
         self._files = MusicLibrary(root_provider, self._refresh_all)
         self._root_provider = root_provider
         root = root_provider()
@@ -166,7 +166,7 @@ class Library(CoreModule):
         self._file_executor = ctx.executor('files')
 
     def ready(self) -> None:
-        if self._ctx.config.setdefault('scan_on_startup', value=True):
+        if self._ctx.config.get('scan_on_startup', default=True):
             self._schedule_scan()
         if self._ctx.config.get('watch', default=True):
             self._watcher = FolderWatcher(self._root_provider, self._schedule_scan,

@@ -141,7 +141,7 @@ class Rfid(CoreModule):
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        path = str(jukebox.paths.resolve(ctx.config.setdefault('reader_config', value=DEFAULT_READER_CONFIG)))
+        path = str(jukebox.paths.resolve(ctx.config.get('reader_config', default=DEFAULT_READER_CONFIG)))
         try:
             jukebox.cfghandler.load_yaml(cfg_rfid, path)
         except FileNotFoundError:

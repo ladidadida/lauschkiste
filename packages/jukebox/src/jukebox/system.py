@@ -127,7 +127,7 @@ class System(CoreModule):
     def start(self, ctx) -> None:
         self._ctx = ctx
         ctx.publish(self.info, self.get_info())
-        interval = float(ctx.config.setdefault('health_interval_sec', value=10))
+        interval = float(ctx.config.get('health_interval_sec', default=10))
         if interval > 0:
             self._health_thread = threading.Thread(target=self._publish_health, args=(interval,),
                                                    name='system.health', daemon=True)
@@ -193,7 +193,7 @@ class System(CoreModule):
     @query(path='/api/v1/settings')
     def get_app_settings(self) -> AppSettings:
         """Web app settings."""
-        return AppSettings(show_covers=cfg.setndefault('webapp', 'show_covers', value=True))
+        return AppSettings(show_covers=cfg.getn('webapp', 'show_covers', default=True))
 
     @action(method='PUT', path='/api/v1/settings')
     def set_app_settings(self, settings: AppSettingsUpdate) -> None:

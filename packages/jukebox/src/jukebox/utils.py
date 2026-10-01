@@ -15,7 +15,7 @@ def get_config_action(cfg, section, option, default, valid_actions_dict, logger)
     the associated entry from valid_actions_dict, if valid. Falls back to the given
     default otherwise.
     """
-    action = cfg.setndefault(section, option, value='').lower()
+    action = str(cfg.getn(section, option, default='')).lower()
     if action not in valid_actions_dict:
         logger.error(f"Config {section}.{option} must be one of {valid_actions_dict.keys()}. Using default '{default}'")
         action = default

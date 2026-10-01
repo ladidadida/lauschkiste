@@ -41,7 +41,7 @@ class MusicLibPath:
         if cfg.getn('player', 'backend', default='local_audio') != 'mpd':
             self._music_library_path = str(jukebox.paths.resolve('audiofolders'))
             return
-        mpd_conf_file = cfg.setndefault('playermpd', 'mpd_conf', value='~/.config/mpd/mpd.conf')
+        mpd_conf_file = cfg.getn('playermpd', 'mpd_conf', default='~/.config/mpd/mpd.conf')
         try:
             self._music_library_path = _get_music_library_path(os.path.expanduser(mpd_conf_file))
         except Exception as e:

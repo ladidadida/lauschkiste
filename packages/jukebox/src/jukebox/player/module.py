@@ -49,7 +49,7 @@ class Player(CoreModule):
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        self._configured_backend = ctx.config.setdefault('backend', value=DEFAULT_BACKEND)
+        self._configured_backend = ctx.config.get('backend', default=DEFAULT_BACKEND)
         self.backends.on_register(self._add_backend)
 
         from jukebox.player.backends.local_audio import PlayerLocalAudio

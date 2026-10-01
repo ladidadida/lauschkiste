@@ -42,7 +42,7 @@ class PlayerLocalAudio:
     def __init__(self):
         self.nvm = nv_manager()
         self._status_store = self.nvm.load(str(jukebox.paths.resolve(
-            cfg.setndefault('player', 'status_file', value='settings/local_audio_status.json'))))
+            cfg.getn('player', 'status_file', default='settings/local_audio_status.json'))))
         if not self._status_store:
             self._status_store['last_played_folder'] = ''
 

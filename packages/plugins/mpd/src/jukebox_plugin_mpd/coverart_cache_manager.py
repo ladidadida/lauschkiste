@@ -21,7 +21,7 @@ cfg = jukebox.cfghandler.get_handler('jukebox')
 
 class CoverartCacheManager:
     def __init__(self):
-        coverart_cache_path = cfg.setndefault('webapp', 'coverart_cache_path', value='cache/mpd-covers')
+        coverart_cache_path = cfg.getn('webapp', 'coverart_cache_path', default='cache/mpd-covers')
         self.cache_folder_path = jukebox.paths.resolve(coverart_cache_path)
         self.cache_folder_path.mkdir(parents=True, exist_ok=True)
         self.write_queue = Queue()

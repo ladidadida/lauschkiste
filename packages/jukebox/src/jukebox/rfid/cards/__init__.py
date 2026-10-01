@@ -62,7 +62,7 @@ class Cards(CoreModule):
     def start(self, ctx) -> None:
         self._ctx = ctx
         legacy_path = cfg_main.getn('rfid', 'card_database', default=None)
-        self._path = str(jukebox.paths.resolve(ctx.config.setdefault('database', value=legacy_path or DEFAULT_DATABASE)))
+        self._path = str(jukebox.paths.resolve(ctx.config.get('database', default=legacy_path or DEFAULT_DATABASE)))
         try:
             cfg_cards.load(self._path)
         except FileNotFoundError:
