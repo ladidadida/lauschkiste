@@ -1,6 +1,6 @@
 [project]
 name = "lauschkiste-plugin-raspberry-pi"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Jukebox plugin: Raspberry Pi hardware control (power, GPIO, battery, health)"
 license = "MIT"
 requires-python = ">=3.11"
