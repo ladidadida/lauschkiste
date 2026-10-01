@@ -53,7 +53,7 @@ jobs:
           curl -fsS localhost:5556/api/v1/modules
           kill %1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: wheels
           path: dist/*.whl
