@@ -1,4 +1,4 @@
-"""`jukebox plugin ...`: list installed plugins, enable/disable them in the configuration, install new ones."""
+"""`lauschctl plugin ...`: list installed plugins, enable/disable them in the configuration, install new ones."""
 
 import shutil
 import subprocess
@@ -46,7 +46,7 @@ def _load(ep):
 
 
 def install_requirements(requirements: List[str]) -> None:
-    """Install into the environment the jukebox runs in (uv if available, else pip)."""
+    """Install into the environment Lauschkiste runs in (uv if available, else pip)."""
     uv = shutil.which('uv')
     if uv:
         command = [uv, 'pip', 'install', '--python', sys.executable, *requirements]
@@ -117,7 +117,7 @@ def enable(name: str, conf: Optional[Path] = ConfOption,
     if not add_to_config(path, [name]):
         typer.echo(f"'{name}' is already enabled in {path}")
         return
-    typer.echo(f"Enabled '{name}' in {path}. Restart the jukebox to load it.")
+    typer.echo(f"Enabled '{name}' in {path}. Restart Lauschkiste to load it.")
 
 
 @app.command()
@@ -132,7 +132,7 @@ def disable(name: str, conf: Optional[Path] = ConfOption) -> None:
     if not enabled:
         cfg['plugins'] = {}
     lauschkiste.cfghandler.write_yaml(cfg, str(path))
-    typer.echo(f"Disabled '{name}' in {path}. Restart the jukebox to unload it.")
+    typer.echo(f"Disabled '{name}' in {path}. Restart Lauschkiste to unload it.")
 
 
 @app.command()
@@ -150,4 +150,4 @@ def install(spec: str, conf: Optional[Path] = ConfOption,
         if enable_plugins:
             enable(name, conf=conf, with_extras=False)
         else:
-            typer.echo(f"  enable with: jukebox plugin enable {name}")
+            typer.echo(f"  enable with: lauschctl plugin enable {name}")

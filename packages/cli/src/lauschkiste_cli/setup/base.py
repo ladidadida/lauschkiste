@@ -1,4 +1,4 @@
-"""Building blocks of `jukebox setup`: questions, steps, the answers file."""
+"""Building blocks of `lauschctl setup`: questions, steps, the answers file."""
 
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -116,5 +116,5 @@ class Answers:
         yaml = YAML()
         yaml.default_flow_style = False
         with self.path.open('w') as stream:
-            stream.write('# Answers of `jukebox setup`, reused by `jukebox setup --yes`\n')
+            stream.write('# Answers of `lauschctl setup`, reused by `lauschctl setup --yes`\n')
             yaml.dump(dict(sorted(answers.items())), stream)

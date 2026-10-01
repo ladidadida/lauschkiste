@@ -1,4 +1,4 @@
-"""`jukebox update`: newer release (package install) or `git pull` (source checkout)."""
+"""`lauschctl update`: newer release (package install) or `git pull` (source checkout)."""
 
 import re
 import shutil
@@ -13,7 +13,7 @@ from packaging.version import Version
 
 import lauschkiste.paths
 from lauschkiste_cli import plugin
-from lauschkiste_cli.environment import DEFAULT_REPO, checkout, jukebox_executable
+from lauschkiste_cli.environment import DEFAULT_REPO, checkout, executable
 from lauschkiste_cli.setup.base import Context
 from lauschkiste_cli.setup.system import System
 
@@ -118,9 +118,9 @@ def update_package(repo: str, tag: str, config_path: Path, check_only: bool = Fa
     release = fetch_release(repo, tag)
     target = release_version(release)
     if tag == 'latest' and target <= current:
-        typer.echo(f"jukebox {current} is up to date (latest release: {target}).")
+        typer.echo(f"Lauschkiste {current} is up to date (latest release: {target}).")
         return False
-    typer.echo(f"Updating jukebox {current} -> {target}")
+    typer.echo(f"Updating Lauschkiste {current} -> {target}")
     if check_only:
         return True
     assets = [asset for asset in release.get('assets', []) if asset['name'].endswith('.whl')]
@@ -151,10 +151,10 @@ def update(release: str = typer.Option('latest', "--version", help="Release tag 
                                     help="GitHub repository"),
            check: bool = typer.Option(False, "--check", help="Only report whether an update is available"),
            setup: bool = typer.Option(True, "--setup/--no-setup",
-                                      help="Re-apply `jukebox setup` with the stored answers afterwards"),
+                                      help="Re-apply `lauschctl setup` with the stored answers afterwards"),
            conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
                                                help="Jukebox configuration file")) -> None:
-    """Update the jukebox: newer release, or `git pull` + `uv sync` in a source checkout."""
+    """Update Lauschkiste: newer release, or `git pull` + `uv sync` in a source checkout."""
     config_path = conf or lauschkiste.paths.config_file()
     root = checkout()
     try:
@@ -166,10 +166,10 @@ def update(release: str = typer.Option('latest', "--version", help="Release tag 
         return
     if setup:
         # In a new process: the updated setup steps, not the ones already imported here
-        result = subprocess.run([jukebox_executable(), 'setup', '--yes', *(['--conf', str(conf)] if conf else [])],
+        result = subprocess.run([executable('lauschctl'), 'setup', '--yes', *(['--conf', str(conf)] if conf else [])],
                                 check=False)
         if result.returncode != 0:
-            typer.echo("Some setup steps are not complete, see above ('jukebox setup --check').", err=True)
+            typer.echo("Some setup steps are not complete, see above ('lauschctl setup --check').", err=True)
     restart_service()
     typer.echo("Update complete.")
 

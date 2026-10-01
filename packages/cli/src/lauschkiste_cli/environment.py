@@ -1,4 +1,4 @@
-"""How this jukebox is installed: from a source checkout or as a package."""
+"""How Lauschkiste is installed: from a source checkout or as a package."""
 
 import shutil
 import sys
@@ -17,6 +17,7 @@ def checkout() -> Optional[Path]:
     return root if (root / '.git').exists() and (root / 'packages' / 'lauschkiste').is_dir() else None
 
 
-def jukebox_executable() -> str:
-    candidate = Path(sys.executable).parent / 'jukebox'
-    return str(candidate) if candidate.exists() else (shutil.which('jukebox') or 'jukebox')
+def executable(name: str) -> str:
+    """Path of one of our commands (``lauschkiste``, ``lauschctl``) in the running environment."""
+    candidate = Path(sys.executable).parent / name
+    return str(candidate) if candidate.exists() else (shutil.which(name) or name)

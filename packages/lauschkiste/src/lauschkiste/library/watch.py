@@ -1,4 +1,4 @@
-"""Notice changes to the music folder made outside the jukebox (Samba, USB stick, scp)."""
+"""Notice changes to the music folder made outside Lauschkiste (Samba, USB stick, scp)."""
 
 import logging
 import os

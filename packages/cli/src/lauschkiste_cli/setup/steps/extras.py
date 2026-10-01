@@ -35,7 +35,7 @@ class MpdStep(Step):
         system = ctx.system
         problems = []
         if system.read(self.CONF) != self.conf():
-            problems.append(f'{self.CONF} is missing or differs from the jukebox template')
+            problems.append(f'{self.CONF} is missing or differs from the Lauschkiste template')
         problems += [f'system-wide {unit} is enabled' for unit in ('mpd.socket', 'mpd.service')
                      if system.unit_enabled(unit)]
         problems += [f'user {unit} is not enabled' for unit in ('mpd.socket', 'mpd.service')
@@ -58,9 +58,9 @@ class MpdStep(Step):
 
 class SambaStep(Step):
     name = 'samba'
-    title = 'Samba share of the jukebox home'
+    title = 'Samba share of the Lauschkiste home'
     questions = (
-        Question('samba', 'Share the jukebox home (music, settings) on the network via Samba?', default=False),
+        Question('samba', 'Share the Lauschkiste home (music, settings) on the network via Samba?', default=False),
         Question('samba_password', 'Samba password', default='raspberry', kind='secret',
                  when=lambda a: a.get('samba')),
     )
@@ -86,9 +86,9 @@ class SambaStep(Step):
         problems = []
         conf = ctx.system.read(self.CONF) or ''
         if not has_marker(conf, self.MARKER):
-            problems.append('no jukebox share in smb.conf')
+            problems.append('no Lauschkiste share in smb.conf')
         elif f'path={lauschkiste.paths.home()}' not in conf.replace(' ', ''):
-            problems.append(f'the jukebox share in {self.CONF} does not point to {lauschkiste.paths.home()}; '
+            problems.append(f'the Lauschkiste share in {self.CONF} does not point to {lauschkiste.paths.home()}; '
                             f'edit it by hand')
         if not self._has_user(ctx):
             problems.append(f'no Samba user {ctx.system.user}')
@@ -186,7 +186,7 @@ class AutohotspotStep(Step):
     title = 'WiFi hotspot when no known WiFi is in range'
     questions = (
         Question('autohotspot', 'Open a WiFi hotspot when no known WiFi is in range?', default=False,
-                 help='Lets you reach the jukebox without a network. Replaces the static IP option.'),
+                 help='Lets you reach Lauschkiste without a network. Replaces the static IP option.'),
         Question('autohotspot_ssid', 'Hotspot name (SSID)', kind='text', validate=_validate_ssid,
                  default=lambda ctx: f"Lauschkiste_{ctx.system.output('hostname')}"[:32],
                  when=lambda a: a.get('autohotspot')),
@@ -289,7 +289,7 @@ class AudioStep(Step):
 
     def apply(self, ctx):
         if ctx.assume_yes:
-            raise StepSkipped("choosing the outputs is interactive; run 'jukebox setup audio' later")
+            raise StepSkipped("choosing the outputs is interactive; run 'lauschctl setup audio' later")
         sinks = self._sinks()
         if not sinks:
             raise SetupError('the sound server reports no audio outputs')

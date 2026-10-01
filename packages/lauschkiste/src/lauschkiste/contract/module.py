@@ -112,7 +112,7 @@ class Module:
 
 
 class CoreModule(Module):
-    """Always shipped, always running part of the jukebox."""
+    """Always shipped, always running part of Lauschkiste."""
 
     is_core = True
 
@@ -121,7 +121,7 @@ class Plugin(Module):
     """Separately installed, opt-in module. Declares which framework contract it targets."""
 
     contract: ClassVar[str] = f">={Version(CONTRACT_VERSION).major}.0,<{Version(CONTRACT_VERSION).major + 1}"
-    #: Extras of the plugin's own package it needs (installed by `jukebox plugin enable --with-extras`)
+    #: Extras of the plugin's own package it needs (installed by `lauschctl plugin enable --with-extras`)
     extras: ClassVar[Tuple[str, ...]] = ()
 
     @classmethod

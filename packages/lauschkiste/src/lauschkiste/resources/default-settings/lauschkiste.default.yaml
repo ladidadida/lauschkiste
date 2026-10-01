@@ -125,7 +125,7 @@ timers:
     default_timeout_sec: 3600
 input:
   # Play/pause/next/previous/volume keys of any input device (e.g. a Bluetooth headset or a
-  # keyboard). Off by default so the jukebox doesn't react to a desktop keyboard's media keys.
+  # keyboard). Off by default so Lauschkiste doesn't react to a desktop keyboard's media keys.
   media_keys: false
   # USB buttons, joysticks, keyboards: device name and key -> action, e.g.
   # devices:

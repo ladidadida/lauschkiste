@@ -36,8 +36,15 @@ def run(
         False, "-a", "--artifacts",
         help="Write out all artifacts and auto-generated help files",
     ),
+    home: Optional[Path] = typer.Option(
+        None, "--home", envvar=lauschkiste.paths.env_names("HOME"),
+        help="Directory with all data (settings, music, logs). "
+             "Default: $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).",
+    ),
 ) -> None:
-    """Start the Jukebox Daemon."""
+    """Run the Lauschkiste server."""
+    if home is not None:
+        lauschkiste.paths.set_home(home)
     if verbose and quiet:
         raise typer.BadParameter("--verbose and --quiet are mutually exclusive")
     conf = conf or lauschkiste.paths.config_file()

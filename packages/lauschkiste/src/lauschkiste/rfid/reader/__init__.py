@@ -155,7 +155,7 @@ class Rfid(CoreModule):
             driver_name = str(reader_cfg.get('module', '')).lower()
             if driver_name not in self.readers:
                 log.error(f"Reader '{key}': no driver '{driver_name}' available. Enable its plugin "
-                          f"('rfid_{driver_name}' under 'plugins:' in the jukebox config).")
+                          f"('rfid_{driver_name}' under 'plugins:' in the Lauschkiste config).")
                 continue
             log.info(f"Reader '{key}': using driver '{driver_name}'")
             self._runners[key] = ReaderRunner(key, self.readers.get(driver_name), self)

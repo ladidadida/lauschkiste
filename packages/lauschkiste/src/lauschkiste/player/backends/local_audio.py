@@ -238,7 +238,7 @@ class PlayerLocalAudio:
         }
 
     def get_player_type_and_version(self):
-        return f"jukebox-local-audio (pyav {av.__version__}, sounddevice {sd.__version__})"
+        return f"lauschkiste-local-audio (pyav {av.__version__}, sounddevice {sd.__version__})"
 
     def play(self):
         with self._cv:

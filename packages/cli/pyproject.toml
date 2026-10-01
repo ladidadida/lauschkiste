@@ -1,7 +1,7 @@
 [project]
 name = "lauschkiste-cli"
 version = "0.1.0"
-description = "Jukebox CLI"
+description = "Lauschkiste command line: the lauschkiste server and lauschctl"
 requires-python = ">=3.11"
 dependencies = [
   "typer",
@@ -17,7 +17,9 @@ package = true
 lauschkiste = { workspace = true }
 
 [project.scripts]
-jukebox = "lauschkiste_cli.cli:app"
+lauschkiste = "lauschkiste_cli.cli:server"
+lauschctl = "lauschkiste_cli.cli:ctl"
+jukebox = "lauschkiste_cli.cli:legacy"
 
 [build-system]
 requires = ["hatchling"]

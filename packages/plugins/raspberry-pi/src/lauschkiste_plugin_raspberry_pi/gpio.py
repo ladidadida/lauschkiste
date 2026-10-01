@@ -1,4 +1,4 @@
-"""GPIO devices via gpiozero: buttons and rotary encoders run actions, a status LED shows the jukebox runs.
+"""GPIO devices via gpiozero: buttons and rotary encoders run actions, a status LED shows Lauschkiste runs.
 
 ::
 

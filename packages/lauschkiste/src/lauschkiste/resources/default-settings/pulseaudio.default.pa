@@ -147,5 +147,5 @@ load-module module-filter-apply
 #set-default-source input
 
 ### Configuration by Jukebox's Tool may come below
-# Run `jukebox setup audio` for configuration
+# Run `lauschctl setup audio` for configuration
 

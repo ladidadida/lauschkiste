@@ -148,7 +148,7 @@ class System(CoreModule):
 
     @query(path='/info')
     def get_info(self) -> SystemInfo:
-        """Version, git state and start time of the jukebox."""
+        """Version, git state and start time of Lauschkiste."""
         daemon = get_daemon()
         return SystemInfo(version=lauschkiste.version(), git_state=daemon.git_state,
                           started_at=time.ctime(daemon.start_time))
@@ -179,7 +179,7 @@ class System(CoreModule):
 
     @action()
     def restart_service(self) -> None:
-        """Restart the jukebox systemd user service."""
+        """Restart the Lauschkiste systemd user service."""
         try:
             subprocess.Popen(['systemctl', '--user', 'restart', 'lauschkiste'])
         except OSError as error:

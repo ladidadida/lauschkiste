@@ -126,7 +126,7 @@ def _is_same_origin(websocket: WebSocket) -> bool:
     """
     origin = websocket.headers.get('origin')
     if origin is None:
-        # Non-browser clients (e.g. `jukebox debug sniff`) don't send Origin at all.
+        # Non-browser clients (e.g. `lauschctl debug sniff`) don't send Origin at all.
         return True
     origin_host = urlsplit(origin).netloc.lower()
     request_host = (websocket.headers.get('host') or '').lower()

@@ -26,7 +26,7 @@ BUNDLED_READER_EXTRAS = {
 
 
 def install_python_packages(requirements: list[str]) -> None:
-    """Into the environment the jukebox runs in (uv if available, else pip)."""
+    """Into the environment Lauschkiste runs in (uv if available, else pip)."""
     uv = shutil.which('uv')
     command = [uv, 'pip', 'install', '--python', sys.executable] if uv else [sys.executable, '-m', 'pip', 'install']
     subprocess.run([*command, *requirements], check=False)

@@ -4,7 +4,7 @@ from typer.testing import CliRunner
 import lauschkiste.cfghandler
 import lauschkiste.paths
 from lauschkiste_cli import plugin
-from lauschkiste_cli.cli import app
+from lauschkiste_cli.cli import ctl as app
 
 runner = CliRunner()
 

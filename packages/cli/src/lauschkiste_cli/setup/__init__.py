@@ -1,4 +1,4 @@
-"""`jukebox setup`: prepare this machine for the jukebox, step by step and idempotent."""
+"""`lauschctl setup`: prepare this machine for Lauschkiste, step by step and idempotent."""
 
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -106,7 +106,7 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
           list_steps: bool = typer.Option(False, "--list", help="List the steps and exit"),
           conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
                                               help="Jukebox configuration file")) -> None:
-    """Set up this machine for the jukebox (packages, service, Samba, hotspot, ...).
+    """Set up this machine for Lauschkiste (packages, service, Samba, hotspot, ...).
 
     Every step checks first and only changes what is missing, so running it again is safe.
     Answers are kept in $LAUSCHKISTE_HOME/settings/setup.yaml.

@@ -1,10 +1,10 @@
-"""The jukebox itself: plugins, the systemd user service, the RFID reader."""
+"""Lauschkiste itself: plugins, the systemd user service, the RFID reader."""
 
 from typing import List
 
 import lauschkiste.paths
 from lauschkiste_cli import plugin
-from lauschkiste_cli.environment import checkout, jukebox_executable
+from lauschkiste_cli.environment import checkout, executable
 from lauschkiste_cli.setup.base import Context, Question, Step
 from lauschkiste_cli.setup.system import SetupError, StepSkipped
 
@@ -67,7 +67,7 @@ class ServiceStep(Step):
             "[Service]\n"
             f"Environment={lauschkiste.paths.HOME_ENV}={lauschkiste.paths.home()}\n"
             f"WorkingDirectory={workdir}\n"
-            f"ExecStart={jukebox_executable()} run\n"
+            f"ExecStart={executable('lauschkiste')}\n"
             "Restart=always\n"
             "\n"
             "[Install]\n"
@@ -121,7 +121,7 @@ class RfidStep(Step):
 
     def apply(self, ctx):
         if ctx.assume_yes:
-            raise StepSkipped("the reader configuration is interactive; run 'jukebox setup rfid' later")
+            raise StepSkipped("the reader configuration is interactive; run 'lauschctl setup rfid' later")
         try:
             import lauschkiste_plugin_rfid_readers.configure as configure
         except ImportError as error:

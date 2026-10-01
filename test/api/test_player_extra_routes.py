@@ -7,7 +7,7 @@ import pytest
 @pytest.fixture
 def player_ctrl():
     ctrl = Mock()
-    ctrl.get_player_type_and_version.return_value = 'jukebox-local-audio'
+    ctrl.get_player_type_and_version.return_value = 'lauschkiste-local-audio'
     ctrl.update.return_value = 7
     ctrl.update_wait.return_value = 7
     ctrl.get_current_song.return_value = {'file': 'a.mp3'}
@@ -28,7 +28,7 @@ def client(player_ctrl, api_client, mocked_player):
 def test_player_type(client, player_ctrl):
     response = client.get('/api/v1/player/type')
     assert response.status_code == 200
-    assert response.json() == 'jukebox-local-audio'
+    assert response.json() == 'lauschkiste-local-audio'
 
 
 def test_update(client, player_ctrl):

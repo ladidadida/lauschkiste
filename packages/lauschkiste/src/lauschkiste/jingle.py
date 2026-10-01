@@ -68,7 +68,7 @@ class Jingle(CoreModule):
 
     @action()
     def play(self, sound: str) -> None:
-        """Play a sound file (path relative to the jukebox directory or absolute)."""
+        """Play a sound file (path relative to the home directory or absolute)."""
         if not sound_path(sound).is_file():
             raise OperationError(404, 'unknown_sound', f"Sound file '{sound}' not found")
         self._executor.submit(self._play, sound)

@@ -23,7 +23,7 @@ def get_config_action(cfg, section, option, default, valid_actions_dict, logger)
 
 
 def get_git_state():
-    """Git state of the checkout the jukebox runs from, or a note that it isn't one (package install)."""
+    """Git state of the checkout Lauschkiste runs from, or a note that it isn't one (package install)."""
     source_dir = os.path.dirname(os.path.abspath(__file__))
 
     def git(*args):

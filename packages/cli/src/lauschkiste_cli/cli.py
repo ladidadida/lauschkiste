@@ -32,26 +32,39 @@ from lauschkiste_cli.setup import setup  # noqa: E402
 from lauschkiste_cli.update import update  # noqa: E402
 from lauschkiste_cli.run import run  # noqa: E402
 
-app = typer.Typer(name="jukebox", help="Jukebox CLI.")
+HOME_HELP = ("Directory with all data (settings, music, logs). "
+             "Default: $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).")
 
 
-@app.callback()
 def main(home: Optional[Path] = typer.Option(
-        None, "--home", envvar=lauschkiste.paths.env_names("HOME"),
-        help="Directory with all data (settings, music, logs). "
-             "Default: $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).")) -> None:
+        None, "--home", envvar=lauschkiste.paths.env_names("HOME"), help=HOME_HELP)) -> None:
     lauschkiste.paths.set_home(home)
 
 
-@app.command(name="home")
 def show_home() -> None:
     """Print the home directory and the configuration file in use."""
     typer.echo(f"home:   {lauschkiste.paths.home()}")
     typer.echo(f"config: {lauschkiste.paths.config_file()}")
 
 
-app.command(name="run")(run)
-app.command(name="setup")(setup)
-app.command(name="update")(update)
-app.add_typer(debug.app, name="debug")
-app.add_typer(plugin.app, name="plugin")
+def _management_app(name: str, help_text: str) -> typer.Typer:
+    app = typer.Typer(name=name, help=help_text, no_args_is_help=True)
+    app.callback()(main)
+    app.command(name="home")(show_home)
+    app.command(name="setup")(setup)
+    app.command(name="update")(update)
+    app.add_typer(debug.app, name="debug")
+    app.add_typer(plugin.app, name="plugin")
+    return app
+
+
+#: `lauschkiste`: the server
+server = typer.Typer(name="lauschkiste", add_completion=False)
+server.command()(run)
+
+#: `lauschctl`: everything else
+ctl = _management_app("lauschctl", "Manage Lauschkiste: setup, plugins, updates.")
+
+#: `jukebox`: the name before the renaming (`jukebox run` = `lauschkiste`); removed after 0.1
+legacy = _management_app("jukebox", "Old name of lauschctl; `lauschkiste` starts the server like `lauschkiste`.")
+legacy.command(name="run")(run)
