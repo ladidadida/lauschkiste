@@ -66,6 +66,38 @@ def plugin_extras(name: str) -> List[str]:
     return [f"{ep.dist.name}[{','.join(extras)}]"] if extras else []
 
 
+def missing_extras(name: str) -> List[str]:
+    """``plugin_extras(name)`` whose dependencies are not (all) installed in this environment."""
+    from importlib.metadata import PackageNotFoundError, distribution
+
+    from packaging.markers import default_environment
+    from packaging.requirements import Requirement
+
+    missing = []
+    for requirement in plugin_extras(name):
+        wanted = Requirement(requirement)
+        try:
+            declared = distribution(wanted.name).requires or []
+        except PackageNotFoundError:
+            missing.append(requirement)
+            continue
+        for extra in wanted.extras:
+            environment = {**default_environment(), 'extra': extra}
+            for line in declared:
+                dependency = Requirement(line)
+                if dependency.marker is None or not dependency.marker.evaluate(environment):
+                    continue
+                try:
+                    distribution(dependency.name)
+                except PackageNotFoundError:
+                    missing.append(requirement)
+                    break
+            else:
+                continue
+            break
+    return missing
+
+
 def add_to_config(path: Path, names: List[str]) -> List[str]:
     """Add ``names`` to ``plugins:`` in the configuration at ``path``; returns the newly added ones."""
     cfg, _ = _config(path)

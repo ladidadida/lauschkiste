@@ -78,8 +78,11 @@ def home(tmp_path):
 
 @pytest.fixture
 def extras(monkeypatch):
+    """Records installed extras; an extra counts as missing until it has been installed here."""
     installed = []
     monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
+    monkeypatch.setattr(plugin, 'missing_extras',
+                        lambda name: [req for req in plugin.plugin_extras(name) if req not in installed])
     return installed
 
 
@@ -250,3 +253,11 @@ def test_service_is_started_and_restarted_after_a_unit_change(tmp_path, home, ex
     system.write('~/.config/systemd/user/lauschkiste.service', '[Unit]\nDescription=old\n')
     setup_run(system, home, names=['service'])
     assert ('systemctl', '--user', 'restart', 'lauschkiste.service') in system.commands
+
+
+def test_missing_extras_of_enabled_plugins_are_reinstalled(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root')
+    plugin.add_to_config(home / 'settings' / 'lauschkiste.yaml', ['rfid_rc522_spi'])
+    failed, _ = setup_run(system, home, names=['plugins'])
+    assert failed == 0
+    assert extras == ['lauschkiste-plugin-rfid-readers[rc522-spi]']

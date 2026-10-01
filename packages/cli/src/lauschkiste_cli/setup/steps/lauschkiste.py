@@ -25,17 +25,24 @@ class PluginsStep(Step):
     name = 'plugins'
     title = 'Plugins'
 
+    def _missing_extras(self, ctx) -> List[str]:
+        """Extras of enabled (or to be enabled) plugins whose dependencies are missing, e.g. after
+        the environment was recreated by an update."""
+        names = dict.fromkeys([*ctx.enabled_plugins(), *wanted_plugins(ctx)])
+        return [req for name in names for req in plugin.missing_extras(name)]
+
     def check(self, ctx):
         enabled = ctx.enabled_plugins()
-        return [f"plugin '{name}' is not enabled" for name in wanted_plugins(ctx) if name not in enabled]
+        problems = [f"plugin '{name}' is not enabled" for name in wanted_plugins(ctx) if name not in enabled]
+        problems += [f"dependencies {req} are not installed" for req in self._missing_extras(ctx)]
+        return problems
 
     def apply(self, ctx):
-        enabled = ctx.enabled_plugins()
-        new = [name for name in wanted_plugins(ctx) if name not in enabled]
-        requirements = [req for name in new for req in plugin.plugin_extras(name)]
+        requirements = self._missing_extras(ctx)
         if requirements:
             plugin.install_requirements(requirements)
-        plugin.add_to_config(ctx.config_path, new)
+        enabled = ctx.enabled_plugins()
+        plugin.add_to_config(ctx.config_path, [name for name in wanted_plugins(ctx) if name not in enabled])
 
 
 class ServiceStep(Step):
