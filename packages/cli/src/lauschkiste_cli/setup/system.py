@@ -125,6 +125,10 @@ class System:
     def is_debian(self) -> bool:
         return self.exists('/usr/bin/apt-get') or self.which('apt-get') is not None
 
+    def unit_active(self, unit: str, user: bool = False) -> bool:
+        args = ['systemctl', *(['--user'] if user else []), 'is-active', unit]
+        return self.output(*args) == 'active'
+
     def unit_enabled(self, unit: str, user: bool = False) -> bool:
         args = ['systemctl', *(['--user'] if user else []), 'is-enabled', unit]
         return self.output(*args) == 'enabled'

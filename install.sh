@@ -101,7 +101,7 @@ download_release_wheels() {
     local base="$api" release
     [[ "$VERSION" == latest ]] && api="${api}/latest" || api="${api}/tags/${VERSION}"
     log "Downloading the wheels of release ${VERSION} from ${REPO}"
-    if ! release="$(curl -fsSL "$api")"; then
+    if ! release="$(curl -fsSL "$api" 2>/dev/null)"; then
         # No stable release yet: take the newest pre-release
         [[ "$VERSION" == latest ]] && release="$(curl -fsSL "${base}?per_page=1" | python3 -c 'import json,sys; r=json.load(sys.stdin); print(json.dumps(r[0]) if r else "")')"
         [[ -n "${release:-}" ]] || die "no release ${VERSION} found in ${REPO}"

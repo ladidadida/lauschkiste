@@ -14,6 +14,7 @@ class FakeSystem(System):
         self.commands = []
         self.enabled = set()
         self.enabled_user = set()
+        self.active = set()
         self.installed = {'build-essential', 'python3-dev', 'libffi-dev', 'alsa-utils', 'libportaudio2'}
         self.outputs = {
             ('ip', 'route', 'get', '8.8.8.8'): '8.8.8.8 via 192.168.1.1 dev wlan0 src 192.168.1.50 uid 1000',
@@ -44,6 +45,8 @@ class FakeSystem(System):
         if 'install' in args and 'apt-get' in args:
             self.installed |= {a for a in args[args.index('install') + 1:] if not a.startswith('-')}
         units = self.enabled_user if '--user' in args else self.enabled
+        if args[0] == 'systemctl' and ('--now' in args or 'restart' in args or 'start' in args):
+            self.active.add(args[-1])
         if args[0] == 'systemctl' and 'enable' in args:
             units |= set(a for a in args[args.index('enable') + 1:] if not a.startswith('-'))
         if args[0] == 'systemctl' and 'disable' in args:
@@ -55,6 +58,9 @@ class FakeSystem(System):
 
     def output(self, *args):
         return self.outputs.get(tuple(args), '')
+
+    def unit_active(self, unit, user=False):
+        return unit in self.active
 
     def unit_enabled(self, unit, user=False):
         return unit in (self.enabled_user if user else self.enabled)
@@ -231,3 +237,16 @@ def test_blocks_and_service_from_before_the_renaming(tmp_path, home, extras):
     assert 'lauschkiste.service' in system.enabled_user
     assert not system.exists('/etc/update-motd.d/99-rpi-jukebox-rfid-welcome')
     assert system.exists('/etc/update-motd.d/99-lauschkiste-welcome')
+
+
+def test_service_is_started_and_restarted_after_a_unit_change(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root')
+    setup_run(system, home, names=['service'])
+    assert 'lauschkiste.service' in system.active
+    assert ('systemctl', '--user', 'enable', '--now', 'lauschkiste.service') in system.commands
+    assert not any('restart' in c for c in system.commands)
+
+    system.commands.clear()
+    system.write('~/.config/systemd/user/lauschkiste.service', '[Unit]\nDescription=old\n')
+    setup_run(system, home, names=['service'])
+    assert ('systemctl', '--user', 'restart', 'lauschkiste.service') in system.commands

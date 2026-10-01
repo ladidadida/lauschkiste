@@ -94,9 +94,13 @@ class ServiceStep(Step):
         if system.exists(self.LEGACY_UNIT_PATH) or system.unit_enabled(LEGACY_SERVICE, user=True):
             system.run('systemctl', '--user', 'disable', '--now', LEGACY_SERVICE, check=False)
             system.remove(self.LEGACY_UNIT_PATH)
+        unit_changed = system.read(self.UNIT_PATH) != self.unit(ctx)
         system.write(self.UNIT_PATH, self.unit(ctx))
         system.run('systemctl', '--user', 'daemon-reload')
-        system.run('systemctl', '--user', 'enable', SERVICE)
+        was_running = system.unit_active(SERVICE, user=True)
+        system.run('systemctl', '--user', 'enable', '--now', SERVICE)
+        if was_running and unit_changed:
+            system.run('systemctl', '--user', 'restart', SERVICE)
         if ctx.answer('start_at_boot') and not self._lingering(ctx):
             system.run('loginctl', 'enable-linger', system.user, root=True)
 
