@@ -1,8 +1,7 @@
 # Renaming to Lauschkiste
 
 > Plan for track 4 of [roadmap-core-architecture.md](roadmap-core-architecture.md) ("New name").
-> Status: planned, to be done after the Raspberry Pi 3B test of
-> [packaging-and-setup.md](packaging-and-setup.md).
+> Status: steps 1-6 done (2026-10-04); open: archive the fork, first pre-release, verification on a Pi.
 
 ## Decision
 
