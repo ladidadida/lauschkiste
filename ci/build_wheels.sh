@@ -15,6 +15,12 @@ if [[ ! -f "${ROOT}/packages/webapp/build/index.html" ]]; then
   echo "No web app build in packages/webapp/build" >&2
   exit 1
 fi
+newer="$(find "${ROOT}/packages/webapp/src" "${ROOT}/packages/webapp/public" "${ROOT}/packages/webapp/package.json" \
+  -newer "${ROOT}/packages/webapp/build/index.html" -type f -not -path '*/cover-cache/*' -print -quit)"
+if [[ -n "${newer}" ]]; then
+  echo "packages/webapp/build is older than its sources (e.g. ${newer#"${ROOT}/"}); rebuild it or unset SKIP_WEBAPP_BUILD" >&2
+  exit 1
+fi
 
 rm -rf "${WEBAPP_TARGET:?}"
 cp -r "${ROOT}/packages/webapp/build" "${WEBAPP_TARGET}"
