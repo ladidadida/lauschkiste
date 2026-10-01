@@ -127,3 +127,29 @@ if __name__ == '__main__':
     test_contains()
     test_lock()
     test_context()
+
+
+def test_write_yaml_interrupted_keeps_old_file(tmp_path, monkeypatch):
+    path = tmp_path / 'jukebox.yaml'
+    path.write_text('system:\n  box_name: Old\n')
+    path.chmod(0o640)
+    cfg = cfghandler.ConfigHandler('atomic')
+    cfghandler.load_yaml(cfg, str(path))
+    cfg.setn('system', 'box_name', value='New')
+
+    def interrupted(*args, **kwargs):
+        raise KeyboardInterrupt
+    monkeypatch.setattr(cfghandler.YAML, 'dump', interrupted)
+    try:
+        cfghandler.write_yaml(cfg, str(path))
+    except KeyboardInterrupt:
+        pass
+    else:
+        raise AssertionError('write was not interrupted')
+    assert path.read_text() == 'system:\n  box_name: Old\n'
+    assert list(tmp_path.iterdir()) == [path]
+
+    monkeypatch.undo()
+    cfghandler.write_yaml(cfg, str(path))
+    assert 'box_name: New' in path.read_text()
+    assert path.stat().st_mode & 0o777 == 0o640

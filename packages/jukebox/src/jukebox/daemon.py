@@ -87,7 +87,8 @@ class JukeBox:
         self._signal_cnt += 1
         # A further signal can interrupt this handler; decide on the count this call started with.
         count = self._signal_cnt
-        timeout: float = 5.0
+        # Below systemd's default stop timeout (90 s); a Pi Zero needs well over 5 s
+        timeout: float = 30.0
         time_start = time.time_ns()
         msg = f"Received signal '{signal.Signals(esignal).name}'. Count = {count}"
         print(msg)

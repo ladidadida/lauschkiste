@@ -343,6 +343,22 @@ def ensure_default_config(filename: str, template: str) -> None:
     shutil.copyfile(template, filename)
 
 
+def _write_atomically(filename: str, write) -> None:
+    """Write via a temporary file and rename it, so an interrupted write never leaves a truncated file."""
+    tmp = f"{filename}.tmp"
+    try:
+        with open(tmp, 'wt') as stream:
+            write(stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        if os.path.exists(filename):
+            shutil.copymode(filename, tmp)
+        os.replace(tmp, filename)
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+
+
 def write_yaml(cfg: ConfigHandler, filename: str, only_if_changed: bool = False, *args, **kwargs) -> None:
     """
     Writes ConfigHandler data to yaml file / sys.stdout
@@ -363,8 +379,7 @@ def write_yaml(cfg: ConfigHandler, filename: str, only_if_changed: bool = False,
             if filename is sys.stdout:
                 yaml.dump(cfg._data, sys.stdout, *args, **kwargs)
             else:
-                with open(filename, 'wt') as stream:
-                    yaml.dump(cfg._data, stream, *args, **kwargs)
+                _write_atomically(filename, lambda stream: yaml.dump(cfg._data, stream, *args, **kwargs))
         else:
             logger.info(f"({cfg.name}) "
                         f"Not writing to file as data has unchanged status set (use only_if_changed=False to override)")

@@ -202,7 +202,8 @@ class FastApiServer(threading.Thread):
         self._server = None
         self._executor = None
 
-    def start_and_wait(self, timeout=5):
+    def start_and_wait(self, timeout=120):
+        """The timeout only catches a hung start; slow boards (Pi Zero) need well over 5 s."""
         self.start()
         if not self._ready.wait(timeout):
             raise TimeoutError('Timed out while starting FastAPI server.')
