@@ -2,20 +2,20 @@ import importlib.util
 
 import pytest
 
-pytest.importorskip('jukebox_rfid_readers', reason="the rfid-readers plugin package is not installed")
+pytest.importorskip('lauschkiste_plugin_rfid_readers', reason="the rfid-readers plugin package is not installed")
 
-import jukebox.cfghandler
-import jukebox_rfid_readers
-from jukebox.cfghandler import ConfigHandler
-from jukebox.contract.manager import ModuleManager, discover_plugins
-from jukebox.publishing.bus import EventBus
-from jukebox.rfid.cards import Cards
-from jukebox.rfid.reader import Rfid
+import lauschkiste.cfghandler
+import lauschkiste_plugin_rfid_readers
+from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.contract.manager import ModuleManager, discover_plugins
+from lauschkiste.publishing.bus import EventBus
+from lauschkiste.rfid.cards import Cards
+from lauschkiste.rfid.reader import Rfid
 
 
 @pytest.fixture
 def start(tmp_path):
-    main = jukebox.cfghandler.get_handler('jukebox')
+    main = lauschkiste.cfghandler.get_handler('jukebox')
     main.config_dict({})
     (tmp_path / 'rfid.yaml').write_text("rfid:\n  readers: {}\n")
     managers = []
@@ -52,7 +52,7 @@ def test_enabled_driver_plugin_registers_its_driver(start):
     assert manager.failed == {}
     readers = manager.instance('rfid').readers
     assert readers.names() == ['generic_usb']
-    assert isinstance(readers.get('generic_usb'), jukebox_rfid_readers.ReaderDriver)
+    assert isinstance(readers.get('generic_usb'), lauschkiste_plugin_rfid_readers.ReaderDriver)
 
 
 def test_only_enabled_drivers_are_registered(start):

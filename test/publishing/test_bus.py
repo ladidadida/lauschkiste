@@ -4,7 +4,7 @@ import time
 
 import pytest
 
-from jukebox.publishing.bus import EventBus
+from lauschkiste.publishing.bus import EventBus
 
 
 def test_publish_delivers_to_subscribers_and_updates_cache():

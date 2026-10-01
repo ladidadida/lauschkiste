@@ -1,4 +1,4 @@
-import jukebox.cfghandler as cfghandler # noqa
+import lauschkiste.cfghandler as cfghandler # noqa
 from ruamel.yaml import YAML # noqa
 
 ref_dict = {'l1': {'key1': 'value1'}, 'tl': 'number2'}

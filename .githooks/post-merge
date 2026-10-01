@@ -82,7 +82,7 @@ python_req_changed="$(git diff --name-only --no-commit-id ORIG_HEAD HEAD pyproje
 webapp_changed="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD packages/webapp)"
 webapp_dep_changed="$(git diff --name-only --no-commit-id ORIG_HEAD HEAD packages/webapp/package.json)"
 githooks_changed="$(git diff --name-only --no-commit-id ORIG_HEAD HEAD .githooks)"
-setup_changed="$(git diff --name-only --no-commit-id ORIG_HEAD HEAD packages/cli/src/jukebox_cli/setup)"
+setup_changed="$(git diff --name-only --no-commit-id ORIG_HEAD HEAD packages/cli/src/lauschkiste_cli/setup)"
 
 if [[ -n $python_req_changed ]]; then
     warn_python_requirements

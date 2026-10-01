@@ -1,0 +1,36 @@
+[project]
+name = "lauschkiste"
+# Keep in sync with src/lauschkiste/version.py
+version = "0.1.0"
+description = "RFID-controlled audio jukebox for the Raspberry Pi (fork) -- Jukebox Core"
+requires-python = ">=3.11"
+dependencies = [
+  "evdev",
+  "mutagen",
+  "pulsectl",
+  "ruamel.yaml",
+  "requests",
+  "fastapi",
+  "packaging",
+  "pydantic>=2",
+  "uvicorn",
+  # Default player backend (player.backend: local_audio): decode via ffmpeg-bundled wheels (no
+  # system ffmpeg needed, wheels exist for x86_64/aarch64/armv7l), output via PortAudio.
+  "av",
+  "sounddevice",
+  # audioop (fast PCM volume scaling) left the standard library in Python 3.13
+  "audioop-lts; python_version >= '3.13'",
+]
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lauschkiste"]
+# The web app build, copied in by ci/build_wheels.sh (ignored by git, so listed explicitly)
+artifacts = ["src/lauschkiste/webapp/**"]
+

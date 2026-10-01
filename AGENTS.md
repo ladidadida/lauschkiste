@@ -18,7 +18,7 @@ pyproject.toml     uv workspace root (virtual: no [project] table); shared dev-t
 packages/          uv workspace members
   jukebox/         Python core application ("Jukebox Core") — the daemon that runs on the Pi
     pyproject.toml Real [project] table (package=true), runtime dependencies, hatchling backend
-    src/jukebox/   The installable package: the core/plugin contract (contract/), the core
+    src/lauschkiste/   The installable package: the core/plugin contract (contract/), the core
                    modules (core_modules.py: system, library, player, volume, timers, jingle,
                    input, cards, rfid), FastAPI API bridge
                    (api/), in-process event bus (publishing/), config handling. Removed former
@@ -27,9 +27,9 @@ packages/          uv workspace members
                    documentation/developers/core-and-plugins.md.
     interfaces/    Interface snapshots of the framework contract and every core module, checked
                    by test/contract/test_snapshots.py (see "Core and plugins" below)
-  cli/             Jukebox CLI (jukebox-cli): `jukebox run` (start the daemon), `home`,
+  cli/             Jukebox CLI (lauschkiste-cli): `jukebox run` (start the daemon), `home`,
                    `plugin list|enable|disable|install`, `update`, `setup` (machine setup steps in
-                   jukebox_cli/setup/, see documentation/developers/packaging-and-setup.md),
+                   lauschkiste_cli/setup/, see documentation/developers/packaging-and-setup.md),
                    `debug sniff` (publishing-bus WebSocket sniffer).
   webapp/          React front-end (the touch/web UI), talks to the core via HTTP/WebSocket
                    (FastAPI, `/api/v1/*`). Not a uv workspace member (npm/Vite project), but lives
@@ -47,10 +47,10 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
 
 ## Architecture essentials
 
-- **Core and plugins** (`jukebox.contract`, design in `documentation/developers/core-and-plugins.md`):
+- **Core and plugins** (`lauschkiste.contract`, design in `documentation/developers/core-and-plugins.md`):
   every piece of functionality is a *module*: a `CoreModule` (always shipped, always running,
   listed in `jukebox/core_modules.py`) or a `Plugin` (separate package, found via the
-  `jukebox.plugins` entry-point group, loaded only when listed under `plugins:` in jukebox.yaml).
+  `lauschkiste.plugins` entry-point group, loaded only when listed under `plugins:` in jukebox.yaml).
   Start order comes from `requires`. Modules declare operations with `@action` (state-changing:
   REST route + card action `<module>.<action>` + in-process call) and `@query` (read-only GET),
   typed events with `event(name, Model)` (topic `<module>.<name>`), and extension points
@@ -58,21 +58,21 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   built from the signature. Don't hand-write REST routes or card aliases for new functionality --
   declare them on a module. Per-module lock by default (`concurrency = 'threadsafe'` opts out).
 - **Interface versioning**: each module has an `interface_version`, the framework a
-  `CONTRACT_VERSION`. Snapshots in `packages/jukebox/interfaces/` (and `interfaces/<plugin>.json` in bundled
+  `CONTRACT_VERSION`. Snapshots in `packages/lauschkiste/interfaces/` (and `interfaces/<plugin>.json` in bundled
   plugin packages) are compared in CI: a breaking change (removed/renamed operation or field,
   type change, protocol change) needs a major bump, an addition a minor bump. After bumping, run
-  `uv run python -m jukebox.contract.snapshots --update` and commit the snapshot.
+  `uv run python -m lauschkiste.contract.snapshots --update` and commit the snapshot.
 - **API**: the webapp talks to routes generated from the modules' operations (`/api/v1/player/*`,
   `/api/v1/settings`, `/api/v1/cards`, ... -- see `/docs` on the running daemon), plus
   `GET /api/v1/modules` (active modules, their operations/events, skipped plugins) and
   `GET /api/v1/actions` (card actions with argument schemas). Card entries, card removal actions
   and the second-swipe action are stored as `action: <module>.<action>` plus named `args`
   (`documentation/builders/actions.md`); the old alias/package-plugin-method format is converted
-  by `jukebox.legacy_actions` (cards.yaml is migrated on start-up with a backup). ZeroMQ, the
+  by `lauschkiste.legacy_actions` (cards.yaml is migrated on start-up with a backup). ZeroMQ, the
   generic HTTP RPC endpoint and the old call registry are gone. A first CLI slice exists
   (`packages/cli`, `jukebox run`/`jukebox debug sniff`), but a dedicated CLI for the API is not
   designed yet.
-- **Event bus** (`jukebox.publishing.get_bus()`, a `jukebox.publishing.bus.EventBus`): thread-safe,
+- **Event bus** (`lauschkiste.publishing.get_bus()`, a `lauschkiste.publishing.bus.EventBus`): thread-safe,
   in-process, last-value cached. Modules publish typed events through `ctx.publish(event,
   payload)` (validated against the event's model; raises with `JUKEBOX_STRICT=1`, logs and drops
   otherwise), never untyped dicts. The
@@ -81,17 +81,17 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
 - **Player backend**: registered at the `player.backends` extension point, selected via
   `player.backend` config. Default is `local_audio` (decodes via PyAV, outputs via sounddevice/
   PortAudio, no external process); `mpd` (an external mpd server, via `python-mpd2`) is an opt-in
-  alternative. Backends implement `jukebox.player.backend.PlayerBackend`; the player module turns
-  their raw status into the typed `player.status` event (`jukebox.player.status.PlayerStatus`).
-- **Library** (`jukebox.library`): owns the music library -- file management, a SQLite index of
+  alternative. Backends implement `lauschkiste.player.backend.PlayerBackend`; the player module turns
+  their raw status into the typed `player.status` event (`lauschkiste.player.status.PlayerStatus`).
+- **Library** (`lauschkiste.library`): owns the music library -- file management, a SQLite index of
   tags/durations (`$JUKEBOX_HOME/settings/library.sqlite`), cover art (`$JUKEBOX_HOME/cache/covers`), and the
   `library.sources` extension point for further catalogs (mpd, streaming). Browsing routes are
   `/api/v1/library/*`; the local source id is `local`.
-- **Paths** (`jukebox.paths`): all runtime data lives in `JUKEBOX_HOME` (`--home`, `$JUKEBOX_HOME`,
+- **Paths** (`lauschkiste.paths`): all runtime data lives in `JUKEBOX_HOME` (`--home`, `$JUKEBOX_HOME`,
   default `$XDG_DATA_HOME/jukebox`; this checkout's `.env` sets it to `shared/`). Relative paths in
   the configuration resolve against it (a legacy leading `shared/` or `../../shared/` is dropped); never resolve paths
   against the working directory or the checkout. Packaged files (default settings, sounds, service
-  templates) live in `jukebox/resources/`, read via `jukebox.paths.resource()`. The web app is
+  templates) live in `jukebox/resources/`, read via `lauschkiste.paths.resource()`. The web app is
   served from `api.webapp_dir` / `$JUKEBOX_WEBAPP_DIR`, else from the package, else (source checkout) from
   `packages/webapp/build`.
   See `documentation/developers/packaging-and-setup.md`.
@@ -111,7 +111,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   conventions" section) — this is a deliberate v2→v3 break, follow it strictly.
 - **JavaScript/React** (`packages/webapp`): Create React App (`react-scripts`), MUI v5, i18next for
   translations (`de`/`en` under `packages/webapp/public/locales`), Ramda, react-router-dom.
-- **Config format**: YAML (`ruamel.yaml`), defaults in `packages/jukebox/src/jukebox/resources/default-settings/`.
+- **Config format**: YAML (`ruamel.yaml`), defaults in `packages/lauschkiste/src/lauschkiste/resources/default-settings/`.
 - Everything under any `scratch*`-named folder is git- and ruff-ignored — safe scratch space,
   never a place for real code.
 

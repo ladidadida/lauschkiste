@@ -31,7 +31,7 @@ See [Best practice procedure](../builders/configuration.md#best-practice-procedu
 
 ### Audio
 
-**Command:** `jukebox setup audio` (`packages/cli/src/jukebox_cli/setup/steps/extras.py`)
+**Command:** `jukebox setup audio` (`packages/cli/src/lauschkiste_cli/setup/steps/extras.py`)
 
 Selects the primary and secondary audio sinks used by the Jukebox (`volume.outputs`).
 
@@ -41,7 +41,7 @@ selected outputs. For more information see
 
 ### RFID Reader
 
-**Command:** `jukebox setup rfid` (uses `jukebox_rfid_readers.configure`)
+**Command:** `jukebox setup rfid` (uses `lauschkiste_plugin_rfid_readers.configure`)
 
 Configures the RFID readers and enables their driver plugins.
 
@@ -56,7 +56,7 @@ Run this once to register and configure the RFID readers with Jukebox. It can be
 
 Most of the player/settings/cards surface is now typed, documented REST -- see `/docs` (Swagger
 UI) on the running daemon for the full, current list. `GET /api/v1/player/status`,
-`POST /api/v1/player/play`, `PUT /api/v1/player/volume`, etc. -- see `jukebox.api.fastapi_server`
+`POST /api/v1/player/play`, `PUT /api/v1/player/volume`, etc. -- see `lauschkiste.api.fastapi_server`
 and `documentation/developers/roadmap-core-architecture.md`, "Advanced plugin system" for how this
 came together.
 

@@ -3,8 +3,8 @@ from typing import Optional, Protocol
 import pytest
 from pydantic import BaseModel
 
-from jukebox.contract import CoreModule, action, event, extension_point, query
-from jukebox.contract.interfaces import (
+from lauschkiste.contract import CoreModule, action, event, extension_point, query
+from lauschkiste.contract.interfaces import (
     EQUAL, MAJOR, MINOR, compare_module_interfaces, describe_module_interface, required_bump_satisfied,
 )
 

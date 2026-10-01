@@ -7,11 +7,11 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 from starlette.testclient import TestClient
 
-from jukebox.contract import CoreModule, query
-from jukebox.api.events import EventBroker, MAX_MESSAGE_SIZE
-from jukebox.api.fastapi_server import FastApiServer, create_app
-from jukebox.library.module import Library
-from jukebox.publishing.bus import EventBus
+from lauschkiste.contract import CoreModule, query
+from lauschkiste.api.events import EventBroker, MAX_MESSAGE_SIZE
+from lauschkiste.api.fastapi_server import FastApiServer, create_app
+from lauschkiste.library.module import Library
+from lauschkiste.publishing.bus import EventBus
 
 
 class FakeClient:

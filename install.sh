@@ -119,8 +119,8 @@ install_package() {
         download_release_wheels "$wheels"
     fi
     local cli with=()
-    cli="$(ls "$wheels"/jukebox_cli-*.whl 2>/dev/null | head -n1)"
-    [[ -n "$cli" ]] || die "no jukebox_cli wheel in ${wheels}"
+    cli="$(ls "$wheels"/lauschkiste_cli-*.whl 2>/dev/null | head -n1)"
+    [[ -n "$cli" ]] || die "no lauschkiste_cli wheel in ${wheels}"
     for wheel in "$wheels"/*.whl; do
         [[ "$wheel" == "$cli" ]] || with+=(--with "$wheel")
     done

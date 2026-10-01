@@ -3,9 +3,9 @@ from unittest.mock import Mock, call, sentinel
 
 import pytest
 
-from jukebox.player.coordinator import PlayerCoordinator
-import jukebox.legacy_actions as legacy_actions
-from jukebox.player.module import Player
+from lauschkiste.player.coordinator import PlayerCoordinator
+import lauschkiste.legacy_actions as legacy_actions
+from lauschkiste.player.module import Player
 
 
 def backend_with(**methods):

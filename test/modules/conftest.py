@@ -2,11 +2,11 @@ import time
 
 import pytest
 
-from jukebox.cfghandler import ConfigHandler
-from jukebox.contract import CoreModule, action
-from jukebox.contract.manager import ModuleManager
-from jukebox.player.module import Player
-from jukebox.publishing.bus import EventBus
+from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.contract import CoreModule, action
+from lauschkiste.contract.manager import ModuleManager
+from lauschkiste.player.module import Player
+from lauschkiste.publishing.bus import EventBus
 
 
 class FakeCoordinator:

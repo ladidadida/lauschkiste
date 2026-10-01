@@ -1,6 +1,6 @@
 import pytest
 
-from jukebox.legacy_actions import convert, is_legacy
+from lauschkiste.legacy_actions import convert, is_legacy
 
 PARAMS = {
     'player.play_folder': ['folder', 'recursive'],

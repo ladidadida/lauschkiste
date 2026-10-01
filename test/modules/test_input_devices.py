@@ -3,7 +3,7 @@ import threading
 
 import pytest
 
-from jukebox.input_devices import InputDevices
+from lauschkiste.input_devices import InputDevices
 
 KEYS = {'KEY_PLAYPAUSE': 164, 'KEY_NEXTSONG': 163, 'KEY_VOLUMEUP': 115, 'BTN_TRIGGER': 288}
 
@@ -55,8 +55,8 @@ class FakeInput(InputDevices):
 
 @pytest.fixture(autouse=True)
 def fast_rescan(monkeypatch):
-    import jukebox.input_devices
-    monkeypatch.setattr(jukebox.input_devices, 'RESCAN_INTERVAL', 0.05)
+    import lauschkiste.input_devices
+    monkeypatch.setattr(lauschkiste.input_devices, 'RESCAN_INTERVAL', 0.05)
     FakeEvdev.devices = []
 
 
@@ -91,7 +91,7 @@ def test_legacy_key_mapping_and_reconnect(start_modules, recorder, recorder_call
 
 
 def test_media_keys_attach_to_devices_with_media_keys(start_modules, fake_player, coordinator, wait_for):
-    from jukebox.volume import Volume
+    from lauschkiste.volume import Volume
     mouse = FakeDevice('Mouse', '/dev/input/event2', [272])
     headset = FakeDevice('BT Headset', '/dev/input/event9', [164, 115])
     FakeEvdev.devices = [mouse, headset]

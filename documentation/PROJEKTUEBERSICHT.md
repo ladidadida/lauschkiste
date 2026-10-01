@@ -21,16 +21,16 @@ Architektur. Es existiert parallel weiter die stabile Version 2 im `main`-Zweig 
 ├── packages/                   uv-Workspace-Member
 │   ├── jukebox/                Python-Kernanwendung ("Jukebox Core"), läuft als Daemon auf dem Pi
 │   │   ├── pyproject.toml      Echtes [project] (package=true), Runtime-Dependencies, hatchling
-│   │   └── src/jukebox/        Das installierbare Package: Component-Registry, FastAPI-API-Bridge
+│   │   └── src/lauschkiste/        Das installierbare Package: Component-Registry, FastAPI-API-Bridge
 │   │                           (api/: HTTP + WebSocket + Webapp-Static-Files + /logs, ersetzt
 │   │                           RPC-Server und nginx), In-Process-Pub/Sub-Bus (publishing/),
-│   │                           Config-Handling, sowie die von jukebox.daemon explizit verdrahteten
+│   │                           Config-Handling, sowie die von lauschkiste.daemon explizit verdrahteten
 │   │                           Komponenten (kein Plugin-System mehr): player, rfid, publishing,
 │   │                           system (vormals "misc"-RPC-Funktionen), misc (Utility-Code). Andere
 │   │                           frühere Komponenten (gpio, mqtt, volume, timers, battery_monitor,
 │   │                           controls, jingle, hostif, synchronisation) wurden entfernt, kommen
 │   │                           später neu gestaltet zurück. Kein ZeroMQ mehr im ganzen Projekt.
-│   ├── cli/                    Jukebox-CLI (jukebox-cli): `jukebox run` (Core starten), `home`,
+│   ├── cli/                    Jukebox-CLI (lauschkiste-cli): `jukebox run` (Core starten), `home`,
 │   │                           `plugin ...`, `setup ...` (Maschinen-Setup), `update`,
 │   │                           `debug sniff` (Publishing-Bus-Sniffer).
 │   └── webapp/                 React-Frontend (Touch-/Web-UI), kommuniziert per HTTP/WebSocket mit
@@ -57,7 +57,7 @@ Siehe `documentation/developers/roadmap-core-architecture.md` für den aktuellen
 Punkte. Kurzfassung:
 
 1. **Component-Registry** (`jukebox.registry`) — ersetzt das alte, config-getriebene
-   Plugin-System. `jukebox.daemon.run()` verdrahtet jede Komponente explizit
+   Plugin-System. `lauschkiste.daemon.run()` verdrahtet jede Komponente explizit
    (`register()`/`start()`), nichts wird mehr dynamisch aus der Config geladen.
 2. **FastAPI als Browser-Bridge** — HTTP (typisierte REST-Endpoints unter `/api/v1/{player,settings,cards,library}`), WebSocket
    (`/api/v1/events`), und seit Kurzem auch das Webapp-Static-Build + `/logs` direkt (kein nginx
@@ -66,7 +66,7 @@ Punkte. Kurzfassung:
    (`src/cli_client/pbc.c`) und der ZMQ-REP-Server wurden entfernt. Es gibt inzwischen eine erste
    CLI-Iteration (`packages/cli`, `jukebox run`/`jukebox debug sniff`), aber ein dediziertes
    RPC-Tool auf Basis des FastAPI-Endpoints ist noch nicht entworfen.
-3. **In-Process Pub/Sub-Bus** (`jukebox.publishing`, `EventBus`) — Status/Events, thread-sicher,
+3. **In-Process Pub/Sub-Bus** (`lauschkiste.publishing`, `EventBus`) — Status/Events, thread-sicher,
    kein ZeroMQ mehr. Die Webapp und `jukebox debug sniff` abonnieren über die
    FastAPI-WebSocket-Bridge.
 
@@ -81,7 +81,7 @@ werden mitinstalliert, aber nur geladen, wenn sie unter `plugins:` in der Config
 
 ## Eingesetzte Tools und Libraries
 
-### Python-Kern (`packages/jukebox`)
+### Python-Kern (`packages/lauschkiste`)
 
 | Zweck | Library |
 |---|---|
@@ -139,11 +139,11 @@ Es gibt zwei grundsätzliche Wege:
    `curl -fsSL https://raw.githubusercontent.com/ladidadida/RPi-Jukebox-RFID/main/install.sh | bash`.
    Das Skript installiert Basis-Pakete und uv, dann die Jukebox (Release-Wheels per
    `uv tool install`, oder mit `--source` als Git-Checkout) und startet `jukebox setup`. Die
-   Setup-Schritte (`packages/cli/src/jukebox_cli/setup/`) richten u. a. System-Pakete, den
+   Setup-Schritte (`packages/cli/src/lauschkiste_cli/setup/`) richten u. a. System-Pakete, den
    systemd-User-Service, MPD, Samba, Kiosk-Modus, Autohotspot, RFID-Reader und
    Boot-Optimierung ein; jeder Schritt prüft zuerst und ändert nur, was fehlt.
 3. Alle Daten liegen in `JUKEBOX_HOME` (auf dem Pi `~/jukebox`): `settings/jukebox.yaml`
-   (Vorlage: `packages/jukebox/src/jukebox/resources/default-settings/jukebox.default.yaml`),
+   (Vorlage: `packages/lauschkiste/src/lauschkiste/resources/default-settings/jukebox.default.yaml`),
    Musik in `audiofolders/`.
 
 ### 2. Lokale Entwicklungsumgebung (Docker, ohne Pi-Hardware)

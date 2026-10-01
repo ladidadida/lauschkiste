@@ -3,8 +3,8 @@ import types
 
 import pytest
 
-from jukebox.contract import OperationError
-from jukebox.volume import Volume
+from lauschkiste.contract import OperationError
+from lauschkiste.volume import Volume
 
 
 def levels(events):
@@ -151,8 +151,8 @@ def test_pulse_mixer_scales_by_volume_limit_and_switches_outputs(start_modules, 
 
 
 def test_legacy_pulse_section_is_read(start_modules, coordinator, pulse, fake_player):
-    import jukebox.volume
-    legacy = jukebox.volume.cfg_main
+    import lauschkiste.volume
+    legacy = lauschkiste.volume.cfg_main
     legacy.config_dict({'pulse': {'soft_max_volume': 40}})
     try:
         manager, _ = start_modules([fake_player, Volume], {})

@@ -9,19 +9,19 @@ tasks:
   # ── Static checks ────────────────────────────────────────────────────────────
 
   lint:
-    command: uv run ruff check packages/jukebox/src packages/cli/src packages/plugins test
+    command: uv run ruff check packages/lauschkiste/src packages/cli/src packages/plugins test
     stage: lint
     inputs:
-      - "packages/jukebox/src/**/*.py"
+      - "packages/lauschkiste/src/**/*.py"
       - "packages/plugins/**/*.py"
       - "packages/cli/src/**/*.py"
       - "test/**/*.py"
       - pyproject.toml
 
   format:
-    command: uv run ruff format packages/jukebox/src packages/cli/src packages/plugins test
+    command: uv run ruff format packages/lauschkiste/src packages/cli/src packages/plugins test
     inputs:
-      - "packages/jukebox/src/**/*.py"
+      - "packages/lauschkiste/src/**/*.py"
       - "packages/plugins/**/*.py"
       - "packages/cli/src/**/*.py"
       - "test/**/*.py"
@@ -32,10 +32,10 @@ tasks:
     # --check currently flags ~70 files), and applying it needs its own dedicated commit at a
     # moment that's acceptable for a large diff, not bundled into unrelated changes. See
     # documentation/developers/roadmap-core-architecture.md.
-    command: uv run ruff format --check packages/jukebox/src packages/cli/src packages/plugins test || true
+    command: uv run ruff format --check packages/lauschkiste/src packages/cli/src packages/plugins test || true
     stage: lint
     inputs:
-      - "packages/jukebox/src/**/*.py"
+      - "packages/lauschkiste/src/**/*.py"
       - "packages/plugins/**/*.py"
       - "packages/cli/src/**/*.py"
       - "test/**/*.py"
@@ -48,7 +48,7 @@ tasks:
     command: uv run pyright || true
     stage: lint
     inputs:
-      - "packages/jukebox/src/**/*.py"
+      - "packages/lauschkiste/src/**/*.py"
       - "packages/plugins/**/*.py"
       - "packages/cli/src/**/*.py"
       - pyproject.toml
@@ -59,7 +59,7 @@ tasks:
     command: uv run pytest --junit-xml=.reports/junit.xml
     stage: test
     inputs:
-      - "packages/jukebox/src/**/*.py"
+      - "packages/lauschkiste/src/**/*.py"
       - "packages/plugins/**/*.py"
       - "packages/cli/src/**/*.py"
       - "test/**/*.py"
@@ -76,14 +76,14 @@ tasks:
       - "packages/*/pyproject.toml"
       - "packages/plugins/*/pyproject.toml"
       - "packages/webapp/src/**"
-      - "packages/jukebox/src/jukebox/resources/**"
+      - "packages/lauschkiste/src/lauschkiste/resources/**"
     outputs:
       - dist/
 
   docs:
     command: uv run pydoc-markdown
     inputs:
-      - "packages/jukebox/src/**/*.py"
+      - "packages/lauschkiste/src/**/*.py"
       - "packages/plugins/**/*.py"
       - "packages/cli/src/**/*.py"
       - pydoc-markdown.yml
@@ -101,7 +101,7 @@ tasks:
 
   build:
     # Builds the webapp's production bundle into packages/webapp/build/, which
-    # jukebox.api.webapp_static serves directly on :5556 (see fastapi_server.py) -- so after
+    # lauschkiste.api.webapp_static serves directly on :5556 (see fastapi_server.py) -- so after
     # this, `uv run jukebox run` alone (no separate `npm start`) gives you the full app, API +
     # UI, on one port. No hot-reload though: re-run this after webapp changes; for active
     # frontend development, `cd packages/webapp && npm run dev` is still the right tool.

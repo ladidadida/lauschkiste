@@ -103,10 +103,10 @@ optimisation. Steps needing root run their commands through `sudo`.
    `.github/workflows/wheels.yml` builds them on every push/PR, installs them into a fresh
    environment and starts the jukebox; a tag `v<version>` attaches them to a GitHub release.
 3. **Plugin commands** -- *done*: `jukebox plugin list|enable|disable|install`
-   (`packages/cli/src/jukebox_cli/plugin.py`). `Plugin.extras` (contract 1.1) names the extras of
+   (`packages/cli/src/lauschkiste_cli/plugin.py`). `Plugin.extras` (contract 1.1) names the extras of
    the plugin's package that `enable --with-extras` installs; installs go through `uv pip` into the
    jukebox's own environment, `pip` as fallback.
-4. **Setup framework and steps** -- *done*: `packages/cli/src/jukebox_cli/setup/`. `System` wraps
+4. **Setup framework and steps** -- *done*: `packages/cli/src/lauschkiste_cli/setup/`. `System` wraps
    commands, files and machine facts (tests swap in a fake with a temporary root); steps:
    `packages`, `raspi`, `mpd`, `plugins`, `service`, `samba`, `rfid`, `kiosk`, `autohotspot`,
    `boot`, `welcome` (`jukebox setup --list`). Missing Debian packages of all chosen steps are
@@ -131,7 +131,7 @@ optimisation. Steps needing root run their commands through `sudo`.
    `~/.bashrc`. `ci/test_install.sh` runs it in a fresh `debian:<codename>-slim` container and
    starts the jukebox; the wheels workflow does that for the wheels (trixie, bookworm) and the
    checkout (trixie). No systemd in those containers, so the `service` step is not covered there.
-6. **`jukebox update`** -- *done* (`packages/cli/src/jukebox_cli/update.py`). Source checkout:
+6. **`jukebox update`** -- *done* (`packages/cli/src/lauschkiste_cli/update.py`). Source checkout:
    `git pull --ff-only`, `uv sync --no-dev --frozen`, web app rebuilt with npm if it changed.
    Package install: newest (or `--version`) GitHub release, if newer than the installed `jukebox`;
    its wheels are installed with `uv pip` into the running environment, so other installed plugins

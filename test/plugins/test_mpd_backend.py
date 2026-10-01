@@ -6,7 +6,7 @@ import pytest
 
 pytest.importorskip('mpd', reason="python-mpd2 comes with the mpd plugin package")
 
-from jukebox_plugin_mpd.backend import PlayerMPD
+from lauschkiste_plugin_mpd.backend import PlayerMPD
 
 
 def mpd_backend():

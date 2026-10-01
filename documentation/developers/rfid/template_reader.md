@@ -7,11 +7,11 @@
 
 This template provides the skeleton API for a new Reader. Readers are plugins: a driver
 registers at the `rfid.readers` extension point. The bundled drivers live in
-`packages/plugins/rfid-readers/src/jukebox_rfid_readers/`; each is exposed as its own plugin
+`packages/plugins/rfid-readers/src/lauschkiste_plugin_rfid_readers/`; each is exposed as its own plugin
 (`rfid_<driver>`) in that package's `pyproject.toml` and `__init__.py`. A driver in its own package
 does the same with its own entry point.
 
-Follow the instructions in [template_new_reader.py](../../../packages/plugins/rfid-readers/src/jukebox_rfid_readers/template_new_reader/template_new_reader.py)
+Follow the instructions in [template_new_reader.py](../../../packages/plugins/rfid-readers/src/lauschkiste_plugin_rfid_readers/template_new_reader/template_new_reader.py)
 
 Also have a look at the other reader subpackages to see how stuff works
 with an example
@@ -21,7 +21,7 @@ with an example
 Your new reader is a python subpackage with these three mandatory files
 
 ``` bash
-jukebox_rfid_readers/awesome_reader/
+lauschkiste_plugin_rfid_readers/awesome_reader/
   +- awesome_reader.py  <-- The actual reader module
   +- description.py     <-- A description module w/o dependencies. Do not change the filename!
   +- README.md         <-- The Readme

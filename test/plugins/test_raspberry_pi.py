@@ -4,16 +4,16 @@ from unittest.mock import Mock
 
 import pytest
 
-pytest.importorskip('jukebox_plugin_raspberry_pi', reason="the raspberry-pi plugin package is not installed")
+pytest.importorskip('lauschkiste_plugin_raspberry_pi', reason="the raspberry-pi plugin package is not installed")
 
-import jukebox.cfghandler
-import jukebox_plugin_raspberry_pi as pi
-from jukebox.cfghandler import ConfigHandler
-from jukebox.contract import CoreModule, action
-from jukebox.contract.manager import ModuleManager
-from jukebox.publishing.bus import EventBus
-from jukebox_plugin_raspberry_pi.battery import BatteryMonitor, state_of_charge
-from jukebox_plugin_raspberry_pi.health import parse_throttled
+import lauschkiste.cfghandler
+import lauschkiste_plugin_raspberry_pi as pi
+from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.contract import CoreModule, action
+from lauschkiste.contract.manager import ModuleManager
+from lauschkiste.publishing.bus import EventBus
+from lauschkiste_plugin_raspberry_pi.battery import BatteryMonitor, state_of_charge
+from lauschkiste_plugin_raspberry_pi.health import parse_throttled
 
 
 class Recorder(CoreModule):
@@ -28,9 +28,9 @@ class Recorder(CoreModule):
 @pytest.fixture(autouse=True)
 def clean():
     Recorder.calls = []
-    jukebox.cfghandler.get_handler('jukebox').config_dict({})
+    lauschkiste.cfghandler.get_handler('jukebox').config_dict({})
     yield
-    jukebox.cfghandler.get_handler('jukebox').config_dict({})
+    lauschkiste.cfghandler.get_handler('jukebox').config_dict({})
 
 
 def start(settings):
@@ -79,7 +79,7 @@ def test_shutdown_runs_the_system_command(monkeypatch):
 def test_legacy_host_debug_mode(monkeypatch):
     popen = Mock()
     monkeypatch.setattr(subprocess, 'Popen', popen)
-    jukebox.cfghandler.get_handler('jukebox').config_dict({'host': {'debug_mode': True}})
+    lauschkiste.cfghandler.get_handler('jukebox').config_dict({'host': {'debug_mode': True}})
     manager, _ = start({})
     manager.catalog.call('raspberry_pi.reboot')
     popen.assert_not_called()

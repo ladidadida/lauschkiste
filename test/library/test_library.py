@@ -2,7 +2,7 @@ import os
 
 import pytest
 
-from jukebox.library import LibraryError, MusicLibrary
+from lauschkiste.library import LibraryError, MusicLibrary
 
 
 @pytest.fixture

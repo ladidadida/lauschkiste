@@ -8,7 +8,7 @@
 /shared/*
 /packages/webapp/public/cover-cache/*.*
 /packages/webapp/test-results/
-/packages/jukebox/src/jukebox/webapp/
+/packages/lauschkiste/src/lauschkiste/webapp/
 /dist/
 /packages/webapp/playwright-report/
 

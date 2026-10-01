@@ -6,7 +6,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUT="${1:-${ROOT}/dist}"
-WEBAPP_TARGET="${ROOT}/packages/jukebox/src/jukebox/webapp"
+WEBAPP_TARGET="${ROOT}/packages/lauschkiste/src/lauschkiste/webapp"
 
 if [[ -z "${SKIP_WEBAPP_BUILD:-}" ]]; then
   (cd "${ROOT}/packages/webapp" && npm ci && npm run build)

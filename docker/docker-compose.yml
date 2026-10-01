@@ -36,7 +36,7 @@ services:
     restart: unless-stopped
     tty: true
     volumes:
-      - ../packages/jukebox:/root/RPi-Jukebox-RFID/packages/jukebox
+      - ../packages/lauschkiste:/root/RPi-Jukebox-RFID/packages/lauschkiste
       - ../packages/cli:/root/RPi-Jukebox-RFID/packages/cli
       - ../packages/webapp/public/cover-cache:/root/RPi-Jukebox-RFID/packages/webapp/build/cover-cache
       - ../shared:/root/RPi-Jukebox-RFID/shared

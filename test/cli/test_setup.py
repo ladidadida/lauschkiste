@@ -1,10 +1,10 @@
 import pytest
 
-import jukebox.paths
-from jukebox_cli import plugin
-from jukebox_cli.setup import run_setup
-from jukebox_cli.setup.base import Answers, Context
-from jukebox_cli.setup.system import System
+import lauschkiste.paths
+from lauschkiste_cli import plugin
+from lauschkiste_cli.setup import run_setup
+from lauschkiste_cli.setup.base import Answers, Context
+from lauschkiste_cli.setup.system import System
 
 
 class FakeSystem(System):
@@ -65,9 +65,9 @@ class FakeSystem(System):
 
 @pytest.fixture
 def home(tmp_path):
-    jukebox.paths.set_home(tmp_path / 'home')
+    lauschkiste.paths.set_home(tmp_path / 'home')
     yield tmp_path / 'home'
-    jukebox.paths.set_home(None)
+    lauschkiste.paths.set_home(None)
 
 
 @pytest.fixture
@@ -111,7 +111,7 @@ def test_pi_setup(tmp_path, home, extras):
     failed, ctx = setup_run(system, home, answers={'disable_onboard_audio': True, 'samba': True})
     assert failed == 0
     assert 'raspberry_pi' in ctx.enabled_plugins()
-    assert extras == ['jukebox-plugin-raspberry-pi[gpio]']
+    assert extras == ['lauschkiste-plugin-raspberry-pi[gpio]']
     assert system.exists('/var/lib/systemd/linger/pi')
     assert 'audio=off' in system.read('/boot/firmware/config.txt')
     assert 'disable_splash=1' in system.read('/boot/firmware/config.txt')
@@ -167,7 +167,7 @@ def test_mpd_and_hotspot(tmp_path, home, extras):
 
 
 def test_audio_is_skipped_unattended_and_writes_outputs_interactively(tmp_path, home, extras, monkeypatch):
-    from jukebox_cli.setup.steps import extras as extras_steps
+    from lauschkiste_cli.setup.steps import extras as extras_steps
     system = FakeSystem(tmp_path / 'root')
     failed, ctx = setup_run(system, home, names=['audio'], answers={'audio': True})
     assert failed == 0
@@ -206,7 +206,7 @@ def test_existing_sound_card_is_the_default(tmp_path, home, extras):
 
 @pytest.mark.parametrize('architecture, expected', [('armv6', True), ('armv7', True), ('arm64', False)])
 def test_ffmpeg_libraries_for_piwheels(tmp_path, home, extras, monkeypatch, architecture, expected):
-    from jukebox_cli.setup.steps.system import PackagesStep
+    from lauschkiste_cli.setup.steps.system import PackagesStep
     system = FakeSystem(tmp_path / 'root', pi=True)
     monkeypatch.setattr(system, 'architecture', lambda: architecture)
     ctx = Context(system=system, config_path=home / 'settings' / 'jukebox.yaml')

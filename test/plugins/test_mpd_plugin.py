@@ -2,17 +2,17 @@ from unittest.mock import Mock
 
 import pytest
 
-pytest.importorskip('jukebox_plugin_mpd', reason="the mpd plugin package is not installed")
+pytest.importorskip('lauschkiste_plugin_mpd', reason="the mpd plugin package is not installed")
 
-import jukebox.paths
-import jukebox_plugin_mpd
-import jukebox_plugin_mpd.backend
-from jukebox.cfghandler import ConfigHandler
-from jukebox.contract.manager import ModuleManager
-from jukebox.library.module import Library
-from jukebox.player.backend import PlayerBackend
-from jukebox.player.module import Player
-from jukebox.publishing.bus import EventBus
+import lauschkiste.paths
+import lauschkiste_plugin_mpd
+import lauschkiste_plugin_mpd.backend
+from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.contract.manager import ModuleManager
+from lauschkiste.library.module import Library
+from lauschkiste.player.backend import PlayerBackend
+from lauschkiste.player.module import Player
+from lauschkiste.publishing.bus import EventBus
 
 
 class PlayerWithoutLocalAudio(Player):
@@ -40,8 +40,8 @@ def fake_backend_class(created):
 ])
 def test_mpd_plugin_registers_its_backend(monkeypatch, tmp_path, config, expected_host):
     created = []
-    monkeypatch.setattr(jukebox_plugin_mpd.backend, 'PlayerMPD', fake_backend_class(created))
-    monkeypatch.setattr(jukebox_plugin_mpd, 'cfg_main', _cfg(config))
+    monkeypatch.setattr(lauschkiste_plugin_mpd.backend, 'PlayerMPD', fake_backend_class(created))
+    monkeypatch.setattr(lauschkiste_plugin_mpd, 'cfg_main', _cfg(config))
     config = {**config, 'player': {'backend': 'mpd'},
               'library': {'path': str(tmp_path), 'index': str(tmp_path / 'index.sqlite'),
                           'cover_cache': str(tmp_path / 'covers'), 'scan_on_startup': False}}
@@ -49,13 +49,13 @@ def test_mpd_plugin_registers_its_backend(monkeypatch, tmp_path, config, expecte
 
     cfg = _cfg(config)
     manager = ModuleManager([Library, PlayerWithoutLocalAudio], cfg, EventBus(),
-                            plugins={'mpd': lambda: jukebox_plugin_mpd.Mpd}, strict=True)
+                            plugins={'mpd': lambda: lauschkiste_plugin_mpd.Mpd}, strict=True)
     manager.load()
     manager.start()
     manager.ready()
 
     assert manager.failed == {}
-    assert created == [(expected_host, str(jukebox.paths.resolve('settings/music_player_status.json')))]
+    assert created == [(expected_host, str(lauschkiste.paths.resolve('settings/music_player_status.json')))]
     player = manager.instance('player')
     assert player.get_active_backend().name == 'mpd'
     sources = manager.handle('library').invoke('list_sources')

@@ -4,8 +4,8 @@ from pathlib import Path
 
 from starlette.testclient import TestClient
 
-from jukebox.api.events import EventBroker
-from jukebox.api.fastapi_server import create_app
+from lauschkiste.api.events import EventBroker
+from lauschkiste.api.fastapi_server import create_app
 
 
 def _make_client(build_dir=None, logs_dir=None):

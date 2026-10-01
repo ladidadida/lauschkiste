@@ -3,9 +3,9 @@ import threading
 import wave
 from unittest.mock import Mock
 
-import jukebox.player
-from jukebox.audio_output import PortAudioSink, scale_volume
-from jukebox.player.backends.local_audio import PlayerLocalAudio
+import lauschkiste.player
+from lauschkiste.audio_output import PortAudioSink, scale_volume
+from lauschkiste.player.backends.local_audio import PlayerLocalAudio
 
 
 class RecordingSink:
@@ -137,7 +137,7 @@ def test_decode_track_corrupt_file_is_skipped_not_raised(tmp_path):
 def test_play_folder_builds_queue_and_starts_playing(tmp_path, monkeypatch):
     (tmp_path / '01.mp3').touch()
     (tmp_path / '02.mp3').touch()
-    monkeypatch.setattr(jukebox.player, 'get_music_library_path', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.player, 'get_music_library_path', lambda: str(tmp_path))
     backend = local_audio_backend()
 
     backend.play_folder('.')
@@ -149,7 +149,7 @@ def test_play_folder_builds_queue_and_starts_playing(tmp_path, monkeypatch):
 
 
 def test_play_folder_with_no_content_stops(tmp_path, monkeypatch):
-    monkeypatch.setattr(jukebox.player, 'get_music_library_path', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.player, 'get_music_library_path', lambda: str(tmp_path))
     backend = local_audio_backend()
 
     backend.play_folder('.')
@@ -228,7 +228,7 @@ def test_repeat_cycles_off_repeat_single():
 # -- PortAudioSink falls back silently without a real device --------------------------------------
 
 def test_portaudio_sink_falls_back_when_no_device(monkeypatch):
-    import jukebox.audio_output as audio_output_module
+    import lauschkiste.audio_output as audio_output_module
 
     def raise_error(*args, **kwargs):
         raise RuntimeError("no output device")
@@ -262,7 +262,7 @@ class FakeStream:
 
 
 def test_portaudio_sink_starts_after_prefill(monkeypatch):
-    import jukebox.audio_output as audio_output_module
+    import lauschkiste.audio_output as audio_output_module
     streams = []
     monkeypatch.setattr(audio_output_module.sd, 'RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
     sink = PortAudioSink()
@@ -278,7 +278,7 @@ def test_portaudio_sink_starts_after_prefill(monkeypatch):
 
 
 def test_portaudio_sink_plays_short_sounds_on_close(monkeypatch):
-    import jukebox.audio_output as audio_output_module
+    import lauschkiste.audio_output as audio_output_module
     streams = []
     monkeypatch.setattr(audio_output_module.sd, 'RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
     sink = PortAudioSink()

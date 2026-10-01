@@ -9,11 +9,11 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "jukebox",
-    "jukebox-cli",
-    "jukebox-plugin-mpd",
-    "jukebox-plugin-raspberry-pi",
-    "jukebox-plugin-rfid-readers",
+    "lauschkiste",
+    "lauschkiste-cli",
+    "lauschkiste-plugin-mpd",
+    "lauschkiste-plugin-raspberry-pi",
+    "lauschkiste-plugin-rfid-readers",
 ]
 
 [manifest.dependency-groups]
@@ -881,9 +881,9 @@ wheels = [
 ]
 
 [[package]]
-name = "jukebox"
-version = "3.7.0"
-source = { editable = "packages/jukebox" }
+name = "lauschkiste"
+version = "0.1.0"
+source = { editable = "packages/lauschkiste" }
 dependencies = [
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
     { name = "av" },
@@ -916,11 +916,11 @@ requires-dist = [
 ]
 
 [[package]]
-name = "jukebox-cli"
+name = "lauschkiste-cli"
 version = "0.1.0"
 source = { editable = "packages/cli" }
 dependencies = [
-    { name = "jukebox" },
+    { name = "lauschkiste" },
     { name = "python-dotenv" },
     { name = "typer" },
     { name = "websockets" },
@@ -928,33 +928,33 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "jukebox", editable = "packages/jukebox" },
+    { name = "lauschkiste", editable = "packages/lauschkiste" },
     { name = "python-dotenv" },
     { name = "typer" },
     { name = "websockets" },
 ]
 
 [[package]]
-name = "jukebox-plugin-mpd"
-version = "1.0.0"
+name = "lauschkiste-plugin-mpd"
+version = "0.1.0"
 source = { editable = "packages/plugins/mpd" }
 dependencies = [
-    { name = "jukebox" },
+    { name = "lauschkiste" },
     { name = "python-mpd2" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "jukebox", editable = "packages/jukebox" },
+    { name = "lauschkiste", editable = "packages/lauschkiste" },
     { name = "python-mpd2" },
 ]
 
 [[package]]
-name = "jukebox-plugin-raspberry-pi"
-version = "1.0.0"
+name = "lauschkiste-plugin-raspberry-pi"
+version = "0.1.0"
 source = { editable = "packages/plugins/raspberry-pi" }
 dependencies = [
-    { name = "jukebox" },
+    { name = "lauschkiste" },
 ]
 
 [package.optional-dependencies]
@@ -969,18 +969,18 @@ gpio = [
 [package.metadata]
 requires-dist = [
     { name = "gpiozero", marker = "extra == 'gpio'" },
-    { name = "jukebox", editable = "packages/jukebox" },
+    { name = "lauschkiste", editable = "packages/lauschkiste" },
     { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv6l' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
     { name = "pi-ina219", marker = "extra == 'battery-ina219'" },
 ]
 provides-extras = ["gpio", "battery-ina219"]
 
 [[package]]
-name = "jukebox-plugin-rfid-readers"
-version = "1.0.0"
+name = "lauschkiste-plugin-rfid-readers"
+version = "0.1.0"
 source = { editable = "packages/plugins/rfid-readers" }
 dependencies = [
-    { name = "jukebox" },
+    { name = "lauschkiste" },
 ]
 
 [package.optional-dependencies]
@@ -1008,7 +1008,7 @@ rdm6300-serial = [
 [package.metadata]
 requires-dist = [
     { name = "gpiozero", marker = "extra == 'rc522-spi'" },
-    { name = "jukebox", editable = "packages/jukebox" },
+    { name = "lauschkiste", editable = "packages/lauschkiste" },
     { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'rc522-spi') or (platform_machine == 'armv6l' and extra == 'rc522-spi') or (platform_machine == 'armv7l' and extra == 'rc522-spi')" },
     { name = "mfrc522-i2c", marker = "extra == 'mfrc522-i2c'" },
     { name = "nfcpy", marker = "extra == 'generic-nfcpy'" },

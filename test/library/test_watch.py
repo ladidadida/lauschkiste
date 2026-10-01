@@ -1,6 +1,6 @@
 import threading
 
-from jukebox.library.watch import FolderWatcher, snapshot
+from lauschkiste.library.watch import FolderWatcher, snapshot
 
 
 def test_snapshot_notices_new_files_folders_and_growing_files(tmp_path):

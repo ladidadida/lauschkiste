@@ -1,10 +1,10 @@
 [project]
-name = "jukebox-plugin-rfid-readers"
-version = "1.0.0"
+name = "lauschkiste-plugin-rfid-readers"
+version = "0.1.0"
 description = "Jukebox plugins: RFID reader drivers (one plugin per driver)"
 requires-python = ">=3.11"
 dependencies = [
-  "jukebox",
+  "lauschkiste",
 ]
 
 [project.optional-dependencies]
@@ -22,21 +22,21 @@ rdm6300-serial = ["pyserial"]
 generic-nfcpy = ["nfcpy"]
 fake-reader-gui = ["ttkthemes"]
 
-[project.entry-points."jukebox.plugins"]
-rfid_generic_usb = "jukebox_rfid_readers:GenericUsb"
-rfid_fake_reader_gui = "jukebox_rfid_readers:FakeReaderGui"
-rfid_rdm6300_serial = "jukebox_rfid_readers:Rdm6300Serial"
-rfid_rc522_spi = "jukebox_rfid_readers:Rc522Spi"
-rfid_mfrc522_i2c = "jukebox_rfid_readers:Mfrc522I2c"
-rfid_pn532_i2c_py532 = "jukebox_rfid_readers:Pn532I2cPy532"
-rfid_generic_nfcpy = "jukebox_rfid_readers:GenericNfcpy"
+[project.entry-points."lauschkiste.plugins"]
+rfid_generic_usb = "lauschkiste_plugin_rfid_readers:GenericUsb"
+rfid_fake_reader_gui = "lauschkiste_plugin_rfid_readers:FakeReaderGui"
+rfid_rdm6300_serial = "lauschkiste_plugin_rfid_readers:Rdm6300Serial"
+rfid_rc522_spi = "lauschkiste_plugin_rfid_readers:Rc522Spi"
+rfid_mfrc522_i2c = "lauschkiste_plugin_rfid_readers:Mfrc522I2c"
+rfid_pn532_i2c_py532 = "lauschkiste_plugin_rfid_readers:Pn532I2cPy532"
+rfid_generic_nfcpy = "lauschkiste_plugin_rfid_readers:GenericNfcpy"
 
 [tool.uv.sources]
-jukebox = { workspace = true }
+lauschkiste = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/jukebox_rfid_readers"]
+packages = ["src/lauschkiste_plugin_rfid_readers"]

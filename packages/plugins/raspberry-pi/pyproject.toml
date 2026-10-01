@@ -1,10 +1,10 @@
 [project]
-name = "jukebox-plugin-raspberry-pi"
-version = "1.0.0"
+name = "lauschkiste-plugin-raspberry-pi"
+version = "0.1.0"
 description = "Jukebox plugin: Raspberry Pi hardware control (power, GPIO, battery, health)"
 requires-python = ">=3.11"
 dependencies = [
-  "jukebox",
+  "lauschkiste",
 ]
 
 [project.optional-dependencies]
@@ -15,15 +15,15 @@ gpio = [
 ]
 battery-ina219 = ["pi-ina219"]
 
-[project.entry-points."jukebox.plugins"]
-raspberry_pi = "jukebox_plugin_raspberry_pi:RaspberryPi"
+[project.entry-points."lauschkiste.plugins"]
+raspberry_pi = "lauschkiste_plugin_raspberry_pi:RaspberryPi"
 
 [tool.uv.sources]
-jukebox = { workspace = true }
+lauschkiste = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/jukebox_plugin_raspberry_pi"]
+packages = ["src/lauschkiste_plugin_raspberry_pi"]

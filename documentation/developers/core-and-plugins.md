@@ -66,7 +66,7 @@ and cover art only covers embedded MP3 (ID3) images through the mpd backend. The
   active backend.
 
 Already backend-independent and staying as is: folder playlists
-(`jukebox.playlistgenerator.PlaylistCollector`, including `.m3u`, `*livestream.txt` and
+(`lauschkiste.playlistgenerator.PlaylistCollector`, including `.m3u`, `*livestream.txt` and
 `*podcast.txt`) and file management (upload, folders, delete).
 
 Not planned for now: saved user playlists, ReplayGain, gapless playback, crossfade. Whether
@@ -92,9 +92,9 @@ Core never special-cases a plugin. Where core behavior needs a platform-specific
 
 Today every piece of functionality is wired up by hand in several places:
 
-- `jukebox.daemon.run()` calls each module's `register()`/`start()`/`stop()` explicitly, and start
+- `lauschkiste.daemon.run()` calls each module's `register()`/`start()`/`stop()` explicitly, and start
   order is encoded only in comments.
-- Every REST route in `jukebox.api.fastapi_server` is hand-written per method and reaches the object
+- Every REST route in `lauschkiste.api.fastapi_server` is hand-written per method and reaches the object
   via `jukebox.registry.get()`.
 - RFID card actions, `card_removal_action` and `second_swipe_action` are stored as
   `(package, plugin, method)` plus untyped `args`/`kwargs`; arguments are only checked when a card is
@@ -125,7 +125,7 @@ Today every piece of functionality is wired up by hand in several places:
 ## The contract
 
 ```python
-from jukebox.contract import Plugin, Context, action, query
+from lauschkiste.contract import Plugin, Context, action, query
 
 
 class Mqtt(Plugin):
@@ -237,16 +237,16 @@ Passed to `start()`; the only way a module reaches the rest of the system:
 **Core modules** are listed in code in the `jukebox` package. They always start; there is no
 switch.
 
-**Plugins** advertise themselves under the entry-point group `jukebox.plugins`:
+**Plugins** advertise themselves under the entry-point group `lauschkiste.plugins`:
 
 ```toml
 # packages/plugins/mqtt/pyproject.toml
 [project]
-name = "jukebox-plugin-mqtt"
+name = "lauschkiste-plugin-mqtt"
 dependencies = ["jukebox", "paho-mqtt"]
 
-[project.entry-points."jukebox.plugins"]
-mqtt = "jukebox_plugin_mqtt:Mqtt"
+[project.entry-points."lauschkiste.plugins"]
+mqtt = "lauschkiste_plugin_mqtt:Mqtt"
 ```
 
 and are enabled by listing them in `jukebox.yaml`; their config lives under the same key:
@@ -278,7 +278,7 @@ plugins:
 A plugin depends on two things, and both are versioned separately from the `jukebox` package
 version:
 
-- **Framework contract** - `jukebox.contract.CONTRACT_VERSION`: the `Plugin` base class,
+- **Framework contract** - `lauschkiste.contract.CONTRACT_VERSION`: the `Plugin` base class,
   `@action`/`@query`/`event`, `Context`, lifecycle and threading semantics.
 - **Module interfaces** - every module (core or plugin) declares `interface_version`, covering its
   actions, queries, event models and extension-point protocols.
@@ -390,16 +390,16 @@ original is kept as `cards.yaml.bak-<timestamp>`:
 ## What goes away
 
 - `jukebox.registry` (`register`, `call`, `tag`/`callable_method`), replaced by the module manager.
-- `command_aliases.py` and `jukebox.utils.{decode_rpc_command,bind_rpc_command,decode_and_call_rpc_command}`.
+- `command_aliases.py` and `lauschkiste.utils.{decode_rpc_command,bind_rpc_command,decode_and_call_rpc_command}`.
 - The hand-written `register_player_routes`/`register_settings_routes`/`register_cards_routes` in
   `fastapi_server.py`.
-- The backend/driver import tables in `jukebox.player.plugin` and `jukebox.rfid.reader`, and the
-  `mpd`/`rpi-gpio`/reader extras in `packages/jukebox/pyproject.toml`.
+- The backend/driver import tables in `lauschkiste.player.plugin` and `lauschkiste.rfid.reader`, and the
+  `mpd`/`rpi-gpio`/reader extras in `packages/lauschkiste/pyproject.toml`.
 - `documentation/builders/rpc-commands.md`, replaced by a generated list of card actions.
 
 ## Implementation plan
 
-1. **Framework** (`jukebox.contract`) -- *done*: `CoreModule`, `Plugin`, `Context`,
+1. **Framework** (`lauschkiste.contract`) -- *done*: `CoreModule`, `Plugin`, `Context`,
    `@action`/`@query`/`event`/`extension_point`, module manager (entry-point discovery, opt-in,
    ordering, version checks, lifecycle incl. `ready()`, locks), route generation, action catalog
    with validation, interface snapshots and the CI check (`test/contract/`).
@@ -412,11 +412,11 @@ original is kept as `cards.yaml.bak-<timestamp>`:
 3. **First bundled plugins** -- *done*: `packages/plugins/mpd` (player backend) and
    `packages/plugins/rfid-readers` (one plugin per driver in one package; driver dependencies are
    extras of that package). The core has no optional dependencies left. The RFID reader
-   configuration tool moved along (`jukebox_rfid_readers.configure`) and enables the driver plugins
+   configuration tool moved along (`lauschkiste_plugin_rfid_readers.configure`) and enables the driver plugins
    of the readers it configures. Snapshots of bundled plugins live in `<package>/interfaces/`.
 4. **Remove the old mechanism** -- *done together with step 2*: registry, command aliases, RPC
    helpers, hand-written routes and the player backend import table are gone.
-5. **Library** -- *done*: `jukebox.library` core module with a SQLite index (`mutagen` tags and
+5. **Library** -- *done*: `lauschkiste.library` core module with a SQLite index (`mutagen` tags and
    durations, incremental rescans on start-up, refresh, upload and delete), album/song/search
    queries, cover art (embedded pictures or folder images, cached, served at
    `/api/v1/library/covers/<name>`), and the `library.sources` extension point (the `mpd` plugin

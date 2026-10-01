@@ -1,10 +1,10 @@
 import pytest
 from typer.testing import CliRunner
 
-import jukebox.cfghandler
-import jukebox.paths
-from jukebox_cli import plugin
-from jukebox_cli.cli import app
+import lauschkiste.cfghandler
+import lauschkiste.paths
+from lauschkiste_cli import plugin
+from lauschkiste_cli.cli import app
 
 runner = CliRunner()
 
@@ -12,15 +12,15 @@ runner = CliRunner()
 @pytest.fixture
 def home(tmp_path, monkeypatch):
     monkeypatch.delenv('JUKEBOX_CONF', raising=False)
-    monkeypatch.setenv(jukebox.paths.HOME_ENV, str(tmp_path))
-    jukebox.paths.set_home(None)
+    monkeypatch.setenv(lauschkiste.paths.HOME_ENV, str(tmp_path))
+    lauschkiste.paths.set_home(None)
     yield tmp_path
-    jukebox.paths.set_home(None)
+    lauschkiste.paths.set_home(None)
 
 
 def enabled(home):
-    cfg = jukebox.cfghandler.ConfigHandler('test-plugin-cli')
-    jukebox.cfghandler.load_yaml(cfg, str(home / 'settings' / 'jukebox.yaml'))
+    cfg = lauschkiste.cfghandler.ConfigHandler('test-plugin-cli')
+    lauschkiste.cfghandler.load_yaml(cfg, str(home / 'settings' / 'jukebox.yaml'))
     return dict(cfg.getn('plugins', default=None) or {})
 
 
@@ -28,7 +28,7 @@ def test_list_shows_bundled_plugins(home):
     result = runner.invoke(app, ['plugin', 'list'])
     assert result.exit_code == 0, result.output
     assert 'rfid_generic_usb' in result.output
-    assert 'jukebox-plugin-rfid-readers' in result.output
+    assert 'lauschkiste-plugin-rfid-readers' in result.output
 
 
 def test_enable_and_disable(home):
@@ -56,5 +56,5 @@ def test_enable_with_extras_installs_them(home, monkeypatch):
     monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
     result = runner.invoke(app, ['plugin', 'enable', 'rfid_rc522_spi', '--with-extras'])
     assert result.exit_code == 0, result.output
-    assert installed == ['jukebox-plugin-rfid-readers[rc522-spi]']
+    assert installed == ['lauschkiste-plugin-rfid-readers[rc522-spi]']
     assert 'rfid_rc522_spi' in enabled(home)

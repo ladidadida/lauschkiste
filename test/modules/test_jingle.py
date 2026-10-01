@@ -2,20 +2,20 @@ import signal
 
 import pytest
 
-import jukebox.daemon
-import jukebox.paths
-import jukebox.jingle
-from jukebox.contract import OperationError
-from jukebox.jingle import Jingle
+import lauschkiste.daemon
+import lauschkiste.paths
+import lauschkiste.jingle
+from lauschkiste.contract import OperationError
+from lauschkiste.jingle import Jingle
 
 
 @pytest.fixture
 def played(monkeypatch, tmp_path):
-    jukebox.paths.set_home(tmp_path)
-    monkeypatch.setattr(jukebox.paths, '_home', tmp_path)
+    lauschkiste.paths.set_home(tmp_path)
+    monkeypatch.setattr(lauschkiste.paths, '_home', tmp_path)
     calls = []
-    monkeypatch.setattr(jukebox.jingle, 'play_file', lambda path, volume, should_stop=None: calls.append((path, volume)))
-    monkeypatch.setattr(jukebox.daemon, '_SHUTDOWN_SIGNAL', None)
+    monkeypatch.setattr(lauschkiste.jingle, 'play_file', lambda path, volume, should_stop=None: calls.append((path, volume)))
+    monkeypatch.setattr(lauschkiste.daemon, '_SHUTDOWN_SIGNAL', None)
     return calls
 
 
@@ -36,7 +36,7 @@ def test_default_sounds_are_packaged(start_modules, played, wait_for):
 
 def test_no_shutdown_sound_on_ctrl_c(start_modules, played, monkeypatch):
     manager, _ = start_modules([Jingle], {'jingle': {'startup_sound': '', 'shutdown_sound': 'stop.wav'}})
-    monkeypatch.setattr(jukebox.daemon, '_SHUTDOWN_SIGNAL', signal.SIGINT)
+    monkeypatch.setattr(lauschkiste.daemon, '_SHUTDOWN_SIGNAL', signal.SIGINT)
     manager.stop()
     assert played == []
 

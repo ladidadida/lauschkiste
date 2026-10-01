@@ -2,8 +2,8 @@ import subprocess
 
 import pytest
 
-import jukebox.paths
-from jukebox_cli import plugin, update
+import lauschkiste.paths
+from lauschkiste_cli import plugin, update
 
 
 def git(cwd, *args):
@@ -65,10 +65,10 @@ def test_source_without_upstream(tmp_path):
 
 def test_wheel_requirements_keep_extras(tmp_path):
     wheels = [tmp_path / 'jukebox-3.8.0-py3-none-any.whl',
-              tmp_path / 'jukebox_plugin_raspberry_pi-1.1.0-py3-none-any.whl']
-    requirements = update.wheel_requirements(wheels, {'jukebox-plugin-raspberry-pi': ['gpio']})
+              tmp_path / 'lauschkiste_plugin_raspberry_pi-1.1.0-py3-none-any.whl']
+    requirements = update.wheel_requirements(wheels, {'lauschkiste-plugin-raspberry-pi': ['gpio']})
     assert requirements == [f'jukebox @ {wheels[0].as_uri()}',
-                            f'jukebox-plugin-raspberry-pi[gpio] @ {wheels[1].as_uri()}']
+                            f'lauschkiste-plugin-raspberry-pi[gpio] @ {wheels[1].as_uri()}']
 
 
 class FakeResponse:
@@ -92,14 +92,14 @@ def test_package_update(tmp_path, monkeypatch):
                         lambda url, timeout: FakeResponse(release) if 'api.github' in url else FakeResponse(content=b'w'))
     installed = []
     monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
-    jukebox.paths.set_home(tmp_path)
+    lauschkiste.paths.set_home(tmp_path)
     try:
         assert update.update_package('o/r', 'latest', tmp_path / 'jukebox.yaml') is True
     finally:
-        jukebox.paths.set_home(None)
+        lauschkiste.paths.set_home(None)
     assert len(installed) == 1 and installed[0].startswith('jukebox @ file://')
 
 
 def test_package_up_to_date(monkeypatch):
     monkeypatch.setattr('requests.get', lambda url, timeout: FakeResponse({'tag_name': 'v0.0.1'}))
-    assert update.update_package('o/r', 'latest', jukebox.paths.settings_dir() / 'x.yaml') is False
+    assert update.update_package('o/r', 'latest', lauschkiste.paths.settings_dir() / 'x.yaml') is False

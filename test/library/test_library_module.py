@@ -6,11 +6,11 @@ import av
 import pytest
 from mutagen.flac import FLAC, Picture
 
-from jukebox.cfghandler import ConfigHandler
-from jukebox.contract.manager import ModuleManager
-from jukebox.library.module import Library
-from jukebox.player.module import Player
-from jukebox.publishing.bus import EventBus
+from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.contract.manager import ModuleManager
+from lauschkiste.library.module import Library
+from lauschkiste.player.module import Player
+from lauschkiste.publishing.bus import EventBus
 
 PNG = b'\x89PNG\r\n\x1a\n' + b'\x00' * 32
 

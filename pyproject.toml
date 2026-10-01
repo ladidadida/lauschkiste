@@ -26,7 +26,7 @@ testpaths = ["test"]
 omit = ["test/*"]
 
 [tool.pydoc-markdown]
-loaders = [{ type = "python", search_path = ["./packages/jukebox/src"] }]
+loaders = [{ type = "python", search_path = ["./packages/lauschkiste/src"] }]
 processors = [{ type = "filter" }, { type = "sphinx" }, { type = "crossref" }]
 
 [tool.pydoc-markdown.renderer]
@@ -40,7 +40,7 @@ line-length = 127
 target-version = "py311"
 extend-exclude = [
   "scratch*",
-  "*/jukebox/nv_manager.py",  # not ported/linted yet, matches the old flake8 exclusion
+  "*/lauschkiste/nv_manager.py",  # not ported/linted yet, matches the old flake8 exclusion
   "**/node_modules",
   "**/rc522_spi/pirc522",  # third-party code, kept as published
 ]
@@ -64,12 +64,12 @@ max-complexity = 12
 [tool.pyright]
 typeCheckingMode = "basic"
 pythonVersion = "3.11"
-include = ["packages/jukebox/src", "packages/cli/src", "packages/plugins"]
+include = ["packages/lauschkiste/src", "packages/cli/src", "packages/plugins"]
 exclude = [
   "**/node_modules",
   "**/__pycache__",
   "**/rc522_spi/pirc522",
   "**/scratch*",
   ".venv",
-  "packages/jukebox/src/jukebox/nv_manager.py",
+  "packages/lauschkiste/src/lauschkiste/nv_manager.py",
 ]

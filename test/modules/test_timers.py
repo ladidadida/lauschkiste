@@ -1,7 +1,7 @@
 import pytest
 
-from jukebox.contract import OperationError
-from jukebox.timers import Timers
+from lauschkiste.contract import OperationError
+from lauschkiste.timers import Timers
 
 
 @pytest.fixture
@@ -56,6 +56,6 @@ def test_unknown_timer_and_invalid_timeout(timers):
 
 
 def test_legacy_timer_card_maps_to_start(timers):
-    from jukebox.legacy_actions import convert
+    from lauschkiste.legacy_actions import convert
     converted, _ = convert({'alias': 'timer_stop_player', 'args': [900]}, lambda a: ['timer', 'wait_seconds'])
     assert converted == {'action': 'timers.start', 'args': {'timer': 'stop_player', 'wait_seconds': 900}}

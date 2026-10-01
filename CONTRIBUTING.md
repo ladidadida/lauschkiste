@@ -31,10 +31,10 @@ The Jukebox core app is written entirely in Python. Therefore, we follow the [Py
 
 Inside the root folder or the repo, these folders are important:
 
-* `packages/jukebox`
+* `packages/lauschkiste`
   * contains the Jukebox Core App
-* `packages/jukebox/src/jukebox`
-  * contains the Python modules/packages explicitly wired up by `jukebox.daemon` at start-up
+* `packages/lauschkiste/src/lauschkiste`
+  * contains the Python modules/packages explicitly wired up by `lauschkiste.daemon` at start-up
     (player, rfid, publishing, system -- see `documentation/developers/roadmap-core-architecture.md`)
 * `packages/webapp`
   * contains the Web Interface

@@ -3,306 +3,306 @@
 ## Table of Contents
 
 * [jukebox](#jukebox)
-* [jukebox.utils](#jukebox.utils)
-  * [get\_config\_action](#jukebox.utils.get_config_action)
-  * [get\_git\_state](#jukebox.utils.get_git_state)
-* [jukebox.jingle](#jukebox.jingle)
-  * [Jingle](#jukebox.jingle.Jingle)
-    * [play](#jukebox.jingle.Jingle.play)
-* [jukebox.library.index](#jukebox.library.index)
-  * [read\_tags](#jukebox.library.index.read_tags)
-  * [LibraryIndex](#jukebox.library.index.LibraryIndex)
-    * [relative](#jukebox.library.index.LibraryIndex.relative)
-    * [scan](#jukebox.library.index.LibraryIndex.scan)
-    * [albums](#jukebox.library.index.LibraryIndex.albums)
-* [jukebox.library.files](#jukebox.library.files)
-  * [LibraryError](#jukebox.library.files.LibraryError)
-  * [resolve\_library\_path](#jukebox.library.files.resolve_library_path)
-  * [UploadSession](#jukebox.library.files.UploadSession)
-  * [MusicLibrary](#jukebox.library.files.MusicLibrary)
-* [jukebox.library.module](#jukebox.library.module)
-  * [LibrarySource](#jukebox.library.module.LibrarySource)
-    * [describe](#jukebox.library.module.LibrarySource.describe)
-    * [list\_items](#jukebox.library.module.LibrarySource.list_items)
-    * [cover](#jukebox.library.module.LibrarySource.cover)
-  * [song\_from\_source](#jukebox.library.module.song_from_source)
-  * [Library](#jukebox.library.module.Library)
-    * [list\_entries](#jukebox.library.module.Library.list_entries)
-    * [create\_folder](#jukebox.library.module.Library.create_folder)
-    * [delete\_entries](#jukebox.library.module.Library.delete_entries)
-    * [refresh](#jukebox.library.module.Library.refresh)
-    * [list\_sources](#jukebox.library.module.Library.list_sources)
-    * [list\_items](#jukebox.library.module.Library.list_items)
-    * [list\_songs](#jukebox.library.module.Library.list_songs)
-    * [get\_song](#jukebox.library.module.Library.get_song)
-    * [search](#jukebox.library.module.Library.search)
-    * [get\_song\_cover](#jukebox.library.module.Library.get_song_cover)
-    * [get\_album\_cover](#jukebox.library.module.Library.get_album_cover)
-    * [flush\_covers](#jukebox.library.module.Library.flush_covers)
-* [jukebox.library.covers](#jukebox.library.covers)
-  * [CoverCache](#jukebox.library.covers.CoverCache)
-    * [cover\_for](#jukebox.library.covers.CoverCache.cover_for)
-* [jukebox.library](#jukebox.library)
-* [jukebox.rfid.reader](#jukebox.rfid.reader)
-  * [ReaderDriver](#jukebox.rfid.reader.ReaderDriver)
-    * [create\_reader](#jukebox.rfid.reader.ReaderDriver.create_reader)
-  * [CardRemovalTimer](#jukebox.rfid.reader.CardRemovalTimer)
-  * [Rfid](#jukebox.rfid.reader.Rfid)
-    * [resolve\_config\_action](#jukebox.rfid.reader.Rfid.resolve_config_action)
-    * [list\_readers](#jukebox.rfid.reader.Rfid.list_readers)
-* [jukebox.rfid.readerbase](#jukebox.rfid.readerbase)
-  * [ReaderBaseClass](#jukebox.rfid.readerbase.ReaderBaseClass)
-* [jukebox.rfid](#jukebox.rfid)
-* [jukebox.rfid.cards](#jukebox.rfid.cards)
-  * [Cards](#jukebox.rfid.cards.Cards)
-    * [list\_cards](#jukebox.rfid.cards.Cards.list_cards)
-    * [get\_card](#jukebox.rfid.cards.Cards.get_card)
-    * [register\_card](#jukebox.rfid.cards.Cards.register_card)
-    * [delete\_card](#jukebox.rfid.cards.Cards.delete_card)
-* [jukebox.rfid.cardutils](#jukebox.rfid.cardutils)
-  * [card\_command\_to\_str](#jukebox.rfid.cardutils.card_command_to_str)
-* [jukebox.volume](#jukebox.volume)
-  * [PlayerMixer](#jukebox.volume.PlayerMixer)
-  * [PulseMixer](#jukebox.volume.PulseMixer)
-  * [Volume](#jukebox.volume.Volume)
-    * [get\_volume](#jukebox.volume.Volume.get_volume)
-    * [set\_volume](#jukebox.volume.Volume.set_volume)
-    * [change\_volume](#jukebox.volume.Volume.change_volume)
-    * [mute](#jukebox.volume.Volume.mute)
-    * [set\_soft\_max\_volume](#jukebox.volume.Volume.set_soft_max_volume)
-    * [get\_outputs](#jukebox.volume.Volume.get_outputs)
-    * [set\_output](#jukebox.volume.Volume.set_output)
-    * [toggle\_output](#jukebox.volume.Volume.toggle_output)
-    * [fade\_out](#jukebox.volume.Volume.fade_out)
-* [jukebox.nv\_manager](#jukebox.nv_manager)
-* [jukebox.publishing.bus](#jukebox.publishing.bus)
-  * [EventBus](#jukebox.publishing.bus.EventBus)
-    * [publish](#jukebox.publishing.bus.EventBus.publish)
-    * [resend](#jukebox.publishing.bus.EventBus.resend)
-    * [cache\_snapshot](#jukebox.publishing.bus.EventBus.cache_snapshot)
-* [jukebox.publishing](#jukebox.publishing)
-  * [get\_bus](#jukebox.publishing.get_bus)
-* [jukebox.playlistgenerator](#jukebox.playlistgenerator)
-  * [TYPE\_DECODE](#jukebox.playlistgenerator.TYPE_DECODE)
-  * [PlaylistCollector](#jukebox.playlistgenerator.PlaylistCollector)
-    * [\_\_init\_\_](#jukebox.playlistgenerator.PlaylistCollector.__init__)
-    * [set\_exclusion\_endings](#jukebox.playlistgenerator.PlaylistCollector.set_exclusion_endings)
-    * [get\_directory\_content](#jukebox.playlistgenerator.PlaylistCollector.get_directory_content)
-    * [parse](#jukebox.playlistgenerator.PlaylistCollector.parse)
-* [jukebox.api.events](#jukebox.api.events)
-  * [EventBroker](#jukebox.api.events.EventBroker)
-    * [publish](#jukebox.api.events.EventBroker.publish)
-  * [parse\_subscription\_command](#jukebox.api.events.parse_subscription_command)
-* [jukebox.api](#jukebox.api)
-* [jukebox.api.fastapi\_server](#jukebox.api.fastapi_server)
-  * [BodySizeLimit](#jukebox.api.fastapi_server.BodySizeLimit)
-  * [FastApiServer](#jukebox.api.fastapi_server.FastApiServer)
-* [jukebox.api.webapp\_static](#jukebox.api.webapp_static)
-  * [register\_webapp\_routes](#jukebox.api.webapp_static.register_webapp_routes)
-* [jukebox.version](#jukebox.version)
-  * [version](#jukebox.version.version)
-  * [version\_info](#jukebox.version.version_info)
-* [jukebox.cfghandler](#jukebox.cfghandler)
-  * [ConfigHandler](#jukebox.cfghandler.ConfigHandler)
-    * [loaded\_from](#jukebox.cfghandler.ConfigHandler.loaded_from)
-    * [get](#jukebox.cfghandler.ConfigHandler.get)
-    * [setdefault](#jukebox.cfghandler.ConfigHandler.setdefault)
-    * [getn](#jukebox.cfghandler.ConfigHandler.getn)
-    * [setn](#jukebox.cfghandler.ConfigHandler.setn)
-    * [setndefault](#jukebox.cfghandler.ConfigHandler.setndefault)
-    * [config\_dict](#jukebox.cfghandler.ConfigHandler.config_dict)
-    * [is\_modified](#jukebox.cfghandler.ConfigHandler.is_modified)
-    * [clear\_modified](#jukebox.cfghandler.ConfigHandler.clear_modified)
-    * [save](#jukebox.cfghandler.ConfigHandler.save)
-    * [load](#jukebox.cfghandler.ConfigHandler.load)
-  * [get\_handler](#jukebox.cfghandler.get_handler)
-  * [load\_yaml](#jukebox.cfghandler.load_yaml)
-  * [ensure\_default\_config](#jukebox.cfghandler.ensure_default_config)
-  * [write\_yaml](#jukebox.cfghandler.write_yaml)
-* [jukebox.timers](#jukebox.timers)
-  * [Timers](#jukebox.timers.Timers)
-    * [list\_timers](#jukebox.timers.Timers.list_timers)
-    * [start\_timer](#jukebox.timers.Timers.start_timer)
-    * [cancel](#jukebox.timers.Timers.cancel)
-    * [toggle](#jukebox.timers.Timers.toggle)
-* [jukebox.audio\_output](#jukebox.audio_output)
-  * [scale\_volume](#jukebox.audio_output.scale_volume)
-  * [AudioSink](#jukebox.audio_output.AudioSink)
-  * [PortAudioSink](#jukebox.audio_output.PortAudioSink)
-  * [play\_file](#jukebox.audio_output.play_file)
-* [jukebox.core\_modules](#jukebox.core_modules)
-* [jukebox.input\_devices](#jukebox.input_devices)
-  * [Evdev](#jukebox.input_devices.Evdev)
-    * [key\_downs](#jukebox.input_devices.Evdev.key_downs)
-  * [InputDevices](#jukebox.input_devices.InputDevices)
-    * [list\_devices](#jukebox.input_devices.InputDevices.list_devices)
-* [jukebox.multitimer](#jukebox.multitimer)
-  * [MultiTimer](#jukebox.multitimer.MultiTimer)
-    * [cancel](#jukebox.multitimer.MultiTimer.cancel)
-    * [trigger](#jukebox.multitimer.MultiTimer.trigger)
-    * [run](#jukebox.multitimer.MultiTimer.run)
-  * [GenericTimerClass](#jukebox.multitimer.GenericTimerClass)
-    * [start](#jukebox.multitimer.GenericTimerClass.start)
-    * [cancel](#jukebox.multitimer.GenericTimerClass.cancel)
-    * [cancel\_generation](#jukebox.multitimer.GenericTimerClass.cancel_generation)
-    * [toggle](#jukebox.multitimer.GenericTimerClass.toggle)
-    * [trigger](#jukebox.multitimer.GenericTimerClass.trigger)
-    * [is\_alive](#jukebox.multitimer.GenericTimerClass.is_alive)
-    * [get\_timeout](#jukebox.multitimer.GenericTimerClass.get_timeout)
-    * [set\_timeout](#jukebox.multitimer.GenericTimerClass.set_timeout)
-    * [publish](#jukebox.multitimer.GenericTimerClass.publish)
-    * [get\_state](#jukebox.multitimer.GenericTimerClass.get_state)
-    * [close](#jukebox.multitimer.GenericTimerClass.close)
-  * [GenericEndlessTimerClass](#jukebox.multitimer.GenericEndlessTimerClass)
-    * [get\_state](#jukebox.multitimer.GenericEndlessTimerClass.get_state)
-* [jukebox.legacy\_actions](#jukebox.legacy_actions)
-  * [convert](#jukebox.legacy_actions.convert)
-  * [bind\_action](#jukebox.legacy_actions.bind_action)
-* [jukebox.daemon](#jukebox.daemon)
-  * [DEFAULT\_CONFIG\_TEMPLATE](#jukebox.daemon.DEFAULT_CONFIG_TEMPLATE)
-  * [shutdown\_signal](#jukebox.daemon.shutdown_signal)
-  * [log\_active\_threads](#jukebox.daemon.log_active_threads)
-  * [JukeBox](#jukebox.daemon.JukeBox)
-    * [signal\_handler](#jukebox.daemon.JukeBox.signal_handler)
-* [jukebox.misc.simplecolors](#jukebox.misc.simplecolors)
-  * [Colors](#jukebox.misc.simplecolors.Colors)
-  * [resolve](#jukebox.misc.simplecolors.resolve)
-  * [print](#jukebox.misc.simplecolors.print)
-* [jukebox.misc](#jukebox.misc)
-  * [recursive\_chmod](#jukebox.misc.recursive_chmod)
-  * [flatten](#jukebox.misc.flatten)
-  * [getattr\_hierarchical](#jukebox.misc.getattr_hierarchical)
-* [jukebox.misc.inputminus](#jukebox.misc.inputminus)
-  * [input\_int](#jukebox.misc.inputminus.input_int)
-  * [input\_yesno](#jukebox.misc.inputminus.input_yesno)
-* [jukebox.misc.loggingext](#jukebox.misc.loggingext)
-  * [ColorFilter](#jukebox.misc.loggingext.ColorFilter)
-    * [\_\_init\_\_](#jukebox.misc.loggingext.ColorFilter.__init__)
-  * [PubStream](#jukebox.misc.loggingext.PubStream)
-  * [PubStreamHandler](#jukebox.misc.loggingext.PubStreamHandler)
-* [jukebox.contract.interfaces](#jukebox.contract.interfaces)
-* [jukebox.contract.declarations](#jukebox.contract.declarations)
-  * [OperationSpec](#jukebox.contract.declarations.OperationSpec)
-    * [kind](#jukebox.contract.declarations.OperationSpec.kind)
-  * [action](#jukebox.contract.declarations.action)
-  * [query](#jukebox.contract.declarations.query)
-  * [EventSpec](#jukebox.contract.declarations.EventSpec)
-  * [ExtensionPoint](#jukebox.contract.declarations.ExtensionPoint)
-    * [on\_register](#jukebox.contract.declarations.ExtensionPoint.on_register)
-  * [ExtensionPointSpec](#jukebox.contract.declarations.ExtensionPointSpec)
-  * [Operation](#jukebox.contract.declarations.Operation)
-    * [validate\_args](#jukebox.contract.declarations.Operation.validate_args)
-* [jukebox.contract.catalog](#jukebox.contract.catalog)
-  * [ActionCatalog](#jukebox.contract.catalog.ActionCatalog)
-    * [validate](#jukebox.contract.catalog.ActionCatalog.validate)
-* [jukebox.contract.context](#jukebox.contract.context)
-  * [ModuleConfig](#jukebox.contract.context.ModuleConfig)
-  * [ModuleProxy](#jukebox.contract.context.ModuleProxy)
-  * [Context](#jukebox.contract.context.Context)
-    * [lock](#jukebox.contract.context.Context.lock)
-    * [subscribe](#jukebox.contract.context.Context.subscribe)
-* [jukebox.contract.routes](#jukebox.contract.routes)
-* [jukebox.contract.manager](#jukebox.contract.manager)
-  * [discover\_plugins](#jukebox.contract.manager.discover_plugins)
-  * [ModuleHandle](#jukebox.contract.manager.ModuleHandle)
-  * [ModuleManager](#jukebox.contract.manager.ModuleManager)
-    * [\_\_init\_\_](#jukebox.contract.manager.ModuleManager.__init__)
-* [jukebox.contract.module](#jukebox.contract.module)
-  * [Module](#jukebox.contract.module.Module)
-    * [concurrency](#jukebox.contract.module.Module.concurrency)
-    * [ready](#jukebox.contract.module.Module.ready)
-    * [extra\_routes](#jukebox.contract.module.Module.extra_routes)
-  * [CoreModule](#jukebox.contract.module.CoreModule)
-  * [Plugin](#jukebox.contract.module.Plugin)
-* [jukebox.contract.version](#jukebox.contract.version)
-  * [CONTRACT\_VERSION](#jukebox.contract.version.CONTRACT_VERSION)
-* [jukebox.contract](#jukebox.contract)
-* [jukebox.contract.snapshots](#jukebox.contract.snapshots)
-  * [check\_target](#jukebox.contract.snapshots.check_target)
-* [jukebox.contract.errors](#jukebox.contract.errors)
-  * [ContractError](#jukebox.contract.errors.ContractError)
-  * [OperationError](#jukebox.contract.errors.OperationError)
-  * [ActionError](#jukebox.contract.errors.ActionError)
-* [jukebox.system](#jukebox.system)
-  * [cpu\_temperature](#jukebox.system.cpu_temperature)
-  * [ip\_addresses](#jukebox.system.ip_addresses)
-  * [System](#jukebox.system.System)
-    * [log](#jukebox.system.System.log)
-    * [get\_info](#jukebox.system.System.get_info)
-    * [get\_health](#jukebox.system.System.get_health)
-    * [get\_ip\_addresses](#jukebox.system.System.get_ip_addresses)
-    * [say\_my\_ip](#jukebox.system.System.say_my_ip)
-    * [restart\_service](#jukebox.system.System.restart_service)
-    * [get\_log](#jukebox.system.System.get_log)
-    * [get\_app\_settings](#jukebox.system.System.get_app_settings)
-    * [set\_app\_settings](#jukebox.system.System.set_app_settings)
-    * [noop](#jukebox.system.System.noop)
-* [jukebox.player.coordinator](#jukebox.player.coordinator)
-  * [PlayerCoordinator](#jukebox.player.coordinator.PlayerCoordinator)
-    * [\_\_init\_\_](#jukebox.player.coordinator.PlayerCoordinator.__init__)
-    * [register\_backend](#jukebox.player.coordinator.PlayerCoordinator.register_backend)
-    * [set\_default\_backend](#jukebox.player.coordinator.PlayerCoordinator.set_default_backend)
-    * [select\_backend](#jukebox.player.coordinator.PlayerCoordinator.select_backend)
-    * [play\_files](#jukebox.player.coordinator.PlayerCoordinator.play_files)
-* [jukebox.player.module](#jukebox.player.module)
-  * [Player](#jukebox.player.module.Player)
-    * [play](#jukebox.player.module.Player.play)
-    * [pause](#jukebox.player.module.Player.pause)
-    * [toggle](#jukebox.player.module.Player.toggle)
-    * [next](#jukebox.player.module.Player.next)
-    * [prev](#jukebox.player.module.Player.prev)
-    * [stop\_playback](#jukebox.player.module.Player.stop_playback)
-    * [seek](#jukebox.player.module.Player.seek)
-    * [shuffle](#jukebox.player.module.Player.shuffle)
-    * [repeat](#jukebox.player.module.Player.repeat)
-    * [rewind](#jukebox.player.module.Player.rewind)
-    * [replay](#jukebox.player.module.Player.replay)
-    * [replay\_if\_stopped](#jukebox.player.module.Player.replay_if_stopped)
-    * [resume](#jukebox.player.module.Player.resume)
-    * [play\_folder](#jukebox.player.module.Player.play_folder)
-    * [play\_card](#jukebox.player.module.Player.play_card)
-    * [play\_single](#jukebox.player.module.Player.play_single)
-    * [play\_album](#jukebox.player.module.Player.play_album)
-    * [queue\_load](#jukebox.player.module.Player.queue_load)
-    * [update](#jukebox.player.module.Player.update)
-    * [update\_wait](#jukebox.player.module.Player.update_wait)
-    * [playerstatus](#jukebox.player.module.Player.playerstatus)
-    * [get\_volume](#jukebox.player.module.Player.get_volume)
-    * [set\_volume](#jukebox.player.module.Player.set_volume)
-    * [playlistinfo](#jukebox.player.module.Player.playlistinfo)
-    * [get\_current\_song](#jukebox.player.module.Player.get_current_song)
-    * [get\_player\_type\_and\_version](#jukebox.player.module.Player.get_player_type_and_version)
-    * [list\_backends](#jukebox.player.module.Player.list_backends)
-    * [get\_active\_backend](#jukebox.player.module.Player.get_active_backend)
-    * [get\_default\_backend](#jukebox.player.module.Player.get_default_backend)
-    * [select\_backend](#jukebox.player.module.Player.select_backend)
-* [jukebox.player.status](#jukebox.player.status)
-  * [status\_from\_backend](#jukebox.player.status.status_from_backend)
-* [jukebox.player](#jukebox.player)
-  * [MusicLibPath](#jukebox.player.MusicLibPath)
-  * [get\_music\_library\_path](#jukebox.player.get_music_library_path)
-* [jukebox.player.backend](#jukebox.player.backend)
-  * [PlayerBackend](#jukebox.player.backend.PlayerBackend)
-    * [set\_status\_callback](#jukebox.player.backend.PlayerBackend.set_status_callback)
-    * [play\_files](#jukebox.player.backend.PlayerBackend.play_files)
-* [jukebox.player.backends.local\_audio](#jukebox.player.backends.local_audio)
-  * [PlayerLocalAudio](#jukebox.player.backends.local_audio.PlayerLocalAudio)
-    * [rewind](#jukebox.player.backends.local_audio.PlayerLocalAudio.rewind)
-    * [replay](#jukebox.player.backends.local_audio.PlayerLocalAudio.replay)
-* [jukebox.player.backends](#jukebox.player.backends)
+* [lauschkiste.utils](#lauschkiste.utils)
+  * [get\_config\_action](#lauschkiste.utils.get_config_action)
+  * [get\_git\_state](#lauschkiste.utils.get_git_state)
+* [lauschkiste.jingle](#lauschkiste.jingle)
+  * [Jingle](#lauschkiste.jingle.Jingle)
+    * [play](#lauschkiste.jingle.Jingle.play)
+* [lauschkiste.library.index](#lauschkiste.library.index)
+  * [read\_tags](#lauschkiste.library.index.read_tags)
+  * [LibraryIndex](#lauschkiste.library.index.LibraryIndex)
+    * [relative](#lauschkiste.library.index.LibraryIndex.relative)
+    * [scan](#lauschkiste.library.index.LibraryIndex.scan)
+    * [albums](#lauschkiste.library.index.LibraryIndex.albums)
+* [lauschkiste.library.files](#lauschkiste.library.files)
+  * [LibraryError](#lauschkiste.library.files.LibraryError)
+  * [resolve\_library\_path](#lauschkiste.library.files.resolve_library_path)
+  * [UploadSession](#lauschkiste.library.files.UploadSession)
+  * [MusicLibrary](#lauschkiste.library.files.MusicLibrary)
+* [lauschkiste.library.module](#lauschkiste.library.module)
+  * [LibrarySource](#lauschkiste.library.module.LibrarySource)
+    * [describe](#lauschkiste.library.module.LibrarySource.describe)
+    * [list\_items](#lauschkiste.library.module.LibrarySource.list_items)
+    * [cover](#lauschkiste.library.module.LibrarySource.cover)
+  * [song\_from\_source](#lauschkiste.library.module.song_from_source)
+  * [Library](#lauschkiste.library.module.Library)
+    * [list\_entries](#lauschkiste.library.module.Library.list_entries)
+    * [create\_folder](#lauschkiste.library.module.Library.create_folder)
+    * [delete\_entries](#lauschkiste.library.module.Library.delete_entries)
+    * [refresh](#lauschkiste.library.module.Library.refresh)
+    * [list\_sources](#lauschkiste.library.module.Library.list_sources)
+    * [list\_items](#lauschkiste.library.module.Library.list_items)
+    * [list\_songs](#lauschkiste.library.module.Library.list_songs)
+    * [get\_song](#lauschkiste.library.module.Library.get_song)
+    * [search](#lauschkiste.library.module.Library.search)
+    * [get\_song\_cover](#lauschkiste.library.module.Library.get_song_cover)
+    * [get\_album\_cover](#lauschkiste.library.module.Library.get_album_cover)
+    * [flush\_covers](#lauschkiste.library.module.Library.flush_covers)
+* [lauschkiste.library.covers](#lauschkiste.library.covers)
+  * [CoverCache](#lauschkiste.library.covers.CoverCache)
+    * [cover\_for](#lauschkiste.library.covers.CoverCache.cover_for)
+* [lauschkiste.library](#lauschkiste.library)
+* [lauschkiste.rfid.reader](#lauschkiste.rfid.reader)
+  * [ReaderDriver](#lauschkiste.rfid.reader.ReaderDriver)
+    * [create\_reader](#lauschkiste.rfid.reader.ReaderDriver.create_reader)
+  * [CardRemovalTimer](#lauschkiste.rfid.reader.CardRemovalTimer)
+  * [Rfid](#lauschkiste.rfid.reader.Rfid)
+    * [resolve\_config\_action](#lauschkiste.rfid.reader.Rfid.resolve_config_action)
+    * [list\_readers](#lauschkiste.rfid.reader.Rfid.list_readers)
+* [lauschkiste.rfid.readerbase](#lauschkiste.rfid.readerbase)
+  * [ReaderBaseClass](#lauschkiste.rfid.readerbase.ReaderBaseClass)
+* [lauschkiste.rfid](#lauschkiste.rfid)
+* [lauschkiste.rfid.cards](#lauschkiste.rfid.cards)
+  * [Cards](#lauschkiste.rfid.cards.Cards)
+    * [list\_cards](#lauschkiste.rfid.cards.Cards.list_cards)
+    * [get\_card](#lauschkiste.rfid.cards.Cards.get_card)
+    * [register\_card](#lauschkiste.rfid.cards.Cards.register_card)
+    * [delete\_card](#lauschkiste.rfid.cards.Cards.delete_card)
+* [lauschkiste.rfid.cardutils](#lauschkiste.rfid.cardutils)
+  * [card\_command\_to\_str](#lauschkiste.rfid.cardutils.card_command_to_str)
+* [lauschkiste.volume](#lauschkiste.volume)
+  * [PlayerMixer](#lauschkiste.volume.PlayerMixer)
+  * [PulseMixer](#lauschkiste.volume.PulseMixer)
+  * [Volume](#lauschkiste.volume.Volume)
+    * [get\_volume](#lauschkiste.volume.Volume.get_volume)
+    * [set\_volume](#lauschkiste.volume.Volume.set_volume)
+    * [change\_volume](#lauschkiste.volume.Volume.change_volume)
+    * [mute](#lauschkiste.volume.Volume.mute)
+    * [set\_soft\_max\_volume](#lauschkiste.volume.Volume.set_soft_max_volume)
+    * [get\_outputs](#lauschkiste.volume.Volume.get_outputs)
+    * [set\_output](#lauschkiste.volume.Volume.set_output)
+    * [toggle\_output](#lauschkiste.volume.Volume.toggle_output)
+    * [fade\_out](#lauschkiste.volume.Volume.fade_out)
+* [jukebox.nv\_manager](#lauschkiste.nv_manager)
+* [lauschkiste.publishing.bus](#lauschkiste.publishing.bus)
+  * [EventBus](#lauschkiste.publishing.bus.EventBus)
+    * [publish](#lauschkiste.publishing.bus.EventBus.publish)
+    * [resend](#lauschkiste.publishing.bus.EventBus.resend)
+    * [cache\_snapshot](#lauschkiste.publishing.bus.EventBus.cache_snapshot)
+* [lauschkiste.publishing](#lauschkiste.publishing)
+  * [get\_bus](#lauschkiste.publishing.get_bus)
+* [lauschkiste.playlistgenerator](#lauschkiste.playlistgenerator)
+  * [TYPE\_DECODE](#lauschkiste.playlistgenerator.TYPE_DECODE)
+  * [PlaylistCollector](#lauschkiste.playlistgenerator.PlaylistCollector)
+    * [\_\_init\_\_](#lauschkiste.playlistgenerator.PlaylistCollector.__init__)
+    * [set\_exclusion\_endings](#lauschkiste.playlistgenerator.PlaylistCollector.set_exclusion_endings)
+    * [get\_directory\_content](#lauschkiste.playlistgenerator.PlaylistCollector.get_directory_content)
+    * [parse](#lauschkiste.playlistgenerator.PlaylistCollector.parse)
+* [lauschkiste.api.events](#lauschkiste.api.events)
+  * [EventBroker](#lauschkiste.api.events.EventBroker)
+    * [publish](#lauschkiste.api.events.EventBroker.publish)
+  * [parse\_subscription\_command](#lauschkiste.api.events.parse_subscription_command)
+* [lauschkiste.api](#lauschkiste.api)
+* [lauschkiste.api.fastapi\_server](#lauschkiste.api.fastapi_server)
+  * [BodySizeLimit](#lauschkiste.api.fastapi_server.BodySizeLimit)
+  * [FastApiServer](#lauschkiste.api.fastapi_server.FastApiServer)
+* [lauschkiste.api.webapp\_static](#lauschkiste.api.webapp_static)
+  * [register\_webapp\_routes](#lauschkiste.api.webapp_static.register_webapp_routes)
+* [lauschkiste.version](#lauschkiste.version)
+  * [version](#lauschkiste.version.version)
+  * [version\_info](#lauschkiste.version.version_info)
+* [lauschkiste.cfghandler](#lauschkiste.cfghandler)
+  * [ConfigHandler](#lauschkiste.cfghandler.ConfigHandler)
+    * [loaded\_from](#lauschkiste.cfghandler.ConfigHandler.loaded_from)
+    * [get](#lauschkiste.cfghandler.ConfigHandler.get)
+    * [setdefault](#lauschkiste.cfghandler.ConfigHandler.setdefault)
+    * [getn](#lauschkiste.cfghandler.ConfigHandler.getn)
+    * [setn](#lauschkiste.cfghandler.ConfigHandler.setn)
+    * [setndefault](#lauschkiste.cfghandler.ConfigHandler.setndefault)
+    * [config\_dict](#lauschkiste.cfghandler.ConfigHandler.config_dict)
+    * [is\_modified](#lauschkiste.cfghandler.ConfigHandler.is_modified)
+    * [clear\_modified](#lauschkiste.cfghandler.ConfigHandler.clear_modified)
+    * [save](#lauschkiste.cfghandler.ConfigHandler.save)
+    * [load](#lauschkiste.cfghandler.ConfigHandler.load)
+  * [get\_handler](#lauschkiste.cfghandler.get_handler)
+  * [load\_yaml](#lauschkiste.cfghandler.load_yaml)
+  * [ensure\_default\_config](#lauschkiste.cfghandler.ensure_default_config)
+  * [write\_yaml](#lauschkiste.cfghandler.write_yaml)
+* [lauschkiste.timers](#lauschkiste.timers)
+  * [Timers](#lauschkiste.timers.Timers)
+    * [list\_timers](#lauschkiste.timers.Timers.list_timers)
+    * [start\_timer](#lauschkiste.timers.Timers.start_timer)
+    * [cancel](#lauschkiste.timers.Timers.cancel)
+    * [toggle](#lauschkiste.timers.Timers.toggle)
+* [jukebox.audio\_output](#lauschkiste.audio_output)
+  * [scale\_volume](#lauschkiste.audio_output.scale_volume)
+  * [AudioSink](#lauschkiste.audio_output.AudioSink)
+  * [PortAudioSink](#lauschkiste.audio_output.PortAudioSink)
+  * [play\_file](#lauschkiste.audio_output.play_file)
+* [jukebox.core\_modules](#lauschkiste.core_modules)
+* [jukebox.input\_devices](#lauschkiste.input_devices)
+  * [Evdev](#lauschkiste.input_devices.Evdev)
+    * [key\_downs](#lauschkiste.input_devices.Evdev.key_downs)
+  * [InputDevices](#lauschkiste.input_devices.InputDevices)
+    * [list\_devices](#lauschkiste.input_devices.InputDevices.list_devices)
+* [lauschkiste.multitimer](#lauschkiste.multitimer)
+  * [MultiTimer](#lauschkiste.multitimer.MultiTimer)
+    * [cancel](#lauschkiste.multitimer.MultiTimer.cancel)
+    * [trigger](#lauschkiste.multitimer.MultiTimer.trigger)
+    * [run](#lauschkiste.multitimer.MultiTimer.run)
+  * [GenericTimerClass](#lauschkiste.multitimer.GenericTimerClass)
+    * [start](#lauschkiste.multitimer.GenericTimerClass.start)
+    * [cancel](#lauschkiste.multitimer.GenericTimerClass.cancel)
+    * [cancel\_generation](#lauschkiste.multitimer.GenericTimerClass.cancel_generation)
+    * [toggle](#lauschkiste.multitimer.GenericTimerClass.toggle)
+    * [trigger](#lauschkiste.multitimer.GenericTimerClass.trigger)
+    * [is\_alive](#lauschkiste.multitimer.GenericTimerClass.is_alive)
+    * [get\_timeout](#lauschkiste.multitimer.GenericTimerClass.get_timeout)
+    * [set\_timeout](#lauschkiste.multitimer.GenericTimerClass.set_timeout)
+    * [publish](#lauschkiste.multitimer.GenericTimerClass.publish)
+    * [get\_state](#lauschkiste.multitimer.GenericTimerClass.get_state)
+    * [close](#lauschkiste.multitimer.GenericTimerClass.close)
+  * [GenericEndlessTimerClass](#lauschkiste.multitimer.GenericEndlessTimerClass)
+    * [get\_state](#lauschkiste.multitimer.GenericEndlessTimerClass.get_state)
+* [jukebox.legacy\_actions](#lauschkiste.legacy_actions)
+  * [convert](#lauschkiste.legacy_actions.convert)
+  * [bind\_action](#lauschkiste.legacy_actions.bind_action)
+* [lauschkiste.daemon](#lauschkiste.daemon)
+  * [DEFAULT\_CONFIG\_TEMPLATE](#lauschkiste.daemon.DEFAULT_CONFIG_TEMPLATE)
+  * [shutdown\_signal](#lauschkiste.daemon.shutdown_signal)
+  * [log\_active\_threads](#lauschkiste.daemon.log_active_threads)
+  * [JukeBox](#lauschkiste.daemon.JukeBox)
+    * [signal\_handler](#lauschkiste.daemon.JukeBox.signal_handler)
+* [lauschkiste.misc.simplecolors](#lauschkiste.misc.simplecolors)
+  * [Colors](#lauschkiste.misc.simplecolors.Colors)
+  * [resolve](#lauschkiste.misc.simplecolors.resolve)
+  * [print](#lauschkiste.misc.simplecolors.print)
+* [lauschkiste.misc](#lauschkiste.misc)
+  * [recursive\_chmod](#lauschkiste.misc.recursive_chmod)
+  * [flatten](#lauschkiste.misc.flatten)
+  * [getattr\_hierarchical](#lauschkiste.misc.getattr_hierarchical)
+* [lauschkiste.misc.inputminus](#lauschkiste.misc.inputminus)
+  * [input\_int](#lauschkiste.misc.inputminus.input_int)
+  * [input\_yesno](#lauschkiste.misc.inputminus.input_yesno)
+* [lauschkiste.misc.loggingext](#lauschkiste.misc.loggingext)
+  * [ColorFilter](#lauschkiste.misc.loggingext.ColorFilter)
+    * [\_\_init\_\_](#lauschkiste.misc.loggingext.ColorFilter.__init__)
+  * [PubStream](#lauschkiste.misc.loggingext.PubStream)
+  * [PubStreamHandler](#lauschkiste.misc.loggingext.PubStreamHandler)
+* [lauschkiste.contract.interfaces](#lauschkiste.contract.interfaces)
+* [lauschkiste.contract.declarations](#lauschkiste.contract.declarations)
+  * [OperationSpec](#lauschkiste.contract.declarations.OperationSpec)
+    * [kind](#lauschkiste.contract.declarations.OperationSpec.kind)
+  * [action](#lauschkiste.contract.declarations.action)
+  * [query](#lauschkiste.contract.declarations.query)
+  * [EventSpec](#lauschkiste.contract.declarations.EventSpec)
+  * [ExtensionPoint](#lauschkiste.contract.declarations.ExtensionPoint)
+    * [on\_register](#lauschkiste.contract.declarations.ExtensionPoint.on_register)
+  * [ExtensionPointSpec](#lauschkiste.contract.declarations.ExtensionPointSpec)
+  * [Operation](#lauschkiste.contract.declarations.Operation)
+    * [validate\_args](#lauschkiste.contract.declarations.Operation.validate_args)
+* [lauschkiste.contract.catalog](#lauschkiste.contract.catalog)
+  * [ActionCatalog](#lauschkiste.contract.catalog.ActionCatalog)
+    * [validate](#lauschkiste.contract.catalog.ActionCatalog.validate)
+* [lauschkiste.contract.context](#lauschkiste.contract.context)
+  * [ModuleConfig](#lauschkiste.contract.context.ModuleConfig)
+  * [ModuleProxy](#lauschkiste.contract.context.ModuleProxy)
+  * [Context](#lauschkiste.contract.context.Context)
+    * [lock](#lauschkiste.contract.context.Context.lock)
+    * [subscribe](#lauschkiste.contract.context.Context.subscribe)
+* [lauschkiste.contract.routes](#lauschkiste.contract.routes)
+* [lauschkiste.contract.manager](#lauschkiste.contract.manager)
+  * [discover\_plugins](#lauschkiste.contract.manager.discover_plugins)
+  * [ModuleHandle](#lauschkiste.contract.manager.ModuleHandle)
+  * [ModuleManager](#lauschkiste.contract.manager.ModuleManager)
+    * [\_\_init\_\_](#lauschkiste.contract.manager.ModuleManager.__init__)
+* [lauschkiste.contract.module](#lauschkiste.contract.module)
+  * [Module](#lauschkiste.contract.module.Module)
+    * [concurrency](#lauschkiste.contract.module.Module.concurrency)
+    * [ready](#lauschkiste.contract.module.Module.ready)
+    * [extra\_routes](#lauschkiste.contract.module.Module.extra_routes)
+  * [CoreModule](#lauschkiste.contract.module.CoreModule)
+  * [Plugin](#lauschkiste.contract.module.Plugin)
+* [lauschkiste.contract.version](#lauschkiste.contract.version)
+  * [CONTRACT\_VERSION](#lauschkiste.contract.version.CONTRACT_VERSION)
+* [lauschkiste.contract](#lauschkiste.contract)
+* [lauschkiste.contract.snapshots](#lauschkiste.contract.snapshots)
+  * [check\_target](#lauschkiste.contract.snapshots.check_target)
+* [lauschkiste.contract.errors](#lauschkiste.contract.errors)
+  * [ContractError](#lauschkiste.contract.errors.ContractError)
+  * [OperationError](#lauschkiste.contract.errors.OperationError)
+  * [ActionError](#lauschkiste.contract.errors.ActionError)
+* [lauschkiste.system](#lauschkiste.system)
+  * [cpu\_temperature](#lauschkiste.system.cpu_temperature)
+  * [ip\_addresses](#lauschkiste.system.ip_addresses)
+  * [System](#lauschkiste.system.System)
+    * [log](#lauschkiste.system.System.log)
+    * [get\_info](#lauschkiste.system.System.get_info)
+    * [get\_health](#lauschkiste.system.System.get_health)
+    * [get\_ip\_addresses](#lauschkiste.system.System.get_ip_addresses)
+    * [say\_my\_ip](#lauschkiste.system.System.say_my_ip)
+    * [restart\_service](#lauschkiste.system.System.restart_service)
+    * [get\_log](#lauschkiste.system.System.get_log)
+    * [get\_app\_settings](#lauschkiste.system.System.get_app_settings)
+    * [set\_app\_settings](#lauschkiste.system.System.set_app_settings)
+    * [noop](#lauschkiste.system.System.noop)
+* [lauschkiste.player.coordinator](#lauschkiste.player.coordinator)
+  * [PlayerCoordinator](#lauschkiste.player.coordinator.PlayerCoordinator)
+    * [\_\_init\_\_](#lauschkiste.player.coordinator.PlayerCoordinator.__init__)
+    * [register\_backend](#lauschkiste.player.coordinator.PlayerCoordinator.register_backend)
+    * [set\_default\_backend](#lauschkiste.player.coordinator.PlayerCoordinator.set_default_backend)
+    * [select\_backend](#lauschkiste.player.coordinator.PlayerCoordinator.select_backend)
+    * [play\_files](#lauschkiste.player.coordinator.PlayerCoordinator.play_files)
+* [lauschkiste.player.module](#lauschkiste.player.module)
+  * [Player](#lauschkiste.player.module.Player)
+    * [play](#lauschkiste.player.module.Player.play)
+    * [pause](#lauschkiste.player.module.Player.pause)
+    * [toggle](#lauschkiste.player.module.Player.toggle)
+    * [next](#lauschkiste.player.module.Player.next)
+    * [prev](#lauschkiste.player.module.Player.prev)
+    * [stop\_playback](#lauschkiste.player.module.Player.stop_playback)
+    * [seek](#lauschkiste.player.module.Player.seek)
+    * [shuffle](#lauschkiste.player.module.Player.shuffle)
+    * [repeat](#lauschkiste.player.module.Player.repeat)
+    * [rewind](#lauschkiste.player.module.Player.rewind)
+    * [replay](#lauschkiste.player.module.Player.replay)
+    * [replay\_if\_stopped](#lauschkiste.player.module.Player.replay_if_stopped)
+    * [resume](#lauschkiste.player.module.Player.resume)
+    * [play\_folder](#lauschkiste.player.module.Player.play_folder)
+    * [play\_card](#lauschkiste.player.module.Player.play_card)
+    * [play\_single](#lauschkiste.player.module.Player.play_single)
+    * [play\_album](#lauschkiste.player.module.Player.play_album)
+    * [queue\_load](#lauschkiste.player.module.Player.queue_load)
+    * [update](#lauschkiste.player.module.Player.update)
+    * [update\_wait](#lauschkiste.player.module.Player.update_wait)
+    * [playerstatus](#lauschkiste.player.module.Player.playerstatus)
+    * [get\_volume](#lauschkiste.player.module.Player.get_volume)
+    * [set\_volume](#lauschkiste.player.module.Player.set_volume)
+    * [playlistinfo](#lauschkiste.player.module.Player.playlistinfo)
+    * [get\_current\_song](#lauschkiste.player.module.Player.get_current_song)
+    * [get\_player\_type\_and\_version](#lauschkiste.player.module.Player.get_player_type_and_version)
+    * [list\_backends](#lauschkiste.player.module.Player.list_backends)
+    * [get\_active\_backend](#lauschkiste.player.module.Player.get_active_backend)
+    * [get\_default\_backend](#lauschkiste.player.module.Player.get_default_backend)
+    * [select\_backend](#lauschkiste.player.module.Player.select_backend)
+* [lauschkiste.player.status](#lauschkiste.player.status)
+  * [status\_from\_backend](#lauschkiste.player.status.status_from_backend)
+* [lauschkiste.player](#lauschkiste.player)
+  * [MusicLibPath](#lauschkiste.player.MusicLibPath)
+  * [get\_music\_library\_path](#lauschkiste.player.get_music_library_path)
+* [lauschkiste.player.backend](#lauschkiste.player.backend)
+  * [PlayerBackend](#lauschkiste.player.backend.PlayerBackend)
+    * [set\_status\_callback](#lauschkiste.player.backend.PlayerBackend.set_status_callback)
+    * [play\_files](#lauschkiste.player.backend.PlayerBackend.play_files)
+* [lauschkiste.player.backends.local\_audio](#lauschkiste.player.backends.local_audio)
+  * [PlayerLocalAudio](#lauschkiste.player.backends.local_audio.PlayerLocalAudio)
+    * [rewind](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.rewind)
+    * [replay](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.replay)
+* [lauschkiste.player.backends](#lauschkiste.player.backends)
 
 <a id="jukebox"></a>
 
 # jukebox
 
-<a id="jukebox.utils"></a>
+<a id="lauschkiste.utils"></a>
 
-# jukebox.utils
+# lauschkiste.utils
 
 Common utility functions
 
 
-<a id="jukebox.utils.get_config_action"></a>
+<a id="lauschkiste.utils.get_config_action"></a>
 
 #### get\_config\_action
 
@@ -317,7 +317,7 @@ the associated entry from valid_actions_dict, if valid. Falls back to the given
 default otherwise.
 
 
-<a id="jukebox.utils.get_git_state"></a>
+<a id="lauschkiste.utils.get_git_state"></a>
 
 #### get\_git\_state
 
@@ -328,14 +328,14 @@ def get_git_state()
 Return git state information for the current branch
 
 
-<a id="jukebox.jingle"></a>
+<a id="lauschkiste.jingle"></a>
 
-# jukebox.jingle
+# lauschkiste.jingle
 
 The jingle core module: startup and shutdown sounds, and playing a sound on demand.
 
 
-<a id="jukebox.jingle.Jingle"></a>
+<a id="lauschkiste.jingle.Jingle"></a>
 
 ## Jingle Objects
 
@@ -346,7 +346,7 @@ class Jingle(CoreModule)
 Plays the startup sound when ready and the shutdown sound when stopping.
 
 
-<a id="jukebox.jingle.Jingle.play"></a>
+<a id="lauschkiste.jingle.Jingle.play"></a>
 
 #### play
 
@@ -358,9 +358,9 @@ def play(sound: str) -> None
 Play a sound file (path relative to the jukebox directory or absolute).
 
 
-<a id="jukebox.library.index"></a>
+<a id="lauschkiste.library.index"></a>
 
-# jukebox.library.index
+# lauschkiste.library.index
 
 SQLite index of the music library: tags and durations read with mutagen.
 
@@ -368,7 +368,7 @@ Songs are keyed by their path relative to the music library root. A scan only re
 modification time or size changed.
 
 
-<a id="jukebox.library.index.read_tags"></a>
+<a id="lauschkiste.library.index.read_tags"></a>
 
 #### read\_tags
 
@@ -379,7 +379,7 @@ def read_tags(path: Path) -> Dict[str, Any]
 Title, artist, album, albumartist, track, disc and duration of an audio file (missing: None).
 
 
-<a id="jukebox.library.index.LibraryIndex"></a>
+<a id="lauschkiste.library.index.LibraryIndex"></a>
 
 ## LibraryIndex Objects
 
@@ -387,7 +387,7 @@ Title, artist, album, albumartist, track, disc and duration of an audio file (mi
 class LibraryIndex()
 ```
 
-<a id="jukebox.library.index.LibraryIndex.relative"></a>
+<a id="lauschkiste.library.index.LibraryIndex.relative"></a>
 
 #### relative
 
@@ -398,7 +398,7 @@ def relative(song_url: str) -> Optional[str]
 ``song_url`` (absolute below the root, or relative to it) as index key, else None.
 
 
-<a id="jukebox.library.index.LibraryIndex.scan"></a>
+<a id="lauschkiste.library.index.LibraryIndex.scan"></a>
 
 #### scan
 
@@ -409,7 +409,7 @@ def scan() -> ScanResult
 Bring the index in line with the files on disk. Concurrent calls run one after another.
 
 
-<a id="jukebox.library.index.LibraryIndex.albums"></a>
+<a id="lauschkiste.library.index.LibraryIndex.albums"></a>
 
 #### albums
 
@@ -420,14 +420,14 @@ def albums() -> List[Dict[str, Any]]
 Albums grouped by album artist (falling back to the artist) and album title.
 
 
-<a id="jukebox.library.files"></a>
+<a id="lauschkiste.library.files"></a>
 
-# jukebox.library.files
+# lauschkiste.library.files
 
 Safe file operations within the music library.
 
 
-<a id="jukebox.library.files.LibraryError"></a>
+<a id="lauschkiste.library.files.LibraryError"></a>
 
 ## LibraryError Objects
 
@@ -438,7 +438,7 @@ class LibraryError(OperationError)
 An expected library operation failure suitable for an HTTP response.
 
 
-<a id="jukebox.library.files.resolve_library_path"></a>
+<a id="lauschkiste.library.files.resolve_library_path"></a>
 
 #### resolve\_library\_path
 
@@ -453,7 +453,7 @@ def resolve_library_path(root,
 Resolve a relative or internal absolute path without escaping ``root``.
 
 
-<a id="jukebox.library.files.UploadSession"></a>
+<a id="lauschkiste.library.files.UploadSession"></a>
 
 ## UploadSession Objects
 
@@ -464,7 +464,7 @@ class UploadSession()
 Write one upload to a temporary file and publish it atomically.
 
 
-<a id="jukebox.library.files.MusicLibrary"></a>
+<a id="lauschkiste.library.files.MusicLibrary"></a>
 
 ## MusicLibrary Objects
 
@@ -475,14 +475,14 @@ class MusicLibrary()
 Perform validated mutations beneath a lazily resolved library root.
 
 
-<a id="jukebox.library.module"></a>
+<a id="lauschkiste.library.module"></a>
 
-# jukebox.library.module
+# lauschkiste.library.module
 
 The library core module: file management, index, metadata, cover art and library sources.
 
 
-<a id="jukebox.library.module.LibrarySource"></a>
+<a id="lauschkiste.library.module.LibrarySource"></a>
 
 ## LibrarySource Objects
 
@@ -493,7 +493,7 @@ class LibrarySource(Protocol)
 Further music a player backend or plugin can play (e.g. an mpd database, a streaming service).
 
 
-<a id="jukebox.library.module.LibrarySource.describe"></a>
+<a id="lauschkiste.library.module.LibrarySource.describe"></a>
 
 #### describe
 
@@ -504,7 +504,7 @@ def describe() -> Dict[str, Any]
 ``{'id', 'label', 'views': [{'id', 'label', 'kind': 'items'|'folders', 'content_types'}]}``
 
 
-<a id="jukebox.library.module.LibrarySource.list_items"></a>
+<a id="lauschkiste.library.module.LibrarySource.list_items"></a>
 
 #### list\_items
 
@@ -515,7 +515,7 @@ def list_items(content_types: Optional[List[str]]) -> List[Dict[str, Any]]
 Items (albums, playlists, ...) with ``albumartist``, ``album``, ``content_type``, ``content_uri``.
 
 
-<a id="jukebox.library.module.LibrarySource.cover"></a>
+<a id="lauschkiste.library.module.LibrarySource.cover"></a>
 
 #### cover
 
@@ -526,7 +526,7 @@ def cover(song_url: str) -> Optional[str]
 URL of the song's cover (absolute or relative to the web app), or None.
 
 
-<a id="jukebox.library.module.song_from_source"></a>
+<a id="lauschkiste.library.module.song_from_source"></a>
 
 #### song\_from\_source
 
@@ -537,7 +537,7 @@ def song_from_source(provider: str, data: Dict[str, Any]) -> Song
 A :class:`Song` from a source's song mapping (mpd style keys are understood).
 
 
-<a id="jukebox.library.module.Library"></a>
+<a id="lauschkiste.library.module.Library"></a>
 
 ## Library Objects
 
@@ -548,7 +548,7 @@ class Library(CoreModule)
 Music library: files, index with metadata, cover art; further sources plug in at ``library.sources``.
 
 
-<a id="jukebox.library.module.Library.list_entries"></a>
+<a id="lauschkiste.library.module.Library.list_entries"></a>
 
 #### list\_entries
 
@@ -560,7 +560,7 @@ def list_entries(folder: str) -> LibraryEntries
 Files and folders in a library folder.
 
 
-<a id="jukebox.library.module.Library.create_folder"></a>
+<a id="lauschkiste.library.module.Library.create_folder"></a>
 
 #### create\_folder
 
@@ -572,7 +572,7 @@ def create_folder(parent: str, name: str) -> CreatedFolder
 Create a folder in the library.
 
 
-<a id="jukebox.library.module.Library.delete_entries"></a>
+<a id="lauschkiste.library.module.Library.delete_entries"></a>
 
 #### delete\_entries
 
@@ -584,7 +584,7 @@ def delete_entries(paths: List[str]) -> DeletedEntries
 Delete files and folders from the library.
 
 
-<a id="jukebox.library.module.Library.refresh"></a>
+<a id="lauschkiste.library.module.Library.refresh"></a>
 
 #### refresh
 
@@ -596,7 +596,7 @@ def refresh() -> ScanStarted
 Rescan the library (and refresh all other sources).
 
 
-<a id="jukebox.library.module.Library.list_sources"></a>
+<a id="lauschkiste.library.module.Library.list_sources"></a>
 
 #### list\_sources
 
@@ -608,7 +608,7 @@ def list_sources() -> List[SourceInfo]
 The local library and every registered source, with their views.
 
 
-<a id="jukebox.library.module.Library.list_items"></a>
+<a id="lauschkiste.library.module.Library.list_items"></a>
 
 #### list\_items
 
@@ -621,7 +621,7 @@ def list_items(provider: Optional[str] = None,
 Albums (and other items) of one source or all of them.
 
 
-<a id="jukebox.library.module.Library.list_songs"></a>
+<a id="lauschkiste.library.module.Library.list_songs"></a>
 
 #### list\_songs
 
@@ -636,7 +636,7 @@ def list_songs(albumartist: str,
 Songs of an album, in track order.
 
 
-<a id="jukebox.library.module.Library.get_song"></a>
+<a id="lauschkiste.library.module.Library.get_song"></a>
 
 #### get\_song
 
@@ -648,7 +648,7 @@ def get_song(song_url: str, provider: Optional[str] = None) -> Optional[Song]
 Metadata of a single song, or null if it is unknown.
 
 
-<a id="jukebox.library.module.Library.search"></a>
+<a id="lauschkiste.library.module.Library.search"></a>
 
 #### search
 
@@ -660,7 +660,7 @@ def search(query: str) -> List[Song]
 Songs of the local library matching title, artist, album or path.
 
 
-<a id="jukebox.library.module.Library.get_song_cover"></a>
+<a id="lauschkiste.library.module.Library.get_song_cover"></a>
 
 #### get\_song\_cover
 
@@ -672,7 +672,7 @@ def get_song_cover(song_url: str, provider: Optional[str] = None) -> CoverArt
 Cover art URL of a song.
 
 
-<a id="jukebox.library.module.Library.get_album_cover"></a>
+<a id="lauschkiste.library.module.Library.get_album_cover"></a>
 
 #### get\_album\_cover
 
@@ -687,7 +687,7 @@ def get_album_cover(albumartist: str,
 Cover art URL of an album (the cover of its first song).
 
 
-<a id="jukebox.library.module.Library.flush_covers"></a>
+<a id="lauschkiste.library.module.Library.flush_covers"></a>
 
 #### flush\_covers
 
@@ -699,14 +699,14 @@ def flush_covers() -> None
 Delete all cached cover art; it is extracted again when needed.
 
 
-<a id="jukebox.library.covers"></a>
+<a id="lauschkiste.library.covers"></a>
 
-# jukebox.library.covers
+# lauschkiste.library.covers
 
 Cover art of songs: embedded pictures (MP3, FLAC, MP4, Ogg) or an image in the song's folder.
 
 
-<a id="jukebox.library.covers.CoverCache"></a>
+<a id="lauschkiste.library.covers.CoverCache"></a>
 
 ## CoverCache Objects
 
@@ -717,7 +717,7 @@ class CoverCache()
 Extracts covers into ``cache_dir`` once; names are content-independent hashes of the source.
 
 
-<a id="jukebox.library.covers.CoverCache.cover_for"></a>
+<a id="lauschkiste.library.covers.CoverCache.cover_for"></a>
 
 #### cover\_for
 
@@ -728,16 +728,16 @@ def cover_for(song: Path) -> Optional[str]
 File name in the cache of the song's cover, or None when it has none.
 
 
-<a id="jukebox.library"></a>
+<a id="lauschkiste.library"></a>
 
-# jukebox.library
+# lauschkiste.library
 
 The music library: file management, index, metadata and cover art.
 
 
-<a id="jukebox.rfid.reader"></a>
+<a id="lauschkiste.rfid.reader"></a>
 
-# jukebox.rfid.reader
+# lauschkiste.rfid.reader
 
 RFID reader framework: one thread per configured reader, card dispatch, card removal detection.
 
@@ -745,7 +745,7 @@ Hardware drivers register at the ``rfid.readers`` extension point. Readers are c
 reader config file (``rfid.reader_config``), each with the name of its driver under ``module``.
 
 
-<a id="jukebox.rfid.reader.ReaderDriver"></a>
+<a id="lauschkiste.rfid.reader.ReaderDriver"></a>
 
 ## ReaderDriver Objects
 
@@ -753,7 +753,7 @@ reader config file (``rfid.reader_config``), each with the name of its driver un
 class ReaderDriver(Protocol)
 ```
 
-<a id="jukebox.rfid.reader.ReaderDriver.create_reader"></a>
+<a id="lauschkiste.rfid.reader.ReaderDriver.create_reader"></a>
 
 #### create\_reader
 
@@ -766,7 +766,7 @@ Return a reader for the reader config key: a context manager that iterates card 
 ('' on timeout) and has ``stop()``.
 
 
-<a id="jukebox.rfid.reader.CardRemovalTimer"></a>
+<a id="lauschkiste.rfid.reader.CardRemovalTimer"></a>
 
 ## CardRemovalTimer Objects
 
@@ -777,7 +777,7 @@ class CardRemovalTimer(threading.Thread)
 Runs ``on_timeout`` once when the card has not been seen for about a second.
 
 
-<a id="jukebox.rfid.reader.Rfid"></a>
+<a id="lauschkiste.rfid.reader.Rfid"></a>
 
 ## Rfid Objects
 
@@ -788,7 +788,7 @@ class Rfid(CoreModule)
 RFID readers: detect cards and run their actions.
 
 
-<a id="jukebox.rfid.reader.Rfid.resolve_config_action"></a>
+<a id="lauschkiste.rfid.reader.Rfid.resolve_config_action"></a>
 
 #### resolve\_config\_action
 
@@ -799,7 +799,7 @@ def resolve_config_action(entry, where: str) -> Optional[Callable[[], Any]]
 Turn a configured action (new or old format) into a callable, or None if invalid.
 
 
-<a id="jukebox.rfid.reader.Rfid.list_readers"></a>
+<a id="lauschkiste.rfid.reader.Rfid.list_readers"></a>
 
 #### list\_readers
 
@@ -811,11 +811,11 @@ def list_readers() -> Dict[str, str]
 Configured readers and their driver.
 
 
-<a id="jukebox.rfid.readerbase"></a>
+<a id="lauschkiste.rfid.readerbase"></a>
 
-# jukebox.rfid.readerbase
+# lauschkiste.rfid.readerbase
 
-<a id="jukebox.rfid.readerbase.ReaderBaseClass"></a>
+<a id="lauschkiste.rfid.readerbase.ReaderBaseClass"></a>
 
 ## ReaderBaseClass Objects
 
@@ -828,13 +828,13 @@ Abstract Base Class for all Reader Classes to ensure common API
 Look at template_new_reader.py for documentation how to integrate a new RFID reader
 
 
-<a id="jukebox.rfid"></a>
+<a id="lauschkiste.rfid"></a>
 
-# jukebox.rfid
+# lauschkiste.rfid
 
-<a id="jukebox.rfid.cards"></a>
+<a id="lauschkiste.rfid.cards"></a>
 
-# jukebox.rfid.cards
+# lauschkiste.rfid.cards
 
 The RFID card database: which action a card triggers.
 
@@ -843,7 +843,7 @@ format (alias or package/plugin/method) are converted once all modules are ready
 file is kept as a backup.
 
 
-<a id="jukebox.rfid.cards.Cards"></a>
+<a id="lauschkiste.rfid.cards.Cards"></a>
 
 ## Cards Objects
 
@@ -854,7 +854,7 @@ class Cards(CoreModule)
 Card database: register, list and delete cards.
 
 
-<a id="jukebox.rfid.cards.Cards.list_cards"></a>
+<a id="lauschkiste.rfid.cards.Cards.list_cards"></a>
 
 #### list\_cards
 
@@ -866,7 +866,7 @@ def list_cards() -> Dict[str, CardInfo]
 All registered cards with their action and whether it is currently available.
 
 
-<a id="jukebox.rfid.cards.Cards.get_card"></a>
+<a id="lauschkiste.rfid.cards.Cards.get_card"></a>
 
 #### get\_card
 
@@ -878,7 +878,7 @@ def get_card(card_id: str) -> Optional[CardEntry]
 The card's entry, or null when it is unknown or its action is unavailable.
 
 
-<a id="jukebox.rfid.cards.Cards.register_card"></a>
+<a id="lauschkiste.rfid.cards.Cards.register_card"></a>
 
 #### register\_card
 
@@ -895,7 +895,7 @@ def register_card(card_id: str,
 Register a card to trigger an action.
 
 
-<a id="jukebox.rfid.cards.Cards.delete_card"></a>
+<a id="lauschkiste.rfid.cards.Cards.delete_card"></a>
 
 #### delete\_card
 
@@ -907,14 +907,14 @@ def delete_card(card_id: str) -> None
 Delete a card.
 
 
-<a id="jukebox.rfid.cardutils"></a>
+<a id="lauschkiste.rfid.cardutils"></a>
 
-# jukebox.rfid.cardutils
+# lauschkiste.rfid.cardutils
 
 Readable descriptions of card database entries.
 
 
-<a id="jukebox.rfid.cardutils.card_command_to_str"></a>
+<a id="lauschkiste.rfid.cardutils.card_command_to_str"></a>
 
 #### card\_command\_to\_str
 
@@ -926,9 +926,9 @@ def card_command_to_str(entry: Mapping[str, Any],
 ``[action(args)]``, plus the card flags when ``long`` is set.
 
 
-<a id="jukebox.volume"></a>
+<a id="lauschkiste.volume"></a>
 
-# jukebox.volume
+# lauschkiste.volume
 
 The volume core module: volume, mute, soft maximum, output selection and fade-out.
 
@@ -936,7 +936,7 @@ The mixer is PulseAudio/PipeWire (via pulsectl) when a server is reachable, othe
 the active player backend.
 
 
-<a id="jukebox.volume.PlayerMixer"></a>
+<a id="lauschkiste.volume.PlayerMixer"></a>
 
 ## PlayerMixer Objects
 
@@ -947,7 +947,7 @@ class PlayerMixer()
 Volume of the active player backend; no outputs to choose from.
 
 
-<a id="jukebox.volume.PulseMixer"></a>
+<a id="lauschkiste.volume.PulseMixer"></a>
 
 ## PulseMixer Objects
 
@@ -958,7 +958,7 @@ class PulseMixer()
 PulseAudio/PipeWire default sink; ``volume_limit`` of an output scales 0..100 to 0..limit.
 
 
-<a id="jukebox.volume.Volume"></a>
+<a id="lauschkiste.volume.Volume"></a>
 
 ## Volume Objects
 
@@ -969,7 +969,7 @@ class Volume(CoreModule)
 Volume, mute, soft maximum and audio output.
 
 
-<a id="jukebox.volume.Volume.get_volume"></a>
+<a id="lauschkiste.volume.Volume.get_volume"></a>
 
 #### get\_volume
 
@@ -981,7 +981,7 @@ def get_volume() -> VolumeState
 Current volume, mute state and soft maximum.
 
 
-<a id="jukebox.volume.Volume.set_volume"></a>
+<a id="lauschkiste.volume.Volume.set_volume"></a>
 
 #### set\_volume
 
@@ -993,7 +993,7 @@ def set_volume(volume: int) -> VolumeState
 Set the volume (0-100, limited to the soft maximum).
 
 
-<a id="jukebox.volume.Volume.change_volume"></a>
+<a id="lauschkiste.volume.Volume.change_volume"></a>
 
 #### change\_volume
 
@@ -1005,7 +1005,7 @@ def change_volume(step: int = 5) -> VolumeState
 Change the volume by ``step`` (negative to lower it).
 
 
-<a id="jukebox.volume.Volume.mute"></a>
+<a id="lauschkiste.volume.Volume.mute"></a>
 
 #### mute
 
@@ -1017,7 +1017,7 @@ def mute(mute: Optional[bool] = None) -> VolumeState
 Mute or unmute; toggles when ``mute`` is left out.
 
 
-<a id="jukebox.volume.Volume.set_soft_max_volume"></a>
+<a id="lauschkiste.volume.Volume.set_soft_max_volume"></a>
 
 #### set\_soft\_max\_volume
 
@@ -1029,7 +1029,7 @@ def set_soft_max_volume(max_volume: int) -> VolumeState
 Limit the volume that can be set (0-100); lowers the current volume if needed.
 
 
-<a id="jukebox.volume.Volume.get_outputs"></a>
+<a id="lauschkiste.volume.Volume.get_outputs"></a>
 
 #### get\_outputs
 
@@ -1041,7 +1041,7 @@ def get_outputs() -> OutputsState
 Configured outputs that are available right now.
 
 
-<a id="jukebox.volume.Volume.set_output"></a>
+<a id="lauschkiste.volume.Volume.set_output"></a>
 
 #### set\_output
 
@@ -1053,7 +1053,7 @@ def set_output(name: str) -> OutputsState
 Switch the audio output.
 
 
-<a id="jukebox.volume.Volume.toggle_output"></a>
+<a id="lauschkiste.volume.Volume.toggle_output"></a>
 
 #### toggle\_output
 
@@ -1065,7 +1065,7 @@ def toggle_output() -> OutputsState
 Switch to the next available output.
 
 
-<a id="jukebox.volume.Volume.fade_out"></a>
+<a id="lauschkiste.volume.Volume.fade_out"></a>
 
 #### fade\_out
 
@@ -1077,13 +1077,13 @@ def fade_out(seconds: float = 10.0) -> None
 Lower the volume to zero over ``seconds``, stop playback, then restore the volume.
 
 
-<a id="jukebox.nv_manager"></a>
+<a id="lauschkiste.nv_manager"></a>
 
 # jukebox.nv\_manager
 
-<a id="jukebox.publishing.bus"></a>
+<a id="lauschkiste.publishing.bus"></a>
 
-# jukebox.publishing.bus
+# lauschkiste.publishing.bus
 
 Thread-safe in-process pub/sub bus with last-value caching.
 
@@ -1098,7 +1098,7 @@ fast and must not block. The FastAPI bridge hands off to its own event loop via
 `asyncio.run_coroutine_threadsafe` rather than doing any real work in the callback itself.
 
 
-<a id="jukebox.publishing.bus.EventBus"></a>
+<a id="lauschkiste.publishing.bus.EventBus"></a>
 
 ## EventBus Objects
 
@@ -1106,7 +1106,7 @@ fast and must not block. The FastAPI bridge hands off to its own event loop via
 class EventBus()
 ```
 
-<a id="jukebox.publishing.bus.EventBus.publish"></a>
+<a id="lauschkiste.publishing.bus.EventBus.publish"></a>
 
 #### publish
 
@@ -1117,7 +1117,7 @@ def publish(topic: str, payload: Optional[Any]) -> None
 Publish `payload` for `topic`. `payload=None` revokes the topic.
 
 
-<a id="jukebox.publishing.bus.EventBus.resend"></a>
+<a id="lauschkiste.publishing.bus.EventBus.resend"></a>
 
 #### resend
 
@@ -1128,7 +1128,7 @@ def resend(topic_prefix: str = '') -> None
 Re-send all cached topics under `topic_prefix` to every subscriber.
 
 
-<a id="jukebox.publishing.bus.EventBus.cache_snapshot"></a>
+<a id="lauschkiste.publishing.bus.EventBus.cache_snapshot"></a>
 
 #### cache\_snapshot
 
@@ -1139,14 +1139,14 @@ def cache_snapshot() -> Dict[str, Any]
 A shallow copy of the full last-value cache, for a client that just subscribed.
 
 
-<a id="jukebox.publishing"></a>
+<a id="lauschkiste.publishing"></a>
 
-# jukebox.publishing
+# lauschkiste.publishing
 
 The process-wide event bus. Modules publish through their ``Context``, not directly.
 
 
-<a id="jukebox.publishing.get_bus"></a>
+<a id="lauschkiste.publishing.get_bus"></a>
 
 #### get\_bus
 
@@ -1157,9 +1157,9 @@ def get_bus() -> EventBus
 The shared, thread-safe event bus.
 
 
-<a id="jukebox.playlistgenerator"></a>
+<a id="lauschkiste.playlistgenerator"></a>
 
-# jukebox.playlistgenerator
+# lauschkiste.playlistgenerator
 
 Playlists are build from directory content in the following way:
 
@@ -1194,14 +1194,14 @@ This means, one ``*.m3u`` file per sub-folder is processed (if present).
 In ``*.txt`` and ``*.m3u`` files, all lines starting with ``#`` are ignored.
 
 
-<a id="jukebox.playlistgenerator.TYPE_DECODE"></a>
+<a id="lauschkiste.playlistgenerator.TYPE_DECODE"></a>
 
 #### TYPE\_DECODE
 
 Types if file entires in parsed directory
 
 
-<a id="jukebox.playlistgenerator.PlaylistCollector"></a>
+<a id="lauschkiste.playlistgenerator.PlaylistCollector"></a>
 
 ## PlaylistCollector Objects
 
@@ -1227,7 +1227,7 @@ The file ending exclusion list :attr:`PlaylistCollector._exclude_endings` is a c
 If changed it will affect all instances. For modifications always call :func:`set_exclusion_endings`.
 
 
-<a id="jukebox.playlistgenerator.PlaylistCollector.__init__"></a>
+<a id="lauschkiste.playlistgenerator.PlaylistCollector.__init__"></a>
 
 #### \_\_init\_\_
 
@@ -1242,7 +1242,7 @@ Initialize the playlist generator with music_library_base_path
 - `music_library_base_path`: Base path the the music library. This is used to locate the file in the disk
 but is omitted when generating the playlist entries. I.e. all files in the playlist are relative to this base dir
 
-<a id="jukebox.playlistgenerator.PlaylistCollector.set_exclusion_endings"></a>
+<a id="lauschkiste.playlistgenerator.PlaylistCollector.set_exclusion_endings"></a>
 
 #### set\_exclusion\_endings
 
@@ -1256,7 +1256,7 @@ Set the class-wide file ending exclusion list
 See :attr:`PlaylistCollector._exclude_endings`
 
 
-<a id="jukebox.playlistgenerator.PlaylistCollector.get_directory_content"></a>
+<a id="lauschkiste.playlistgenerator.PlaylistCollector.get_directory_content"></a>
 
 #### get\_directory\_content
 
@@ -1275,7 +1275,7 @@ Parse the folder ``path`` and create a content list. Depth is always the current
 [ { type: 'directory', name: 'Simone', path: '/some/path/to/Simone' }, {...} ]
 where type is one of :attr:`TYPE_DECODE`
 
-<a id="jukebox.playlistgenerator.PlaylistCollector.parse"></a>
+<a id="lauschkiste.playlistgenerator.PlaylistCollector.parse"></a>
 
 #### parse
 
@@ -1290,17 +1290,17 @@ Parse the folder ``path`` and create a playlist from its content
 - `path`: Path to folder **relative** to ``music_library_base_path``
 - `recursive`: Parse folder recursivley, or stay in top-level folder
 
-<a id="jukebox.api.events"></a>
+<a id="lauschkiste.api.events"></a>
 
-# jukebox.api.events
+# lauschkiste.api.events
 
 Transport-neutral pieces of the browser events-over-websocket bridge.
 
-Split out of the old Tornado bridge (`jukebox.api.server`, removed once `jukebox.api.fastapi_server`
+Split out of the old Tornado bridge (`lauschkiste.api.server`, removed once `lauschkiste.api.fastapi_server`
 became the sole HTTP/WebSocket bridge) so nothing here depends on a specific web framework.
 
 
-<a id="jukebox.api.events.EventBroker"></a>
+<a id="lauschkiste.api.events.EventBroker"></a>
 
 ## EventBroker Objects
 
@@ -1308,14 +1308,14 @@ became the sole HTTP/WebSocket bridge) so nothing here depends on a specific web
 class EventBroker()
 ```
 
-Maintain browser subscriptions, backed by the shared :class:`jukebox.publishing.bus.EventBus`.
+Maintain browser subscriptions, backed by the shared :class:`lauschkiste.publishing.bus.EventBus`.
 
 Register :meth:`publish` as a bus subscriber callback (``bus.register(broker.publish)``); the
 bus already delivers `payload=None` for revocations and calls this from whatever thread
 published, so no separate transport bridging is needed here.
 
 
-<a id="jukebox.api.events.EventBroker.publish"></a>
+<a id="lauschkiste.api.events.EventBroker.publish"></a>
 
 #### publish
 
@@ -1326,7 +1326,7 @@ def publish(topic, payload)
 Bus subscriber callback. `payload=None` means the topic was revoked.
 
 
-<a id="jukebox.api.events.parse_subscription_command"></a>
+<a id="lauschkiste.api.events.parse_subscription_command"></a>
 
 #### parse\_subscription\_command
 
@@ -1344,21 +1344,21 @@ Validate a decoded events-websocket command.
 
 ``(command_type, topics)``
 
-<a id="jukebox.api"></a>
+<a id="lauschkiste.api"></a>
 
-# jukebox.api
+# lauschkiste.api
 
 HTTP and WebSocket API for browser clients.
 
 
-<a id="jukebox.api.fastapi_server"></a>
+<a id="lauschkiste.api.fastapi_server"></a>
 
-# jukebox.api.fastapi\_server
+# lauschkiste.api.fastapi\_server
 
 FastAPI + uvicorn HTTP and WebSocket API server.
 
 The sole browser-facing HTTP/WebSocket bridge. Serves health, the routes of the modules (see
-jukebox.contract.routes), events-over-websocket and (see jukebox.api.webapp_static) the webapp's
+lauschkiste.contract.routes), events-over-websocket and (see lauschkiste.api.webapp_static) the webapp's
 static build + /logs -- this is the one thing reachable from the LAN, hence `api.bind_address`
 defaulting to 0.0.0.0.
 
@@ -1366,7 +1366,7 @@ Handlers run on a multi-worker executor; each module guards itself (see the cont
 model), so a slow call doesn't serialize the rest of the API.
 
 
-<a id="jukebox.api.fastapi_server.BodySizeLimit"></a>
+<a id="lauschkiste.api.fastapi_server.BodySizeLimit"></a>
 
 ## BodySizeLimit Objects
 
@@ -1377,7 +1377,7 @@ class BodySizeLimit()
 Reject request bodies above ``limit`` bytes with 413 (except for streaming upload paths).
 
 
-<a id="jukebox.api.fastapi_server.FastApiServer"></a>
+<a id="lauschkiste.api.fastapi_server.FastApiServer"></a>
 
 ## FastApiServer Objects
 
@@ -1388,9 +1388,9 @@ class FastApiServer(threading.Thread)
 Run the browser API on an isolated asyncio event loop.
 
 
-<a id="jukebox.api.webapp_static"></a>
+<a id="lauschkiste.api.webapp_static"></a>
 
-# jukebox.api.webapp\_static
+# lauschkiste.api.webapp\_static
 
 Serve the built webapp, its fallback pages, and the /logs directory directly from FastAPI.
 
@@ -1404,7 +1404,7 @@ adding new behavior (e.g. no SPA deep-link fallback to index.html for unknown pa
 `try_files $uri $uri/ =404` didn't do that either, so neither does this).
 
 
-<a id="jukebox.api.webapp_static.register_webapp_routes"></a>
+<a id="lauschkiste.api.webapp_static.register_webapp_routes"></a>
 
 #### register\_webapp\_routes
 
@@ -1416,11 +1416,11 @@ def register_webapp_routes(app: FastAPI, *, build_dir: Path,
 Mount the webapp build's static assets, index.html, a generic 404, and /logs. Call once.
 
 
-<a id="jukebox.version"></a>
+<a id="lauschkiste.version"></a>
 
-# jukebox.version
+# lauschkiste.version
 
-<a id="jukebox.version.version"></a>
+<a id="lauschkiste.version.version"></a>
 
 #### version
 
@@ -1431,7 +1431,7 @@ def version()
 Return the Jukebox version as a string
 
 
-<a id="jukebox.version.version_info"></a>
+<a id="lauschkiste.version.version_info"></a>
 
 #### version\_info
 
@@ -1444,9 +1444,9 @@ Return the Jukebox version as a tuple of three numbers
 If this is a development version, an identifier string will be appended after the third integer.
 
 
-<a id="jukebox.cfghandler"></a>
+<a id="lauschkiste.cfghandler"></a>
 
-# jukebox.cfghandler
+# lauschkiste.cfghandler
 
 This module handles global and local configuration data
 
@@ -1465,7 +1465,7 @@ Handlers are identified by their name (in the above example *global*)
 The function :func:`get_handler` is the main entry point to obtain a new or existing handler.
 
 
-<a id="jukebox.cfghandler.ConfigHandler"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler"></a>
 
 ## ConfigHandler Objects
 
@@ -1498,7 +1498,7 @@ Reading may be done without acquiring a lock. But be aware that when reading mul
 thread may intervene and modify some values in between! So, locking is still recommended.
 
 
-<a id="jukebox.cfghandler.ConfigHandler.loaded_from"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.loaded_from"></a>
 
 #### loaded\_from
 
@@ -1510,7 +1510,7 @@ def loaded_from() -> Optional[str]
 Property to store filename from which the config was loaded
 
 
-<a id="jukebox.cfghandler.ConfigHandler.get"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.get"></a>
 
 #### get
 
@@ -1521,7 +1521,7 @@ def get(key, *, default=None)
 Enforce keyword on default to avoid accidental misuse when actually getn is wanted
 
 
-<a id="jukebox.cfghandler.ConfigHandler.setdefault"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.setdefault"></a>
 
 #### setdefault
 
@@ -1532,7 +1532,7 @@ def setdefault(key, *, value)
 Enforce keyword on default to avoid accidental misuse when actually setndefault is wanted
 
 
-<a id="jukebox.cfghandler.ConfigHandler.getn"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.getn"></a>
 
 #### getn
 
@@ -1546,7 +1546,7 @@ The *default* value is returned no matter at which hierarchy level the path abor
 A hierarchy is considered as any type with a :func:`get` method.
 
 
-<a id="jukebox.cfghandler.ConfigHandler.setn"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.setn"></a>
 
 #### setn
 
@@ -1565,7 +1565,7 @@ All non-existing hierarchy levels are created.
 - `hierarchy_type`: The type for new hierarchy levels. If *None*, the top-level type
 is used
 
-<a id="jukebox.cfghandler.ConfigHandler.setndefault"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.setndefault"></a>
 
 #### setndefault
 
@@ -1588,7 +1588,7 @@ is used
 
 The actual value or or the default value if key does not exit
 
-<a id="jukebox.cfghandler.ConfigHandler.config_dict"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.config_dict"></a>
 
 #### config\_dict
 
@@ -1602,7 +1602,7 @@ Initialize configuration data from dict-like data structure
 
 - `data`: configuration data
 
-<a id="jukebox.cfghandler.ConfigHandler.is_modified"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.is_modified"></a>
 
 #### is\_modified
 
@@ -1617,7 +1617,7 @@ Check if the data has changed since the last load/store
 > In case of ruamel, this ignores comments and only looks at the data
 
 
-<a id="jukebox.cfghandler.ConfigHandler.clear_modified"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.clear_modified"></a>
 
 #### clear\_modified
 
@@ -1628,7 +1628,7 @@ def clear_modified() -> None
 Sets the current state as new baseline, clearing the is_modified state
 
 
-<a id="jukebox.cfghandler.ConfigHandler.save"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.save"></a>
 
 #### save
 
@@ -1641,7 +1641,7 @@ Save config back to the file it was loaded from
 If you want to save to a different file, use :func:`write_yaml`.
 
 
-<a id="jukebox.cfghandler.ConfigHandler.load"></a>
+<a id="lauschkiste.cfghandler.ConfigHandler.load"></a>
 
 #### load
 
@@ -1652,7 +1652,7 @@ def load(filename: str) -> None
 Load YAML config file into memory
 
 
-<a id="jukebox.cfghandler.get_handler"></a>
+<a id="lauschkiste.cfghandler.get_handler"></a>
 
 #### get\_handler
 
@@ -1674,7 +1674,7 @@ This is the main entry point for obtaining an configuration handler
 
 `ConfigHandler`: The configuration data handler for *name*
 
-<a id="jukebox.cfghandler.load_yaml"></a>
+<a id="lauschkiste.cfghandler.load_yaml"></a>
 
 #### load\_yaml
 
@@ -1693,7 +1693,7 @@ Load a yaml file into a ConfigHandler
 
 None
 
-<a id="jukebox.cfghandler.ensure_default_config"></a>
+<a id="lauschkiste.cfghandler.ensure_default_config"></a>
 
 #### ensure\_default\_config
 
@@ -1715,7 +1715,7 @@ separate install step to have copied the template first.
 
 None
 
-<a id="jukebox.cfghandler.write_yaml"></a>
+<a id="lauschkiste.cfghandler.write_yaml"></a>
 
 #### write\_yaml
 
@@ -1741,9 +1741,9 @@ Writes ConfigHandler data to yaml file / sys.stdout
 
 None
 
-<a id="jukebox.timers"></a>
+<a id="lauschkiste.timers"></a>
 
-# jukebox.timers
+# lauschkiste.timers
 
 The timers core module: named countdowns that run an action when they expire.
 
@@ -1752,7 +1752,7 @@ Timers are configured under ``timers:``; each runs an action (``action``/``args`
 (e.g. its plugin is disabled) is listed, but can't be started.
 
 
-<a id="jukebox.timers.Timers"></a>
+<a id="lauschkiste.timers.Timers"></a>
 
 ## Timers Objects
 
@@ -1763,7 +1763,7 @@ class Timers(CoreModule)
 Countdown timers that run an action when they expire.
 
 
-<a id="jukebox.timers.Timers.list_timers"></a>
+<a id="lauschkiste.timers.Timers.list_timers"></a>
 
 #### list\_timers
 
@@ -1775,7 +1775,7 @@ def list_timers() -> List[TimerState]
 All timers with their state.
 
 
-<a id="jukebox.timers.Timers.start_timer"></a>
+<a id="lauschkiste.timers.Timers.start_timer"></a>
 
 #### start\_timer
 
@@ -1788,7 +1788,7 @@ def start_timer(timer: str,
 Start (or restart) a timer; ``wait_seconds`` defaults to the timer's configured timeout.
 
 
-<a id="jukebox.timers.Timers.cancel"></a>
+<a id="lauschkiste.timers.Timers.cancel"></a>
 
 #### cancel
 
@@ -1800,7 +1800,7 @@ def cancel(timer: str) -> TimerState
 Cancel a running timer.
 
 
-<a id="jukebox.timers.Timers.toggle"></a>
+<a id="lauschkiste.timers.Timers.toggle"></a>
 
 #### toggle
 
@@ -1812,14 +1812,14 @@ def toggle(timer: str, wait_seconds: Optional[float] = None) -> TimerState
 Start the timer if it is not running, cancel it otherwise.
 
 
-<a id="jukebox.audio_output"></a>
+<a id="lauschkiste.audio_output"></a>
 
 # jukebox.audio\_output
 
 PCM output through sounddevice/PortAudio, shared by the local_audio backend and the jingle.
 
 
-<a id="jukebox.audio_output.scale_volume"></a>
+<a id="lauschkiste.audio_output.scale_volume"></a>
 
 #### scale\_volume
 
@@ -1830,7 +1830,7 @@ def scale_volume(data: bytes, volume: int) -> bytes
 Scale packed s16 PCM by volume (0-100). No-op at full volume (the common case).
 
 
-<a id="jukebox.audio_output.AudioSink"></a>
+<a id="lauschkiste.audio_output.AudioSink"></a>
 
 ## AudioSink Objects
 
@@ -1841,7 +1841,7 @@ class AudioSink()
 What a decoded track is written to. Exists so tests don't need a real audio device.
 
 
-<a id="jukebox.audio_output.PortAudioSink"></a>
+<a id="lauschkiste.audio_output.PortAudioSink"></a>
 
 ## PortAudioSink Objects
 
@@ -1855,7 +1855,7 @@ available -- e.g. the no-audio docker dev stack, or a CI box -- rather than rais
 killing the daemon.
 
 
-<a id="jukebox.audio_output.play_file"></a>
+<a id="lauschkiste.audio_output.play_file"></a>
 
 #### play\_file
 
@@ -1869,14 +1869,14 @@ def play_file(path: str,
 Decode ``path`` and play it to the end (or until ``should_stop()``), blocking.
 
 
-<a id="jukebox.core_modules"></a>
+<a id="lauschkiste.core_modules"></a>
 
 # jukebox.core\_modules
 
 The core modules the daemon always starts. Order is irrelevant, ``requires`` decides.
 
 
-<a id="jukebox.input_devices"></a>
+<a id="lauschkiste.input_devices"></a>
 
 # jukebox.input\_devices
 
@@ -1895,7 +1895,7 @@ Configured under ``input:``::
             297: {action: player.prev}
 
 
-<a id="jukebox.input_devices.Evdev"></a>
+<a id="lauschkiste.input_devices.Evdev"></a>
 
 ## Evdev Objects
 
@@ -1906,7 +1906,7 @@ class Evdev()
 Access to the evdev library; replaced in tests.
 
 
-<a id="jukebox.input_devices.Evdev.key_downs"></a>
+<a id="lauschkiste.input_devices.Evdev.key_downs"></a>
 
 #### key\_downs
 
@@ -1917,7 +1917,7 @@ def key_downs(device, stop: threading.Event)
 Yield key codes pressed on ``device`` until ``stop`` is set; raises OSError on disconnect.
 
 
-<a id="jukebox.input_devices.InputDevices"></a>
+<a id="lauschkiste.input_devices.InputDevices"></a>
 
 ## InputDevices Objects
 
@@ -1928,7 +1928,7 @@ class InputDevices(CoreModule)
 Keys of input devices run actions.
 
 
-<a id="jukebox.input_devices.InputDevices.list_devices"></a>
+<a id="lauschkiste.input_devices.InputDevices.list_devices"></a>
 
 #### list\_devices
 
@@ -1940,14 +1940,14 @@ def list_devices() -> List[DeviceState]
 Configured input devices and whether they are connected.
 
 
-<a id="jukebox.multitimer"></a>
+<a id="lauschkiste.multitimer"></a>
 
-# jukebox.multitimer
+# lauschkiste.multitimer
 
 Threaded one-shot and fixed-delay periodic timers.
 
 
-<a id="jukebox.multitimer.MultiTimer"></a>
+<a id="lauschkiste.multitimer.MultiTimer"></a>
 
 ## MultiTimer Objects
 
@@ -1961,7 +1961,7 @@ Limited timers count iterations down from ``iterations - 1`` to zero.
 Negative iteration counts repeat until cancellation.
 
 
-<a id="jukebox.multitimer.MultiTimer.cancel"></a>
+<a id="lauschkiste.multitimer.MultiTimer.cancel"></a>
 
 #### cancel
 
@@ -1972,7 +1972,7 @@ def cancel()
 Stop the timer and wake its worker.
 
 
-<a id="jukebox.multitimer.MultiTimer.trigger"></a>
+<a id="lauschkiste.multitimer.MultiTimer.trigger"></a>
 
 #### trigger
 
@@ -1983,7 +1983,7 @@ def trigger()
 Trigger the next callback immediately.
 
 
-<a id="jukebox.multitimer.MultiTimer.run"></a>
+<a id="lauschkiste.multitimer.MultiTimer.run"></a>
 
 #### run
 
@@ -1994,7 +1994,7 @@ def run()
 Run until all iterations complete, cancellation, or callback failure.
 
 
-<a id="jukebox.multitimer.GenericTimerClass"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass"></a>
 
 ## GenericTimerClass Objects
 
@@ -2005,7 +2005,7 @@ class GenericTimerClass()
 A race-safe, single-execution timer. ``on_change(state)`` is called on every state change.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.start"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.start"></a>
 
 #### start
 
@@ -2016,7 +2016,7 @@ def start(wait_seconds: Optional[float] = None, restart: bool = True)
 Start the timer, atomically replacing an active generation by default.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.cancel"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.cancel"></a>
 
 #### cancel
 
@@ -2027,7 +2027,7 @@ def cancel()
 Cancel the active generation.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.cancel_generation"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.cancel_generation"></a>
 
 #### cancel\_generation
 
@@ -2038,7 +2038,7 @@ def cancel_generation(worker)
 Cancel one worker without affecting a newer generation.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.toggle"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.toggle"></a>
 
 #### toggle
 
@@ -2049,7 +2049,7 @@ def toggle()
 Toggle between active and disabled states.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.trigger"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.trigger"></a>
 
 #### trigger
 
@@ -2060,7 +2060,7 @@ def trigger()
 Trigger the active generation immediately.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.is_alive"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.is_alive"></a>
 
 #### is\_alive
 
@@ -2071,7 +2071,7 @@ def is_alive() -> bool
 Return whether a timer generation is logically active.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.get_timeout"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.get_timeout"></a>
 
 #### get\_timeout
 
@@ -2082,7 +2082,7 @@ def get_timeout() -> float
 Return the configured timeout in seconds.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.set_timeout"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.set_timeout"></a>
 
 #### set\_timeout
 
@@ -2093,7 +2093,7 @@ def set_timeout(wait_seconds: float) -> float
 Set the timeout, atomically replacing an active generation.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.publish"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.publish"></a>
 
 #### publish
 
@@ -2104,7 +2104,7 @@ def publish()
 Publish the current timer state.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.get_state"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.get_state"></a>
 
 #### get\_state
 
@@ -2115,7 +2115,7 @@ def get_state() -> Dict[str, Any]
 Return the timer state.
 
 
-<a id="jukebox.multitimer.GenericTimerClass.close"></a>
+<a id="lauschkiste.multitimer.GenericTimerClass.close"></a>
 
 #### close
 
@@ -2126,7 +2126,7 @@ def close()
 Permanently close this timer and join all active workers.
 
 
-<a id="jukebox.multitimer.GenericEndlessTimerClass"></a>
+<a id="lauschkiste.multitimer.GenericEndlessTimerClass"></a>
 
 ## GenericEndlessTimerClass Objects
 
@@ -2137,7 +2137,7 @@ class GenericEndlessTimerClass(GenericTimerClass)
 A fixed-delay timer that repeats until cancellation.
 
 
-<a id="jukebox.multitimer.GenericEndlessTimerClass.get_state"></a>
+<a id="lauschkiste.multitimer.GenericEndlessTimerClass.get_state"></a>
 
 #### get\_state
 
@@ -2148,7 +2148,7 @@ def get_state() -> Dict[str, Any]
 Return the periodic timer state.
 
 
-<a id="jukebox.legacy_actions"></a>
+<a id="lauschkiste.legacy_actions"></a>
 
 # jukebox.legacy\_actions
 
@@ -2159,7 +2159,7 @@ Before the core/plugin contract, card entries and config actions were stored eit
 ``kwargs``. The contract stores ``action: <module>.<action>`` plus named ``args``.
 
 
-<a id="jukebox.legacy_actions.convert"></a>
+<a id="lauschkiste.legacy_actions.convert"></a>
 
 #### convert
 
@@ -2180,7 +2180,7 @@ needed only to name positional arguments
 
 ``(converted, None)`` or ``(None, reason)``
 
-<a id="jukebox.legacy_actions.bind_action"></a>
+<a id="lauschkiste.legacy_actions.bind_action"></a>
 
 #### bind\_action
 
@@ -2192,11 +2192,11 @@ def bind_action(catalog, entry, where: str,
 A callable running a configured action (either format), or None (logged) if it's invalid.
 
 
-<a id="jukebox.daemon"></a>
+<a id="lauschkiste.daemon"></a>
 
-# jukebox.daemon
+# lauschkiste.daemon
 
-<a id="jukebox.daemon.DEFAULT_CONFIG_TEMPLATE"></a>
+<a id="lauschkiste.daemon.DEFAULT_CONFIG_TEMPLATE"></a>
 
 #### DEFAULT\_CONFIG\_TEMPLATE
 
@@ -2205,7 +2205,7 @@ Template a missing configuration_file is created from on first run (see JukeBox.
 Repository-root-relative, same convention as every other path in this codebase.
 
 
-<a id="jukebox.daemon.shutdown_signal"></a>
+<a id="lauschkiste.daemon.shutdown_signal"></a>
 
 #### shutdown\_signal
 
@@ -2216,7 +2216,7 @@ def shutdown_signal() -> Optional[int]
 The signal that started the shutdown (e.g. ``signal.SIGINT`` for Ctrl-C), None before.
 
 
-<a id="jukebox.daemon.log_active_threads"></a>
+<a id="lauschkiste.daemon.log_active_threads"></a>
 
 #### log\_active\_threads
 
@@ -2232,7 +2232,7 @@ evaluate which Threads are still running (and probably shouldn't be)
 This function is registered before all the components and their dependencies are loaded
 
 
-<a id="jukebox.daemon.JukeBox"></a>
+<a id="lauschkiste.daemon.JukeBox"></a>
 
 ## JukeBox Objects
 
@@ -2240,7 +2240,7 @@ This function is registered before all the components and their dependencies are
 class JukeBox()
 ```
 
-<a id="jukebox.daemon.JukeBox.signal_handler"></a>
+<a id="lauschkiste.daemon.JukeBox.signal_handler"></a>
 
 #### signal\_handler
 
@@ -2254,9 +2254,9 @@ On first Ctrl-C (or SIGTERM) orderly shutdown procedure is embarked upon. It get
 On third Ctrl-C (or SIGTERM), this is interrupted and there will be a hard exit!
 
 
-<a id="jukebox.misc.simplecolors"></a>
+<a id="lauschkiste.misc.simplecolors"></a>
 
-# jukebox.misc.simplecolors
+# lauschkiste.misc.simplecolors
 
 Zero 3rd-party dependency module to add colors to unix terminal output
 
@@ -2264,7 +2264,7 @@ Yes, there are modules out there to do the same and they have more features.
 However, this is low-complexity and has zero dependencies
 
 
-<a id="jukebox.misc.simplecolors.Colors"></a>
+<a id="lauschkiste.misc.simplecolors.Colors"></a>
 
 ## Colors Objects
 
@@ -2275,7 +2275,7 @@ class Colors()
 Container class for all the colors as constants
 
 
-<a id="jukebox.misc.simplecolors.resolve"></a>
+<a id="lauschkiste.misc.simplecolors.resolve"></a>
 
 #### resolve
 
@@ -2293,7 +2293,7 @@ Resolve a color name into the respective color constant
 
 color constant
 
-<a id="jukebox.misc.simplecolors.print"></a>
+<a id="lauschkiste.misc.simplecolors.print"></a>
 
 #### print
 
@@ -2311,11 +2311,11 @@ Drop-in replacement for print with color choice and auto color reset for conveni
 Use just as a regular print function, but with first parameter as color
 
 
-<a id="jukebox.misc"></a>
+<a id="lauschkiste.misc"></a>
 
-# jukebox.misc
+# lauschkiste.misc
 
-<a id="jukebox.misc.recursive_chmod"></a>
+<a id="lauschkiste.misc.recursive_chmod"></a>
 
 #### recursive\_chmod
 
@@ -2331,7 +2331,7 @@ flags from the stats module.
 Reference: https://docs.python.org/3/library/os.html#os.chmod
 
 
-<a id="jukebox.misc.flatten"></a>
+<a id="lauschkiste.misc.flatten"></a>
 
 #### flatten
 
@@ -2342,7 +2342,7 @@ def flatten(iterable)
 Flatten all levels of hierarchy in nested iterables
 
 
-<a id="jukebox.misc.getattr_hierarchical"></a>
+<a id="lauschkiste.misc.getattr_hierarchical"></a>
 
 #### getattr\_hierarchical
 
@@ -2353,9 +2353,9 @@ def getattr_hierarchical(obj: Any, name: str) -> Any
 Like the builtin getattr, but descends though the hierarchy levels
 
 
-<a id="jukebox.misc.inputminus"></a>
+<a id="lauschkiste.misc.inputminus"></a>
 
-# jukebox.misc.inputminus
+# lauschkiste.misc.inputminus
 
 Zero 3rd-party dependency module for user prompting
 
@@ -2363,7 +2363,7 @@ Yes, there are modules out there to do the same and they have more features.
 However, this is low-complexity and has zero dependencies
 
 
-<a id="jukebox.misc.inputminus.input_int"></a>
+<a id="lauschkiste.misc.inputminus.input_int"></a>
 
 #### input\_int
 
@@ -2391,7 +2391,7 @@ Request an integer input from user
 
 integer value read from user input
 
-<a id="jukebox.misc.inputminus.input_yesno"></a>
+<a id="lauschkiste.misc.inputminus.input_yesno"></a>
 
 #### input\_yesno
 
@@ -2417,9 +2417,9 @@ Accepts multiple input for true/false and is case insensitive
 
 boolean value read from user input
 
-<a id="jukebox.misc.loggingext"></a>
+<a id="lauschkiste.misc.loggingext"></a>
 
-# jukebox.misc.loggingext
+# lauschkiste.misc.loggingext
 
 ## Logger
 
@@ -2453,7 +2453,7 @@ Example: YAML snippet, setting WARNING as default level everywhere and DEBUG for
 > There can be multiple loggers per module, e.g. for special classes, to further control the amount of log output
 
 
-<a id="jukebox.misc.loggingext.ColorFilter"></a>
+<a id="lauschkiste.misc.loggingext.ColorFilter"></a>
 
 ## ColorFilter Objects
 
@@ -2472,7 +2472,7 @@ for the levelname depending on severity.
 Don't forget to {reset} the color settings at the end of the string.
 
 
-<a id="jukebox.misc.loggingext.ColorFilter.__init__"></a>
+<a id="lauschkiste.misc.loggingext.ColorFilter.__init__"></a>
 
 #### \_\_init\_\_
 
@@ -2485,7 +2485,7 @@ def __init__(enable=True, color_levelname=True)
 - `enable`: Enable the coloring
 - `color_levelname`: Enable auto-coloring when using the levelname keyword
 
-<a id="jukebox.misc.loggingext.PubStream"></a>
+<a id="lauschkiste.misc.loggingext.PubStream"></a>
 
 ## PubStream Objects
 
@@ -2502,7 +2502,7 @@ to the Publisher.
 > This can lead to recursions!
 > Recursions come up when
 > * Publish.send / EventBus.publish also emits logs, which cause a another send, which emits a log,
-> which causes a send, ..... `jukebox.publishing.bus.EventBus` guards against this (caps it at one
+> which causes a send, ..... `lauschkiste.publishing.bus.EventBus` guards against this (caps it at one
 > extra level instead of recursing indefinitely), but still avoid triggering it needlessly.
 > * Publisher initialization emits logs, which need a Publisher instance to send logs
 
@@ -2511,7 +2511,7 @@ to the Publisher.
 > functions in the send-function stack!
 
 
-<a id="jukebox.misc.loggingext.PubStreamHandler"></a>
+<a id="lauschkiste.misc.loggingext.PubStreamHandler"></a>
 
 ## PubStreamHandler Objects
 
@@ -2527,9 +2527,9 @@ Using this Handler, we can output to PubStream whithout
 support code to instantiate PubStream keeping this file generic
 
 
-<a id="jukebox.contract.interfaces"></a>
+<a id="lauschkiste.contract.interfaces"></a>
 
-# jukebox.contract.interfaces
+# lauschkiste.contract.interfaces
 
 Interface snapshots of modules and the framework contract, and the rules for version bumps.
 
@@ -2538,14 +2538,14 @@ the stored snapshot with the current one tells whether a change is compatible (m
 breaking (major bump). See documentation/developers/core-and-plugins.md, "Versioning".
 
 
-<a id="jukebox.contract.declarations"></a>
+<a id="lauschkiste.contract.declarations"></a>
 
-# jukebox.contract.declarations
+# lauschkiste.contract.declarations
 
 Declarations a module uses to describe its interface: operations, events, extension points.
 
 
-<a id="jukebox.contract.declarations.OperationSpec"></a>
+<a id="lauschkiste.contract.declarations.OperationSpec"></a>
 
 ## OperationSpec Objects
 
@@ -2554,14 +2554,14 @@ Declarations a module uses to describe its interface: operations, events, extens
 class OperationSpec()
 ```
 
-<a id="jukebox.contract.declarations.OperationSpec.kind"></a>
+<a id="lauschkiste.contract.declarations.OperationSpec.kind"></a>
 
 #### kind
 
 'action' | 'query'
 
 
-<a id="jukebox.contract.declarations.action"></a>
+<a id="lauschkiste.contract.declarations.action"></a>
 
 #### action
 
@@ -2582,7 +2582,7 @@ would clash with the lifecycle methods ``start``/``stop``/``ready``. ``status_co
 the default HTTP status of a successful call (200, or 204 without a result).
 
 
-<a id="jukebox.contract.declarations.query"></a>
+<a id="lauschkiste.contract.declarations.query"></a>
 
 #### query
 
@@ -2597,7 +2597,7 @@ def query(func: Optional[Callable] = None,
 Declare a read-only operation: GET route and in-process call, not card-triggerable.
 
 
-<a id="jukebox.contract.declarations.EventSpec"></a>
+<a id="lauschkiste.contract.declarations.EventSpec"></a>
 
 ## EventSpec Objects
 
@@ -2608,7 +2608,7 @@ class EventSpec()
 A declared event. Published through ``ctx.publish(spec, payload)`` as ``<module>.<name>``.
 
 
-<a id="jukebox.contract.declarations.ExtensionPoint"></a>
+<a id="lauschkiste.contract.declarations.ExtensionPoint"></a>
 
 ## ExtensionPoint Objects
 
@@ -2619,7 +2619,7 @@ class ExtensionPoint()
 Named implementations of a protocol, registered by other modules.
 
 
-<a id="jukebox.contract.declarations.ExtensionPoint.on_register"></a>
+<a id="lauschkiste.contract.declarations.ExtensionPoint.on_register"></a>
 
 #### on\_register
 
@@ -2630,7 +2630,7 @@ def on_register(listener: Callable[[str, Any], None]) -> None
 Call ``listener(key, implementation)`` for every current and future registration.
 
 
-<a id="jukebox.contract.declarations.ExtensionPointSpec"></a>
+<a id="lauschkiste.contract.declarations.ExtensionPointSpec"></a>
 
 ## ExtensionPointSpec Objects
 
@@ -2641,7 +2641,7 @@ class ExtensionPointSpec()
 Class-level declaration of an extension point; each module instance gets its own registry.
 
 
-<a id="jukebox.contract.declarations.Operation"></a>
+<a id="lauschkiste.contract.declarations.Operation"></a>
 
 ## Operation Objects
 
@@ -2652,7 +2652,7 @@ class Operation()
 An operation of a module class with its argument model and return type.
 
 
-<a id="jukebox.contract.declarations.Operation.validate_args"></a>
+<a id="lauschkiste.contract.declarations.Operation.validate_args"></a>
 
 #### validate\_args
 
@@ -2663,14 +2663,14 @@ def validate_args(args: Optional[dict]) -> dict
 Validate a mapping of arguments; return the coerced keyword arguments.
 
 
-<a id="jukebox.contract.catalog"></a>
+<a id="lauschkiste.contract.catalog"></a>
 
-# jukebox.contract.catalog
+# lauschkiste.contract.catalog
 
 Card-triggerable actions of all started modules, addressed by ``<module>.<action>``.
 
 
-<a id="jukebox.contract.catalog.ActionCatalog"></a>
+<a id="lauschkiste.contract.catalog.ActionCatalog"></a>
 
 ## ActionCatalog Objects
 
@@ -2678,7 +2678,7 @@ Card-triggerable actions of all started modules, addressed by ``<module>.<action
 class ActionCatalog()
 ```
 
-<a id="jukebox.contract.catalog.ActionCatalog.validate"></a>
+<a id="lauschkiste.contract.catalog.ActionCatalog.validate"></a>
 
 #### validate
 
@@ -2689,14 +2689,14 @@ def validate(action_id: str, args: Optional[dict] = None) -> Dict[str, Any]
 Check that ``action_id`` exists and ``args`` fit its signature. Returns coerced args.
 
 
-<a id="jukebox.contract.context"></a>
+<a id="lauschkiste.contract.context"></a>
 
-# jukebox.contract.context
+# lauschkiste.contract.context
 
 What a module sees of the rest of the system.
 
 
-<a id="jukebox.contract.context.ModuleConfig"></a>
+<a id="lauschkiste.contract.context.ModuleConfig"></a>
 
 ## ModuleConfig Objects
 
@@ -2707,7 +2707,7 @@ class ModuleConfig()
 A module's own section of the main config (``<name>`` for core, ``plugins.<name>`` for plugins).
 
 
-<a id="jukebox.contract.context.ModuleProxy"></a>
+<a id="lauschkiste.contract.context.ModuleProxy"></a>
 
 ## ModuleProxy Objects
 
@@ -2718,7 +2718,7 @@ class ModuleProxy()
 The contract surface of another module: its operations and extension points.
 
 
-<a id="jukebox.contract.context.Context"></a>
+<a id="lauschkiste.contract.context.Context"></a>
 
 ## Context Objects
 
@@ -2726,7 +2726,7 @@ The contract surface of another module: its operations and extension points.
 class Context()
 ```
 
-<a id="jukebox.contract.context.Context.lock"></a>
+<a id="lauschkiste.contract.context.Context.lock"></a>
 
 #### lock
 
@@ -2740,7 +2740,7 @@ The module's own lock, for work outside operations (e.g. background threads).
 A no-op context manager for ``concurrency = 'threadsafe'`` modules.
 
 
-<a id="jukebox.contract.context.Context.subscribe"></a>
+<a id="lauschkiste.contract.context.Context.subscribe"></a>
 
 #### subscribe
 
@@ -2752,21 +2752,21 @@ def subscribe(topic_prefix: str, callback: Callable[[str, Optional[Any]],
 Call ``callback(topic, payload)`` for every event under ``topic_prefix``; payload None = revoked.
 
 
-<a id="jukebox.contract.routes"></a>
+<a id="lauschkiste.contract.routes"></a>
 
-# jukebox.contract.routes
+# lauschkiste.contract.routes
 
 FastAPI routes generated from module operations, plus ``GET /api/v1/modules``.
 
 
-<a id="jukebox.contract.manager"></a>
+<a id="lauschkiste.contract.manager"></a>
 
-# jukebox.contract.manager
+# lauschkiste.contract.manager
 
 Discovers, orders, starts and stops core modules and enabled plugins.
 
 
-<a id="jukebox.contract.manager.discover_plugins"></a>
+<a id="lauschkiste.contract.manager.discover_plugins"></a>
 
 #### discover\_plugins
 
@@ -2777,7 +2777,7 @@ def discover_plugins() -> Dict[str, Callable[[], type]]
 Installed plugins by entry-point name. Loading (importing) happens only when enabled.
 
 
-<a id="jukebox.contract.manager.ModuleHandle"></a>
+<a id="lauschkiste.contract.manager.ModuleHandle"></a>
 
 ## ModuleHandle Objects
 
@@ -2788,7 +2788,7 @@ class ModuleHandle()
 A started (or starting) module instance plus its lock and context.
 
 
-<a id="jukebox.contract.manager.ModuleManager"></a>
+<a id="lauschkiste.contract.manager.ModuleManager"></a>
 
 ## ModuleManager Objects
 
@@ -2796,7 +2796,7 @@ A started (or starting) module instance plus its lock and context.
 class ModuleManager()
 ```
 
-<a id="jukebox.contract.manager.ModuleManager.__init__"></a>
+<a id="lauschkiste.contract.manager.ModuleManager.__init__"></a>
 
 #### \_\_init\_\_
 
@@ -2814,17 +2814,17 @@ def __init__(core_modules: Sequence[Type[CoreModule]],
 - `core_modules`: core module classes (order doesn't matter, ``requires`` decides)
 - `cfg`: the main config handler; plugins are enabled under its ``plugins`` key
 - `bus`: the event bus
-- `plugins`: installed plugins by name (default: entry points of ``jukebox.plugins``)
+- `plugins`: installed plugins by name (default: entry points of ``lauschkiste.plugins``)
 - `strict`: raise instead of log on invalid events (default: ``$JUKEBOX_STRICT``)
 
-<a id="jukebox.contract.module"></a>
+<a id="lauschkiste.contract.module"></a>
 
-# jukebox.contract.module
+# lauschkiste.contract.module
 
 Base classes for core modules and plugins.
 
 
-<a id="jukebox.contract.module.Module"></a>
+<a id="lauschkiste.contract.module.Module"></a>
 
 ## Module Objects
 
@@ -2835,14 +2835,14 @@ class Module()
 Common base of :class:`CoreModule` and :class:`Plugin`. Not subclassed directly.
 
 
-<a id="jukebox.contract.module.Module.concurrency"></a>
+<a id="lauschkiste.contract.module.Module.concurrency"></a>
 
 #### concurrency
 
 'serialized': every operation runs under a per-module lock. 'threadsafe': no lock.
 
 
-<a id="jukebox.contract.module.Module.ready"></a>
+<a id="lauschkiste.contract.module.Module.ready"></a>
 
 #### ready
 
@@ -2853,7 +2853,7 @@ def ready() -> None
 Called once every module has started, in start order. All actions are available now.
 
 
-<a id="jukebox.contract.module.Module.extra_routes"></a>
+<a id="lauschkiste.contract.module.Module.extra_routes"></a>
 
 #### extra\_routes
 
@@ -2866,7 +2866,7 @@ Escape hatch for routes the declarations can't express (e.g. streaming uploads).
 Receives a FastAPI ``APIRouter``; paths should live under ``/api/v1/<name>``.
 
 
-<a id="jukebox.contract.module.CoreModule"></a>
+<a id="lauschkiste.contract.module.CoreModule"></a>
 
 ## CoreModule Objects
 
@@ -2877,7 +2877,7 @@ class CoreModule(Module)
 Always shipped, always running part of the jukebox.
 
 
-<a id="jukebox.contract.module.Plugin"></a>
+<a id="lauschkiste.contract.module.Plugin"></a>
 
 ## Plugin Objects
 
@@ -2888,11 +2888,11 @@ class Plugin(Module)
 Separately installed, opt-in module. Declares which framework contract it targets.
 
 
-<a id="jukebox.contract.version"></a>
+<a id="lauschkiste.contract.version"></a>
 
-# jukebox.contract.version
+# lauschkiste.contract.version
 
-<a id="jukebox.contract.version.CONTRACT_VERSION"></a>
+<a id="lauschkiste.contract.version.CONTRACT_VERSION"></a>
 
 #### CONTRACT\_VERSION
 
@@ -2901,24 +2901,24 @@ Version of the framework contract (Module/CoreModule/Plugin, declarations, Conte
 Major bump on breaking changes, minor bump on additions. Checked by test/contract snapshots.
 
 
-<a id="jukebox.contract"></a>
+<a id="lauschkiste.contract"></a>
 
-# jukebox.contract
+# lauschkiste.contract
 
 Contract shared by core modules and plugins. See documentation/developers/core-and-plugins.md.
 
 
-<a id="jukebox.contract.snapshots"></a>
+<a id="lauschkiste.contract.snapshots"></a>
 
-# jukebox.contract.snapshots
+# lauschkiste.contract.snapshots
 
 Check or update the stored interface snapshots of the framework, core modules and bundled plugins.
 
-uv run python -m jukebox.contract.snapshots            # check (what CI runs via pytest)
-uv run python -m jukebox.contract.snapshots --update   # write snapshots after a version bump
+uv run python -m lauschkiste.contract.snapshots            # check (what CI runs via pytest)
+uv run python -m lauschkiste.contract.snapshots --update   # write snapshots after a version bump
 
 
-<a id="jukebox.contract.snapshots.check_target"></a>
+<a id="lauschkiste.contract.snapshots.check_target"></a>
 
 #### check\_target
 
@@ -2929,11 +2929,11 @@ def check_target(target: Target) -> Optional[str]
 Return a problem description, or None when the stored snapshot matches.
 
 
-<a id="jukebox.contract.errors"></a>
+<a id="lauschkiste.contract.errors"></a>
 
-# jukebox.contract.errors
+# lauschkiste.contract.errors
 
-<a id="jukebox.contract.errors.ContractError"></a>
+<a id="lauschkiste.contract.errors.ContractError"></a>
 
 ## ContractError Objects
 
@@ -2944,7 +2944,7 @@ class ContractError(Exception)
 A module violates the contract (declaration, dependency or version problem).
 
 
-<a id="jukebox.contract.errors.OperationError"></a>
+<a id="lauschkiste.contract.errors.OperationError"></a>
 
 ## OperationError Objects
 
@@ -2955,7 +2955,7 @@ class OperationError(Exception)
 Raised by an operation to report a client error with an HTTP status and error code.
 
 
-<a id="jukebox.contract.errors.ActionError"></a>
+<a id="lauschkiste.contract.errors.ActionError"></a>
 
 ## ActionError Objects
 
@@ -2966,14 +2966,14 @@ class ActionError(Exception)
 An action id or its arguments are invalid.
 
 
-<a id="jukebox.system"></a>
+<a id="lauschkiste.system"></a>
 
-# jukebox.system
+# lauschkiste.system
 
 The system core module: version, logs, system information and web app settings.
 
 
-<a id="jukebox.system.cpu_temperature"></a>
+<a id="lauschkiste.system.cpu_temperature"></a>
 
 #### cpu\_temperature
 
@@ -2984,7 +2984,7 @@ def cpu_temperature() -> Optional[float]
 CPU temperature in °C from the first thermal zone, None where there is none.
 
 
-<a id="jukebox.system.ip_addresses"></a>
+<a id="lauschkiste.system.ip_addresses"></a>
 
 #### ip\_addresses
 
@@ -2995,7 +2995,7 @@ def ip_addresses() -> List[str]
 Non-loopback IPv4 addresses of this machine.
 
 
-<a id="jukebox.system.System"></a>
+<a id="lauschkiste.system.System"></a>
 
 ## System Objects
 
@@ -3006,14 +3006,14 @@ class System(CoreModule)
 Version information, log files and web app settings.
 
 
-<a id="jukebox.system.System.log"></a>
+<a id="lauschkiste.system.System.log"></a>
 
 #### log
 
-Published by jukebox.misc.loggingext.PubStreamHandler when configured in logger.yaml
+Published by lauschkiste.misc.loggingext.PubStreamHandler when configured in logger.yaml
 
 
-<a id="jukebox.system.System.get_info"></a>
+<a id="lauschkiste.system.System.get_info"></a>
 
 #### get\_info
 
@@ -3025,7 +3025,7 @@ def get_info() -> SystemInfo
 Version, git state and start time of the jukebox.
 
 
-<a id="jukebox.system.System.get_health"></a>
+<a id="lauschkiste.system.System.get_health"></a>
 
 #### get\_health
 
@@ -3037,7 +3037,7 @@ def get_health() -> SystemHealth
 CPU temperature (where available) and disk usage of the music library's file system.
 
 
-<a id="jukebox.system.System.get_ip_addresses"></a>
+<a id="lauschkiste.system.System.get_ip_addresses"></a>
 
 #### get\_ip\_addresses
 
@@ -3049,7 +3049,7 @@ def get_ip_addresses() -> IpAddresses
 IPv4 addresses of this machine.
 
 
-<a id="jukebox.system.System.say_my_ip"></a>
+<a id="lauschkiste.system.System.say_my_ip"></a>
 
 #### say\_my\_ip
 
@@ -3061,7 +3061,7 @@ def say_my_ip() -> None
 Speak the IP address (needs espeak).
 
 
-<a id="jukebox.system.System.restart_service"></a>
+<a id="lauschkiste.system.System.restart_service"></a>
 
 #### restart\_service
 
@@ -3073,7 +3073,7 @@ def restart_service() -> None
 Restart the jukebox systemd user service.
 
 
-<a id="jukebox.system.System.get_log"></a>
+<a id="lauschkiste.system.System.get_log"></a>
 
 #### get\_log
 
@@ -3085,7 +3085,7 @@ def get_log(kind: Literal['debug', 'error'] = 'debug') -> str
 Content of the debug or error log file of this run.
 
 
-<a id="jukebox.system.System.get_app_settings"></a>
+<a id="lauschkiste.system.System.get_app_settings"></a>
 
 #### get\_app\_settings
 
@@ -3097,7 +3097,7 @@ def get_app_settings() -> AppSettings
 Web app settings.
 
 
-<a id="jukebox.system.System.set_app_settings"></a>
+<a id="lauschkiste.system.System.set_app_settings"></a>
 
 #### set\_app\_settings
 
@@ -3109,7 +3109,7 @@ def set_app_settings(settings: AppSettingsUpdate) -> None
 Change web app settings; fields left out stay unchanged.
 
 
-<a id="jukebox.system.System.noop"></a>
+<a id="lauschkiste.system.System.noop"></a>
 
 #### noop
 
@@ -3121,11 +3121,11 @@ def noop(message: str = '') -> None
 Do nothing (logs ``message`` as a warning if given).
 
 
-<a id="jukebox.player.coordinator"></a>
+<a id="lauschkiste.player.coordinator"></a>
 
-# jukebox.player.coordinator
+# lauschkiste.player.coordinator
 
-<a id="jukebox.player.coordinator.PlayerCoordinator"></a>
+<a id="lauschkiste.player.coordinator.PlayerCoordinator"></a>
 
 ## PlayerCoordinator Objects
 
@@ -3136,7 +3136,7 @@ class PlayerCoordinator()
 Provider-neutral facade for playback and content backends.
 
 
-<a id="jukebox.player.coordinator.PlayerCoordinator.__init__"></a>
+<a id="lauschkiste.player.coordinator.PlayerCoordinator.__init__"></a>
 
 #### \_\_init\_\_
 
@@ -3149,7 +3149,7 @@ def __init__(second_swipe_action: Optional[Callable[[], Any]] = None)
 - `second_swipe_action`: runs on a second swipe of the same card instead of the
 backend's own second-swipe behavior
 
-<a id="jukebox.player.coordinator.PlayerCoordinator.register_backend"></a>
+<a id="lauschkiste.player.coordinator.PlayerCoordinator.register_backend"></a>
 
 #### register\_backend
 
@@ -3162,7 +3162,7 @@ def register_backend(name: str,
 Register a backend, selecting the first registered backend by default.
 
 
-<a id="jukebox.player.coordinator.PlayerCoordinator.set_default_backend"></a>
+<a id="lauschkiste.player.coordinator.PlayerCoordinator.set_default_backend"></a>
 
 #### set\_default\_backend
 
@@ -3173,7 +3173,7 @@ def set_default_backend(name: str) -> None
 Make ``name`` the backend used for content without an explicit provider.
 
 
-<a id="jukebox.player.coordinator.PlayerCoordinator.select_backend"></a>
+<a id="lauschkiste.player.coordinator.PlayerCoordinator.select_backend"></a>
 
 #### select\_backend
 
@@ -3184,7 +3184,7 @@ def select_backend(name: str)
 Stop the current backend and select another registered backend.
 
 
-<a id="jukebox.player.coordinator.PlayerCoordinator.play_files"></a>
+<a id="lauschkiste.player.coordinator.PlayerCoordinator.play_files"></a>
 
 #### play\_files
 
@@ -3195,14 +3195,14 @@ def play_files(paths)
 Play a list of songs (paths below the music library, absolute or relative).
 
 
-<a id="jukebox.player.module"></a>
+<a id="lauschkiste.player.module"></a>
 
-# jukebox.player.module
+# lauschkiste.player.module
 
 The player core module: playback through registered backends, typed status events.
 
 
-<a id="jukebox.player.module.Player"></a>
+<a id="lauschkiste.player.module.Player"></a>
 
 ## Player Objects
 
@@ -3213,7 +3213,7 @@ class Player(CoreModule)
 Playback of folders, songs and albums; backends plug in at ``player.backends``.
 
 
-<a id="jukebox.player.module.Player.play"></a>
+<a id="lauschkiste.player.module.Player.play"></a>
 
 #### play
 
@@ -3225,7 +3225,7 @@ def play() -> None
 Start or resume playback.
 
 
-<a id="jukebox.player.module.Player.pause"></a>
+<a id="lauschkiste.player.module.Player.pause"></a>
 
 #### pause
 
@@ -3237,7 +3237,7 @@ def pause(state: int = 1) -> None
 Pause (state=1) or resume (state=0).
 
 
-<a id="jukebox.player.module.Player.toggle"></a>
+<a id="lauschkiste.player.module.Player.toggle"></a>
 
 #### toggle
 
@@ -3249,7 +3249,7 @@ def toggle() -> None
 Toggle between play and pause.
 
 
-<a id="jukebox.player.module.Player.next"></a>
+<a id="lauschkiste.player.module.Player.next"></a>
 
 #### next
 
@@ -3261,7 +3261,7 @@ def next() -> None
 Skip to the next song.
 
 
-<a id="jukebox.player.module.Player.prev"></a>
+<a id="lauschkiste.player.module.Player.prev"></a>
 
 #### prev
 
@@ -3273,7 +3273,7 @@ def prev() -> None
 Go back to the previous song.
 
 
-<a id="jukebox.player.module.Player.stop_playback"></a>
+<a id="lauschkiste.player.module.Player.stop_playback"></a>
 
 #### stop\_playback
 
@@ -3285,7 +3285,7 @@ def stop_playback() -> None
 Stop playback.
 
 
-<a id="jukebox.player.module.Player.seek"></a>
+<a id="lauschkiste.player.module.Player.seek"></a>
 
 #### seek
 
@@ -3297,7 +3297,7 @@ def seek(position: float) -> None
 Jump to a position (seconds) in the current song.
 
 
-<a id="jukebox.player.module.Player.shuffle"></a>
+<a id="lauschkiste.player.module.Player.shuffle"></a>
 
 #### shuffle
 
@@ -3309,7 +3309,7 @@ def shuffle(option: str = 'toggle') -> None
 Shuffle mode: 'toggle', 'enable' or 'disable'.
 
 
-<a id="jukebox.player.module.Player.repeat"></a>
+<a id="lauschkiste.player.module.Player.repeat"></a>
 
 #### repeat
 
@@ -3321,7 +3321,7 @@ def repeat(option: str = 'toggle') -> None
 Repeat mode: 'toggle', 'enable', 'enable_repeat_single' or 'disable'.
 
 
-<a id="jukebox.player.module.Player.rewind"></a>
+<a id="lauschkiste.player.module.Player.rewind"></a>
 
 #### rewind
 
@@ -3333,7 +3333,7 @@ def rewind() -> None
 Restart the playlist from its first song.
 
 
-<a id="jukebox.player.module.Player.replay"></a>
+<a id="lauschkiste.player.module.Player.replay"></a>
 
 #### replay
 
@@ -3345,7 +3345,7 @@ def replay() -> None
 Replay the current folder from the start.
 
 
-<a id="jukebox.player.module.Player.replay_if_stopped"></a>
+<a id="lauschkiste.player.module.Player.replay_if_stopped"></a>
 
 #### replay\_if\_stopped
 
@@ -3357,7 +3357,7 @@ def replay_if_stopped() -> None
 Replay the current folder if playback has stopped.
 
 
-<a id="jukebox.player.module.Player.resume"></a>
+<a id="lauschkiste.player.module.Player.resume"></a>
 
 #### resume
 
@@ -3369,7 +3369,7 @@ def resume() -> None
 Resume the last played folder where it stopped.
 
 
-<a id="jukebox.player.module.Player.play_folder"></a>
+<a id="lauschkiste.player.module.Player.play_folder"></a>
 
 #### play\_folder
 
@@ -3381,7 +3381,7 @@ def play_folder(folder: str, recursive: bool = False) -> None
 Play a folder of the music library.
 
 
-<a id="jukebox.player.module.Player.play_card"></a>
+<a id="lauschkiste.player.module.Player.play_card"></a>
 
 #### play\_card
 
@@ -3393,7 +3393,7 @@ def play_card(folder: str, recursive: bool = False) -> None
 Play a folder; a second swipe of the same card runs the second-swipe action.
 
 
-<a id="jukebox.player.module.Player.play_single"></a>
+<a id="lauschkiste.player.module.Player.play_single"></a>
 
 #### play\_single
 
@@ -3405,7 +3405,7 @@ def play_single(song_url: str, provider: Optional[str] = None) -> None
 Play a single song.
 
 
-<a id="jukebox.player.module.Player.play_album"></a>
+<a id="lauschkiste.player.module.Player.play_album"></a>
 
 #### play\_album
 
@@ -3420,7 +3420,7 @@ def play_album(albumartist: str,
 Play an album of the library or of a backend's own catalog (``provider``).
 
 
-<a id="jukebox.player.module.Player.queue_load"></a>
+<a id="lauschkiste.player.module.Player.queue_load"></a>
 
 #### queue\_load
 
@@ -3432,7 +3432,7 @@ def queue_load(folder: str) -> None
 Load a folder into the queue without playing it.
 
 
-<a id="jukebox.player.module.Player.update"></a>
+<a id="lauschkiste.player.module.Player.update"></a>
 
 #### update
 
@@ -3444,7 +3444,7 @@ def update() -> Any
 Rescan the music library of the default backend.
 
 
-<a id="jukebox.player.module.Player.update_wait"></a>
+<a id="lauschkiste.player.module.Player.update_wait"></a>
 
 #### update\_wait
 
@@ -3456,7 +3456,7 @@ def update_wait() -> Any
 Rescan the music library and wait for it to finish.
 
 
-<a id="jukebox.player.module.Player.playerstatus"></a>
+<a id="lauschkiste.player.module.Player.playerstatus"></a>
 
 #### playerstatus
 
@@ -3468,7 +3468,7 @@ def playerstatus() -> PlayerStatus
 Current player status.
 
 
-<a id="jukebox.player.module.Player.get_volume"></a>
+<a id="lauschkiste.player.module.Player.get_volume"></a>
 
 #### get\_volume
 
@@ -3480,7 +3480,7 @@ def get_volume() -> VolumeLevel
 Current playback volume of the active backend.
 
 
-<a id="jukebox.player.module.Player.set_volume"></a>
+<a id="lauschkiste.player.module.Player.set_volume"></a>
 
 #### set\_volume
 
@@ -3492,7 +3492,7 @@ def set_volume(volume: int) -> VolumeLevel
 Set the playback volume of the active backend.
 
 
-<a id="jukebox.player.module.Player.playlistinfo"></a>
+<a id="lauschkiste.player.module.Player.playlistinfo"></a>
 
 #### playlistinfo
 
@@ -3504,7 +3504,7 @@ def playlistinfo() -> List[Dict[str, Any]]
 The current queue.
 
 
-<a id="jukebox.player.module.Player.get_current_song"></a>
+<a id="lauschkiste.player.module.Player.get_current_song"></a>
 
 #### get\_current\_song
 
@@ -3516,7 +3516,7 @@ def get_current_song(param: Optional[str] = None) -> Any
 Details of the current song.
 
 
-<a id="jukebox.player.module.Player.get_player_type_and_version"></a>
+<a id="lauschkiste.player.module.Player.get_player_type_and_version"></a>
 
 #### get\_player\_type\_and\_version
 
@@ -3528,7 +3528,7 @@ def get_player_type_and_version() -> str
 Type and version of the active backend.
 
 
-<a id="jukebox.player.module.Player.list_backends"></a>
+<a id="lauschkiste.player.module.Player.list_backends"></a>
 
 #### list\_backends
 
@@ -3540,7 +3540,7 @@ def list_backends() -> List[str]
 Registered backends.
 
 
-<a id="jukebox.player.module.Player.get_active_backend"></a>
+<a id="lauschkiste.player.module.Player.get_active_backend"></a>
 
 #### get\_active\_backend
 
@@ -3552,7 +3552,7 @@ def get_active_backend() -> BackendName
 The backend playing right now.
 
 
-<a id="jukebox.player.module.Player.get_default_backend"></a>
+<a id="lauschkiste.player.module.Player.get_default_backend"></a>
 
 #### get\_default\_backend
 
@@ -3564,7 +3564,7 @@ def get_default_backend() -> BackendName
 The backend used for content without an explicit provider.
 
 
-<a id="jukebox.player.module.Player.select_backend"></a>
+<a id="lauschkiste.player.module.Player.select_backend"></a>
 
 #### select\_backend
 
@@ -3576,14 +3576,14 @@ def select_backend(name: str) -> BackendName
 Stop the current backend and switch to another one.
 
 
-<a id="jukebox.player.status"></a>
+<a id="lauschkiste.player.status"></a>
 
-# jukebox.player.status
+# lauschkiste.player.status
 
 Typed player status, independent of the backend that produced it.
 
 
-<a id="jukebox.player.status.status_from_backend"></a>
+<a id="lauschkiste.player.status.status_from_backend"></a>
 
 #### status\_from\_backend
 
@@ -3594,11 +3594,11 @@ def status_from_backend(raw: Mapping[str, Any], provider: str) -> PlayerStatus
 Build a :class:`PlayerStatus` from a backend's raw (mpd-style) status mapping.
 
 
-<a id="jukebox.player"></a>
+<a id="lauschkiste.player"></a>
 
-# jukebox.player
+# lauschkiste.player
 
-<a id="jukebox.player.MusicLibPath"></a>
+<a id="lauschkiste.player.MusicLibPath"></a>
 
 ## MusicLibPath Objects
 
@@ -3613,7 +3613,7 @@ Primarily from `player.music_library_path` config (backend-agnostic). Falls back
 configured -- keeps existing mpd installs working without a migration step.
 
 
-<a id="jukebox.player.get_music_library_path"></a>
+<a id="lauschkiste.player.get_music_library_path"></a>
 
 #### get\_music\_library\_path
 
@@ -3624,9 +3624,9 @@ def get_music_library_path()
 Get the music library path
 
 
-<a id="jukebox.player.backend"></a>
+<a id="lauschkiste.player.backend"></a>
 
-# jukebox.player.backend
+# lauschkiste.player.backend
 
 Protocol a player backend implements to register at the ``player.backends`` extension point.
 
@@ -3634,7 +3634,7 @@ Optional capabilities (library browsing, cover art, rewind, ...) are looked up b
 time; a backend without them makes the corresponding operation answer 501.
 
 
-<a id="jukebox.player.backend.PlayerBackend"></a>
+<a id="lauschkiste.player.backend.PlayerBackend"></a>
 
 ## PlayerBackend Objects
 
@@ -3642,7 +3642,7 @@ time; a backend without them makes the corresponding operation answer 501.
 class PlayerBackend(Protocol)
 ```
 
-<a id="jukebox.player.backend.PlayerBackend.set_status_callback"></a>
+<a id="lauschkiste.player.backend.PlayerBackend.set_status_callback"></a>
 
 #### set\_status\_callback
 
@@ -3653,7 +3653,7 @@ def set_status_callback(callback: Callable[[Mapping[str, Any]], None]) -> None
 Receive the raw status mapping whenever it changes (only forwarded while active).
 
 
-<a id="jukebox.player.backend.PlayerBackend.play_files"></a>
+<a id="lauschkiste.player.backend.PlayerBackend.play_files"></a>
 
 #### play\_files
 
@@ -3664,16 +3664,16 @@ def play_files(paths: List[str]) -> None
 Replace the queue with ``paths`` (absolute or relative to the music library) and play.
 
 
-<a id="jukebox.player.backends.local_audio"></a>
+<a id="lauschkiste.player.backends.local_audio"></a>
 
-# jukebox.player.backends.local\_audio
+# lauschkiste.player.backends.local\_audio
 
 Default player backend: decodes audio directly (PyAV) and writes PCM to the machine's normal
 
 audio output (sounddevice/PortAudio) -- no mpd, no external player process, works on any Linux
 box. See documentation/developers/roadmap-core-architecture.md, "Advanced plugin system".
 
-Folder scanning reuses `jukebox.playlistgenerator.PlaylistCollector` (already backend-agnostic --
+Folder scanning reuses `lauschkiste.playlistgenerator.PlaylistCollector` (already backend-agnostic --
 `backends/mpd.py` uses the exact same class, just pushes the resulting paths into MPD's queue
 instead of this backend's own in-process one).
 
@@ -3684,7 +3684,7 @@ whenever it's told to (re)start one. This keeps the state machine in one place i
 to signal a live decode loop with finer-grained commands.
 
 
-<a id="jukebox.player.backends.local_audio.PlayerLocalAudio"></a>
+<a id="lauschkiste.player.backends.local_audio.PlayerLocalAudio"></a>
 
 ## PlayerLocalAudio Objects
 
@@ -3695,7 +3695,7 @@ class PlayerLocalAudio()
 Decode-and-output player backend. See module docstring for the state machine.
 
 
-<a id="jukebox.player.backends.local_audio.PlayerLocalAudio.rewind"></a>
+<a id="lauschkiste.player.backends.local_audio.PlayerLocalAudio.rewind"></a>
 
 #### rewind
 
@@ -3706,7 +3706,7 @@ def rewind()
 Re-start current playlist from the first track.
 
 
-<a id="jukebox.player.backends.local_audio.PlayerLocalAudio.replay"></a>
+<a id="lauschkiste.player.backends.local_audio.PlayerLocalAudio.replay"></a>
 
 #### replay
 
@@ -3717,9 +3717,9 @@ def replay()
 Re-start playing the last-played folder.
 
 
-<a id="jukebox.player.backends"></a>
+<a id="lauschkiste.player.backends"></a>
 
-# jukebox.player.backends
+# lauschkiste.player.backends
 
 Playback backend implementations used by the player coordinator.
 

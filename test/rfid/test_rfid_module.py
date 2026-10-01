@@ -5,13 +5,13 @@ from unittest.mock import Mock
 
 import pytest
 
-import jukebox.cfghandler
-from jukebox.cfghandler import ConfigHandler
-from jukebox.contract.manager import ModuleManager
-from jukebox.player.module import Player
-from jukebox.publishing.bus import EventBus
-from jukebox.rfid.cards import Cards
-from jukebox.rfid.reader import Rfid
+import lauschkiste.cfghandler
+from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.contract.manager import ModuleManager
+from lauschkiste.player.module import Player
+from lauschkiste.publishing.bus import EventBus
+from lauschkiste.rfid.cards import Cards
+from lauschkiste.rfid.reader import Rfid
 
 
 class FakeReader:
@@ -52,7 +52,7 @@ class FakeDriver:
 
 @pytest.fixture
 def setup(tmp_path):
-    main = jukebox.cfghandler.get_handler('jukebox')
+    main = lauschkiste.cfghandler.get_handler('jukebox')
     main.config_dict({})
     (tmp_path / 'cards.yaml').write_text(
         "'0001':\n  action: player.play_folder\n  args:\n    folder: Rock\n"
