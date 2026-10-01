@@ -11,7 +11,6 @@ import typer
 
 import jukebox.cfghandler
 import jukebox.paths
-from jukebox.contract.manager import ENTRY_POINT_GROUP
 
 app = typer.Typer(help="Manage plugins.", no_args_is_help=True)
 
@@ -34,6 +33,7 @@ def _enabled(cfg) -> dict:
 
 
 def _installed():
+    from jukebox.contract.manager import ENTRY_POINT_GROUP
     return {ep.name: ep for ep in entry_points(group=ENTRY_POINT_GROUP)}
 
 

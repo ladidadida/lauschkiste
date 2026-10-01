@@ -5,7 +5,6 @@ from typing import Optional
 import typer
 
 import jukebox.cfghandler
-import jukebox.daemon
 import jukebox.paths
 from jukebox.misc import loggingext
 
@@ -58,5 +57,7 @@ def run(
         logger = loggingext.configure_from_file(str(logger_conf))
 
     logger.info(f"Jukebox home '{jukebox.paths.home()}', configuration file '{conf}'")
-    myjukebox = jukebox.daemon.get_jukebox_daemon(str(conf), artifacts)
+    from jukebox.daemon import get_jukebox_daemon  # heavy (web server); only `run` needs it
+
+    myjukebox = get_jukebox_daemon(str(conf), artifacts)
     myjukebox.run()

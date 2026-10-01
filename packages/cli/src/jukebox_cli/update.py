@@ -8,7 +8,6 @@ from importlib.metadata import PackageNotFoundError, version as installed_versio
 from pathlib import Path
 from typing import Dict, List, Optional
 
-import requests
 import typer
 from packaging.version import Version
 
@@ -73,6 +72,7 @@ def update_source(root: Path, check_only: bool = False) -> bool:
 
 def fetch_release(repo: str, tag: str = 'latest') -> dict:
     url = f'https://api.github.com/repos/{repo}/releases/' + ('latest' if tag == 'latest' else f'tags/{tag}')
+    import requests
     response = requests.get(url, timeout=30)
     if response.status_code == 404:
         raise UpdateError(f"no release '{tag}' in {repo}")
@@ -130,6 +130,7 @@ def update_package(repo: str, tag: str, config_path: Path, check_only: bool = Fa
         wheels = []
         for asset in assets:
             path = Path(tmp) / asset['name']
+            import requests
             response = requests.get(asset['browser_download_url'], timeout=120)
             response.raise_for_status()
             path.write_bytes(response.content)
@@ -157,7 +158,7 @@ def update(release: str = typer.Option('latest', "--version", help="Release tag 
     root = checkout()
     try:
         changed = update_source(root, check) if root else update_package(repo, release, config_path, check)
-    except (UpdateError, requests.RequestException) as error:
+    except (UpdateError, OSError) as error:
         typer.echo(f"Update failed: {error}", err=True)
         raise typer.Exit(1)
     if check or not changed:

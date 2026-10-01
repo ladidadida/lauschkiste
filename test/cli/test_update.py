@@ -88,7 +88,7 @@ def test_package_update(tmp_path, monkeypatch):
     release = {'tag_name': 'v99.0.0', 'assets': [
         {'name': 'jukebox-99.0.0-py3-none-any.whl', 'browser_download_url': 'https://x/jukebox.whl'},
         {'name': 'notes.txt', 'browser_download_url': 'https://x/notes.txt'}]}
-    monkeypatch.setattr(update.requests, 'get',
+    monkeypatch.setattr('requests.get',
                         lambda url, timeout: FakeResponse(release) if 'api.github' in url else FakeResponse(content=b'w'))
     installed = []
     monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
@@ -101,5 +101,5 @@ def test_package_update(tmp_path, monkeypatch):
 
 
 def test_package_up_to_date(monkeypatch):
-    monkeypatch.setattr(update.requests, 'get', lambda url, timeout: FakeResponse({'tag_name': 'v0.0.1'}))
+    monkeypatch.setattr('requests.get', lambda url, timeout: FakeResponse({'tag_name': 'v0.0.1'}))
     assert update.update_package('o/r', 'latest', jukebox.paths.settings_dir() / 'x.yaml') is False
