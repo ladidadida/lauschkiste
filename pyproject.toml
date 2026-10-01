@@ -7,7 +7,7 @@ exclude = ["packages/webapp", "packages/plugins"]
 
 [dependency-groups]
 dev = [
-  "pytest>=8",
+  "pytest>=9.1.1",
   "pytest-cov",
   "coverage",
   "mock",
