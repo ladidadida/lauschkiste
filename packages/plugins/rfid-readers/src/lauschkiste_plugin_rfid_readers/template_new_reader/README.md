@@ -1,2 +1,3 @@
+# RFID reader driver `template_new_reader`
 
 For documentation see [documentation/developers/rfid/template_reader.md](../../../../../../documentation/developers/rfid/template_reader.md).

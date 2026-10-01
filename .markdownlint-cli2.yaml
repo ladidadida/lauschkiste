@@ -31,9 +31,11 @@ globs:
 # Define glob expressions to ignore
 ignores:
   - "documentation/developers/docstring/*"
-  - "src/**"
   - "LICENSE"
   - ".venv/**"
+  - "**/node_modules/**"
+  # third-party code, kept as published
+  - "**/rc522_spi/pirc522/**"
 
 # Use a plugin to recognize math
 #markdownItPlugins:

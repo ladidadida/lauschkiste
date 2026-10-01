@@ -12,7 +12,7 @@ Architektur. Es existiert parallel weiter die stabile Version 2 im `main`-Zweig 
 
 ## Ordnerstruktur
 
-```
+```text
 .
 ├── pyproject.toml              uv-Workspace-Root (virtuell: keine [project]-Tabelle); zentrale
 │                                Dev-Tool-Config (ruff/pyright/pytest/coverage/pydoc-markdown)

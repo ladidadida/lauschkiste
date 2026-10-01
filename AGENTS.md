@@ -12,7 +12,7 @@ apply.
 
 ## Repository layout
 
-```
+```text
 pyproject.toml     uv workspace root (virtual: no [project] table); shared dev-tool config
                    (ruff/pyright/pytest/coverage/pydoc-markdown) lives here
 packages/          uv workspace members
@@ -168,8 +168,8 @@ Webapp (`cd packages/webapp`): standard CRA scripts — `npm start`, `npm run bu
 The default `player.backend: local_audio` + `generic_usb`/`fake_reader_gui` RFID readers need no
 Pi-specific hardware or extra system packages at all -- `uv run lauschkiste` plays through this
 machine's normal audio output directly. The Docker dev environment
-(`documentation/developers/docker.md`) is still useful for testing the full stack (core + webapp
-+ nginx-free FastAPI static serving) in isolation, but is no longer required just to avoid GPIO/
+(`documentation/developers/docker.md`) is still useful for testing the full stack (core, webapp and
+nginx-free FastAPI static serving) in isolation, but is no longer required just to avoid GPIO/
 mpd/RFID hardware.
 
 ## Key docs to read before larger changes
