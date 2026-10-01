@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import {
   useLocation,
   useNavigate,
@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import {
   Box,
+  CircularProgress,
   Grid,
   IconButton,
   Tab,
@@ -14,13 +15,42 @@ import {
   TextField,
 } from "@mui/material";
 
+import RefreshIcon from '@mui/icons-material/Refresh';
 import SearchIcon from '@mui/icons-material/Search';
+
+import PubSubContext from '../../context/pubsub/context';
+import { refreshLibrary } from '../../utils/library-api';
+import { LIBRARY_SCANNED_TOPIC } from '../../config';
+
+// Stop the spinner even if the scan event never arrives
+const REFRESH_TIMEOUT_MS = 60000;
 
 const LibraryHeader = ({ handleMusicFilter, musicFilter, sources }) => {
   const { pathname, search: urlSearch } = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [showSearchInput, setShowSearchInput] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { state: { [LIBRARY_SCANNED_TOPIC]: lastScan } = {} } = useContext(PubSubContext);
+  const refreshTimeout = useRef(null);
+
+  useEffect(() => {
+    setIsRefreshing(false);
+    clearTimeout(refreshTimeout.current);
+  }, [lastScan]);
+
+  useEffect(() => () => clearTimeout(refreshTimeout.current), []);
+
+  const refresh = async () => {
+    setIsRefreshing(true);
+    refreshTimeout.current = setTimeout(() => setIsRefreshing(false), REFRESH_TIMEOUT_MS);
+    try {
+      await refreshLibrary();
+    } catch {
+      setIsRefreshing(false);
+      clearTimeout(refreshTimeout.current);
+    }
+  };
 
   const pathParts = pathname.split('/').filter(Boolean);
   const activeSource = pathParts[1] || 'overview';
@@ -74,6 +104,14 @@ const LibraryHeader = ({ handleMusicFilter, musicFilter, sources }) => {
             />
           ))}
         </Tabs>
+        <IconButton
+          aria-label={t('library.header.refresh')}
+          disabled={isRefreshing}
+          onClick={refresh}
+          title={t('library.header.refresh')}
+        >
+          {isRefreshing ? <CircularProgress size={24} /> : <RefreshIcon />}
+        </IconButton>
         <IconButton
           aria-label={iconLabel}
           color={showSearchInput ? 'primary' : undefined}

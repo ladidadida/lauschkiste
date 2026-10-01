@@ -3,6 +3,7 @@ const PUBSUB_ENDPOINT = '/api/v1/events';
 const LOCAL_LIBRARY_SOURCE = 'local';
 const PLAYER_STATUS_TOPIC = 'player.status';
 const CARD_DETECTED_TOPIC = 'rfid.card_detected';
+const LIBRARY_SCANNED_TOPIC = 'library.scanned';
 const SYSTEM_INFO_TOPIC = 'system.info';
 const SYSTEM_HEALTH_TOPIC = 'system.health';
 const TIMERS_TOPIC = 'timers.changed';
@@ -13,6 +14,7 @@ const BATTERY_TOPIC = 'raspberry_pi.battery';
 const SUBSCRIPTIONS = [
   BATTERY_TOPIC,
   CARD_DETECTED_TOPIC,
+  LIBRARY_SCANNED_TOPIC,
   SYSTEM_HEALTH_TOPIC,
   SYSTEM_INFO_TOPIC,
   TIMERS_TOPIC,
@@ -78,6 +80,7 @@ export {
   BATTERY_TOPIC,
   CARD_DETECTED_TOPIC,
   JUKEBOX_ACTIONS_MAP,
+  LIBRARY_SCANNED_TOPIC,
   LOCAL_LIBRARY_SOURCE,
   PLAYER_STATUS_TOPIC,
   PUBSUB_ENDPOINT,

@@ -21,3 +21,10 @@ See also
 
 As login credentials use the same username you used to run the installation with. The password is `raspberry`.
 You can change the password anytime using the command `sudo smbpasswd -a "<your-username>"`.
+
+## Copying music
+
+Copy albums into the `audiofolders` folder of the share. The library notices new, changed and
+removed files by itself and rescans a few seconds after copying has finished
+(`library.watch` / `library.watch_interval_sec` in `jukebox.yaml`); the refresh button in the web
+app's library view starts a rescan right away.

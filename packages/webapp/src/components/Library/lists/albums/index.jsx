@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -6,7 +6,9 @@ import {
   Typography,
 } from "@mui/material";
 
+import PubSubContext from '../../../../context/pubsub/context';
 import request from '../../../../utils/request';
+import { LIBRARY_SCANNED_TOPIC } from '../../../../config';
 import { flatByAlbum } from '../../../../utils/utils';
 
 import AlbumList from "./album-list";
@@ -18,6 +20,7 @@ const Albums = ({
   view,
 }) => {
   const { t } = useTranslation();
+  const { state: { [LIBRARY_SCANNED_TOPIC]: lastScan } = {} } = useContext(PubSubContext);
 
   const [albums, setAlbums] = useState([]);
   const [error, setError] = useState(null);
@@ -37,7 +40,8 @@ const Albums = ({
   useEffect(() => {
     let isCurrent = true;
     const fetchAlbumList = async () => {
-      setIsLoading(true);
+      // A rescan reloads the list in place, without the spinner
+      if (lastScan === undefined) setIsLoading(true);
       setError(null);
       const { result, error: requestError } = await request('libraryItems', {
         provider,
@@ -54,7 +58,7 @@ const Albums = ({
     return () => {
       isCurrent = false;
     };
-  }, [contentTypesKey, provider]);
+  }, [contentTypesKey, provider, lastScan]);
 
   return (
     <>

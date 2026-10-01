@@ -16,6 +16,7 @@ from jukebox.contract import CoreModule, OperationError, action, event, extensio
 from jukebox.library.covers import CoverCache
 from jukebox.library.files import MAX_UPLOAD_SIZE, LibraryError, MusicLibrary
 from jukebox.library.index import LibraryIndex
+from jukebox.library.watch import FolderWatcher
 
 logger = logging.getLogger('jb.library')
 
@@ -143,6 +144,8 @@ class Library(CoreModule):
         self._scan_pending = threading.Event()
         self._executor = None
         self._file_executor = None
+        self._watcher: Optional[FolderWatcher] = None
+        self._root_provider = None
 
     # -- lifecycle ------------------------------------------------------------------------------
 
@@ -155,6 +158,7 @@ class Library(CoreModule):
         self._covers = CoverCache(str(jukebox.paths.resolve(ctx.config.setdefault('cover_cache',
                                                                                   value=DEFAULT_COVER_CACHE))))
         self._files = MusicLibrary(root_provider, self._refresh_all)
+        self._root_provider = root_provider
         root = root_provider()
         if root:
             Path(root).expanduser().mkdir(parents=True, exist_ok=True)
@@ -164,10 +168,15 @@ class Library(CoreModule):
     def ready(self) -> None:
         if self._ctx.config.setdefault('scan_on_startup', value=True):
             self._schedule_scan()
+        if self._ctx.config.get('watch', default=True):
+            self._watcher = FolderWatcher(self._root_provider, self._schedule_scan,
+                                          interval=float(self._ctx.config.get('watch_interval_sec', default=5)))
+            self._watcher.start()
 
     def stop(self):
+        thread = self._watcher.stop() if self._watcher else None
         self._index.close()
-        return []
+        return [thread] if thread else []
 
     def _schedule_scan(self) -> None:
         """Rescan in the background; requests during a running scan collapse into one follow-up."""

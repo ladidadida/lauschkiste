@@ -95,6 +95,10 @@ library:
   index: settings/library.sqlite
   cover_cache: cache/covers
   scan_on_startup: true
+  # Rescan automatically after files were added, changed or removed outside the web app
+  # (Samba, USB stick, ...), once the music folder has been quiet for watch_interval_sec
+  watch: true
+  watch_interval_sec: 5
 playermpd:
   # Only read by jukebox.player to find the music library in mpd.conf when player.music_library_path
   # is not set. The mpd plugin's own settings live under plugins.mpd.
