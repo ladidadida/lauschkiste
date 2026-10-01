@@ -29,7 +29,7 @@ const ROOT_DIR = './';
 // the data structure from object to array requires some refactoring, this
 // was not done yet to maintain functionality. It's ok to change the command
 // object keys to arrays, but some downstream methods need to change as well
-const JUKEBOX_ACTIONS_MAP = {
+const ACTIONS_MAP = {
   // Command Aliases
   // Player
   play_music: {
@@ -79,7 +79,7 @@ const TIMER_STEPS = [0, 2, 5, 10, 15, 20, 30, 45, 60, 120, 180, 240];
 export {
   BATTERY_TOPIC,
   CARD_DETECTED_TOPIC,
-  JUKEBOX_ACTIONS_MAP,
+  ACTIONS_MAP,
   LIBRARY_SCANNED_TOPIC,
   LOCAL_LIBRARY_SOURCE,
   PLAYER_STATUS_TOPIC,

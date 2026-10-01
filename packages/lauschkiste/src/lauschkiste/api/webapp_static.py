@@ -23,8 +23,8 @@ from starlette.staticfiles import StaticFiles
 logger = logging.getLogger('lauschkiste.api.webapp_static')
 
 NO_BUILD_HTML = """<html><body><h2>The Web App bundle is missing</h2>
-<p>Phoniebox requires a pre-built bundle. See
-<a href="https://github.com/MiczFlor/RPi-Jukebox-RFID/blob/future3/main/documentation/developers/webapp.md">
+<p>Lauschkiste requires a pre-built bundle. See
+<a href="https://github.com/ladidadida/lauschkiste/blob/main/documentation/developers/webapp.md">
 the Web App documentation</a> for how to build/install one.</p></body></html>"""
 
 NOT_FOUND_HTML = """<html><body><h2>Not found</h2>

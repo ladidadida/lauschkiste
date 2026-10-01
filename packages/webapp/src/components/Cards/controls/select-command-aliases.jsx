@@ -6,7 +6,7 @@ import {
   NativeSelect
 } from '@mui/material';
 
-import { JUKEBOX_ACTIONS_MAP } from '../../../config';
+import { ACTIONS_MAP } from '../../../config';
 import { getActionAndCommand } from '../utils';
 
 const SelectCommandAliases = ({
@@ -16,7 +16,7 @@ const SelectCommandAliases = ({
   const { t } = useTranslation();
 
   const { action = {} } = getActionAndCommand(actionData);
-  const actionsList = Object.keys(JUKEBOX_ACTIONS_MAP);
+  const actionsList = Object.keys(ACTIONS_MAP);
   const value = isEmpty(action) ? 0 : action;
 
   return (

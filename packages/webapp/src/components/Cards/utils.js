@@ -4,7 +4,7 @@ import {
 } from 'ramda';
 
 import commands from '../../commands';
-import { JUKEBOX_ACTIONS_MAP } from '../../config';
+import { ACTIONS_MAP } from '../../config';
 
 const mapValuesToKeys = (command, args) => {
   const argKeys = getCommandArgKeys(command);
@@ -25,8 +25,8 @@ const getActionAndCommand = (actionData) => {
 }
 
 const findActionByCommand = (command) => {
-  const action = Object.keys(JUKEBOX_ACTIONS_MAP).find((action) => {
-    return has(command)(JUKEBOX_ACTIONS_MAP[action].commands)
+  const action = Object.keys(ACTIONS_MAP).find((action) => {
+    return has(command)(ACTIONS_MAP[action].commands)
   });
 
   return action;

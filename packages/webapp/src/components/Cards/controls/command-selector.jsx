@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 
-import { JUKEBOX_ACTIONS_MAP } from '../../../config';
+import { ACTIONS_MAP } from '../../../config';
 import { getActionAndCommand } from '../utils';
 
 const CommandSelector = ({
@@ -17,7 +17,7 @@ const CommandSelector = ({
 }) => {
   const { t } = useTranslation();
   const { action, command = {} } = getActionAndCommand(actionData);
-  const commandList = Object.keys(JUKEBOX_ACTIONS_MAP[action].commands);
+  const commandList = Object.keys(ACTIONS_MAP[action].commands);
   const value = isEmpty(command) ? 0 : command;
 
   const onChange = (event) => {
@@ -40,7 +40,7 @@ const CommandSelector = ({
             inputProps={{
               'aria-label': t(
                 'cards.controls.command-selector.label',
-                { title: JUKEBOX_ACTIONS_MAP[action]?.title }
+                { title: ACTIONS_MAP[action]?.title }
               )
             }}
           >

@@ -35,7 +35,7 @@
         }
       },
       "controls-selector": {
-        "label": "Jukebox Aktion"
+        "label": "Lauschkiste-Aktion"
       },
       "select-command-aliases": {
         "label": "Aktionen",
@@ -206,8 +206,8 @@
           "invalid_folder_name": "Der Ordnername ist ungültig.",
           "invalid_path": "Der ausgewählte Pfad liegt außerhalb der Musikbibliothek.",
           "mpd_update_failed": "Die Dateien wurden geändert, aber die MPD-Bibliothek konnte nicht aktualisiert werden.",
-          "network_error": "Die Verbindung zur Phoniebox ist fehlgeschlagen.",
-          "permission_denied": "Die Phoniebox hat keine Berechtigung für diesen Vorgang.",
+          "network_error": "Die Verbindung zur Lauschkiste ist fehlgeschlagen.",
+          "permission_denied": "Die Lauschkiste hat keine Berechtigung für diesen Vorgang.",
           "request_failed": "Der Bibliotheksvorgang ist fehlgeschlagen.",
           "storage_error": "Der Speichervorgang ist fehlgeschlagen.",
           "unsupported_file_type": "Dieser Dateityp wird nicht unterstützt."
@@ -306,7 +306,7 @@
       },
       "shutdown": {
         "title": "Herunterfahren",
-        "label": "Fährt die Phoniebox nach Ablauf des Timers herunter."
+        "label": "Fährt die Lauschkiste nach Ablauf des Timers herunter."
       },
       "fade-volume": {
         "title": "Leiser werden und stoppen",
@@ -314,7 +314,7 @@
       },
       "idle-shutdown": {
         "title": "Leerlaufabschaltung",
-        "label": "Fährt die Phoniebox herunter, nachdem sie für eine bestimmte Zeit im Leerlauf war."
+        "label": "Fährt die Lauschkiste herunter, nachdem sie für eine bestimmte Zeit im Leerlauf war."
       },
       "set": "Timer erstellen",
       "cancel": "Abbrechen",
@@ -358,7 +358,7 @@
         "loading-error": "Die IP Adresse konnte nicht geladen werden."
       },
       "version": {
-        "label": "Jukebox Core Version"
+        "label": "Lauschkiste-Version"
       }
     },
     "audio": {

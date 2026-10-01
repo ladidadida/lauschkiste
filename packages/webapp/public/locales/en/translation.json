@@ -35,7 +35,7 @@
         }
       },
       "controls-selector": {
-        "label": "Jukebox action"
+        "label": "Lauschkiste action"
       },
       "select-command-aliases": {
         "label": "Actions",
@@ -206,8 +206,8 @@
           "invalid_folder_name": "The folder name is invalid.",
           "invalid_path": "The selected path is outside the music library.",
           "mpd_update_failed": "The files changed, but the MPD library could not be updated.",
-          "network_error": "The connection to the Phoniebox failed.",
-          "permission_denied": "The Phoniebox does not have permission for this operation.",
+          "network_error": "The connection to Lauschkiste failed.",
+          "permission_denied": "Lauschkiste does not have permission for this operation.",
           "request_failed": "The library operation failed.",
           "storage_error": "The storage operation failed.",
           "unsupported_file_type": "This file type is not supported."
@@ -306,7 +306,7 @@
       },
       "shutdown": {
         "title": "Shut Down",
-        "label": "Forces the Phoniebox to shut down after the timer has ended."
+        "label": "Shuts Lauschkiste down when the timer has ended."
       },
       "fade-volume": {
         "title": "Fade volume and stop",
@@ -314,7 +314,7 @@
       },
       "idle-shutdown": {
         "title": "Idle Shut Down",
-        "label": "Shuts down the Phoniebox after the Phoniebox was idle for a given time."
+        "label": "Shuts Lauschkiste down after it was idle for a given time."
       },
       "ended": "Done",
       "set": "Set timer",
@@ -358,7 +358,7 @@
         "loading-error": "IP address could not be loaded."
       },
       "version": {
-        "label": "Jukebox Core Version"
+        "label": "Lauschkiste version"
       }
     },
     "audio": {
