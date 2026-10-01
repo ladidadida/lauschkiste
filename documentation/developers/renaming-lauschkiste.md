@@ -22,7 +22,7 @@
 | CLI distribution / import package | `jukebox-cli` / `jukebox_cli` | `lauschkiste-cli` / `lauschkiste_cli` |
 | Bundled plugins | `jukebox-plugin-<name>`, `jukebox_rfid_readers`, `jukebox_plugin_*` | `lauschkiste-plugin-<name>`, `lauschkiste_plugin_<name>` |
 | Plugin entry-point group | `jukebox.plugins` | `lauschkiste.plugins` |
-| Command | `jukebox run`, `jukebox setup`, ... | `lauschkiste ...` (open: short alias `lausch`) |
+| Commands | `jukebox run`; `jukebox setup`, `plugin`, `update`, `home`, `debug` | server: `lauschkiste` (what `jukebox run` is now, started by the service); management: `lauschctl setup`, `lauschctl plugin ...`, `lauschctl update`, `lauschctl home`, `lauschctl debug ...` |
 | Environment | `JUKEBOX_HOME`, `JUKEBOX_CONF`, `JUKEBOX_LOGGER_CONF`, `JUKEBOX_WEBAPP_DIR`, `JUKEBOX_REPO`, `JUKEBOX_STRICT` | `LAUSCHKISTE_*` |
 | Home directory | `$XDG_DATA_HOME/jukebox`, on a Pi `~/jukebox` | `$XDG_DATA_HOME/lauschkiste`, on a Pi `~/lauschkiste` |
 | Main configuration | `settings/jukebox.yaml` | `settings/lauschkiste.yaml` |
@@ -63,7 +63,8 @@ Each step leaves the tests green and is one commit.
 2. **Runtime names:** environment variables, home directory, configuration file name, logger
    names, unit name, Samba share, login message, hotspot SSID; the compatibility fallbacks above
    with tests.
-3. **Command line:** `lauschkiste` command (and the alias, if decided), help texts.
+3. **Command line:** two console scripts from the CLI package: `lauschkiste` (server, the options of
+   `jukebox run`) and `lauschctl` (all other commands); help texts.
 4. **Web app:** title, manifest, translations, texts mentioning Phoniebox; logo/icons later.
 5. **Installer and CI:** `install.sh` (repository, paths, messages), `DEFAULT_REPO`, workflows,
    `ci/` scripts, Docker files.
@@ -76,6 +77,5 @@ Each step leaves the tests green and is one commit.
 
 ## Open questions
 
-- Short command alias `lausch` in addition to `lauschkiste`?
 - Trademark check (DPMA/EUIPO) and domain registration (by the maintainer).
 - Logo and icons for the web app.
