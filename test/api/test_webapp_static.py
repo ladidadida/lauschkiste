@@ -83,6 +83,26 @@ def test_root_level_build_file_is_served_by_catch_all():
             executor.shutdown(wait=True, cancel_futures=True)
 
 
+def test_hashed_assets_are_cached_everything_else_is_not():
+    with tempfile.TemporaryDirectory() as tmp:
+        build_dir = Path(tmp)
+        (build_dir / 'index.html').write_text('<html>the webapp</html>')
+        (build_dir / 'assets').mkdir()
+        (build_dir / 'assets' / 'index-Ab12Cd.js').write_text('console.log(1)')
+        (build_dir / 'locales' / 'de').mkdir(parents=True)
+        (build_dir / 'locales' / 'de' / 'translation.json').write_text('{}')
+
+        client, executor = _make_client(build_dir=build_dir)
+        try:
+            asset = client.get('/assets/index-Ab12Cd.js')
+            assert asset.headers['cache-control'] == 'public, max-age=31536000, immutable'
+            translation = client.get('/locales/de/translation.json')
+            assert translation.status_code == 200
+            assert translation.headers['cache-control'] == 'no-store'
+        finally:
+            executor.shutdown(wait=True, cancel_futures=True)
+
+
 def test_catch_all_rejects_path_traversal_outside_build_dir():
     with tempfile.TemporaryDirectory() as tmp:
         build_dir = Path(tmp) / 'build'

@@ -31,9 +31,17 @@ NOT_FOUND_HTML = """<html><body><h2>Not found</h2>
 <p><a href="/">Web App</a> &middot; <a href="/logs">Log files</a></p></body></html>"""
 
 
+#: Vite puts content-hashed files here; a new build gives them new names.
+HASHED_ASSETS_DIR = 'assets'
+CACHE_FOREVER = 'public, max-age=31536000, immutable'
+#: Everything else keeps its name across versions, and packaged files all carry the same
+#: modification time, so neither heuristic caching nor revalidation would notice an update.
+CACHE_NEVER = 'no-store'
+
+
 def _serve_html(path: Path, fallback_html: str, status_code: int = 200) -> Response:
     if path.is_file():
-        return FileResponse(path, media_type='text/html', headers={'Cache-Control': 'no-store'})
+        return FileResponse(path, media_type='text/html', headers={'Cache-Control': CACHE_NEVER})
     return HTMLResponse(fallback_html, status_code=status_code)
 
 
@@ -83,5 +91,6 @@ def register_webapp_routes(app: FastAPI, *, build_dir: Path, logs_dir: Path) -> 
         except ValueError:
             return HTMLResponse(NOT_FOUND_HTML, status_code=404)
         if candidate.is_file():
-            return FileResponse(candidate)
+            hashed = path.split('/', 1)[0] == HASHED_ASSETS_DIR
+            return FileResponse(candidate, headers={'Cache-Control': CACHE_FOREVER if hashed else CACHE_NEVER})
         return HTMLResponse(NOT_FOUND_HTML, status_code=404)
