@@ -11,16 +11,16 @@ from lauschkiste.misc import loggingext
 def run(
     conf: Optional[Path] = typer.Option(
         None, "-c", "--conf",
-        envvar="JUKEBOX_CONF",
+        envvar=lauschkiste.paths.env_names("CONF"),
         file_okay=True, dir_okay=False,
-        help="Jukebox configuration file (default: $JUKEBOX_HOME/settings/jukebox.yaml). Created from "
+        help="Configuration file (default: $LAUSCHKISTE_HOME/settings/lauschkiste.yaml). Created from "
              "the default template on first run if it doesn't exist yet.",
     ),
     logger_conf: Optional[Path] = typer.Option(
         None, "-l", "--logger",
-        envvar="JUKEBOX_LOGGER_CONF",
+        envvar=lauschkiste.paths.env_names("LOGGER_CONF"),
         file_okay=True, dir_okay=False,
-        help="Logger configuration file (default: $JUKEBOX_HOME/settings/logger.yaml). Created from "
+        help="Logger configuration file (default: $LAUSCHKISTE_HOME/settings/logger.yaml). Created from "
              "the default template on first run if it doesn't exist yet.",
     ),
     verbose: int = typer.Option(
@@ -40,7 +40,7 @@ def run(
     """Start the Jukebox Daemon."""
     if verbose and quiet:
         raise typer.BadParameter("--verbose and --quiet are mutually exclusive")
-    conf = conf or lauschkiste.paths.settings_dir() / 'jukebox.yaml'
+    conf = conf or lauschkiste.paths.config_file()
     logger_conf = logger_conf or lauschkiste.paths.settings_dir() / 'logger.yaml'
 
     if verbose:

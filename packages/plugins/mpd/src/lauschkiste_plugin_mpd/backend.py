@@ -97,7 +97,7 @@ from lauschkiste.nv_manager import nv_manager
 from .coverart_cache_manager import CoverartCacheManager
 
 logger = logging.getLogger('jb.PlayerMPD')
-cfg = lauschkiste.cfghandler.get_handler('jukebox')
+cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 
 class MpdLock:

@@ -34,7 +34,7 @@ from lauschkiste.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale
 from lauschkiste.nv_manager import nv_manager
 
 logger = logging.getLogger('jb.PlayerLocalAudio')
-cfg = lauschkiste.cfghandler.get_handler('jukebox')
+cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 class PlayerLocalAudio:
     """Decode-and-output player backend. See module docstring for the state machine."""

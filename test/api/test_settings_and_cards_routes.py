@@ -27,7 +27,7 @@ class QuietSystem(System):
 
 @pytest.fixture
 def main_cfg():
-    cfg = lauschkiste.cfghandler.get_handler('jukebox')
+    cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
     cfg.config_dict({})
     yield cfg
     cfg.config_dict({})

@@ -104,18 +104,18 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
           yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask; reuse earlier answers or defaults"),
           force: bool = typer.Option(False, "--force", help="Apply steps even if they look complete"),
           list_steps: bool = typer.Option(False, "--list", help="List the steps and exit"),
-          conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar="JUKEBOX_CONF",
+          conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
                                               help="Jukebox configuration file")) -> None:
     """Set up this machine for the jukebox (packages, service, Samba, hotspot, ...).
 
     Every step checks first and only changes what is missing, so running it again is safe.
-    Answers are kept in $JUKEBOX_HOME/settings/setup.yaml.
+    Answers are kept in $LAUSCHKISTE_HOME/settings/setup.yaml.
     """
     if list_steps:
         for step in all_steps():
             typer.echo(f"{step.name:12} {step.title}")
         return
-    ctx = Context(system=System(), config_path=conf or lauschkiste.paths.settings_dir() / 'jukebox.yaml',
+    ctx = Context(system=System(), config_path=conf or lauschkiste.paths.config_file(),
                   assume_yes=yes)
     failed = run_setup(steps, ctx, Answers(), check_only=check, force=force)
     if failed:

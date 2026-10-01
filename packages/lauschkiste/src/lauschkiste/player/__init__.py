@@ -7,7 +7,7 @@ from typing import Optional
 
 
 logger = logging.getLogger('jb.player')
-cfg = lauschkiste.cfghandler.get_handler('jukebox')
+cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 
 def _get_music_library_path(conf_file):

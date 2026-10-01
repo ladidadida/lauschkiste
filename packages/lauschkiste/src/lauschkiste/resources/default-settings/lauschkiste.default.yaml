@@ -1,4 +1,4 @@
-# Relative paths are relative to the jukebox home ($JUKEBOX_HOME, see `jukebox home`).
+# Relative paths are relative to the home directory ($LAUSCHKISTE_HOME, see `lauschctl home`).
 system:
   box_name: Jukebox
   # Seconds between system.health events (CPU temperature, disk usage); 0 disables them

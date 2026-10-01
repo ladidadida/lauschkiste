@@ -20,7 +20,7 @@ from lauschkiste.contract import CoreModule, OperationError, action, event, quer
 from lauschkiste.daemon import get_jukebox_daemon
 
 logger = logging.getLogger('jb.system')
-cfg = lauschkiste.cfghandler.get_handler('jukebox')
+cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 LOG_TOPIC = 'system.log'
 

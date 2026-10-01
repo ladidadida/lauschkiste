@@ -28,9 +28,9 @@ class Recorder(CoreModule):
 @pytest.fixture(autouse=True)
 def clean():
     Recorder.calls = []
-    lauschkiste.cfghandler.get_handler('jukebox').config_dict({})
+    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
     yield
-    lauschkiste.cfghandler.get_handler('jukebox').config_dict({})
+    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
 
 
 def start(settings):
@@ -79,7 +79,7 @@ def test_shutdown_runs_the_system_command(monkeypatch):
 def test_legacy_host_debug_mode(monkeypatch):
     popen = Mock()
     monkeypatch.setattr(subprocess, 'Popen', popen)
-    lauschkiste.cfghandler.get_handler('jukebox').config_dict({'host': {'debug_mode': True}})
+    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({'host': {'debug_mode': True}})
     manager, _ = start({})
     manager.catalog.call('raspberry_pi.reboot')
     popen.assert_not_called()

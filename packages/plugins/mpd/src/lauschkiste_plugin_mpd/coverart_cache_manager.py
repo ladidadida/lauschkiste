@@ -16,7 +16,7 @@ NO_CACHE = ''
 CACHE_PENDING = 'CACHE_PENDING'
 
 logger = logging.getLogger('jb.CoverartCacheManager')
-cfg = lauschkiste.cfghandler.get_handler('jukebox')
+cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 
 class CoverartCacheManager:

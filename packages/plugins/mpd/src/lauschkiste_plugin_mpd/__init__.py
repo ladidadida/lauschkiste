@@ -20,7 +20,7 @@ import lauschkiste.player
 from lauschkiste.contract import Plugin
 
 logger = logging.getLogger('jb.mpd')
-cfg_main = lauschkiste.cfghandler.get_handler('jukebox')
+cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 DEFAULTS = {
     'host': 'localhost',

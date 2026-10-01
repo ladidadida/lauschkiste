@@ -42,7 +42,7 @@ class Context:
 
     def load_config(self) -> lauschkiste.cfghandler.ConfigHandler:
         lauschkiste.cfghandler.ensure_default_config(
-            str(self.config_path), str(lauschkiste.paths.resource('default-settings', 'jukebox.default.yaml')))
+            str(self.config_path), str(lauschkiste.paths.resource('default-settings', 'lauschkiste.default.yaml')))
         cfg = lauschkiste.cfghandler.ConfigHandler('setup')
         lauschkiste.cfghandler.load_yaml(cfg, str(self.config_path))
         return cfg
@@ -100,7 +100,7 @@ def ask(question: Question, ctx: Context, stored: Dict[str, Any], assume_yes: bo
 
 
 class Answers:
-    """``$JUKEBOX_HOME/settings/setup.yaml``: the answers of earlier runs."""
+    """``$LAUSCHKISTE_HOME/settings/setup.yaml``: the answers of earlier runs."""
 
     def __init__(self, path: Optional[Path] = None):
         self.path = path or lauschkiste.paths.settings_dir() / 'setup.yaml'

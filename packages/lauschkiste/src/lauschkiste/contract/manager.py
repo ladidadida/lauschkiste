@@ -56,7 +56,7 @@ class ModuleManager:
         :param cfg: the main config handler; plugins are enabled under its ``plugins`` key
         :param bus: the event bus
         :param plugins: installed plugins by name (default: entry points of ``lauschkiste.plugins``)
-        :param strict: raise instead of log on invalid events (default: ``$JUKEBOX_STRICT``)
+        :param strict: raise instead of log on invalid events (default: ``$LAUSCHKISTE_STRICT``)
         """
         self._core_classes = list(core_modules)
         self._cfg = cfg

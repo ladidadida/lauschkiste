@@ -52,7 +52,7 @@ class FakeDriver:
 
 @pytest.fixture
 def setup(tmp_path):
-    main = lauschkiste.cfghandler.get_handler('jukebox')
+    main = lauschkiste.cfghandler.get_handler('lauschkiste')
     main.config_dict({})
     (tmp_path / 'cards.yaml').write_text(
         "'0001':\n  action: player.play_folder\n  args:\n    folder: Rock\n"

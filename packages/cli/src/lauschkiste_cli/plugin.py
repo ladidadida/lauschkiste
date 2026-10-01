@@ -14,14 +14,14 @@ import lauschkiste.paths
 
 app = typer.Typer(help="Manage plugins.", no_args_is_help=True)
 
-ConfOption = typer.Option(None, "-c", "--conf", envvar="JUKEBOX_CONF",
-                          help="Jukebox configuration file (default: $JUKEBOX_HOME/settings/jukebox.yaml)")
+ConfOption = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
+                          help="Configuration file (default: $LAUSCHKISTE_HOME/settings/lauschkiste.yaml)")
 
 
 def _config(conf: Optional[Path]):
-    path = conf or lauschkiste.paths.settings_dir() / 'jukebox.yaml'
+    path = conf or lauschkiste.paths.config_file()
     lauschkiste.cfghandler.ensure_default_config(
-        str(path), str(lauschkiste.paths.resource('default-settings', 'jukebox.default.yaml')))
+        str(path), str(lauschkiste.paths.resource('default-settings', 'lauschkiste.default.yaml')))
     cfg = lauschkiste.cfghandler.ConfigHandler('plugin-cli')
     lauschkiste.cfghandler.load_yaml(cfg, str(path))
     return cfg, path

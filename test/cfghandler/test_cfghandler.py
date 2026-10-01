@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
 
 def test_write_yaml_interrupted_keeps_old_file(tmp_path, monkeypatch):
-    path = tmp_path / 'jukebox.yaml'
+    path = tmp_path / 'lauschkiste.yaml'
     path.write_text('system:\n  box_name: Old\n')
     path.chmod(0o640)
     cfg = cfghandler.ConfigHandler('atomic')

@@ -20,7 +20,7 @@ from lauschkiste.contract import ActionError, CoreModule, OperationError, action
 
 log = logging.getLogger('jb.cards')
 cfg_cards = lauschkiste.cfghandler.get_handler('cards')
-cfg_main = lauschkiste.cfghandler.get_handler('jukebox')
+cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 DEFAULT_DATABASE = 'settings/cards.yaml'
 

@@ -15,7 +15,7 @@ import lauschkiste.cfghandler
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 
 logger = logging.getLogger('jb.volume')
-cfg_main = lauschkiste.cfghandler.get_handler('jukebox')
+cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 
 class Output(BaseModel):

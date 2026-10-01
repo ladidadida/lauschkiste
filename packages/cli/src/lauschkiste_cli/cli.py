@@ -5,7 +5,7 @@ from dotenv import dotenv_values, find_dotenv
 
 
 def load_env() -> None:
-    """``JUKEBOX_*`` defaults from the nearest ``.env`` above this file (a source checkout's).
+    """``LAUSCHKISTE_*`` defaults from the nearest ``.env`` above this file (a source checkout's).
 
     Relative paths in it are relative to the ``.env`` file. The environment wins over the file.
     Runs at import: typer reads ``envvar`` options from os.environ.
@@ -14,8 +14,8 @@ def load_env() -> None:
     if not path:
         return
     for key, value in dotenv_values(path).items():
-        if key.startswith('JUKEBOX_') and key not in os.environ and value is not None:
-            if key in ('JUKEBOX_HOME', 'JUKEBOX_WEBAPP_DIR', 'JUKEBOX_CONF', 'JUKEBOX_LOGGER_CONF'):
+        if key.startswith(('LAUSCHKISTE_', 'JUKEBOX_')) and key not in os.environ and value is not None:
+            if key.split('_', 1)[1] in ('HOME', 'WEBAPP_DIR', 'CONF', 'LOGGER_CONF'):
                 value = str(Path(path).parent / Path(value).expanduser())
             os.environ[key] = value
 
@@ -37,17 +37,17 @@ app = typer.Typer(name="jukebox", help="Jukebox CLI.")
 
 @app.callback()
 def main(home: Optional[Path] = typer.Option(
-        None, "--home", envvar=lauschkiste.paths.HOME_ENV,
-        help="Directory with all jukebox data (settings, music, logs). "
-             "Default: $XDG_DATA_HOME/jukebox (~/.local/share/jukebox).")) -> None:
+        None, "--home", envvar=lauschkiste.paths.env_names("HOME"),
+        help="Directory with all data (settings, music, logs). "
+             "Default: $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).")) -> None:
     lauschkiste.paths.set_home(home)
 
 
 @app.command(name="home")
 def show_home() -> None:
-    """Print the jukebox home and the configuration file in use."""
+    """Print the home directory and the configuration file in use."""
     typer.echo(f"home:   {lauschkiste.paths.home()}")
-    typer.echo(f"config: {lauschkiste.paths.settings_dir() / 'jukebox.yaml'}")
+    typer.echo(f"config: {lauschkiste.paths.config_file()}")
 
 
 app.command(name="run")(run)

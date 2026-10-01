@@ -2,13 +2,13 @@
 
 import contextlib
 import logging
-import os
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ValidationError
 
+import lauschkiste.paths
 from lauschkiste.contract.declarations import EventSpec, ExtensionPointSpec
 from lauschkiste.contract.errors import ContractError
 
@@ -20,7 +20,7 @@ logger = logging.getLogger('jb.contract')
 
 
 def strict_mode_default() -> bool:
-    return os.environ.get('JUKEBOX_STRICT', '').lower() in ('1', 'true', 'yes')
+    return (lauschkiste.paths.getenv('STRICT') or '').lower() in ('1', 'true', 'yes')
 
 
 class ModuleConfig:

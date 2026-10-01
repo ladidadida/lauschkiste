@@ -147,14 +147,15 @@ def restart_service() -> None:
 
 
 def update(release: str = typer.Option('latest', "--version", help="Release tag to install (package installs)"),
-           repo: str = typer.Option(DEFAULT_REPO, "--repo", envvar="JUKEBOX_REPO", help="GitHub repository"),
+           repo: str = typer.Option(DEFAULT_REPO, "--repo", envvar=lauschkiste.paths.env_names("REPO"),
+                                    help="GitHub repository"),
            check: bool = typer.Option(False, "--check", help="Only report whether an update is available"),
            setup: bool = typer.Option(True, "--setup/--no-setup",
                                       help="Re-apply `jukebox setup` with the stored answers afterwards"),
-           conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar="JUKEBOX_CONF",
+           conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
                                                help="Jukebox configuration file")) -> None:
     """Update the jukebox: newer release, or `git pull` + `uv sync` in a source checkout."""
-    config_path = conf or lauschkiste.paths.settings_dir() / 'jukebox.yaml'
+    config_path = conf or lauschkiste.paths.config_file()
     root = checkout()
     try:
         changed = update_source(root, check) if root else update_package(repo, release, config_path, check)

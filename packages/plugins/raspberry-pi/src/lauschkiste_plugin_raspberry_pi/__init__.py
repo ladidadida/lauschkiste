@@ -38,7 +38,7 @@ from lauschkiste_plugin_raspberry_pi.battery import (
 )
 
 logger = logging.getLogger('jb.raspberry_pi')
-cfg_main = lauschkiste.cfghandler.get_handler('jukebox')
+cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 
 class RaspberryPi(Plugin):

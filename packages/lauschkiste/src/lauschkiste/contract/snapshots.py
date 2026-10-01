@@ -14,8 +14,8 @@ from typing import Callable, Dict, List, Optional, Tuple
 from lauschkiste.contract import interfaces
 from lauschkiste.contract.manager import discover_plugins
 
-_JUKEBOX_PACKAGE_ROOT = Path(__file__).resolve().parents[3]
-CORE_SNAPSHOT_DIR = _JUKEBOX_PACKAGE_ROOT / 'interfaces'
+_PACKAGE_ROOT = Path(__file__).resolve().parents[3]
+CORE_SNAPSHOT_DIR = _PACKAGE_ROOT / 'interfaces'
 
 
 @dataclass

@@ -11,7 +11,8 @@ runner = CliRunner()
 
 @pytest.fixture
 def home(tmp_path, monkeypatch):
-    monkeypatch.delenv('JUKEBOX_CONF', raising=False)
+    for name in lauschkiste.paths.env_names('CONF'):
+        monkeypatch.delenv(name, raising=False)
     monkeypatch.setenv(lauschkiste.paths.HOME_ENV, str(tmp_path))
     lauschkiste.paths.set_home(None)
     yield tmp_path
@@ -20,7 +21,7 @@ def home(tmp_path, monkeypatch):
 
 def enabled(home):
     cfg = lauschkiste.cfghandler.ConfigHandler('test-plugin-cli')
-    lauschkiste.cfghandler.load_yaml(cfg, str(home / 'settings' / 'jukebox.yaml'))
+    lauschkiste.cfghandler.load_yaml(cfg, str(home / 'settings' / 'lauschkiste.yaml'))
     return dict(cfg.getn('plugins', default=None) or {})
 
 
@@ -37,7 +38,7 @@ def test_enable_and_disable(home):
     assert 'rfid_generic_usb' in enabled(home)
     assert 'enabled   rfid_generic_usb' in runner.invoke(app, ['plugin', 'list']).output
 
-    config = (home / 'settings' / 'jukebox.yaml').read_text()
+    config = (home / 'settings' / 'lauschkiste.yaml').read_text()
     assert config.count('#') > 0
 
     result = runner.invoke(app, ['plugin', 'disable', 'rfid_generic_usb'])
@@ -48,7 +49,7 @@ def test_enable_and_disable(home):
 def test_enable_unknown_plugin_fails(home):
     result = runner.invoke(app, ['plugin', 'enable', 'no_such_plugin'])
     assert result.exit_code == 1
-    assert not (home / 'settings' / 'jukebox.yaml').exists()
+    assert not (home / 'settings' / 'lauschkiste.yaml').exists()
 
 
 def test_enable_with_extras_installs_them(home, monkeypatch):

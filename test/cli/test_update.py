@@ -94,7 +94,7 @@ def test_package_update(tmp_path, monkeypatch):
     monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
     lauschkiste.paths.set_home(tmp_path)
     try:
-        assert update.update_package('o/r', 'latest', tmp_path / 'jukebox.yaml') is True
+        assert update.update_package('o/r', 'latest', tmp_path / 'lauschkiste.yaml') is True
     finally:
         lauschkiste.paths.set_home(None)
     assert len(installed) == 1 and installed[0].startswith('jukebox @ file://')

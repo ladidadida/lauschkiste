@@ -19,10 +19,10 @@ import lauschkiste
 import lauschkiste.cfghandler
 
 logger = logging.getLogger('jb.daemon')
-cfg = lauschkiste.cfghandler.get_handler('jukebox')
+cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 #: Template a missing configuration_file is created from on first run (see JukeBox.__init__).
-DEFAULT_CONFIG_TEMPLATE = str(lauschkiste.paths.resource('default-settings', 'jukebox.default.yaml'))
+DEFAULT_CONFIG_TEMPLATE = str(lauschkiste.paths.resource('default-settings', 'lauschkiste.default.yaml'))
 
 _SHUTDOWN_SIGNAL: Optional[int] = None
 

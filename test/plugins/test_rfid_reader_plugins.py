@@ -15,7 +15,7 @@ from lauschkiste.rfid.reader import Rfid
 
 @pytest.fixture
 def start(tmp_path):
-    main = lauschkiste.cfghandler.get_handler('jukebox')
+    main = lauschkiste.cfghandler.get_handler('lauschkiste')
     main.config_dict({})
     (tmp_path / 'rfid.yaml').write_text("rfid:\n  readers: {}\n")
     managers = []

@@ -78,7 +78,7 @@ def extras(monkeypatch):
 
 
 def setup_run(system, home, names=None, answers=None, check_only=False):
-    ctx = Context(system=system, config_path=home / 'settings' / 'jukebox.yaml', assume_yes=True)
+    ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml', assume_yes=True)
     store = Answers(home / 'settings' / 'setup.yaml')
     if answers is not None:
         store.save(answers)
@@ -91,7 +91,7 @@ def test_pc_setup_installs_packages_and_service(tmp_path, home, extras):
     assert failed == 0
     assert any('install' in c and 'espeak' in c for c in system.commands)
     unit = system.read('~/.config/systemd/user/jukebox-daemon.service')
-    assert f'Environment=JUKEBOX_HOME={home}' in unit
+    assert f'Environment=LAUSCHKISTE_HOME={home}' in unit
     assert 'jukebox-daemon.service' in system.enabled_user
     assert not system.exists('/var/lib/systemd/linger/pi')
     assert ctx.enabled_plugins() == {}
@@ -209,5 +209,5 @@ def test_ffmpeg_libraries_for_piwheels(tmp_path, home, extras, monkeypatch, arch
     from lauschkiste_cli.setup.steps.system import PackagesStep
     system = FakeSystem(tmp_path / 'root', pi=True)
     monkeypatch.setattr(system, 'architecture', lambda: architecture)
-    ctx = Context(system=system, config_path=home / 'settings' / 'jukebox.yaml')
+    ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml')
     assert ('ffmpeg' in PackagesStep().packages(ctx)) is expected

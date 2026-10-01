@@ -13,7 +13,6 @@ model), so a slow call doesn't serialize the rest of the API.
 import asyncio
 import json
 import logging
-import os
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -30,17 +29,17 @@ from lauschkiste.api.webapp_static import register_webapp_routes
 from lauschkiste.contract.routes import build_router
 
 logger = logging.getLogger('jb.api.fastapi_server')
-cfg = lauschkiste.cfghandler.get_handler('jukebox')
+cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 API_EXECUTOR_WORKERS = 4
 
-WEBAPP_DIR_ENV = 'JUKEBOX_WEBAPP_DIR'
+WEBAPP_DIR_ENV = lauschkiste.paths.ENV_PREFIX + 'WEBAPP_DIR'
 
 
 def default_webapp_build_dir() -> Path:
-    """``api.webapp_dir``, else ``$JUKEBOX_WEBAPP_DIR``, else the web app shipped in the package,
+    """``api.webapp_dir``, else ``$LAUSCHKISTE_WEBAPP_DIR``, else the web app shipped in the package,
     else the build directory of a source checkout."""
-    configured = cfg.getn('api', 'webapp_dir', default=None) or os.environ.get(WEBAPP_DIR_ENV)
+    configured = cfg.getn('api', 'webapp_dir', default=None) or lauschkiste.paths.getenv('WEBAPP_DIR')
     if configured:
         return Path(configured).expanduser().resolve()
     package = Path(__file__).resolve().parent.parent
