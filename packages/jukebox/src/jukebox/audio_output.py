@@ -36,29 +36,50 @@ class AudioSink:
 class PortAudioSink(AudioSink):
     """Real output via sounddevice/PortAudio. Falls back to silent (no-op) if no device is
     available -- e.g. the no-audio docker dev stack, or a CI box -- rather than raising and
-    killing the daemon."""
+    killing the daemon.
+
+    The stream starts once ``PREFILL_SECONDS`` of audio are decoded, so the slow start of a track
+    (opening and probing the file) doesn't empty the device buffer right away."""
+
+    PREFILL_SECONDS = 0.3
 
     def __init__(self):
         self._stream = None
+        self._pending = bytearray()
+        self._prefill_bytes = 0
 
     def open(self, samplerate, channels):
+        self._pending = bytearray()
+        self._prefill_bytes = int(samplerate * self.PREFILL_SECONDS) * channels * 2
         try:
             self._stream = sd.RawOutputStream(samplerate=samplerate, channels=channels, dtype='int16')
-            self._stream.start()
         except Exception as e:
             logger.warning(f"No audio output device available ({e.__class__.__name__}: {e}); playing silently")
             self._stream = None
 
-    def write(self, data):
-        if self._stream is None:
-            return
+    def _write(self, data):
         try:
+            if not self._stream.active:
+                self._stream.start()
             self._stream.write(data)
         except Exception as e:
             logger.warning(f"Audio output error, playing silently for the rest of this track: {e}")
             self._stream = None
 
+    def write(self, data):
+        if self._stream is None:
+            return
+        if self._pending is not None:
+            self._pending += data
+            if len(self._pending) < self._prefill_bytes:
+                return
+            data, self._pending = bytes(self._pending), None
+        self._write(data)
+
     def close(self):
+        if self._stream is not None and self._pending:
+            self._write(bytes(self._pending))
+        self._pending = None
         if self._stream is not None:
             try:
                 self._stream.stop()

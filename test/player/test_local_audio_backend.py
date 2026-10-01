@@ -239,3 +239,50 @@ def test_portaudio_sink_falls_back_when_no_device(monkeypatch):
     sink.open(44100, 2)  # must not raise
     sink.write(b'\x00\x00')  # must not raise
     sink.close()  # must not raise
+
+
+class FakeStream:
+    def __init__(self, **kwargs):
+        self.active = False
+        self.events = []
+
+    def start(self):
+        self.active = True
+        self.events.append('start')
+
+    def write(self, data):
+        assert self.active
+        self.events.append(len(data))
+
+    def stop(self):
+        self.events.append('stop')
+
+    def close(self):
+        self.events.append('close')
+
+
+def test_portaudio_sink_starts_after_prefill(monkeypatch):
+    import jukebox.audio_output as audio_output_module
+    streams = []
+    monkeypatch.setattr(audio_output_module.sd, 'RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
+    sink = PortAudioSink()
+    sink.open(1000, 2)  # prefill: 300 frames = 1200 bytes
+
+    sink.write(b'\x00' * 800)
+    assert streams[0].events == []
+    sink.write(b'\x00' * 800)
+    assert streams[0].events == ['start', 1600]
+    sink.write(b'\x00' * 400)
+    sink.close()
+    assert streams[0].events == ['start', 1600, 400, 'stop', 'close']
+
+
+def test_portaudio_sink_plays_short_sounds_on_close(monkeypatch):
+    import jukebox.audio_output as audio_output_module
+    streams = []
+    monkeypatch.setattr(audio_output_module.sd, 'RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
+    sink = PortAudioSink()
+    sink.open(1000, 2)
+    sink.write(b'\x00' * 100)
+    sink.close()
+    assert streams[0].events == ['start', 100, 'stop', 'close']
