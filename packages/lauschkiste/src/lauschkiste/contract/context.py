@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from lauschkiste.contract.catalog import ActionCatalog
     from lauschkiste.contract.manager import ModuleHandle
 
-logger = logging.getLogger('jb.contract')
+logger = logging.getLogger('lauschkiste.contract')
 
 
 def strict_mode_default() -> bool:
@@ -99,7 +99,7 @@ class Context:
         self.config = config
         self.modules = modules
         self.actions = actions
-        self.logger = logging.getLogger(f'jb.{handle.name}')
+        self.logger = logging.getLogger(f'lauschkiste.{handle.name}')
 
     @property
     def name(self) -> str:

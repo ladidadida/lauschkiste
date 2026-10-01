@@ -28,7 +28,7 @@ from lauschkiste.api.events import EventBroker, MAX_MESSAGE_SIZE, parse_subscrip
 from lauschkiste.api.webapp_static import register_webapp_routes
 from lauschkiste.contract.routes import build_router
 
-logger = logging.getLogger('jb.api.fastapi_server')
+logger = logging.getLogger('lauschkiste.api.fastapi_server')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 API_EXECUTOR_WORKERS = 4

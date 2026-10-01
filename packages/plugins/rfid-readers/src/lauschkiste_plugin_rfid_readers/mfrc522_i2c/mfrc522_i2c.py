@@ -20,7 +20,7 @@ def query_customization() -> dict:
 
 class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key):
-        self._logger = logging.getLogger(f"jb.rfid.522i2c({reader_cfg_key})")
+        self._logger = logging.getLogger(f"lauschkiste.rfid.522i2c({reader_cfg_key})")
         super().__init__(
             reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger
         )

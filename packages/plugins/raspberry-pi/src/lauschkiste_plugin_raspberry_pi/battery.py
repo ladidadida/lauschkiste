@@ -6,7 +6,7 @@ from typing import Callable, Optional, Protocol
 
 from pydantic import BaseModel
 
-logger = logging.getLogger('jb.raspberry_pi.battery')
+logger = logging.getLogger('lauschkiste.raspberry_pi.battery')
 
 
 class BatteryState(BaseModel):

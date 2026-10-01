@@ -20,7 +20,7 @@ def query_customization() -> dict:
 
 class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key):
-        self._logger = logging.getLogger(f'jb.rfid.532({reader_cfg_key})')
+        self._logger = logging.getLogger(f'lauschkiste.rfid.532({reader_cfg_key})')
         super().__init__(reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger)
 
         self.log_all_cards = cfg.setndefault('rfid', 'readers', reader_cfg_key, 'config', 'log_all_cards', value=False)

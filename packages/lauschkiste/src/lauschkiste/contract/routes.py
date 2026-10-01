@@ -13,7 +13,7 @@ from lauschkiste.contract.declarations import Operation
 from lauschkiste.contract.errors import ActionError, OperationError
 from lauschkiste.contract.manager import ModuleHandle, ModuleManager
 
-logger = logging.getLogger('jb.contract.routes')
+logger = logging.getLogger('lauschkiste.contract.routes')
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:

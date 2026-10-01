@@ -17,7 +17,7 @@ from lauschkiste.misc.simplecolors import Colors
 from .description import DESCRIPTION
 
 # Create logger.
-logger = logging.getLogger('jb.rfid.nfcpy')
+logger = logging.getLogger('lauschkiste.rfid.nfcpy')
 # Get the global handler to the RFID config
 cfg = lauschkiste.cfghandler.get_handler('rfid')
 
@@ -69,7 +69,7 @@ class ReaderClass(ReaderBaseClass):
     """
     def __init__(self, reader_cfg_key):
         # Create a per-instance logger, just in case the reader will run multiple times in various threads
-        self._logger = logging.getLogger(f'jb.rfid.nfcpy({reader_cfg_key})')
+        self._logger = logging.getLogger(f'lauschkiste.rfid.nfcpy({reader_cfg_key})')
         # Initialize the super-class. Don't change anything here
         super().__init__(reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger)
 

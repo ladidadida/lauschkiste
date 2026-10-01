@@ -37,7 +37,7 @@ from lauschkiste_plugin_raspberry_pi.battery import (
     BatteryMonitor, BatteryState, Ina219Reader, SimulatedReader,
 )
 
-logger = logging.getLogger('jb.raspberry_pi')
+logger = logging.getLogger('lauschkiste.raspberry_pi')
 cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 

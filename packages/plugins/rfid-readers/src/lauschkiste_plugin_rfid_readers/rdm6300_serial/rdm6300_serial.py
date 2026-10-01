@@ -9,7 +9,7 @@ import lauschkiste.cfghandler
 from .description import DESCRIPTION
 
 # Create logger
-logger = logging.getLogger('jb.rfid.rdm6300')
+logger = logging.getLogger('lauschkiste.rfid.rdm6300')
 cfg = lauschkiste.cfghandler.get_handler('rfid')
 
 NUMBER_FORMAT = ['card_id_dec',
@@ -83,7 +83,7 @@ def decode(raw_card_id: bytearray, number_format: int) -> str:
 
 class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key):
-        self._logger = logging.getLogger(f'jb.rfid.rdm({reader_cfg_key})')
+        self._logger = logging.getLogger(f'lauschkiste.rfid.rdm({reader_cfg_key})')
         super().__init__(reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger)
 
         with cfg:

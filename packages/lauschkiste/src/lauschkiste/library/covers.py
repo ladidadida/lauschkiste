@@ -13,7 +13,7 @@ from mutagen.flac import FLAC, Picture
 from mutagen.id3 import APIC
 from mutagen.mp4 import MP4Cover
 
-logger = logging.getLogger('jb.library.covers')
+logger = logging.getLogger('lauschkiste.library.covers')
 
 FOLDER_IMAGES = ('cover', 'folder', 'front', 'album')
 IMAGE_SUFFIXES = ('.jpg', '.jpeg', '.png', '.webp', '.gif')

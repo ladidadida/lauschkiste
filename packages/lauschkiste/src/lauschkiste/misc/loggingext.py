@@ -3,25 +3,25 @@
 
 We use a hierarchical Logger structure based on pythons logging module. It can be finely configured with a yaml file.
 
-The top-level logger is called 'jb' (to make it short). In any module you may simple create a child-logger at any hierarchy
-level below 'jb'. It will inherit settings from it's parent logger unless otherwise configured in the yaml file.
+The top-level logger is called 'lauschkiste'. In any module you may simple create a child-logger at any hierarchy
+level below 'lauschkiste'. It will inherit settings from it's parent logger unless otherwise configured in the yaml file.
 Hierarchy separator is the '.'. If the logger already exits, getLogger will return a reference to the same, else it will be
 created on the spot.
 
 Example: How to get logger and log away at your heart's content:
 
     >>> import logging
-    >>> logger = logging.getLogger('jb.awesome_module')
+    >>> logger = logging.getLogger('lauschkiste.awesome_module')
     >>> logger.info('Started general awesomeness aura')
 
-Example: YAML snippet, setting WARNING as default level everywhere and DEBUG for jb.awesome_module:
+Example: YAML snippet, setting WARNING as default level everywhere and DEBUG for lauschkiste.awesome_module:
 
     loggers:
-      jb:
+      lauschkiste:
         level: WARNING
         handlers: [console, debug_file_handler, error_file_handler]
         propagate: no
-      jb.awesome_module:
+      lauschkiste.awesome_module:
         level: DEBUG
 
 
@@ -38,6 +38,9 @@ import lauschkiste.paths
 import lauschkiste.publishing as publishing
 import lauschkiste.misc.simplecolors as sc
 from ruamel.yaml import YAML
+
+ROOT_LOGGER = 'lauschkiste'
+LEGACY_ROOT_LOGGER = 'jb'
 
 
 class ColorFilter(logging.Filter):
@@ -123,7 +126,7 @@ class PubStreamHandler(logging.StreamHandler):
         super().__init__(PubStream())
 
 
-def configure_default(level=logging.DEBUG, name='jb', with_publisher=False):
+def configure_default(level=logging.DEBUG, name=ROOT_LOGGER, with_publisher=False):
     logger = logging.getLogger(name)
     logger.setLevel(level)
     console = logging.StreamHandler(sys.stdout)
@@ -151,20 +154,35 @@ def configure_default(level=logging.DEBUG, name='jb', with_publisher=False):
     return logger
 
 
+def _migrate_legacy_names(cfg: dict) -> dict:
+    """Logger configurations from before the renaming: ``jb.*`` loggers, ``jukebox.*`` classes."""
+    loggers = cfg.get('loggers') or {}
+    for name in list(loggers):
+        if name == LEGACY_ROOT_LOGGER or name.startswith(LEGACY_ROOT_LOGGER + '.'):
+            loggers.setdefault(ROOT_LOGGER + name[len(LEGACY_ROOT_LOGGER):], loggers[name])
+            del loggers[name]
+    for section in ('handlers', 'filters', 'formatters'):
+        for entry in (cfg.get(section) or {}).values():
+            factory = entry.get('()') if isinstance(entry, dict) else None
+            if isinstance(factory, str) and factory.startswith('jukebox.'):
+                entry['()'] = 'lauschkiste.' + factory[len('jukebox.'):]
+    return cfg
+
+
 def configure_from_file(filename=None):
     if filename is None:
         return configure_default(level=logging.WARNING)
     yaml = YAML(typ='safe')
     try:
         with open(filename) as stream:
-            cfg = yaml.load(stream)
+            cfg = _migrate_legacy_names(yaml.load(stream))
         for handler in (cfg.get('handlers') or {}).values():
             if 'filename' in handler:
                 path = lauschkiste.paths.resolve(handler['filename'])
                 path.parent.mkdir(parents=True, exist_ok=True)
                 handler['filename'] = str(path)
         logging.config.dictConfig(cfg)
-        logger = logging.getLogger('jb')
+        logger = logging.getLogger(ROOT_LOGGER)
     except Exception as e:
         logger = configure_default(level=logging.DEBUG)
         logger.error(f"Using default fallback logger. Reason: while opening '{filename}' for logger configuration")

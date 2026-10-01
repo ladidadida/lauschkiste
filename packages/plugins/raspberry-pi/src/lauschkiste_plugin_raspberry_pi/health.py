@@ -6,7 +6,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-logger = logging.getLogger('jb.raspberry_pi.health')
+logger = logging.getLogger('lauschkiste.raspberry_pi.health')
 
 # Bits of `vcgencmd get_throttled`
 UNDER_VOLTAGE_NOW = 1 << 0

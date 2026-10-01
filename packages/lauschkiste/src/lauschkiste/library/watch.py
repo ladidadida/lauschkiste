@@ -5,7 +5,7 @@ import os
 import threading
 from typing import Callable, Dict, Optional, Tuple
 
-logger = logging.getLogger('jb.library.watch')
+logger = logging.getLogger('lauschkiste.library.watch')
 
 #: Per folder: its own modification time, the sum of its files' sizes, their newest modification time
 Snapshot = Dict[str, Tuple[int, int, int]]

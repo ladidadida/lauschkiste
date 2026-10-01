@@ -6,7 +6,7 @@ import lauschkiste.paths
 from typing import Optional
 
 
-logger = logging.getLogger('jb.player')
+logger = logging.getLogger('lauschkiste.player')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 

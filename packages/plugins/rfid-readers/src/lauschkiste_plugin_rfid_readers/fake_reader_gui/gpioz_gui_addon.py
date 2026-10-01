@@ -13,7 +13,7 @@ import jukebox.gpio.gpioz as gpioz
 from jukebox.gpio.gpioz.core.input_devices import Button, ShortLongPressButton, LongPressButton, RotaryEncoder
 from lauschkiste_plugin_rfid_readers.fake_reader_gui.fake_reader_gui import action_que
 
-logger = logging.getLogger('jb.rfid.tk')
+logger = logging.getLogger('lauschkiste.rfid.tk')
 
 
 def _gpioz_press_short(device):

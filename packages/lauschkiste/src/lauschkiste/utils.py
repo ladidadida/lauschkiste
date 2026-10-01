@@ -6,7 +6,7 @@ import os
 import subprocess
 
 
-log = logging.getLogger('jb.utils')
+log = logging.getLogger('lauschkiste.utils')
 
 
 def get_config_action(cfg, section, option, default, valid_actions_dict, logger):

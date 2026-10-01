@@ -3,7 +3,7 @@ import threading
 from typing import Any, Callable, Dict, Optional
 
 
-logger = logging.getLogger('jb.player')
+logger = logging.getLogger('lauschkiste.player')
 
 
 class PlayerCoordinator:

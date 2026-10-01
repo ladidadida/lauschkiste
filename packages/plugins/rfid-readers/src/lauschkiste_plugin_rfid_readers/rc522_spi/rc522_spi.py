@@ -9,7 +9,7 @@ import lauschkiste.misc.inputminus as pyil
 from lauschkiste.misc.simplecolors import Colors
 from .description import DESCRIPTION
 
-logger = logging.getLogger('jb.rfid.rc522')
+logger = logging.getLogger('lauschkiste.rfid.rc522')
 cfg = lauschkiste.cfghandler.get_handler('rfid')
 
 
@@ -58,7 +58,7 @@ def query_customization() -> dict:
 
 class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key):
-        self._logger = logging.getLogger(f'jb.rfid.522({reader_cfg_key})')
+        self._logger = logging.getLogger(f'lauschkiste.rfid.522({reader_cfg_key})')
         super().__init__(reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger)
 
         with cfg:

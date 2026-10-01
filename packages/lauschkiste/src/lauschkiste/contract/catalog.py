@@ -12,7 +12,7 @@ from lauschkiste.contract.errors import ActionError
 if TYPE_CHECKING:
     from lauschkiste.contract.manager import ModuleHandle
 
-logger = logging.getLogger('jb.contract.actions')
+logger = logging.getLogger('lauschkiste.contract.actions')
 
 
 class ActionCatalog:

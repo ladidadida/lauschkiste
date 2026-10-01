@@ -7,7 +7,7 @@ import av
 import sounddevice as sd
 from av.audio.resampler import AudioResampler
 
-logger = logging.getLogger('jb.audio_output')
+logger = logging.getLogger('lauschkiste.audio_output')
 
 SAMPLE_RATE = 44100
 CHANNELS = 2

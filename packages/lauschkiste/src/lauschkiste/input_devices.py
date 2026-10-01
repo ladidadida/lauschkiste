@@ -24,7 +24,7 @@ from pydantic import BaseModel
 import lauschkiste.legacy_actions as legacy_actions
 from lauschkiste.contract import CoreModule, event, query
 
-logger = logging.getLogger('jb.input')
+logger = logging.getLogger('lauschkiste.input')
 
 RESCAN_INTERVAL = 3.0
 

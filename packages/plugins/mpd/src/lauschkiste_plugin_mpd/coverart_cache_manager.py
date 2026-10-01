@@ -15,7 +15,7 @@ NO_COVER_ART_EXTENSION = 'no-art'
 NO_CACHE = ''
 CACHE_PENDING = 'CACHE_PENDING'
 
-logger = logging.getLogger('jb.CoverartCacheManager')
+logger = logging.getLogger('lauschkiste.CoverartCacheManager')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 

@@ -18,7 +18,7 @@ from lauschkiste.nv_manager import nv_manager
 import lauschkiste
 import lauschkiste.cfghandler
 
-logger = logging.getLogger('jb.daemon')
+logger = logging.getLogger('lauschkiste.daemon')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 #: Template a missing configuration_file is created from on first run (see JukeBox.__init__).

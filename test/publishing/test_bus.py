@@ -97,7 +97,7 @@ def test_subscriber_error_is_logged_not_raised(caplog):
         raise ValueError('boom')
 
     bus.register(failing_callback)
-    with caplog.at_level('ERROR', logger='jb.pub.bus'):
+    with caplog.at_level('ERROR', logger='lauschkiste.pub.bus'):
         bus.publish('topic', 'payload')  # must not raise
 
     assert 'boom' in caplog.text or 'failed' in caplog.text
@@ -115,7 +115,7 @@ def test_subscriber_error_via_log_handler_does_not_recurse_forever():
         def emit(self, record):
             bus.publish('core.logger', self.format(record))
 
-    logger = logging.getLogger('jb.pub.bus')
+    logger = logging.getLogger('lauschkiste.pub.bus')
     handler = RepublishingHandler()
     logger.addHandler(handler)
     logger.setLevel(logging.ERROR)

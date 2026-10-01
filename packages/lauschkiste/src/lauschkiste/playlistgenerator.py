@@ -55,7 +55,7 @@ from lauschkiste.library import resolve_library_path
 
 from typing import (List)
 
-logger = logging.getLogger('jb.plgen')
+logger = logging.getLogger('lauschkiste.plgen')
 
 # From .xml podcasts, need to parse out these strings:
 # '<enclosure url="https://podcast-mp3.dradio.de/podcast/2020/07/19/balzen_flirten_liebhaben_wie_tiere_fuer_nachwuchs_drk_20200719_0730_0126ac2f.mp3" length="19204101" type="audio/mpeg"/>'  # noqa: E501

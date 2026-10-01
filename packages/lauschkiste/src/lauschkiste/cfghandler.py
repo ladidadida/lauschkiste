@@ -25,7 +25,7 @@ from ruamel.yaml import YAML
 import hashlib
 from typing import (Dict, Optional, Any)
 
-logger = logging.getLogger('jb.cfghandler')
+logger = logging.getLogger('lauschkiste.cfghandler')
 
 # ---------------------------------------------------------------------------
 # Global thread-related stuff

@@ -16,7 +16,7 @@ import logging
 import threading
 from typing import Any, Callable, Dict, Optional
 
-logger = logging.getLogger('jb.pub.bus')
+logger = logging.getLogger('lauschkiste.pub.bus')
 
 # (topic, payload) -> None. payload is None for a revocation.
 Callback = Callable[[str, Optional[Any]], None]

@@ -1,11 +1,11 @@
 version: 1
 formatters:
   color:
-    format: '{asctime} - {lineno:4}:{filename:18} - {name:20} - {threadName:15} - {levelnameColored:8} - {lightcyan}{message}{reset}'
+    format: '{asctime} - {lineno:4}:{filename:18} - {name:30} - {threadName:15} - {levelnameColored:8} - {lightcyan}{message}{reset}'
     datefmt: '%d.%m.%Y %H:%M:%S'
     style: '{'
   base:
-    format: '{asctime} - {lineno:4}:{filename:18} - {name:20} - {threadName:15} - {levelname:8} - {message}'
+    format: '{asctime} - {lineno:4}:{filename:18} - {name:30} - {threadName:15} - {levelname:8} - {message}'
     datefmt: '%d.%m.%Y %H:%M:%S'
     style: '{'
 handlers:
@@ -46,19 +46,19 @@ filters:
     enable: True
     color_levelname: True
 loggers:
-  jb:
+  lauschkiste:
     level: DEBUG
     handlers: [console, publisher, debug_file_handler, error_file_handler]
     # handlers: [console, publisher]
     # handlers: [console]
     propagate: false
-  jb.audio.event:
+  lauschkiste.audio.event:
     level: WARNING
-  jb.daemon:
+  lauschkiste.daemon:
     level: DEBUG
-  jb.plugin.call:
+  lauschkiste.plugin.call:
     level: DEBUG
-  jb.pub.server:
+  lauschkiste.pub.server:
     level: DEBUG
     # In case you recursion problems, make sure this logger does not go to the publisher
     # propagate: false

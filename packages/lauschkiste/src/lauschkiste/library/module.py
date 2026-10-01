@@ -18,7 +18,7 @@ from lauschkiste.library.files import MAX_UPLOAD_SIZE, LibraryError, MusicLibrar
 from lauschkiste.library.index import LibraryIndex
 from lauschkiste.library.watch import FolderWatcher
 
-logger = logging.getLogger('jb.library')
+logger = logging.getLogger('lauschkiste.library')
 
 LOCAL_SOURCE = 'local'
 COVER_ROUTE = '/api/v1/library/covers'

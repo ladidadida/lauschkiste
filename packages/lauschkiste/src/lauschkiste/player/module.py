@@ -13,7 +13,7 @@ from lauschkiste.player.backend import PlayerBackend
 from lauschkiste.player.coordinator import PlayerCoordinator
 from lauschkiste.player.status import PlayerStatus, status_from_backend
 
-logger = logging.getLogger('jb.player')
+logger = logging.getLogger('lauschkiste.player')
 
 DEFAULT_BACKEND = 'local_audio'
 

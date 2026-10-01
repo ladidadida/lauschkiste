@@ -16,7 +16,7 @@ import lauschkiste.legacy_actions as legacy_actions
 import lauschkiste.paths
 from lauschkiste.contract import CoreModule, event, extension_point, query
 
-log = logging.getLogger('jb.rfid')
+log = logging.getLogger('lauschkiste.rfid')
 
 cfg_rfid = lauschkiste.cfghandler.get_handler('rfid')
 
@@ -61,7 +61,7 @@ class ReaderRunner(threading.Thread):
         self._key = reader_cfg_key
         self._driver = driver
         self._rfid = rfid
-        self._logger = logging.getLogger(f'jb.rfid({reader_cfg_key})')
+        self._logger = logging.getLogger(f'lauschkiste.rfid({reader_cfg_key})')
         self._reader = None
         self._cancel = threading.Event()
         self._same_id_delay = cfg_rfid.setndefault('rfid', 'readers', reader_cfg_key, 'same_id_delay', value=1.0)

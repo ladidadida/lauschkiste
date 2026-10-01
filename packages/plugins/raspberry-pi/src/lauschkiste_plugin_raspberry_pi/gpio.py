@@ -19,7 +19,7 @@
 import logging
 from typing import Any, Callable, Dict, List, Optional
 
-logger = logging.getLogger('jb.raspberry_pi.gpio')
+logger = logging.getLogger('lauschkiste.raspberry_pi.gpio')
 
 ActionRunner = Callable[[Dict[str, Any]], Optional[Callable[[], None]]]
 

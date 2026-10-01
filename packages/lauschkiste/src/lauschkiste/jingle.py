@@ -9,7 +9,7 @@ import lauschkiste.paths
 from lauschkiste.audio_output import play_file
 from lauschkiste.contract import CoreModule, OperationError, action
 
-logger = logging.getLogger('jb.jingle')
+logger = logging.getLogger('lauschkiste.jingle')
 
 SHUTDOWN_SOUND_TIMEOUT = 3.0
 DEFAULT_SOUNDS = {'startup_sound': 'startupsound.wav', 'shutdown_sound': 'shutdownsound.wav'}

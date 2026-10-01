@@ -14,7 +14,7 @@ from .description import DESCRIPTION
 
 # Create logger.
 # Logging is fully setup. Just replace '.new' with something meaningful and short
-logger = logging.getLogger('jb.rfid.new')
+logger = logging.getLogger('lauschkiste.rfid.new')
 # Get the global handler to the RFID config
 cfg = lauschkiste.cfghandler.get_handler('rfid')
 
@@ -63,7 +63,7 @@ class ReaderClass(ReaderBaseClass):
         """
         # Create a per-instance logger, just in case the reader will run multiple times in various threads
         # Replace '.new' with something meaningful and short
-        self._logger = logging.getLogger(f'jb.rfid.new({reader_cfg_key})')
+        self._logger = logging.getLogger(f'lauschkiste.rfid.new({reader_cfg_key})')
         # Initialize the super-class. Don't change anything here
         super().__init__(reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger)
 

@@ -16,7 +16,7 @@ import mutagen
 
 from lauschkiste.library.files import AUDIO_EXTENSIONS
 
-logger = logging.getLogger('jb.library.index')
+logger = logging.getLogger('lauschkiste.library.index')
 
 SCHEMA_VERSION = 1
 

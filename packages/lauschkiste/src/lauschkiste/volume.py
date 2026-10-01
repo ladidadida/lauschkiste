@@ -14,7 +14,7 @@ from pydantic import BaseModel
 import lauschkiste.cfghandler
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 
-logger = logging.getLogger('jb.volume')
+logger = logging.getLogger('lauschkiste.volume')
 cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 

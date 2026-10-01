@@ -47,7 +47,7 @@ def run(
         logger = loggingext.configure_default({1: logging.INFO, 2: logging.DEBUG}[min(verbose, 2)],
                                                with_publisher=True)
         if verbose < 3:
-            loggingext.configure_default(logging.ERROR, name='jb.plugin.call', with_publisher=True)
+            loggingext.configure_default(logging.ERROR, name='lauschkiste.plugin.call', with_publisher=True)
     elif quiet:
         logger = loggingext.configure_default({1: logging.ERROR, 2: logging.CRITICAL}[min(quiet, 2)],
                                                with_publisher=True)

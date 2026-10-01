@@ -14,7 +14,7 @@ from lauschkiste.contract.errors import ContractError
 from lauschkiste.contract.module import CoreModule, Module, Plugin
 from lauschkiste.contract.version import CONTRACT_VERSION
 
-logger = logging.getLogger('jb.contract')
+logger = logging.getLogger('lauschkiste.contract')
 
 ENTRY_POINT_GROUP = 'lauschkiste.plugins'
 

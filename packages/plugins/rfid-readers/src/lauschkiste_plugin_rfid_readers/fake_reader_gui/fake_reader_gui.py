@@ -20,7 +20,7 @@ from lauschkiste.rfid.cardutils import (card_to_str)
 from .description import DESCRIPTION
 
 # Create logger
-logger = logging.getLogger('jb.rfid.tk')
+logger = logging.getLogger('lauschkiste.rfid.tk')
 cfg = lauschkiste.cfghandler.get_handler('rfid')
 cfg_cards = lauschkiste.cfghandler.get_handler('cards')
 
@@ -49,7 +49,7 @@ action_que = queue.Queue()
 
 class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key):
-        self._logger = logging.getLogger(f'jb.rfid.tk({reader_cfg_key})')
+        self._logger = logging.getLogger(f'lauschkiste.rfid.tk({reader_cfg_key})')
         super().__init__(reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger)
         self._cancel = threading.Event()
 

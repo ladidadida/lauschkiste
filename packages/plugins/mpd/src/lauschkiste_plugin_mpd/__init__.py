@@ -19,7 +19,7 @@ import lauschkiste.paths
 import lauschkiste.player
 from lauschkiste.contract import Plugin
 
-logger = logging.getLogger('jb.mpd')
+logger = logging.getLogger('lauschkiste.mpd')
 cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 DEFAULTS = {

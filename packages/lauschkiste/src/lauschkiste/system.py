@@ -19,7 +19,7 @@ import lauschkiste.player
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 from lauschkiste.daemon import get_jukebox_daemon
 
-logger = logging.getLogger('jb.system')
+logger = logging.getLogger('lauschkiste.system')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 LOG_TOPIC = 'system.log'
@@ -83,7 +83,7 @@ class AppSettingsUpdate(BaseModel):
 
 def _read_log(handler_name: str) -> str:
     content = "No file handles configured"
-    for h in logging.getLogger('jb').handlers:
+    for h in logging.getLogger('lauschkiste').handlers:
         if not isinstance(h, logging.handlers.RotatingFileHandler):
             continue
         content = f"No file handler with name {handler_name} configured"

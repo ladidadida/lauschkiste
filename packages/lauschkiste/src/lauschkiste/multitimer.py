@@ -7,7 +7,7 @@ from typing import Any, Callable, Dict, Optional
 
 
 
-logger = logging.getLogger('jb.multitimers')
+logger = logging.getLogger('lauschkiste.multitimers')
 
 
 class MultiTimer(threading.Thread):

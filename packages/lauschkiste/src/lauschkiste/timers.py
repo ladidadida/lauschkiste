@@ -14,7 +14,7 @@ from pydantic import BaseModel
 
 from lauschkiste.contract import ActionError, CoreModule, OperationError, action, event, query
 
-logger = logging.getLogger('jb.timers')
+logger = logging.getLogger('lauschkiste.timers')
 
 DEFAULT_TIMERS: Dict[str, Dict[str, Any]] = {
     'stop_player': {'action': 'player.stop', 'default_timeout_sec': 3600},

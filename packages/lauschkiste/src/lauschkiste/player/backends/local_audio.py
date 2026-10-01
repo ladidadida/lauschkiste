@@ -33,7 +33,7 @@ import lauschkiste.playlistgenerator as playlistgenerator
 from lauschkiste.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_volume
 from lauschkiste.nv_manager import nv_manager
 
-logger = logging.getLogger('jb.PlayerLocalAudio')
+logger = logging.getLogger('lauschkiste.PlayerLocalAudio')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 class PlayerLocalAudio:

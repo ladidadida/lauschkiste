@@ -18,7 +18,7 @@ import lauschkiste.legacy_actions as legacy_actions
 import lauschkiste.paths
 from lauschkiste.contract import ActionError, CoreModule, OperationError, action, event, query
 
-log = logging.getLogger('jb.cards')
+log = logging.getLogger('lauschkiste.cards')
 cfg_cards = lauschkiste.cfghandler.get_handler('cards')
 cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 

@@ -96,7 +96,7 @@ import lauschkiste.playlistgenerator as playlistgenerator
 from lauschkiste.nv_manager import nv_manager
 from .coverart_cache_manager import CoverartCacheManager
 
-logger = logging.getLogger('jb.PlayerMPD')
+logger = logging.getLogger('lauschkiste.PlayerMPD')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 

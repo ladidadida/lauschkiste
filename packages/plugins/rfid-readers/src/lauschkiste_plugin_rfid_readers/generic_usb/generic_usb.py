@@ -22,7 +22,7 @@ import lauschkiste.cfghandler
 from .description import DESCRIPTION
 
 # Create logger
-logger = logging.getLogger('jb.rfid.usb')
+logger = logging.getLogger('lauschkiste.rfid.usb')
 cfg = lauschkiste.cfghandler.get_handler('rfid')
 
 
@@ -122,7 +122,7 @@ class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key, logger=None):
         self._logger = logger
         if logger is None:
-            self._logger = logging.getLogger(f'jb.rfid.usb({reader_cfg_key})')
+            self._logger = logging.getLogger(f'lauschkiste.rfid.usb({reader_cfg_key})')
         super().__init__(reader_cfg_key=reader_cfg_key, description=DESCRIPTION, logger=self._logger)
 
         # Key event codes return from evdev are numerical indexes, not decoded ASCII characters

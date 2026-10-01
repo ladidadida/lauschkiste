@@ -20,7 +20,7 @@ from starlette.requests import Request
 from starlette.responses import FileResponse, HTMLResponse, PlainTextResponse, Response
 from starlette.staticfiles import StaticFiles
 
-logger = logging.getLogger('jb.api.webapp_static')
+logger = logging.getLogger('lauschkiste.api.webapp_static')
 
 NO_BUILD_HTML = """<html><body><h2>The Web App bundle is missing</h2>
 <p>Phoniebox requires a pre-built bundle. See
