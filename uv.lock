@@ -904,15 +904,15 @@ battery-ina219 = [
 ]
 gpio = [
     { name = "gpiozero" },
-    { name = "rpi-lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv7l'" },
+    { name = "lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv6l' or platform_machine == 'armv7l'" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "gpiozero", marker = "extra == 'gpio'" },
     { name = "jukebox", editable = "packages/jukebox" },
+    { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv6l' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
     { name = "pi-ina219", marker = "extra == 'battery-ina219'" },
-    { name = "rpi-lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
 ]
 provides-extras = ["gpio", "battery-ina219"]
 
@@ -939,8 +939,8 @@ pn532-i2c-py532 = [
 ]
 rc522-spi = [
     { name = "gpiozero" },
-    { name = "pi-rc522-gpiozero" },
-    { name = "rpi-lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv7l'" },
+    { name = "lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv6l' or platform_machine == 'armv7l'" },
+    { name = "spidev" },
 ]
 rdm6300-serial = [
     { name = "pyserial" },
@@ -950,12 +950,12 @@ rdm6300-serial = [
 requires-dist = [
     { name = "gpiozero", marker = "extra == 'rc522-spi'" },
     { name = "jukebox", editable = "packages/jukebox" },
+    { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'rc522-spi') or (platform_machine == 'armv6l' and extra == 'rc522-spi') or (platform_machine == 'armv7l' and extra == 'rc522-spi')" },
     { name = "mfrc522-i2c", marker = "extra == 'mfrc522-i2c'" },
     { name = "nfcpy", marker = "extra == 'generic-nfcpy'" },
-    { name = "pi-rc522-gpiozero", marker = "extra == 'rc522-spi'", git = "https://github.com/hoffie/pi-rc522-gpiozero?rev=1dc878c" },
     { name = "py532lib", marker = "extra == 'pn532-i2c-py532'" },
     { name = "pyserial", marker = "extra == 'rdm6300-serial'" },
-    { name = "rpi-lgpio", marker = "(platform_machine == 'aarch64' and extra == 'rc522-spi') or (platform_machine == 'armv7l' and extra == 'rc522-spi')" },
+    { name = "spidev", marker = "extra == 'rc522-spi'" },
     { name = "ttkthemes", marker = "extra == 'fake-reader-gui'" },
 ]
 provides-extras = ["rc522-spi", "mfrc522-i2c", "pn532-i2c-py532", "rdm6300-serial", "generic-nfcpy", "fake-reader-gui"]
@@ -1233,15 +1233,6 @@ dependencies = [
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/51/b7/7fb7bc5d9caac0581a24bce30ceb260898cb8ef7efe2be34f115e87afbbe/pi_ina219-1.4.1-py2.py3-none-any.whl", hash = "sha256:ddff5c9b7538beeb8ecd41e96947de5fb2aea9eaf993294845eb5383fe235222", size = 10125, upload-time = "2023-04-23T03:00:51.482Z" },
-]
-
-[[package]]
-name = "pi-rc522-gpiozero"
-version = "2.3.0+hoffie1"
-source = { git = "https://github.com/hoffie/pi-rc522-gpiozero?rev=1dc878c#1dc878c8a3d6f32ad6601877b00e7316d72811d1" }
-dependencies = [
-    { name = "gpiozero" },
-    { name = "spidev" },
 ]
 
 [[package]]
@@ -1696,18 +1687,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb", size = 310654, upload-time = "2026-04-12T08:24:02.83Z" },
-]
-
-[[package]]
-name = "rpi-lgpio"
-version = "0.6"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "lgpio" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/6e/6d/7b6cb0def16abda6af89d16a3363d4036501bf042f9c67668aad3b34927f/rpi_lgpio-0.6.tar.gz", hash = "sha256:84579b11d543bb8abdddc1e10fcd6bdc2819e5897be72d6949a2b044d71fb73e", size = 12723, upload-time = "2024-05-11T16:09:29.463Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/a9/06b843528e47ded0dd276537e9c56e7aec7c841b3b2749274e7d8121dab5/rpi_lgpio-0.6-py3-none-any.whl", hash = "sha256:0930b6e0ffbfbeee9366fbfa5038d29a7606be96a5229d570b1f81be8f776777", size = 11880, upload-time = "2024-05-11T16:09:27.75Z" },
 ]
 
 [[package]]

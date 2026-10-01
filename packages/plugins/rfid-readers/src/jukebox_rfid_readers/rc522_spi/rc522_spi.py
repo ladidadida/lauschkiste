@@ -1,7 +1,7 @@
 # Standard imports from python packages
 import logging
 
-import pirc522
+from . import pirc522
 
 import jukebox.cfghandler
 from jukebox.rfid import ReaderBaseClass

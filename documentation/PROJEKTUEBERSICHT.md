@@ -95,7 +95,7 @@ werden mitinstalliert, aber nur geladen, wenn sie unter `plugins:` in der Config
 | HTTP-Requests (Playlist-Generator) | `requests` |
 | HTTP/WebSocket-API | `fastapi`, `uvicorn` |
 | Publicity-Sniffer (WebSocket-Client) | `websockets` |
-| GPIO (Raspberry Pi, Extra `rpi-gpio`) | `rpi-lgpio` (lgpio-Shim für Bookworm-Kompatibilität), `gpiozero` |
+| GPIO (Raspberry Pi, Extra `gpio`) | `gpiozero` mit `lgpio` als Pin-Backend |
 | Code-Qualität | `ruff`, `pyright`, `pytest`, `pytest-cov`, `mock` |
 | API-Doku-Generierung | `pydoc-markdown` |
 

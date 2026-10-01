@@ -10,8 +10,8 @@ dependencies = [
 [project.optional-dependencies]
 gpio = [
   "gpiozero",
-  # RPi.GPIO shim for kernels >= 6.6 (Trixie), where /sys/class/gpio/ is gone.
-  "rpi-lgpio; platform_machine == 'armv7l' or platform_machine == 'aarch64'",
+  # gpiozero's pin backend on kernels >= 6.6, where /sys/class/gpio/ is gone
+  "lgpio; platform_machine == 'armv6l' or platform_machine == 'armv7l' or platform_machine == 'aarch64'",
 ]
 battery-ina219 = ["pi-ina219"]
 
