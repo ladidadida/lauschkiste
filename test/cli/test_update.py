@@ -103,3 +103,21 @@ def test_package_update(tmp_path, monkeypatch):
 def test_package_up_to_date(monkeypatch):
     monkeypatch.setattr('requests.get', lambda url, timeout: FakeResponse({'tag_name': 'v0.0.1'}))
     assert update.update_package('o/r', 'latest', lauschkiste.paths.settings_dir() / 'x.yaml') is False
+
+
+def test_latest_falls_back_to_the_newest_pre_release(monkeypatch):
+    calls = []
+
+    class NotFound(FakeResponse):
+        status_code = 404
+
+    def get(url, timeout, params=None):
+        calls.append(url)
+        if url.endswith('/latest'):
+            return NotFound()
+        return FakeResponse([{'tag_name': 'v0.1.0-alpha.1', 'assets': []}])
+
+    monkeypatch.setattr('requests.get', get)
+    assert update.fetch_release('o/r')['tag_name'] == 'v0.1.0-alpha.1'
+    assert calls == ['https://api.github.com/repos/o/r/releases/latest', 'https://api.github.com/repos/o/r/releases']
+    assert update.release_version({'tag_name': 'v0.1.0-alpha.1'}) > update.Version('0.1.0a0')

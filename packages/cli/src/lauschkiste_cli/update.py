@@ -71,9 +71,16 @@ def update_source(root: Path, check_only: bool = False) -> bool:
 # --- package install ---------------------------------------------------------------------------
 
 def fetch_release(repo: str, tag: str = 'latest') -> dict:
-    url = f'https://api.github.com/repos/{repo}/releases/' + ('latest' if tag == 'latest' else f'tags/{tag}')
+    """``latest``: the newest stable release, else (only pre-releases yet) the newest pre-release."""
     import requests
-    response = requests.get(url, timeout=30)
+    base = f'https://api.github.com/repos/{repo}/releases'
+    response = requests.get(f'{base}/latest' if tag == 'latest' else f'{base}/tags/{tag}', timeout=30)
+    if response.status_code == 404 and tag == 'latest':
+        response = requests.get(base, params={'per_page': 1}, timeout=30)
+        response.raise_for_status()
+        releases = response.json()
+        if releases:
+            return releases[0]
     if response.status_code == 404:
         raise UpdateError(f"no release '{tag}' in {repo}")
     response.raise_for_status()

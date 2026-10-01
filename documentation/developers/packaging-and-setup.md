@@ -101,7 +101,10 @@ optimisation. Steps needing root run their commands through `sudo`.
 2. **Wheels** -- *done*: `ci/build_wheels.sh` (also `bam wheels`) builds the web app, copies it into
    the `lauschkiste` package and builds the wheels of core, CLI and bundled plugins.
    `.github/workflows/wheels.yml` builds them on every push/PR, installs them into a fresh
-   environment and starts Lauschkiste; a tag `v<version>` attaches them to a GitHub release.
+   environment and starts Lauschkiste; a tag `v<version>` attaches them to a GitHub release
+   (the tag is compared after PEP 440 normalization: `v0.1.0-alpha.1` matches `0.1.0a1`; tags with a
+   `-` become pre-releases). Without a stable release, `install.sh` and `lauschctl update` use the
+   newest pre-release.
 3. **Plugin commands** -- *done*: `lauschctl plugin list|enable|disable|install`
    (`packages/cli/src/lauschkiste_cli/plugin.py`). `Plugin.extras` (contract 1.1) names the extras of
    the plugin's package that `enable --with-extras` installs; installs go through `uv pip` into the

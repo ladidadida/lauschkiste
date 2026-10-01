@@ -98,10 +98,14 @@ install_uv() {
 
 download_release_wheels() {
     local target="$1" api="https://api.github.com/repos/${REPO}/releases"
+    local base="$api" release
     [[ "$VERSION" == latest ]] && api="${api}/latest" || api="${api}/tags/${VERSION}"
     log "Downloading the wheels of release ${VERSION} from ${REPO}"
-    local release
-    release="$(curl -fsSL "$api")" || die "no release ${VERSION} found in ${REPO}"
+    if ! release="$(curl -fsSL "$api")"; then
+        # No stable release yet: take the newest pre-release
+        [[ "$VERSION" == latest ]] && release="$(curl -fsSL "${base}?per_page=1" | python3 -c 'import json,sys; r=json.load(sys.stdin); print(json.dumps(r[0]) if r else "")')"
+        [[ -n "${release:-}" ]] || die "no release ${VERSION} found in ${REPO}"
+    fi
     python3 -c '
 import json, sys
 for asset in json.load(sys.stdin).get("assets", []):

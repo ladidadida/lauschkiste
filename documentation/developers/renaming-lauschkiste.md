@@ -49,8 +49,8 @@ release, then removed):
 
 - Plugins import `lauschkiste.contract` instead of `jukebox.contract`: the framework contract
   becomes **2.0**; module interface versions stay (their actions and events do not change).
-- Versions start over at 0: all packages (core, CLI, bundled plugins) become `0.1.0`; the first
-  pre-release is `v0.1.0-alpha.1`. Tags of upstream Phoniebox releases are not carried over.
+- Versions start over at 0: all packages (core, CLI, bundled plugins) become `0.1.0a1` (PEP 440);
+  the first pre-release is tagged `v0.1.0-alpha.1`. Tags of upstream Phoniebox releases are not carried over.
 
 ## Steps
 
