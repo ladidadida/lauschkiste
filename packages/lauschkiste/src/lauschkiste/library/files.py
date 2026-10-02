@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Safe file operations within the music library."""
+"""Safe file operations within the library."""
 
 import errno
 import os
@@ -33,6 +33,8 @@ AUDIO_EXTENSIONS = frozenset({
 PLAYLIST_EXTENSIONS = frozenset({'.m3u', '.m3u8', '.pls'})
 COVER_EXTENSIONS = frozenset({'.gif', '.jpeg', '.jpg', '.png', '.webp'})
 SUPPORTED_EXTENSIONS = AUDIO_EXTENSIONS | PLAYLIST_EXTENSIONS | COVER_EXTENSIONS
+FILE_MODE = 0o664
+DIR_MODE = 0o775
 
 
 class LibraryError(OperationError):
@@ -55,7 +57,7 @@ def _parse_relative_path(value, *, allow_root):
 
     path = PurePosixPath(value)
     if path.is_absolute() or '..' in path.parts:
-        raise LibraryError(400, 'invalid_path', 'The library path must stay within the music library.')
+        raise LibraryError(400, 'invalid_path', 'The path must stay within the library.')
 
     parts = tuple(part for part in path.parts if part != '.')
     if not allow_root and not parts:
@@ -73,7 +75,7 @@ def resolve_library_path(root, value, *, allow_root=True, require_exists=False):
 
     resolved = candidate.resolve(strict=require_exists)
     if not _contains_path(root, resolved) or (not allow_root and resolved == root):
-        raise LibraryError(400, 'invalid_path', 'The library path must stay within the music library.')
+        raise LibraryError(400, 'invalid_path', 'The path must stay within the library.')
     return resolved
 
 
@@ -156,7 +158,7 @@ class UploadSession:
                     f"'{self.target.name}' was created while the upload was running.",
                 )
 
-            os.chmod(self._temporary_path, 0o666)
+            os.chmod(self._temporary_path, FILE_MODE)
             os.replace(self._temporary_path, self.target)
             self._temporary_path = None
             self._completed = True
@@ -231,7 +233,7 @@ class MusicLibrary:
         except FileNotFoundError as error:
             raise LibraryError(404, 'folder_not_found', 'The destination folder does not exist.') from error
         if not _contains_path(self.root, resolved):
-            raise LibraryError(400, 'invalid_path', 'The library path must stay within the music library.')
+            raise LibraryError(400, 'invalid_path', 'The path must stay within the library.')
         if not resolved.is_dir():
             raise LibraryError(400, 'not_a_folder', 'The destination path is not a folder.')
         return resolved
@@ -243,7 +245,7 @@ class MusicLibrary:
         target = parent / file_name
 
         try:
-            reservation_fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o666)
+            reservation_fd = os.open(target, os.O_WRONLY | os.O_CREAT | os.O_EXCL, FILE_MODE)
         except FileExistsError as error:
             raise LibraryError(
                 409,
@@ -284,8 +286,8 @@ class MusicLibrary:
         name = _validate_name(name)
         target = self._directory(parent) / name
         try:
-            target.mkdir(mode=0o777)
-            target.chmod(0o777)
+            target.mkdir(mode=DIR_MODE)
+            target.chmod(DIR_MODE)
         except FileExistsError as error:
             raise LibraryError(
                 409,
@@ -348,7 +350,7 @@ class MusicLibrary:
 
             resolved = candidate.resolve(strict=False)
             if not _contains_path(root, resolved):
-                raise LibraryError(400, 'invalid_path', 'The library path must stay within the music library.')
+                raise LibraryError(400, 'invalid_path', 'The path must stay within the library.')
             targets[candidate] = relative_path
 
         deleted = []

@@ -89,7 +89,7 @@ class Mpd(Plugin):
             music_library_path = lauschkiste.library.root()
             if music_library_path is not None:
                 logger.info(f"Change user rights for {music_library_path}")
-                misc.recursive_chmod(music_library_path, mode_files=0o666, mode_dirs=0o777)
+                misc.recursive_chmod(music_library_path, mode_files=0o664, mode_dirs=0o775)
         ctx.modules.player.backends.register('mpd', backend)
         ctx.modules.library.sources.register('mpd', MpdLibrarySource(backend))
         self._backend = backend

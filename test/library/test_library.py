@@ -159,10 +159,12 @@ def test_update_returns_mpd_job_identifier(music_library):
     assert updates == ['update']
 
 
-def test_uploaded_file_mode_is_shared_writable(music_library):
+def test_uploaded_files_and_folders_are_group_writable_only(music_library):
     library, root, _ = music_library
     upload = library.start_upload('.', 'track.wav')
     upload.write(b'audio')
     upload.finish()
 
-    assert os.stat(root / 'track.wav').st_mode & 0o777 == 0o666
+    assert os.stat(root / 'track.wav').st_mode & 0o777 == 0o664
+    library.create_folder('.', 'Album')
+    assert os.stat(root / 'Album').st_mode & 0o777 == 0o775

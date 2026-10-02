@@ -1,7 +1,7 @@
 # Samba
 
 Samba makes the library a network drive in Windows Explorer, the macOS Finder or a Linux file
-manager. It is optional and off by default: the web app and SFTP can copy music too, see
+manager. It is optional and off by default: the web app can upload music too, see
 [Copying music](copying-music.md).
 
 ## Enable

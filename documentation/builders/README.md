@@ -16,7 +16,7 @@
   * [RFID Cards synchronisation](./components/synchronisation/rfidcards.md)
 * [Auto Hotspot](./autohotspot.md)
 * File Management
-  * [Copying music](./copying-music.md): web app, SFTP, Samba
+  * [Copying music](./copying-music.md): web app, Samba
   * [Network share / Samba](./samba.md)
 * [Audiobooks](./audiobooks.md)
 * [Radio](./radio.md)

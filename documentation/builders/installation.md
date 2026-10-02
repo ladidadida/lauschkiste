@@ -49,8 +49,8 @@ After a successful installation, [configure your Lauschkiste](configuration.md).
 > consider running the installation in `screen` or `tmux`, so a dropped SSH connection doesn't
 > interrupt it.
 
-Music gets onto the box through the web app, SFTP (with your Pi login) or an optional Samba
-share of the library, see [Copying music](copying-music.md).
+Music gets onto the box through the web app or an optional Samba share of the library, see
+[Copying music](copying-music.md).
 
 ### Options
 
