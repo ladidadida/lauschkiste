@@ -94,6 +94,15 @@ audiobooks:
 radio:
   # Stations (name, URL, logo); edited through the web app or the API
   stations_file: settings/radio.yaml
+podcasts:
+  # Subscribed feeds; edited through the web app or the API
+  podcasts_file: settings/podcasts.yaml
+  # Fetch a feed again when its episodes are older than this
+  refresh_minutes: 60
+  # Episodes kept per podcast (newest first)
+  max_episodes: 100
+  # Go back this many seconds when an episode continues
+  rewind_sec: 10
 library:
   # The library, with music/ and audiobooks/ below
   path: library

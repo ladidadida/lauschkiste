@@ -50,6 +50,17 @@
     * [cover\_for](#lauschkiste.library.covers.CoverCache.cover_for)
 * [lauschkiste.library](#lauschkiste.library)
   * [root](#lauschkiste.library.root)
+* [lauschkiste.podcasts](#lauschkiste.podcasts)
+  * [parse\_feed](#lauschkiste.podcasts.parse_feed)
+  * [Podcasts](#lauschkiste.podcasts.Podcasts)
+    * [list\_podcasts](#lauschkiste.podcasts.Podcasts.list_podcasts)
+    * [list\_episodes](#lauschkiste.podcasts.Podcasts.list_episodes)
+    * [add\_podcast](#lauschkiste.podcasts.Podcasts.add_podcast)
+    * [update\_podcast](#lauschkiste.podcasts.Podcasts.update_podcast)
+    * [delete\_podcast](#lauschkiste.podcasts.Podcasts.delete_podcast)
+    * [refresh](#lauschkiste.podcasts.Podcasts.refresh)
+    * [play](#lauschkiste.podcasts.Podcasts.play)
+    * [set\_heard](#lauschkiste.podcasts.Podcasts.set_heard)
 * [lauschkiste.rfid.reader](#lauschkiste.rfid.reader)
   * [ReaderDriver](#lauschkiste.rfid.reader.ReaderDriver)
     * [create\_reader](#lauschkiste.rfid.reader.ReaderDriver.create_reader)
@@ -844,6 +855,139 @@ def root() -> str
 ```
 
 The library directory, from ``library.path``.
+
+
+<a id="lauschkiste.podcasts"></a>
+
+# lauschkiste.podcasts
+
+The podcasts core module: podcast feeds, episodes streamed and continued where they stopped.
+
+Subscribed podcasts are kept in ``podcasts.podcasts_file``, the episodes of each feed are cached in
+``podcasts.cache_dir`` and fetched again when older than ``refresh_minutes``. The position is kept
+per episode; an episode played to the end counts as heard.
+
+
+<a id="lauschkiste.podcasts.parse_feed"></a>
+
+#### parse\_feed
+
+```python
+def parse_feed(content: bytes) -> Dict[str, Any]
+```
+
+``{'title', 'image', 'episodes': [{'id', 'title', 'url', 'published', 'duration', 'image'}]}``,
+
+newest episode first. Raises FeedError if ``content`` is not an RSS or Atom feed with audio.
+
+
+<a id="lauschkiste.podcasts.Podcasts"></a>
+
+## Podcasts Objects
+
+```python
+class Podcasts(CoreModule)
+```
+
+Podcasts: subscribe to feeds, play episodes and continue them.
+
+
+<a id="lauschkiste.podcasts.Podcasts.list_podcasts"></a>
+
+#### list\_podcasts
+
+```python
+@query(path='/')
+def list_podcasts() -> List[Podcast]
+```
+
+All podcasts, by name, with the number of (unheard) episodes.
+
+
+<a id="lauschkiste.podcasts.Podcasts.list_episodes"></a>
+
+#### list\_episodes
+
+```python
+@query(path='/{podcast}/episodes')
+def list_episodes(podcast: str) -> List[Episode]
+```
+
+Episodes of a podcast, newest first (the feed is fetched again when stale).
+
+
+<a id="lauschkiste.podcasts.Podcasts.add_podcast"></a>
+
+#### add\_podcast
+
+```python
+@action(path='/', status_code=201)
+def add_podcast(url: str, name: Optional[str] = None) -> Podcast
+```
+
+Subscribe to a feed; the name defaults to the feed's title.
+
+
+<a id="lauschkiste.podcasts.Podcasts.update_podcast"></a>
+
+#### update\_podcast
+
+```python
+@action(method='PUT', path='/{podcast}')
+def update_podcast(podcast: str, name: str) -> Podcast
+```
+
+Rename a podcast.
+
+
+<a id="lauschkiste.podcasts.Podcasts.delete_podcast"></a>
+
+#### delete\_podcast
+
+```python
+@action(method='DELETE', path='/{podcast}')
+def delete_podcast(podcast: str) -> None
+```
+
+Unsubscribe from a podcast. Cards playing it stop working.
+
+
+<a id="lauschkiste.podcasts.Podcasts.refresh"></a>
+
+#### refresh
+
+```python
+@action(path='/refresh')
+def refresh(podcast: Optional[str] = None) -> None
+```
+
+Fetch the episodes of one podcast, or of all.
+
+
+<a id="lauschkiste.podcasts.Podcasts.play"></a>
+
+#### play
+
+```python
+@action()
+def play(podcast: str, episode: Optional[str] = None) -> None
+```
+
+Play an episode where it stopped; without ``episode`` the newest unheard one (or the
+
+newest, when all are heard).
+
+
+<a id="lauschkiste.podcasts.Podcasts.set_heard"></a>
+
+#### set\_heard
+
+```python
+@action()
+def set_heard(podcast: str, episode: str, heard: bool = True) -> None
+```
+
+Mark an episode as heard (or not); either way it starts from the beginning next time.
 
 
 <a id="lauschkiste.rfid.reader"></a>

@@ -20,6 +20,7 @@
   * [Network share / Samba](./samba.md)
 * [Audiobooks](./audiobooks.md)
 * [Radio](./radio.md)
+* [Podcasts](./podcasts.md)
 
 ## Hardware Components
 

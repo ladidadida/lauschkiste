@@ -1,0 +1,466 @@
+{
+  "events": {
+    "changed": {
+      "properties": {
+        "podcasts": {
+          "items": {
+            "properties": {
+              "episodes": {
+                "default": 0,
+                "type": "integer"
+              },
+              "id": {
+                "type": "string"
+              },
+              "image": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "name": {
+                "type": "string"
+              },
+              "unheard": {
+                "default": 0,
+                "type": "integer"
+              },
+              "updated_at": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "url"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "podcasts"
+      ],
+      "type": "object"
+    }
+  },
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "podcasts",
+  "operations": {
+    "add_podcast": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/podcasts",
+      "returns": {
+        "properties": {
+          "episodes": {
+            "default": 0,
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "name": {
+            "type": "string"
+          },
+          "unheard": {
+            "default": 0,
+            "type": "integer"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ],
+        "type": "object"
+      }
+    },
+    "delete_podcast": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "podcast": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "podcast"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "DELETE",
+      "path": "/api/v1/podcasts/{podcast}",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "list_episodes": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "podcast": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "podcast"
+        ],
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/podcasts/{podcast}/episodes",
+      "returns": {
+        "items": {
+          "properties": {
+            "duration": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "elapsed": {
+              "default": 0.0,
+              "type": "number"
+            },
+            "heard": {
+              "default": false,
+              "type": "boolean"
+            },
+            "id": {
+              "type": "string"
+            },
+            "image": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "published": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "title": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "title",
+            "url"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "list_podcasts": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/podcasts",
+      "returns": {
+        "items": {
+          "properties": {
+            "episodes": {
+              "default": 0,
+              "type": "integer"
+            },
+            "id": {
+              "type": "string"
+            },
+            "image": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "name": {
+              "type": "string"
+            },
+            "unheard": {
+              "default": 0,
+              "type": "integer"
+            },
+            "updated_at": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "url"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "play": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "episode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "podcast": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "podcast"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/podcasts/play",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "refresh": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "podcast": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/podcasts/refresh",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "set_heard": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "episode": {
+            "type": "string"
+          },
+          "heard": {
+            "default": true,
+            "type": "boolean"
+          },
+          "podcast": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "podcast",
+          "episode"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/podcasts/set_heard",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "update_podcast": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "podcast": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "podcast",
+          "name"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "PUT",
+      "path": "/api/v1/podcasts/{podcast}",
+      "returns": {
+        "properties": {
+          "episodes": {
+            "default": 0,
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "image": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "name": {
+            "type": "string"
+          },
+          "unheard": {
+            "default": 0,
+            "type": "integer"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "requires": {
+    "player": null
+  }
+}

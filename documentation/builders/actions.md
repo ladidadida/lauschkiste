@@ -32,6 +32,7 @@ Frequently used actions of the core:
 | `player.play_single` | `song_url` | play one song |
 | `audiobooks.play` | `book` | continue an audiobook, see [Audiobooks](audiobooks.md) |
 | `radio.play` | `station` | play a radio station, see [Radio](radio.md) |
+| `podcasts.play` | `podcast`, `episode` (optional) | play a podcast episode, see [Podcasts](podcasts.md) |
 | `player.play`, `player.pause`, `player.toggle`, `player.stop` | | playback |
 | `player.next`, `player.prev` | | skip |
 | `player.shuffle`, `player.repeat` | `option` (default `toggle`) | playback modes |
