@@ -1,6 +1,6 @@
 [project]
 name = "lauschkiste-plugin-mpd"
-version = "0.1.0a2"
+version = "0.1.0a3"
 description = "Lauschkiste plugin: player backend using an external MPD server"
 license = "MIT"
 requires-python = ">=3.11"

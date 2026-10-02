@@ -882,7 +882,7 @@ wheels = [
 
 [[package]]
 name = "lauschkiste"
-version = "0.1.0a2"
+version = "0.1.0a3"
 source = { editable = "packages/lauschkiste" }
 dependencies = [
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
@@ -917,7 +917,7 @@ requires-dist = [
 
 [[package]]
 name = "lauschkiste-cli"
-version = "0.1.0a2"
+version = "0.1.0a3"
 source = { editable = "packages/cli" }
 dependencies = [
     { name = "lauschkiste" },
@@ -936,7 +936,7 @@ requires-dist = [
 
 [[package]]
 name = "lauschkiste-plugin-mpd"
-version = "0.1.0a2"
+version = "0.1.0a3"
 source = { editable = "packages/plugins/mpd" }
 dependencies = [
     { name = "lauschkiste" },
@@ -951,7 +951,7 @@ requires-dist = [
 
 [[package]]
 name = "lauschkiste-plugin-raspberry-pi"
-version = "0.1.0a2"
+version = "0.1.0a3"
 source = { editable = "packages/plugins/raspberry-pi" }
 dependencies = [
     { name = "lauschkiste" },
@@ -977,7 +977,7 @@ provides-extras = ["gpio", "battery-ina219"]
 
 [[package]]
 name = "lauschkiste-plugin-rfid-readers"
-version = "0.1.0a2"
+version = "0.1.0a3"
 source = { editable = "packages/plugins/rfid-readers" }
 dependencies = [
     { name = "lauschkiste" },
