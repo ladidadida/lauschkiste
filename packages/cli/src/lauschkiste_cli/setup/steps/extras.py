@@ -58,9 +58,9 @@ class MpdStep(Step):
 
 class SambaStep(Step):
     name = 'samba'
-    title = 'Samba share of the music folder'
+    title = 'Samba share of the library'
     questions = (
-        Question('samba', 'Share the music folder on the network via Samba (Windows/macOS file sharing)?',
+        Question('samba', 'Share the library (music and audiobooks) on the network via Samba (Windows/macOS file sharing)?',
                  default=False,
                  help='Not needed for uploading music: the web app can do that, and so can SFTP with your login '
                       '(e.g. WinSCP, FileZilla, scp).'),
