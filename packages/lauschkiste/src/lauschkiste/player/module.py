@@ -3,7 +3,7 @@
 import logging
 import threading
 from functools import partial
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Literal, Mapping, Optional
 
 from pydantic import BaseModel
 
@@ -92,7 +92,7 @@ class Player(CoreModule):
             update['context'] = self._context
         return status.model_copy(update=update)
 
-    def _set_context(self, kind: str, title: Optional[str], action: str, args: Dict[str, Any]) -> None:
+    def _set_context(self, kind: Literal['music', 'audiobook', 'podcast', 'radio'], title: Optional[str], action: str, args: Dict[str, Any]) -> None:
         context = PlaybackContext(kind=kind, title=title, action=action,
                                   args={key: value for key, value in args.items() if value is not None})
         with self._metadata_lock:
