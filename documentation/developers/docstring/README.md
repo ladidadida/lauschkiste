@@ -270,6 +270,11 @@
     * [get\_app\_settings](#lauschkiste.system.System.get_app_settings)
     * [set\_app\_settings](#lauschkiste.system.System.set_app_settings)
     * [noop](#lauschkiste.system.System.noop)
+* [lauschkiste.resume](#lauschkiste.resume)
+  * [relative](#lauschkiste.resume.relative)
+  * [ResumeTracker](#lauschkiste.resume.ResumeTracker)
+    * [set\_finished](#lauschkiste.resume.ResumeTracker.set_finished)
+    * [play](#lauschkiste.resume.ResumeTracker.play)
 * [lauschkiste.player.coordinator](#lauschkiste.player.coordinator)
   * [PlayerCoordinator](#lauschkiste.player.coordinator.PlayerCoordinator)
     * [\_\_init\_\_](#lauschkiste.player.coordinator.PlayerCoordinator.__init__)
@@ -1037,8 +1042,8 @@ def card_command_to_str(entry: Mapping[str, Any],
 The audiobooks core module: audiobooks in ``library/audiobooks``, continued where they stopped.
 
 Each folder directly below ``audiobooks`` is one audiobook, its files are the chapters in file name
-order. The position is kept per audiobook in ``audiobooks.state_file``. Shuffle and repeat are
-switched off while an audiobook plays and restored afterwards.
+order. The position is kept per audiobook in ``audiobooks.state_file``; chapters play in order,
+regardless of shuffle and repeat.
 
 
 <a id="lauschkiste.audiobooks.Audiobooks"></a>
@@ -3497,6 +3502,63 @@ def noop(message: str = '') -> None
 Do nothing (logs ``message`` as a warning if given).
 
 
+<a id="lauschkiste.resume"></a>
+
+# lauschkiste.resume
+
+Continue items (audiobooks, podcast episodes) where they stopped.
+
+An item is a list of files played in order through the player. While it plays, its position (file
+and seconds) is taken from ``player.status`` and kept in a JSON file; it counts as finished once
+its last file has played to the end.
+
+
+<a id="lauschkiste.resume.relative"></a>
+
+#### relative
+
+```python
+def relative(file: Optional[str]) -> Optional[str]
+```
+
+``file`` relative to the library if it is an absolute path below it.
+
+
+<a id="lauschkiste.resume.ResumeTracker"></a>
+
+## ResumeTracker Objects
+
+```python
+class ResumeTracker()
+```
+
+Positions of the items of one module, keyed by item id.
+
+
+<a id="lauschkiste.resume.ResumeTracker.set_finished"></a>
+
+#### set\_finished
+
+```python
+def set_finished(key: str, finished: bool) -> None
+```
+
+Mark an item as finished or forget it; either way it starts from the beginning next time.
+
+
+<a id="lauschkiste.resume.ResumeTracker.play"></a>
+
+#### play
+
+```python
+def play(key: str, files: List[str], resume: bool = True) -> None
+```
+
+Play an item: where it stopped (``resume``), else from the beginning. The item that is
+
+already playing keeps playing, a paused one continues.
+
+
 <a id="lauschkiste.player.coordinator"></a>
 
 # lauschkiste.player.coordinator
@@ -3565,7 +3627,7 @@ Stop the current backend and select another registered backend.
 #### play\_files
 
 ```python
-def play_files(paths, start=0, position=0.0)
+def play_files(paths, start=0, position=0.0, ordered=False)
 ```
 
 Play a list of songs (paths below the library, absolute or relative).
@@ -3804,10 +3866,13 @@ Play an album of the library or of a backend's own catalog (``provider``).
 @action(path='/files')
 def play_files(files: List[str],
                start: int = 0,
-               position: float = 0.0) -> None
+               position: float = 0.0,
+               ordered: bool = False) -> None
 ```
 
-Play files of the library, from ``position`` seconds into the file at index ``start``.
+Play files of the library (or URLs), from ``position`` seconds into the file at index ``start``;
+
+``ordered`` plays them in order, ignoring shuffle and repeat.
 
 
 <a id="lauschkiste.player.module.Player.queue_load"></a>
@@ -4042,12 +4107,14 @@ Receive the raw status mapping whenever it changes (only forwarded while active)
 ```python
 def play_files(paths: List[str],
                start: int = 0,
-               position: float = 0.0) -> None
+               position: float = 0.0,
+               ordered: bool = False) -> None
 ```
 
 Replace the queue with ``paths`` (absolute or relative to the library) and play from
 
-``position`` seconds into the entry at index ``start``.
+``position`` seconds into the entry at index ``start``. ``ordered`` plays the queue in order,
+ignoring shuffle and repeat until other content is played.
 
 
 <a id="lauschkiste.player.backends.local_audio"></a>

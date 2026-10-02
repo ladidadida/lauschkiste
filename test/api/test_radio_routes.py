@@ -63,7 +63,7 @@ def test_play_station(radio):
     client, ctrl, _ = radio
     station = add(client, name='Stream', url='https://example.org/live.mp3').json()['id']
     assert client.post('/api/v1/radio/play', json={'station': station}).status_code == 204
-    ctrl.play_files.assert_called_once_with(['https://example.org/live.mp3'], 0, 0.0)
+    ctrl.play_files.assert_called_once_with(['https://example.org/live.mp3'], 0, 0.0, False)
     assert client.post('/api/v1/radio/play', json={'station': 'nope'}).status_code == 404
 
 
@@ -76,7 +76,7 @@ def test_play_resolves_playlists(radio, monkeypatch):
     monkeypatch.setattr(lauschkiste.radio.requests, 'get', Mock(return_value=response))
     station = add(client, name='Playlist', url='https://example.org/station.pls').json()['id']
     client.post('/api/v1/radio/play', json={'station': station})
-    ctrl.play_files.assert_called_once_with(['https://example.org/real.aac'], 0, 0.0)
+    ctrl.play_files.assert_called_once_with(['https://example.org/real.aac'], 0, 0.0, False)
 
 
 def test_streams_in_playlist():

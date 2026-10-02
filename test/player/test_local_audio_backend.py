@@ -45,6 +45,7 @@ def local_audio_backend(**attrs):
     backend._state = 'stop'
     backend._random = False
     backend._repeat_mode = 'off'
+    backend._ordered = False
     backend._volume = 100
     backend._last_played_folder = ''
     backend._status_store = _FakeStatusStore()
@@ -300,3 +301,18 @@ def test_play_files_starts_at_entry_and_position(tmp_path, monkeypatch):
 
     backend.play_files(['a/01.mp3'], 5)
     assert (backend._index, backend._position) == (0, 0.0)
+
+
+def test_ordered_files_ignore_shuffle_and_repeat_until_other_content(tmp_path, monkeypatch):
+    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    backend = local_audio_backend()
+    backend.shuffle('enable')
+    backend.repeat('enable_repeat')
+
+    backend.play_files(['a/01.mp3', 'a/02.mp3'], ordered=True)
+    status = backend.playerstatus()
+    assert (status['random'], status['repeat']) == ('0', '0')
+
+    backend.play_single('b/song.mp3')
+    status = backend.playerstatus()
+    assert (status['random'], status['repeat']) == ('1', '1')

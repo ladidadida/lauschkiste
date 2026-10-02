@@ -218,6 +218,7 @@ class PlayerMPD:
         self.mpd_status = {}
         self.mpd_status_poll_interval = 0.25
         self.mpd_lock = MpdLock(self.mpd_client, self.mpd_host, 6600)
+        self._saved_modes = None
         self.status_is_closing = False
         self._active = False
         # self.status_thread = threading.Timer(self.mpd_status_poll_interval, self._mpd_status_poll).start()
@@ -501,8 +502,24 @@ class PlayerMPD:
         # MPDClient.swapid(song1, song2)
         raise NotImplementedError
 
+    def _set_ordered(self, ordered: bool) -> None:
+        """Switch shuffle and repeat off for ordered content and back on afterwards (mpd_lock held)."""
+        saved = getattr(self, '_saved_modes', None)
+        if ordered and saved is None:
+            status = self.mpd_client.status()
+            self._saved_modes = {key: int(status.get(key, 0)) for key in ('random', 'repeat', 'single')}
+            self.mpd_client.random(0)
+            self.mpd_client.repeat(0)
+            self.mpd_client.single(0)
+        elif not ordered and saved is not None:
+            self._saved_modes = None
+            self.mpd_client.random(saved['random'])
+            self.mpd_client.repeat(saved['repeat'])
+            self.mpd_client.single(saved['single'])
+
     def play_single(self, song_url):
         with self.mpd_lock:
+            self._set_ordered(False)
             self.mpd_client.clear()
             self.mpd_client.addid(song_url)
             self.mpd_client.play()
@@ -572,6 +589,7 @@ class PlayerMPD:
         # TODO: This changes the current state -> Need to save last state
         with self.mpd_lock:
             logger.info(f"Play folder: '{folder}'")
+            self._set_ordered(False)
             self.mpd_client.clear()
 
             plc = playlistgenerator.PlaylistCollector(lauschkiste.library.root())
@@ -593,9 +611,10 @@ class PlayerMPD:
 
             self.mpd_client.play()
 
-    def play_files(self, paths, start=0, position=0.0):
+    def play_files(self, paths, start=0, position=0.0, ordered=False):
         """Replace the queue with ``paths`` and play (absolute paths below the library are shortened)."""
         with self.mpd_lock:
+            self._set_ordered(ordered)
             self.mpd_client.clear()
             for path in paths:
                 try:
@@ -620,6 +639,7 @@ class PlayerMPD:
         """
         with self.mpd_lock:
             logger.info(f"Play album: '{album}' by '{albumartist}")
+            self._set_ordered(False)
             self.mpd_client.clear()
             self.mpd_retry_with_mutex(self.mpd_client.findadd, 'albumartist', albumartist, 'album', album)
             self.mpd_client.play()

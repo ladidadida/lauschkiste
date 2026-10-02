@@ -63,6 +63,7 @@ class PlayerLocalAudio:
         self._state = 'stop'           # 'play' | 'pause' | 'stop'
         self._random = False
         self._repeat_mode = 'off'      # 'off' | 'repeat' | 'single'
+        self._ordered = False          # play the queue in order, ignoring shuffle and repeat
         self._volume = int(cfg.getn('player', 'volume', default=100))
         self._last_played_folder = self._status_store.get('last_played_folder', '')
 
@@ -119,15 +120,16 @@ class PlayerLocalAudio:
                     # Interrupted by an external control call (stop/pause/next/prev/seek/new
                     # play_folder) -- it already set _index/_position/_state to what it wants.
                     continue
-                if self._repeat_mode == 'single':
+                repeat_mode = 'off' if self._ordered else self._repeat_mode
+                if repeat_mode == 'single':
                     self._position = 0.0
-                elif self._random and len(self._queue) > 1:
+                elif self._random and not self._ordered and len(self._queue) > 1:
                     self._index = random.randrange(len(self._queue))
                     self._position = 0.0
                 elif index + 1 < len(self._queue):
                     self._index = index + 1
                     self._position = 0.0
-                elif self._repeat_mode == 'repeat':
+                elif repeat_mode == 'repeat':
                     self._index = 0
                     self._position = 0.0
                 else:
@@ -233,6 +235,8 @@ class PlayerLocalAudio:
     def _status_dict(self):
         with self._cv:
             index, position, state, queue_len = self._index, self._position, self._state, len(self._queue)
+            random_on = self._random and not self._ordered
+            repeat_mode = 'off' if self._ordered else self._repeat_mode
             current_file = self._queue[index] if 0 <= index < queue_len else None
         status = {
             'state': state,
@@ -243,9 +247,9 @@ class PlayerLocalAudio:
             'duration': self._duration,
             'playlistlength': str(queue_len),
             'volume': str(self._volume),
-            'random': '1' if self._random else '0',
-            'repeat': '1' if self._repeat_mode in ('repeat', 'single') else '0',
-            'single': '1' if self._repeat_mode == 'single' else '0',
+            'random': '1' if random_on else '0',
+            'repeat': '1' if repeat_mode in ('repeat', 'single') else '0',
+            'single': '1' if repeat_mode == 'single' else '0',
             'provider': 'local_audio',
         }
         metadata = self._stream_metadata
@@ -363,6 +367,7 @@ class PlayerLocalAudio:
 
     def play_single(self, song_url):
         with self._cv:
+            self._ordered = False
             self._queue = [song_url]
             self._index = 0
             self._position = 0.0
@@ -387,6 +392,7 @@ class PlayerLocalAudio:
         plc.parse(folder, recursive)
         paths = list(plc)
         with self._cv:
+            self._ordered = False
             self._queue = paths
             self._last_played_folder = folder
             self._status_store['last_played_folder'] = folder
@@ -402,10 +408,11 @@ class PlayerLocalAudio:
                 self._state = 'stop'
         self._status_store.save_to_json()
 
-    def play_files(self, paths, start=0, position=0.0):
+    def play_files(self, paths, start=0, position=0.0, ordered=False):
         root = os.path.expanduser(lauschkiste.library.root() or '')
         queue = [p if os.path.isabs(p) or '://' in p else os.path.join(root, p) for p in paths]
         with self._cv:
+            self._ordered = bool(ordered)
             self._queue = queue
             self._last_played_folder = ''
             if queue:

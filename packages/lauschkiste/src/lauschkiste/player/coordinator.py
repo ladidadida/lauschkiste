@@ -213,11 +213,11 @@ class PlayerCoordinator:
             backend = self._content_backend()
             return self._call_backend(backend, 'play_folder', folder, recursive)
 
-    def play_files(self, paths, start=0, position=0.0):
+    def play_files(self, paths, start=0, position=0.0, ordered=False):
         """Play a list of songs (paths below the library, absolute or relative)."""
         with self._lock:
             backend = self._content_backend()
-            return self._call_backend(backend, 'play_files', list(paths), start, position)
+            return self._call_backend(backend, 'play_files', list(paths), start, position, ordered)
 
     def play_album(
             self,

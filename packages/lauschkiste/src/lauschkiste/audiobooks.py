@@ -1,30 +1,20 @@
 """The audiobooks core module: audiobooks in ``library/audiobooks``, continued where they stopped.
 
 Each folder directly below ``audiobooks`` is one audiobook, its files are the chapters in file name
-order. The position is kept per audiobook in ``audiobooks.state_file``. Shuffle and repeat are
-switched off while an audiobook plays and restored afterwards.
+order. The position is kept per audiobook in ``audiobooks.state_file``; chapters play in order,
+regardless of shuffle and repeat.
 """
 
-import logging
-import os
 import re
-import threading
-import time
-from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
-import lauschkiste.library
 import lauschkiste.paths
-import lauschkiste.statefile as statefile
 from lauschkiste.contract import CoreModule, OperationError, action, query
-
-logger = logging.getLogger('lauschkiste.audiobooks')
+from lauschkiste.resume import ResumeTracker
 
 DEFAULT_STATE_FILE = 'settings/audiobooks.json'
-FINISHED_MARGIN_SEC = 15.0
-ACTIVATION_GRACE_SEC = 2.0
 
 
 class Audiobook(BaseModel):
@@ -39,8 +29,8 @@ class Audiobook(BaseModel):
     cover_url: Optional[str] = None
 
 
-def _natural_key(path: str):
-    return [int(part) if part.isdigit() else part.casefold() for part in re.split(r'(\d+)', path)]
+def natural_key(text: str):
+    return [int(part) if part.isdigit() else part.casefold() for part in re.split(r'(\d+)', text)]
 
 
 def _number(value: Any) -> float:
@@ -60,111 +50,19 @@ class Audiobooks(CoreModule):
 
     def __init__(self):
         self._ctx: Any = None
-        self._lock = threading.Lock()
-        self._save_lock = threading.Lock()
-        self._path = Path(DEFAULT_STATE_FILE)
-        self._rewind = 10.0
-        self._save_interval = 10.0
-        self._positions: Dict[str, Dict[str, Any]] = {}
-        self._dirty = False
-        self._saved_at = 0.0
-        self._active: Optional[str] = None
-        self._chapters: List[str] = []
-        self._activated_at = 0.0
-        self._last: Optional[Dict[str, float]] = None
-        self._modes: Optional[Dict[str, bool]] = None
-        self._worker: Any = None
-
-    # -- lifecycle ------------------------------------------------------------------------------
+        self._resume: Any = None
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        self._path = lauschkiste.paths.resolve(ctx.config.get('state_file', default=DEFAULT_STATE_FILE))
-        self._rewind = float(ctx.config.get('rewind_sec', default=10))
-        self._save_interval = float(ctx.config.get('save_interval_sec', default=10))
-        self._positions = self._load()
-        self._worker = ctx.executor('worker')
-        ctx.subscribe('player.status', self._on_status)
+        self._resume = ResumeTracker(
+            ctx, lauschkiste.paths.resolve(ctx.config.get('state_file', default=DEFAULT_STATE_FILE)),
+            rewind_sec=float(ctx.config.get('rewind_sec', default=10)),
+            save_interval_sec=float(ctx.config.get('save_interval_sec', default=10)))
+        self._resume.start()
 
     def stop(self):
-        self._save()
+        self._resume.stop()
         return []
-
-    # -- state file -----------------------------------------------------------------------------
-
-    def _load(self) -> Dict[str, Dict[str, Any]]:
-        return {book: entry for book, entry in statefile.read_json(self._path).items() if isinstance(entry, dict)}
-
-    def _save(self) -> None:
-        with self._save_lock:
-            with self._lock:
-                if not self._dirty:
-                    return
-                data = {book: dict(entry) for book, entry in self._positions.items()}
-                self._dirty = False
-                self._saved_at = time.monotonic()
-            try:
-                statefile.write_json(self._path, data)
-            except OSError as error:
-                logger.error(f"Could not save audiobook positions to '{self._path}': {error}")
-
-    # -- tracking -------------------------------------------------------------------------------
-
-    def _relative(self, file: Optional[str]) -> Optional[str]:
-        if not file or not os.path.isabs(file):
-            return file
-        root = os.path.expanduser(lauschkiste.library.root()).rstrip('/') + '/'
-        return file[len(root):] if file.startswith(root) else file
-
-    def _on_status(self, _topic: str, status: Optional[Dict[str, Any]]) -> None:
-        if not status:
-            return
-        file = self._relative(status.get('file'))
-        state = status.get('state')
-        save = False
-        restore = None
-        with self._lock:
-            if self._active is None:
-                return
-            if file not in self._chapters:
-                if time.monotonic() - self._activated_at < ACTIVATION_GRACE_SEC:
-                    return
-                restore = self._deactivate()
-            elif state in ('play', 'pause'):
-                elapsed = _number(status.get('elapsed'))
-                self._positions[self._active] = {'file': file, 'elapsed': elapsed, 'finished': False}
-                self._last = {'chapter': self._chapters.index(file), 'elapsed': elapsed,
-                              'duration': _number(status.get('duration'))}
-                self._dirty = True
-                save = state == 'pause' or time.monotonic() - self._saved_at >= self._save_interval
-            elif state == 'stop':
-                last = self._last
-                if (last and last['chapter'] == len(self._chapters) - 1 and last['duration']
-                        and last['elapsed'] >= last['duration'] - FINISHED_MARGIN_SEC):
-                    self._positions[self._active] = {'finished': True}
-                    self._dirty = True
-                    restore = self._deactivate()
-                save = True
-        if restore:
-            self._worker.submit(self._restore_modes, restore)
-        if save or restore is not None:
-            self._worker.submit(self._save)
-
-    def _deactivate(self) -> Dict[str, bool]:
-        """Forget the active audiobook (lock held); returns the modes to restore."""
-        self._active, self._chapters, self._last = None, [], None
-        modes, self._modes = self._modes, None
-        return modes or {}
-
-    def _restore_modes(self, modes: Dict[str, bool]) -> None:
-        player = self._ctx.modules.player
-        try:
-            if modes.get('random'):
-                player.shuffle('enable')
-            if modes.get('repeat'):
-                player.repeat('enable_repeat_single' if modes.get('single') else 'enable_repeat')
-        except Exception as error:
-            logger.warning(f"Could not restore shuffle/repeat: {error}")
 
     # -- library --------------------------------------------------------------------------------
 
@@ -175,7 +73,7 @@ class Audiobooks(CoreModule):
     def _chapter_files(self, book: str) -> List[str]:
         if not book or '/' in book or book in ('.', '..'):
             raise OperationError(422, 'invalid_audiobook', f"Invalid audiobook name '{book}'")
-        files = sorted((song.file for song in self._songs(book)), key=_natural_key)
+        files = sorted((song.file for song in self._songs(book)), key=natural_key)
         if not files:
             raise OperationError(404, 'unknown_audiobook', f"No audiobook '{book}' in the library")
         return files
@@ -191,11 +89,10 @@ class Audiobooks(CoreModule):
             parts = song.file[len(prefix):].split('/', 1)
             if len(parts) == 2:
                 books.setdefault(parts[0], []).append(song)
-        with self._lock:
-            positions = {book: dict(entry) for book, entry in self._positions.items()}
+        positions = self._resume.entries()
         result = []
-        for book in sorted(books, key=_natural_key):
-            songs = sorted(books[book], key=lambda song: _natural_key(song.file))
+        for book in sorted(books, key=natural_key):
+            songs = sorted(books[book], key=lambda song: natural_key(song.file))
             files = [song.file for song in songs]
             durations = [song.duration or 0.0 for song in songs]
             total = sum(durations) if all(song.duration for song in songs) else None
@@ -216,57 +113,15 @@ class Audiobooks(CoreModule):
     @action()
     def play(self, book: str) -> None:
         """Play an audiobook where it stopped (from the beginning when it is new or finished)."""
-        self._start(book, resume=True)
+        self._resume.play(book, self._chapter_files(book))
 
     @action()
     def restart(self, book: str) -> None:
         """Play an audiobook from the beginning."""
-        self._start(book, resume=False)
-
-    def _start(self, book: str, resume: bool) -> None:
-        files = self._chapter_files(book)
-        player = self._ctx.modules.player
-        status = player.playerstatus()
-        with self._lock:
-            if not resume:
-                self._positions.pop(book, None)
-                self._dirty = True
-            entry = dict(self._positions.get(book, {}))
-            current = resume and self._active == book and self._relative(status.file) in self._chapters
-        if current and status.state == 'play':
-            return
-        if current and status.state == 'pause':
-            player.play()
-            return
-        start, position = 0, 0.0
-        if not entry.get('finished') and entry.get('file') in files:
-            start = files.index(entry['file'])
-            position = max(0.0, _number(entry.get('elapsed')) - self._rewind)
-        with self._lock:
-            modes = self._modes if self._active else None
-        if modes is None:
-            modes = {'random': status.random, 'repeat': status.repeat, 'single': status.single}
-            if status.random:
-                player.shuffle('disable')
-            if status.repeat:
-                player.repeat('disable')
-        player.play_files(files, start, position)
-        with self._lock:
-            self._active, self._chapters, self._last = book, files, None
-            self._activated_at = time.monotonic()
-            self._modes = modes
+        self._resume.play(book, self._chapter_files(book), resume=False)
 
     @action()
     def set_finished(self, book: str, finished: bool = True) -> None:
         """Mark an audiobook as finished (or not); either way it starts from the beginning next time."""
         self._chapter_files(book)
-        with self._lock:
-            restore = self._deactivate() if self._active == book else None
-            if finished:
-                self._positions[book] = {'finished': True}
-            else:
-                self._positions.pop(book, None)
-            self._dirty = True
-        if restore:
-            self._worker.submit(self._restore_modes, restore)
-        self._worker.submit(self._save)
+        self._resume.set_finished(book, finished)

@@ -35,9 +35,10 @@ class PlayerBackend(Protocol):
 
     def play_folder(self, folder: str, recursive: bool = False) -> None: ...
 
-    def play_files(self, paths: List[str], start: int = 0, position: float = 0.0) -> None:
+    def play_files(self, paths: List[str], start: int = 0, position: float = 0.0, ordered: bool = False) -> None:
         """Replace the queue with ``paths`` (absolute or relative to the library) and play from
-        ``position`` seconds into the entry at index ``start``."""
+        ``position`` seconds into the entry at index ``start``. ``ordered`` plays the queue in order,
+        ignoring shuffle and repeat until other content is played."""
 
     def is_second_swipe(self, folder: str) -> bool: ...
 

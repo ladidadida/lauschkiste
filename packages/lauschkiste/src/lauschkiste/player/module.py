@@ -29,7 +29,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '2.1'
+    interface_version = '3.0'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -206,11 +206,12 @@ class Player(CoreModule):
         self._coordinator.play_files([song.file for song in songs])
 
     @action(path='/files')
-    def play_files(self, files: List[str], start: int = 0, position: float = 0.0) -> None:
-        """Play files of the library, from ``position`` seconds into the file at index ``start``."""
+    def play_files(self, files: List[str], start: int = 0, position: float = 0.0, ordered: bool = False) -> None:
+        """Play files of the library (or URLs), from ``position`` seconds into the file at index ``start``;
+        ``ordered`` plays them in order, ignoring shuffle and repeat."""
         if not files:
             raise OperationError(422, 'no_files', 'No files to play')
-        self._coordinator.play_files(files, start, position)
+        self._coordinator.play_files(files, start, position, ordered)
 
     @action(path='/queue')
     def queue_load(self, folder: str) -> None:

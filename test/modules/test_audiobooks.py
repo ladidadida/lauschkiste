@@ -1,12 +1,12 @@
 import json
 import time
 from fractions import Fraction
-from unittest.mock import Mock, call
+from unittest.mock import Mock
 
 import av
 import pytest
 
-import lauschkiste.audiobooks
+import lauschkiste.resume
 from lauschkiste.audiobooks import Audiobooks
 from lauschkiste.cfghandler import ConfigHandler
 from lauschkiste.contract import OperationError
@@ -61,7 +61,7 @@ def library_dir(tmp_path):
 
 @pytest.fixture
 def setup(tmp_path, library_dir, monkeypatch):
-    monkeypatch.setattr(lauschkiste.audiobooks, 'ACTIVATION_GRACE_SEC', 0)
+    monkeypatch.setattr(lauschkiste.resume, 'ACTIVATION_GRACE_SEC', 0)
     ctrl = Mock()
     ctrl.get_active_backend.return_value = 'local_audio'
     ctrl.playerstatus.return_value = {'state': 'play', 'file': 'music/Rock/01.flac', 'random': '1', 'repeat': '0'}
@@ -115,26 +115,24 @@ def test_lists_audiobooks_with_chapters_in_file_name_order(setup):
     assert books[1].duration == pytest.approx(0.3, abs=0.03)
 
 
-def test_play_continues_where_it_stopped_and_restores_shuffle(setup):
+def test_play_continues_where_it_stopped(setup):
     start, ctrl, status, state_file = setup
     audiobooks = start()
 
     audiobooks.invoke('play', 'Pippi')
-    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0)
-    ctrl.shuffle.assert_called_once_with('disable')
+    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0, True)
 
     status(file=BOOK[1], elapsed='70.0', duration='300')
     status(file=BOOK[1], state='pause', elapsed='75.5', duration='300')
     assert wait_for(lambda: state_file.exists() and json.loads(state_file.read_text())['Pippi']['elapsed'] == 75.5)
 
     status(file='music/Rock/01.flac')
-    assert wait_for(lambda: call('enable') in ctrl.shuffle.call_args_list)
     book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
     assert (book.chapter, book.elapsed) == (1, 75.5)
 
     ctrl.play_files.reset_mock()
     audiobooks.invoke('play', 'Pippi')
-    ctrl.play_files.assert_called_once_with(BOOK, 1, 65.5)
+    ctrl.play_files.assert_called_once_with(BOOK, 1, 65.5, True)
 
 
 def test_position_survives_a_restart(setup):
@@ -147,7 +145,7 @@ def test_position_survives_a_restart(setup):
     ctrl.play_files.reset_mock()
     ctrl.playerstatus.return_value = {'state': 'stop'}
     start().invoke('play', 'Pippi')
-    ctrl.play_files.assert_called_once_with(BOOK, 2, 10.0)
+    ctrl.play_files.assert_called_once_with(BOOK, 2, 10.0, True)
 
 
 def test_playing_the_active_book_again_keeps_playing_or_resumes(setup):
@@ -164,7 +162,7 @@ def test_playing_the_active_book_again_keeps_playing_or_resumes(setup):
     ctrl.play.assert_called_once()
 
     audiobooks.invoke('restart', 'Pippi')
-    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0)
+    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0, True)
 
 
 def test_reaching_the_end_marks_the_book_finished(setup):
@@ -178,7 +176,7 @@ def test_reaching_the_end_marks_the_book_finished(setup):
 
     ctrl.play_files.reset_mock()
     audiobooks.invoke('play', 'Pippi')
-    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0)
+    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0, True)
 
 
 def test_stopping_in_the_middle_keeps_the_position(setup):
