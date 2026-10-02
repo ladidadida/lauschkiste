@@ -154,28 +154,26 @@
   "library": {
     "loading-error": "An error occurred while loading the library.",
     "header": {
-      "sources-label": "Library sources",
       "views-label": "Library views",
       "search-hide": "Hide search",
       "search-show": "Show search",
       "search-label": "Search",
       "refresh": "Refresh library",
-      "overview": "Overview",
       "albums": "Albums",
       "folders": "Folders",
       "playlists": "Playlists",
       "tracks": "Tracks",
       "audiobooks": "Audiobooks",
       "radio": "Radio",
-      "podcasts": "Podcasts"
+      "podcasts": "Podcasts",
+      "continue": "Continue",
+      "music": "Music",
+      "books": "Books",
+      "sections-label": "Library sections"
     },
     "sources": {
       "mpd": "Local",
       "local": "Local"
-    },
-    "overview": {
-      "group": "{{source}} {{view}}",
-      "show-all": "Show all"
     },
     "selector-header": {
       "title": "Select an album, folder or song"
@@ -257,7 +255,7 @@
       "save-error": "Could not save."
     },
     "audiobooks": {
-      "empty": "No audiobooks yet. Put each audiobook in its own folder in \"audiobooks\" (folder view under \"Local\").",
+      "empty": "No audiobooks yet. Upload them under \"Folders\", one folder per audiobook.",
       "finished": "Finished",
       "progress": "Chapter {{chapter}} of {{chapters}} · {{progress}} %",
       "chapters_one": "{{count}} chapter",
@@ -303,6 +301,14 @@
       "progress-label": "Progress of {{title}}",
       "unsubscribe-title": "Unsubscribe from {{name}}?",
       "unsubscribe-text": "Cards playing this podcast stop working."
+    },
+    "music": {
+      "empty": "No music yet. Upload albums under \"Folders\", one folder per album.",
+      "all-sources": "All"
+    },
+    "continue": {
+      "empty": "Audiobooks in progress and new podcast episodes show up here.",
+      "new-episodes": "New episodes"
     }
   },
   "navigation": {

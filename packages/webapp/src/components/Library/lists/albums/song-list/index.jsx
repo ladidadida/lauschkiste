@@ -21,13 +21,11 @@ const SongList = ({
   isSelecting,
   provider: providerProperty,
   registerMusicToCard,
-  view: viewProperty,
 }) => {
   const { t } = useTranslation();
-  const { artist, album, provider: routeProvider, view: routeView } = useParams();
+  const { artist, album, provider: routeProvider } = useParams();
   const [searchParams] = useSearchParams();
   const provider = providerProperty || routeProvider || LOCAL_LIBRARY_SOURCE;
-  const view = viewProperty || routeView || 'albums';
   const contentUri = searchParams.get('content_uri') || undefined;
   const [songs, setSongs] = useState([]);
   const [error, setError] = useState(null);
@@ -58,7 +56,7 @@ const SongList = ({
 
   return (
     <Grid container id="song-list" size={12}>
-      <SongListHeader provider={provider} view={view} />
+      <SongListHeader />
       <SongListHeadline
         album={decodeURIComponent(album)}
         artist={decodeURIComponent(artist)}

@@ -78,9 +78,30 @@ web app's card dialog picks the type first, then the item.
 
 ## Web app
 
-Separate sections for music, audiobooks, podcasts and radio, each with its own list, uploads into
-the right folder for file-based types, and management of podcast feeds and stations. This is part
-of the web app overhaul.
+The library is organised by content type, not by source. Its tabs are:
+
+- **Continue**: audiobooks in progress and podcasts with unheard episodes.
+- **Music**: albums of all sources in one list (filter chips per source once there is more than
+  one), and a folder view of `library/music` with upload and file management.
+- **Audiobooks**: the audiobooks with progress, and a folder view of `library/audiobooks`.
+- **Radio** and **Podcasts**: stations and subscribed feeds.
+
+There is no tab per source. Setting up a source (account, server address) belongs to the settings,
+later to the plugin settings in the web app.
+
+## Sources from plugins
+
+A plugin can add content to one or more types, e.g. MPD (music, radio), Spotify (music, podcasts),
+Music Assistant (music, radio, podcasts), Audiobookshelf (audiobooks, podcasts). Each type has an
+extension point for its sources, like `library.sources` for music today:
+
+- `audiobooks.sources`, `radio.sources`, `podcasts.sources`: list items, play an item, and
+  optionally keep the position themselves (Audiobookshelf has its own progress; then Lauschkiste
+  uses it instead of its own).
+- Items and card actions carry the source (`source` argument, like `provider` for albums); without
+  it the built-in source is meant.
+
+The extension points are added with the first plugin that needs them.
 
 ## Decisions
 

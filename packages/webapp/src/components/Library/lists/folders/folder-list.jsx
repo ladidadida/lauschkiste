@@ -20,6 +20,7 @@ const FolderList = ({
   isSelecting,
   onToggleSelected,
   registerMusicToCard,
+  root = ROOT_DIR,
   selectedPaths,
 }) => {
   const { t } = useTranslation();
@@ -27,7 +28,7 @@ const FolderList = ({
   const getParentDir = (dir) => {
     const decodedDir = decodeURIComponent(dir);
 
-    if (decodedDir === ROOT_DIR) return undefined;
+    if (decodedDir === ROOT_DIR || decodedDir === root) return undefined;
 
     const parentDir = dropLast(1, decodedDir.split('/')).join('/') || ROOT_DIR;
     return parentDir;

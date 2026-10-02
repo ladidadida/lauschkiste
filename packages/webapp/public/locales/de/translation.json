@@ -154,28 +154,26 @@
   "library": {
     "loading-error": "Die Bibliothek konnte nicht geladen werden.",
     "header": {
-      "sources-label": "Bibliotheksquellen",
       "views-label": "Bibliotheksansichten",
       "search-hide": "Suche ausblenden",
       "search-show": "Suche einblenden",
       "search-label": "Suche",
       "refresh": "Bibliothek aktualisieren",
-      "overview": "Übersicht",
       "albums": "Alben",
       "folders": "Ordner",
       "playlists": "Playlists",
       "tracks": "Titel",
       "audiobooks": "Hörbücher",
       "radio": "Radio",
-      "podcasts": "Podcasts"
+      "podcasts": "Podcasts",
+      "continue": "Weiterhören",
+      "music": "Musik",
+      "books": "Bücher",
+      "sections-label": "Bereiche der Bibliothek"
     },
     "sources": {
       "mpd": "Lokal",
       "local": "Lokal"
-    },
-    "overview": {
-      "group": "{{source}}: {{view}}",
-      "show-all": "Alle anzeigen"
     },
     "selector-header": {
       "title": "Wähle ein Album, einen Ordner oder einen Song aus"
@@ -257,7 +255,7 @@
       "save-error": "Speichern fehlgeschlagen."
     },
     "audiobooks": {
-      "empty": "Noch keine Hörbücher. Lege jedes Hörbuch als eigenen Ordner in „audiobooks“ ab (Ordneransicht unter „Lokal“).",
+      "empty": "Noch keine Hörbücher. Lade sie unter „Ordner“ hoch, je Hörbuch ein Ordner.",
       "finished": "Fertig gehört",
       "progress": "Kapitel {{chapter}} von {{chapters}} · {{progress}} %",
       "chapters_one": "{{count}} Kapitel",
@@ -303,6 +301,14 @@
       "progress-label": "Fortschritt von {{title}}",
       "unsubscribe-title": "{{name}} abbestellen?",
       "unsubscribe-text": "Karten, die diesen Podcast abspielen, funktionieren danach nicht mehr."
+    },
+    "music": {
+      "empty": "Noch keine Musik. Lade Alben unter „Ordner“ hoch, je Album ein Ordner.",
+      "all-sources": "Alle"
+    },
+    "continue": {
+      "empty": "Hier erscheinen angefangene Hörbücher und neue Podcast-Folgen.",
+      "new-episodes": "Neue Folgen"
     }
   },
   "navigation": {

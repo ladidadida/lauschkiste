@@ -24,13 +24,13 @@ import { coverSrc, toHHMMSS } from '../../../utils/utils';
 import { LIBRARY_SCANNED_TOPIC } from '../../../config';
 import ItemMenu from './item-menu';
 
-const progressOf = ({ duration, finished, listened }) => {
+export const progressOf = ({ duration, finished, listened }) => {
   if (finished) return 100;
   if (!duration) return 0;
   return Math.min(100, Math.round((listened / duration) * 100));
 };
 
-const AudiobookItem = ({ book, onChanged, showCovers }) => {
+export const AudiobookItem = ({ book, onChanged, showCovers }) => {
   const { t } = useTranslation();
   const progress = progressOf(book);
   const started = progress > 0 && !book.finished;

@@ -32,9 +32,10 @@ const Folders = ({
   musicFilter,
   isSelecting,
   registerMusicToCard,
+  root = ROOT_DIR,
 }) => {
   const { t } = useTranslation();
-  const { dir = ROOT_DIR } = useParams();
+  const { dir = root } = useParams();
   const [folders, setFolders] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -200,6 +201,7 @@ const Folders = ({
       {!isLoading && !error && (!musicFilter || filteredFolders.length > 0) &&
         <FolderList
           dir={dir}
+          root={root}
           folders={filteredFolders}
           isManagementSelecting={isManagementSelecting}
           isSelecting={isSelecting}

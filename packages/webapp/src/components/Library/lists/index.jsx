@@ -8,16 +8,13 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 
-import {
-  CircularProgress,
-  Grid,
-} from '@mui/material';
+import { Grid } from '@mui/material';
 
 import Albums from './albums';
-import LibraryOverview from './overview';
 import SongList from './albums/song-list';
 import Folders from './folders';
 import Audiobooks from '../content/audiobooks';
+import Continue from '../content/continue';
 import PodcastEpisodes from '../content/podcast-episodes';
 import Podcasts from '../content/podcasts';
 import Radio from '../content/radio';
@@ -28,24 +25,7 @@ import { buildActionData } from '../../Cards/utils';
 import request from '../../../utils/request';
 import { LOCAL_LIBRARY_SOURCE } from '../../../config';
 
-const LOCAL_SOURCE = {
-  id: LOCAL_LIBRARY_SOURCE,
-  label: 'Local',
-  views: [
-    {
-      id: 'albums',
-      label: 'Albums',
-      kind: 'items',
-      content_types: ['album'],
-    },
-    {
-      id: 'folders',
-      label: 'Folders',
-      kind: 'folders',
-      content_types: [],
-    },
-  ],
-};
+const LOCAL_SOURCE = { id: LOCAL_LIBRARY_SOURCE, label: 'Local' };
 
 const RedirectWithSearch = ({ to }) => {
   const [searchParams] = useSearchParams();
@@ -53,106 +33,13 @@ const RedirectWithSearch = ({ to }) => {
   return <Navigate to={`${to}${search ? `?${search}` : ''}`} replace />;
 };
 
-const findSourceView = (sources, provider, view) => (
-  sources
-    .find(({ id }) => id === provider)
-    ?.views?.find(({ id }) => id === view)
-);
-
-const LibrarySourceView = ({
-  isSelecting,
-  isLoadingSources,
-  musicFilter,
-  sources,
-}) => {
-  const { provider, view } = useParams();
-  const sourceView = findSourceView(sources, provider, view);
-
-  if (!sourceView && isLoadingSources) return <CircularProgress />;
-  if (!sourceView) return <RedirectWithSearch to="/library/overview" />;
-  if (sourceView.kind === 'folders') {
-    return (
-      <RedirectWithSearch
-        to={`/library/${provider}/${view}/.%2F`}
-      />
-    );
-  }
-
-  return (
-    <Albums
-      contentTypes={sourceView.content_types}
-      isSelecting={isSelecting}
-      musicFilter={musicFilter}
-      provider={provider}
-      view={view}
-    />
-  );
-};
-
-const LibraryFolderView = ({
-  isLoadingSources,
-  isSelecting,
-  musicFilter,
-  registerMusicToCard,
-  sources,
-}) => {
-  const { provider, view } = useParams();
-  const sourceView = findSourceView(sources, provider, view);
-
-  if (!sourceView && isLoadingSources) return <CircularProgress />;
-  if (sourceView?.kind !== 'folders') {
-    return <RedirectWithSearch to="/library/overview" />;
-  }
-
-  return (
-    <Folders
-      musicFilter={musicFilter}
-      isSelecting={isSelecting}
-      registerMusicToCard={registerMusicToCard}
-    />
-  );
-};
-
-const LibraryItemView = ({
-  isLoadingSources,
-  isSelecting,
-  registerMusicToCard,
-  sources,
-}) => {
-  const { provider, view } = useParams();
-  const sourceView = findSourceView(sources, provider, view);
-
-  if (!sourceView && isLoadingSources) return <CircularProgress />;
-  if (!sourceView || sourceView.kind === 'folders') {
-    return <RedirectWithSearch to="/library/overview" />;
-  }
-
-  return (
-    <SongList
-      isSelecting={isSelecting}
-      provider={provider}
-      registerMusicToCard={registerMusicToCard}
-      view={view}
-    />
-  );
-};
-
-const LegacyAlbumRedirect = () => {
-  const { artist, album } = useParams();
-  return (
-    <RedirectWithSearch
-      to={`/library/${LOCAL_LIBRARY_SOURCE}/albums/${encodeURIComponent(artist)}/${encodeURIComponent(album)}`}
-    />
-  );
-};
-
-const LegacyFolderRedirect = () => {
+const FolderView = ({ root, ...props }) => {
   const { dir } = useParams();
-  return (
-    <RedirectWithSearch
-      to={`/library/${LOCAL_LIBRARY_SOURCE}/folders/${encodeURIComponent(dir)}`}
-    />
-  );
+  const folder = decodeURIComponent(dir || root);
+  if (folder !== root && !folder.startsWith(`${root}/`)) {
+    return <RedirectWithSearch to={`/library/${root}/folders/${encodeURIComponent(root)}`} />;
+  }
+  return <Folders root={root} {...props} />;
 };
 
 const LibraryLists = () => {
@@ -162,17 +49,12 @@ const LibraryLists = () => {
   const [cardId] = useState(searchParams.get('cardId'));
   const [musicFilter, setMusicFilter] = useState('');
   const [sources, setSources] = useState([LOCAL_SOURCE]);
-  const [isLoadingSources, setIsLoadingSources] = useState(true);
 
   useEffect(() => {
     let isCurrent = true;
-    const fetchSources = async () => {
-      const { result } = await request('librarySources');
-      if (!isCurrent) return;
-      if (result?.length) setSources(result);
-      setIsLoadingSources(false);
-    };
-    fetchSources();
+    request('librarySources').then(({ result }) => {
+      if (isCurrent && result?.length) setSources(result);
+    });
     return () => {
       isCurrent = false;
     };
@@ -184,15 +66,10 @@ const LibraryLists = () => {
 
   const registerMusicToCard = (command, args) => {
     const actionData = buildActionData('play_music', command, args);
-    const state = {
-      registerCard: {
-        actionData,
-        cardId,
-      },
-    };
-
-    navigate('/cards/register', { state });
+    navigate('/cards/register', { state: { registerCard: { actionData, cardId } } });
   };
+
+  const folderProps = { isSelecting, musicFilter, registerMusicToCard };
 
   return (
     <Grid container id="library">
@@ -200,9 +77,8 @@ const LibraryLists = () => {
       <Grid container size={12} sx={{ padding: '10px' }}>
         <LibraryHeader
           handleMusicFilter={handleMusicFilter}
+          isSelecting={Boolean(isSelecting)}
           musicFilter={musicFilter}
-          showContentTabs={!isSelecting}
-          sources={sources}
         />
         <Grid
           container
@@ -214,75 +90,34 @@ const LibraryLists = () => {
           }}
         >
           <Routes>
+            <Route path="continue" element={<Continue musicFilter={musicFilter} />} />
+            <Route path="music" element={<RedirectWithSearch to="/library/music/albums" />} />
             <Route
-              path="overview"
-              element={
-                <LibraryOverview
-                  musicFilter={musicFilter}
-                  sources={sources}
-                />
-              }
-              exact
+              path="music/albums"
+              element={<Albums musicFilter={musicFilter} sources={sources} />}
             />
+            <Route
+              path="music/folders"
+              element={<RedirectWithSearch to="/library/music/folders/music" />}
+            />
+            <Route path="music/folders/:dir" element={<FolderView root="music" {...folderProps} />} />
             <Route path="audiobooks" element={<Audiobooks musicFilter={musicFilter} />} />
+            <Route
+              path="audiobooks/folders"
+              element={<RedirectWithSearch to="/library/audiobooks/folders/audiobooks" />}
+            />
+            <Route
+              path="audiobooks/folders/:dir"
+              element={<FolderView root="audiobooks" {...folderProps} />}
+            />
             <Route path="radio" element={<Radio musicFilter={musicFilter} />} />
             <Route path="podcasts" element={<Podcasts musicFilter={musicFilter} />} />
             <Route path="podcasts/:podcast" element={<PodcastEpisodes musicFilter={musicFilter} />} />
             <Route
-              path=":provider/:view"
-              element={
-                <LibrarySourceView
-                  isSelecting={isSelecting}
-                  isLoadingSources={isLoadingSources}
-                  musicFilter={musicFilter}
-                  sources={sources}
-                />
-              }
-              exact
+              path=":provider/albums/:artist/:album"
+              element={<SongList isSelecting={isSelecting} registerMusicToCard={registerMusicToCard} />}
             />
-            <Route
-              path=":provider/:view/:dir"
-              element={
-                <LibraryFolderView
-                  isLoadingSources={isLoadingSources}
-                  isSelecting={isSelecting}
-                  musicFilter={musicFilter}
-                  registerMusicToCard={registerMusicToCard}
-                  sources={sources}
-                />
-              }
-            />
-            <Route
-              path=":provider/:view/:artist/:album"
-              element={
-                <LibraryItemView
-                  isLoadingSources={isLoadingSources}
-                  isSelecting={isSelecting}
-                  registerMusicToCard={registerMusicToCard}
-                  sources={sources}
-                />
-              }
-            />
-            <Route
-              path="albums"
-              element={<RedirectWithSearch to={`/library/${LOCAL_LIBRARY_SOURCE}/albums`} />}
-            />
-            <Route
-              path="albums/:artist/:album"
-              element={<LegacyAlbumRedirect />}
-            />
-            <Route
-              path="folders"
-              element={<RedirectWithSearch to={`/library/${LOCAL_LIBRARY_SOURCE}/folders/.%2F`} />}
-            />
-            <Route
-              path="folders/:dir"
-              element={<LegacyFolderRedirect />}
-            />
-            <Route
-              path="*"
-              element={<RedirectWithSearch to="/library/overview" />}
-            />
+            <Route path="*" element={<RedirectWithSearch to="/library/music/albums" />} />
           </Routes>
         </Grid>
       </Grid>
