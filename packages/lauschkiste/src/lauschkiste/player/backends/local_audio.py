@@ -376,10 +376,14 @@ class PlayerLocalAudio:
     def move(self):
         raise NotImplementedError
 
+    def _absolute(self, path):
+        root = os.path.expanduser(lauschkiste.library.root() or '')
+        return path if os.path.isabs(path) or '://' in path else os.path.join(root, path)
+
     def play_single(self, song_url):
         with self._cv:
             self._ordered = False
-            self._queue = [song_url]
+            self._queue = [self._absolute(song_url)]
             self._index = 0
             self._position = 0.0
             self._state = 'play'
@@ -420,8 +424,7 @@ class PlayerLocalAudio:
         self._status_store.save_to_json()
 
     def play_files(self, paths, start=0, position=0.0, ordered=False):
-        root = os.path.expanduser(lauschkiste.library.root() or '')
-        queue = [p if os.path.isabs(p) or '://' in p else os.path.join(root, p) for p in paths]
+        queue = [self._absolute(p) for p in paths]
         with self._cv:
             self._ordered = bool(ordered)
             self._queue = queue

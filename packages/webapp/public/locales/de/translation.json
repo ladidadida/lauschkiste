@@ -372,6 +372,13 @@
         "podcast": "Folgenende",
         "radio": ""
       }
+    },
+    "search": {
+      "title": "Musik suchen",
+      "label": "Titel, Interpret oder Album",
+      "nothing": "Nichts gefunden.",
+      "albums": "Alben",
+      "songs": "Titel"
     }
   },
   "settings": {

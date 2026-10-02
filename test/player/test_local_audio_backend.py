@@ -326,3 +326,12 @@ def test_stop_after_current_is_reported_and_cleared_by_stop():
     assert backend.playerstatus()['stop_after_current'] == '1'
     backend.stop()
     assert backend.playerstatus()['stop_after_current'] == '0'
+
+
+def test_play_single_resolves_library_paths(tmp_path, monkeypatch):
+    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    backend = local_audio_backend()
+    backend.play_single('music/a/01.mp3')
+    assert backend._queue == [str(tmp_path / 'music' / 'a' / '01.mp3')]
+    backend.play_single('https://example.org/stream')
+    assert backend._queue == ['https://example.org/stream']

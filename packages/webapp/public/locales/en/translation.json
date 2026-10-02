@@ -372,6 +372,13 @@
         "podcast": "End of episode",
         "radio": ""
       }
+    },
+    "search": {
+      "title": "Search music",
+      "label": "Title, artist or album",
+      "nothing": "Nothing found.",
+      "albums": "Albums",
+      "songs": "Songs"
     }
   },
   "settings": {

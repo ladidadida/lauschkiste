@@ -18,6 +18,10 @@ const commands = {
     rest: { method: 'GET', path: '/api/v1/library/song' },
     argKeys: ['song_url', 'provider']
   },
+  librarySearch: {
+    rest: { method: 'GET', path: '/api/v1/library/search' },
+    argKeys: ['query'],
+  },
   cardsList: {
     rest: { method: 'GET', path: '/api/v1/cards' },
   },
