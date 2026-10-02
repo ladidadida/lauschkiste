@@ -3,6 +3,8 @@ import threading
 import wave
 from unittest.mock import Mock
 
+import pytest
+
 import lauschkiste.library
 from lauschkiste.audio_output import PortAudioSink, scale_volume
 from lauschkiste.player.backends.local_audio import PlayerLocalAudio
@@ -47,6 +49,7 @@ def local_audio_backend(**attrs):
     backend._repeat_mode = 'off'
     backend._ordered = False
     backend._stop_after_current = False
+    backend._speed = 1.0
     backend._volume = 100
     backend._last_played_folder = ''
     backend._status_store = _FakeStatusStore()
@@ -199,6 +202,7 @@ def test_playerstatus_shape():
         'repeat': '0',
         'single': '0',
         'stop_after_current': '0',
+        'speed': '1.00',
         'provider': 'local_audio',
     }
     assert backend.get_current_song(None) == status
@@ -335,3 +339,40 @@ def test_play_single_resolves_library_paths(tmp_path, monkeypatch):
     assert backend._queue == [str(tmp_path / 'music' / 'a' / '01.mp3')]
     backend.play_single('https://example.org/stream')
     assert backend._queue == ['https://example.org/stream']
+
+
+def test_speed_applies_to_ordered_content_only(tmp_path, monkeypatch):
+    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    backend = local_audio_backend()
+    backend.set_speed(1.5)
+    backend.play_files(['b/01.mp3'], ordered=True)
+    assert backend.playerstatus()['speed'] == '1.50'
+    backend.play_files(['m/01.mp3'])
+    assert backend.playerstatus()['speed'] == '1.00'
+    backend.set_speed(5)
+    backend.play_files(['b/01.mp3'], ordered=True)
+    assert backend.playerstatus()['speed'] == '2.00'
+
+
+def test_jump_within_the_queue(tmp_path, monkeypatch):
+    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    backend = local_audio_backend()
+    backend.play_files(['a/1.mp3', 'a/2.mp3', 'a/3.mp3'])
+    backend.jump(2)
+    assert (backend._index, backend._position) == (2, 0.0)
+    backend.jump(7)
+    assert backend._index == 2
+
+
+def test_decode_track_at_higher_speed_writes_less_audio(tmp_path):
+    wav_path = tmp_path / 'tone.wav'
+    write_wav(wav_path, duration_s=2.0)
+    normal = local_audio_backend()
+    normal._decode_track(str(wav_path), 0.0)
+    fast = local_audio_backend(_ordered=True, _speed=1.5)
+    fast._decode_track(str(wav_path), 0.0)
+
+    normal_bytes = sum(len(c) for c in normal._sink.chunks)
+    fast_bytes = sum(len(c) for c in fast._sink.chunks)
+    assert fast_bytes == pytest.approx(normal_bytes / 1.5, rel=0.1)
+    assert fast._position == pytest.approx(normal._position, rel=0.1)

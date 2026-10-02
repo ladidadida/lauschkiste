@@ -191,3 +191,12 @@ def test_player_status_gets_library_metadata(modules, music):
     assert status.title == 'First'
     assert status.albumartist == 'The Band'
     assert status.cover_url.endswith('.png')
+
+
+def test_player_queue_has_library_titles(modules):
+    manager, ctrl, _ = modules
+    ctrl.playlistinfo.return_value = [{'file': 'music/Rock/01.flac', 'pos': '0'},
+                                      {'file': 'https://radio.example/live', 'pos': '1'}]
+    queue = manager.handle('player').invoke('get_queue')
+    assert [(e.position, e.title) for e in queue] == [(0, 'First'), (1, None)]
+    assert queue[0].duration == pytest.approx(0.2, abs=0.05)

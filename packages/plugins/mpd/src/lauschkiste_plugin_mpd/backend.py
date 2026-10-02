@@ -517,6 +517,10 @@ class PlayerMPD:
             self.mpd_client.repeat(saved['repeat'])
             self.mpd_client.single(saved['single'])
 
+    def jump(self, position):
+        with self.mpd_lock:
+            self.mpd_client.play(int(position))
+
     def stop_after_current(self, enabled=True):
         with self.mpd_lock:
             self.mpd_client.single('oneshot' if enabled else 0)

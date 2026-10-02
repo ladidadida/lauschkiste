@@ -20,6 +20,7 @@ import random
 import threading
 
 import av
+from fractions import Fraction
 import sounddevice as sd
 from av.audio.resampler import AudioResampler
 
@@ -65,6 +66,7 @@ class PlayerLocalAudio:
         self._repeat_mode = 'off'      # 'off' | 'repeat' | 'single'
         self._ordered = False          # play the queue in order, ignoring shuffle and repeat
         self._stop_after_current = False
+        self._speed = 1.0              # for ordered content (audiobooks, podcasts) only
         self._volume = int(cfg.getn('player', 'volume', default=100))
         self._last_played_folder = self._status_store.get('last_played_folder', '')
 
@@ -169,9 +171,46 @@ class PlayerLocalAudio:
         finally:
             container.close()
 
+    def _effective_speed(self) -> float:
+        return self._speed if self._ordered else 1.0
+
+    def _tempo_filter(self, speed: float):
+        graph = av.filter.Graph()
+        source = graph.add_abuffer(format='s16', sample_rate=SAMPLE_RATE, layout='stereo',
+                                   time_base=Fraction(1, SAMPLE_RATE))
+        tempo = graph.add('atempo', f'{speed:.3f}')
+        sink = graph.add('abuffersink')
+        source.link_to(tempo)
+        tempo.link_to(sink)
+        graph.configure()
+        return graph
+
+    def _output(self, frames, speed: float, graph):
+        """Write resampled frames (through the tempo filter unless at normal speed); False if aborted."""
+        for rframe in frames:
+            if self._abort.is_set():
+                return False
+            if graph is None:
+                out = [rframe]
+            else:
+                graph.push(rframe)
+                out = []
+                while True:
+                    try:
+                        out.append(graph.pull())
+                    except (av.error.BlockingIOError, av.error.EOFError):
+                        break
+            for oframe in out:
+                n = oframe.samples * CHANNELS * 2
+                self._sink.write(scale_volume(bytes(oframe.planes[0])[:n], self._volume))
+                self._position += oframe.samples / SAMPLE_RATE * speed
+        return True
+
     def _decode_loop(self, container, start_position: float) -> bool:
         stream = container.streams.audio[0]
         resampler = AudioResampler(format='s16', layout='stereo', rate=SAMPLE_RATE)
+        speed = self._effective_speed()
+        graph = self._tempo_filter(speed) if abs(speed - 1.0) > 0.01 else None
         if start_position:
             try:
                 container.seek(int(start_position * 1_000_000), backward=True)
@@ -185,13 +224,8 @@ class PlayerLocalAudio:
                     return False
                 if is_stream and count % 50 == 0:
                     self._stream_metadata = dict(container.metadata)
-                for rframe in resampler.resample(frame):
-                    if self._abort.is_set():
-                        return False
-                    n = rframe.samples * CHANNELS * 2
-                    data = bytes(rframe.planes[0])[:n]
-                    self._sink.write(scale_volume(data, self._volume))
-                    self._position += rframe.samples / SAMPLE_RATE
+                if not self._output(resampler.resample(frame), speed, graph):
+                    return False
             return True
         finally:
             self._sink.close()
@@ -256,6 +290,7 @@ class PlayerLocalAudio:
             'repeat': '1' if repeat_mode in ('repeat', 'single') else '0',
             'single': '1' if repeat_mode == 'single' else '0',
             'stop_after_current': '1' if self._stop_after_current else '0',
+            'speed': f'{self._effective_speed():.2f}',
             'provider': 'local_audio',
         }
         metadata = self._stream_metadata
@@ -359,6 +394,19 @@ class PlayerLocalAudio:
                 self._repeat_mode = 'off'
             else:
                 logger.error(f"'{option}' does not exist for 'repeat'")
+
+    def jump(self, position):
+        with self._cv:
+            if not 0 <= int(position) < len(self._queue):
+                return
+        self._jump_to(int(position))
+
+    def set_speed(self, speed):
+        with self._cv:
+            self._speed = min(max(float(speed), 0.5), 2.0)
+            if self._ordered and self._state == 'play':
+                self._abort.set()
+                self._cv.notify_all()
 
     def stop_after_current(self, enabled=True):
         with self._cv:

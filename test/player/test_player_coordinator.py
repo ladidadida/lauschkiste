@@ -61,6 +61,8 @@ def test_rejects_invalid_backend_registrations():
         ('repeat', (), ('toggle',)),
         ('repeat', ('disable',), ('disable',)),
         ('stop_after_current', (), (True,)),
+        ('jump', (3,), (3,)),
+        ('set_speed', (1.25,), (1.25,)),
         ('stop_after_current', (False,), (False,)),
         ('get_current_song', ('title',), ('title',)),
         ('map_filename_to_playlist_pos', ('song.mp3',), ('song.mp3',)),

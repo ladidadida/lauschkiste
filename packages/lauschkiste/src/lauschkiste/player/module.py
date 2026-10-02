@@ -21,6 +21,13 @@ class VolumeLevel(BaseModel):
     volume: int
 
 
+class QueueEntry(BaseModel):
+    position: int
+    file: str
+    title: Optional[str] = None
+    duration: Optional[float] = None
+
+
 class BackendName(BaseModel):
     name: Optional[str] = None
 
@@ -29,7 +36,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '4.0'
+    interface_version = '5.0'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -164,6 +171,36 @@ class Player(CoreModule):
     def repeat(self, option: str = 'toggle') -> None:
         """Repeat mode: 'toggle', 'enable', 'enable_repeat_single' or 'disable'."""
         self._coordinator.repeat(option)
+
+    @action(path='/jump')
+    def jump(self, position: int) -> None:
+        """Play the entry at ``position`` of the queue."""
+        self._coordinator.jump(position)
+
+    @action(path='/speed')
+    def set_speed(self, speed: float) -> None:
+        """Playback speed (0.5 to 2.0) of audiobooks and podcasts; music and radio always play at 1.0."""
+        try:
+            self._coordinator.set_speed(speed)
+        except NotImplementedError as error:
+            raise OperationError(501, 'not_supported', str(error)) from None
+
+    @query(path='/queue')
+    def get_queue(self) -> List[QueueEntry]:
+        """The queue with title and duration from the library."""
+        library = self._ctx.modules.library
+        entries = []
+        for position, item in enumerate(self._coordinator.playlistinfo() or []):
+            file = str(item.get('file') or '')
+            song = None
+            if file and '://' not in file:
+                try:
+                    song = library.get_song(file)
+                except Exception:
+                    song = None
+            entries.append(QueueEntry(position=position, file=file, title=(song.title if song else None)
+                                      or item.get('title'), duration=song.duration if song else None))
+        return entries
 
     @action(path='/stop-after-current')
     def stop_after_current(self, enabled: bool = True) -> None:

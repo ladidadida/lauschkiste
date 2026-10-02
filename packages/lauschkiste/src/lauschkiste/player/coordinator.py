@@ -179,6 +179,13 @@ class PlayerCoordinator:
     def repeat(self, option='toggle'):
         return self._call_active('repeat', option)
 
+    def jump(self, position):
+        return self._call_active('jump', position)
+
+    def set_speed(self, speed):
+        """Optional for backends; NotImplementedError if the active one can't change the speed."""
+        return self._call_active('set_speed', speed)
+
     def stop_after_current(self, enabled=True):
         return self._call_active('stop_after_current', enabled)
 

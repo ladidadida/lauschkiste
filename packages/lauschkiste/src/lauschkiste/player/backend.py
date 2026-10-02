@@ -31,6 +31,9 @@ class PlayerBackend(Protocol):
 
     def repeat(self, option: str = 'toggle') -> None: ...
 
+    def jump(self, position: int) -> None:
+        """Play the queue entry at ``position``."""
+
     def stop_after_current(self, enabled: bool = True) -> None:
         """Stop once the current entry has played to its end."""
 

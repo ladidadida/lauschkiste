@@ -165,6 +165,10 @@
           "default": false,
           "type": "boolean"
         },
+        "speed": {
+          "default": 1.0,
+          "type": "number"
+        },
         "state": {
           "default": "stop",
           "enum": [
@@ -212,6 +216,7 @@
       "exit": "(self) -> Any",
       "get_volume": "(self) -> int",
       "is_second_swipe": "(self, folder: str) -> bool",
+      "jump": "(self, position: int) -> None",
       "next": "(self) -> None",
       "pause": "(self, state: int = 1) -> None",
       "play": "(self) -> None",
@@ -233,7 +238,7 @@
       "toggle": "(self) -> None"
     }
   },
-  "interface_version": "4.0",
+  "interface_version": "5.0",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -325,6 +330,56 @@
         "type": "string"
       }
     },
+    "get_queue": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/player/queue",
+      "returns": {
+        "items": {
+          "properties": {
+            "duration": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "file": {
+              "type": "string"
+            },
+            "position": {
+              "type": "integer"
+            },
+            "title": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            }
+          },
+          "required": [
+            "position",
+            "file"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
     "get_volume": {
       "args": {
         "additionalProperties": false,
@@ -344,6 +399,26 @@
           "volume"
         ],
         "type": "object"
+      }
+    },
+    "jump": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "position": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "position"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/player/jump",
+      "returns": {
+        "type": "null"
       }
     },
     "list_backends": {
@@ -792,6 +867,10 @@
             "default": false,
             "type": "boolean"
           },
+          "speed": {
+            "default": 1.0,
+            "type": "number"
+          },
           "state": {
             "default": "stop",
             "enum": [
@@ -1005,6 +1084,26 @@
           }
         },
         "type": "object"
+      }
+    },
+    "set_speed": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "speed": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "speed"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/player/speed",
+      "returns": {
+        "type": "null"
       }
     },
     "set_volume": {

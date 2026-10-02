@@ -35,6 +35,7 @@ class PlayerStatus(BaseModel):
     repeat: bool = False
     single: bool = False
     stop_after_current: bool = False
+    speed: float = 1.0
     cover_url: Optional[str] = None
     context: Optional[PlaybackContext] = None
 
@@ -81,6 +82,7 @@ def status_from_backend(raw: Mapping[str, Any], provider: str) -> PlayerStatus:
         random=_flag(raw.get('random')),
         repeat=_flag(raw.get('repeat')),
         single=_flag(raw.get('single')),
+        speed=_number(raw.get('speed')) or 1.0,
         stop_after_current=_flag(raw.get('stop_after_current')) or raw.get('single') == 'oneshot',
         cover_url=_text(raw.get('cover_url')),
     )
