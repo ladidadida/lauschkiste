@@ -67,8 +67,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `GET /api/v1/modules` (active modules, their operations/events, skipped plugins) and
   `GET /api/v1/actions` (card actions with argument schemas). Card entries, card removal actions
   and the second-swipe action are stored as `action: <module>.<action>` plus named `args`
-  (`documentation/builders/actions.md`); the old alias/package-plugin-method format is converted
-  by `lauschkiste.legacy_actions` (cards.yaml is migrated on start-up with a backup). ZeroMQ, the
+  (`documentation/builders/actions.md`). ZeroMQ, the
   generic HTTP RPC endpoint and the old call registry are gone. A first CLI slice exists
   (`packages/cli`, `lauschkiste`/`lauschctl debug sniff`), but a dedicated CLI for the API is not
   designed yet.
