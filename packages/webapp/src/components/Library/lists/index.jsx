@@ -17,6 +17,10 @@ import Albums from './albums';
 import LibraryOverview from './overview';
 import SongList from './albums/song-list';
 import Folders from './folders';
+import Audiobooks from '../content/audiobooks';
+import PodcastEpisodes from '../content/podcast-episodes';
+import Podcasts from '../content/podcasts';
+import Radio from '../content/radio';
 import LibraryHeader from "../library-header";
 import SelectorHeader from "../selector-header";
 
@@ -197,6 +201,7 @@ const LibraryLists = () => {
         <LibraryHeader
           handleMusicFilter={handleMusicFilter}
           musicFilter={musicFilter}
+          showContentTabs={!isSelecting}
           sources={sources}
         />
         <Grid
@@ -219,6 +224,10 @@ const LibraryLists = () => {
               }
               exact
             />
+            <Route path="audiobooks" element={<Audiobooks musicFilter={musicFilter} />} />
+            <Route path="radio" element={<Radio musicFilter={musicFilter} />} />
+            <Route path="podcasts" element={<Podcasts musicFilter={musicFilter} />} />
+            <Route path="podcasts/:podcast" element={<PodcastEpisodes musicFilter={musicFilter} />} />
             <Route
               path=":provider/:view"
               element={

@@ -73,3 +73,19 @@ test('timer cards share the timers.start action and keep their timer name', () =
     .toBe('timer_fade_volume');
   expect(findCommandByCardAction('timers.start', { timer: 'stop_player' })).toBe('timer_stop_player');
 });
+
+test('content card actions build named args and are found again', () => {
+  const book = buildActionData('audiobooks', 'audiobook_play', { book: 'Pippi' });
+  expect(buildCardEntry(book)).toEqual({ action: 'audiobooks.play', args: { book: 'Pippi' } });
+
+  const station = buildActionData('radio', 'radio_play', { station: 'dlf' });
+  expect(buildCardEntry(station)).toEqual({ action: 'radio.play', args: { station: 'dlf' } });
+
+  const newest = buildActionData('podcasts', 'podcast_play', { podcast: 'kakadu' });
+  expect(buildCardEntry(newest)).toEqual({ action: 'podcasts.play', args: { podcast: 'kakadu' } });
+  const episode = buildActionData('podcasts', 'podcast_play', { podcast: 'kakadu', episode: 'abc' });
+  expect(buildCardEntry(episode).args).toEqual({ podcast: 'kakadu', episode: 'abc' });
+
+  expect(findCommandByCardAction('audiobooks.restart', { book: 'x' })).toBe('audiobook_restart');
+  expect(findCommandByCardAction('podcasts.play', { podcast: 'x' })).toBe('podcast_play');
+});

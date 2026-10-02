@@ -86,4 +86,16 @@ const request = async (command, kwargs = {}) => {
   };
 };
 
+// The message of an API error ({"error": {"message"}}) carried by a failed request, if any.
+const requestErrorMessage = (error) => {
+  const body = String(error?.message || '').split(': ').slice(1).join(': ');
+  try {
+    return JSON.parse(body)?.error?.message || null;
+  }
+  catch {
+    return null;
+  }
+};
+
+export { requestErrorMessage };
 export default request;

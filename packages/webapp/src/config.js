@@ -4,6 +4,8 @@ const LOCAL_LIBRARY_SOURCE = 'local';
 const PLAYER_STATUS_TOPIC = 'player.status';
 const CARD_DETECTED_TOPIC = 'rfid.card_detected';
 const LIBRARY_SCANNED_TOPIC = 'library.scanned';
+const PODCASTS_TOPIC = 'podcasts.changed';
+const RADIO_TOPIC = 'radio.changed';
 const SYSTEM_INFO_TOPIC = 'system.info';
 const SYSTEM_HEALTH_TOPIC = 'system.health';
 const TIMERS_TOPIC = 'timers.changed';
@@ -15,6 +17,8 @@ const SUBSCRIPTIONS = [
   BATTERY_TOPIC,
   CARD_DETECTED_TOPIC,
   LIBRARY_SCANNED_TOPIC,
+  PODCASTS_TOPIC,
+  RADIO_TOPIC,
   SYSTEM_HEALTH_TOPIC,
   SYSTEM_INFO_TOPIC,
   TIMERS_TOPIC,
@@ -38,6 +42,25 @@ const ACTIONS_MAP = {
       play_folder: {},
       play_single: {},
     }
+  },
+
+  audiobooks: {
+    commands: {
+      audiobook_play: {},
+      audiobook_restart: {},
+    },
+  },
+
+  radio: {
+    commands: {
+      radio_play: {},
+    },
+  },
+
+  podcasts: {
+    commands: {
+      podcast_play: {},
+    },
   },
 
   // Audio & Volume
@@ -83,7 +106,9 @@ export {
   LIBRARY_SCANNED_TOPIC,
   LOCAL_LIBRARY_SOURCE,
   PLAYER_STATUS_TOPIC,
+  PODCASTS_TOPIC,
   PUBSUB_ENDPOINT,
+  RADIO_TOPIC,
   ROOT_DIR,
   SUBSCRIPTIONS,
   SYSTEM_HEALTH_TOPIC,

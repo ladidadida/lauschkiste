@@ -55,3 +55,22 @@ describe('LibraryHeader refresh', () => {
     expect(button).toBeEnabled();
   });
 });
+
+describe('LibraryHeader content tabs', () => {
+  test('shows audiobooks, radio and podcasts unless selecting for a card', () => {
+    const { unmount } = renderHeader();
+    for (const tab of ['audiobooks', 'radio', 'podcasts']) {
+      expect(screen.getByRole('tab', { name: `library.header.${tab}` })).toBeInTheDocument();
+    }
+    unmount();
+
+    render(
+      <PubSubContext.Provider value={{ state: {} }}>
+        <MemoryRouter initialEntries={['/library/overview']}>
+          <LibraryHeader handleMusicFilter={() => {}} musicFilter="" showContentTabs={false} sources={[]} />
+        </MemoryRouter>
+      </PubSubContext.Provider>,
+    );
+    expect(screen.queryByRole('tab', { name: 'library.header.radio' })).not.toBeInTheDocument();
+  });
+});

@@ -25,7 +25,9 @@ import { LIBRARY_SCANNED_TOPIC } from '../../config';
 // Stop the spinner even if the scan event never arrives
 const REFRESH_TIMEOUT_MS = 60000;
 
-const LibraryHeader = ({ handleMusicFilter, musicFilter, sources }) => {
+const CONTENT_TABS = ['audiobooks', 'radio', 'podcasts'];
+
+const LibraryHeader = ({ handleMusicFilter, musicFilter, showContentTabs = true, sources }) => {
   const { pathname, search: urlSearch } = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -56,7 +58,8 @@ const LibraryHeader = ({ handleMusicFilter, musicFilter, sources }) => {
   const activeSource = pathParts[1] || 'overview';
   const activeView = pathParts[2];
   const source = sources.find(({ id }) => id === activeSource);
-  const sourceIds = ['overview', ...sources.map(({ id }) => id)];
+  const contentTabs = showContentTabs ? CONTENT_TABS : [];
+  const sourceIds = ['overview', ...sources.map(({ id }) => id), ...contentTabs];
   const sourceValue = sourceIds.includes(activeSource) ? activeSource : false;
 
   const navigateTo = (path) => {
@@ -82,6 +85,10 @@ const LibraryHeader = ({ handleMusicFilter, musicFilter, sources }) => {
         <Tabs
           aria-label={t('library.header.sources-label')}
           onChange={(_event, value) => {
+            if (contentTabs.includes(value)) {
+              navigateTo(value);
+              return;
+            }
             const nextSource = sources.find(({ id }) => id === value);
             const firstView = nextSource?.views?.[0]?.id;
             navigateTo(
@@ -102,6 +109,9 @@ const LibraryHeader = ({ handleMusicFilter, musicFilter, sources }) => {
               label={t(`library.sources.${id}`, { defaultValue: label })}
               value={id}
             />
+          ))}
+          {contentTabs.map((id) => (
+            <Tab key={id} label={t(`library.header.${id}`)} value={id} />
           ))}
         </Tabs>
         <IconButton

@@ -31,7 +31,11 @@
           "prev_song": "Previous song",
           "shuffle": "Shuffle",
           "repeat": "Repeat",
-          "toggle": "Toggle Play/Pause"
+          "toggle": "Toggle Play/Pause",
+          "audiobook_play": "Continue where it stopped",
+          "audiobook_restart": "Play from the beginning",
+          "radio_play": "Play station",
+          "podcast_play": "Play episode"
         }
       },
       "controls-selector": {
@@ -45,7 +49,10 @@
           "audio": "Audio & Volume",
           "host": "System",
           "timers": "Timers",
-          "synchronisation": "Synchronisation"
+          "synchronisation": "Synchronisation",
+          "audiobooks": "Play audiobook",
+          "radio": "Play radio",
+          "podcasts": "Play podcast"
         }
       },
       "actions": {
@@ -95,7 +102,25 @@
             "label-enable": "Enable",
             "label-disable": "Disable"
           }
+        },
+        "audiobooks": {
+          "book": "Audiobook",
+          "none": "No audiobooks available"
+        },
+        "radio": {
+          "station": "Station",
+          "none": "No stations available"
+        },
+        "podcasts": {
+          "podcast": "Podcast",
+          "episode": "Episode",
+          "newest-unheard": "Newest unheard episode",
+          "none": "No podcasts subscribed"
         }
+      },
+      "item-select": {
+        "placeholder": "Please select",
+        "unknown": "No longer available ({{value}})"
       }
     },
     "dialogs": {
@@ -139,10 +164,14 @@
       "albums": "Albums",
       "folders": "Folders",
       "playlists": "Playlists",
-      "tracks": "Tracks"
+      "tracks": "Tracks",
+      "audiobooks": "Audiobooks",
+      "radio": "Radio",
+      "podcasts": "Podcasts"
     },
     "sources": {
-      "mpd": "Local"
+      "mpd": "Local",
+      "local": "Local"
     },
     "overview": {
       "group": "{{source}} {{view}}",
@@ -222,6 +251,58 @@
       "empty-library": "Your library is empty!",
       "no-songs-in-album": "Strange, no songs in this album.",
       "assign-to-card": "Assign album to card"
+    },
+    "content": {
+      "more": "More actions",
+      "save-error": "Could not save."
+    },
+    "audiobooks": {
+      "empty": "No audiobooks yet. Put each audiobook in its own folder in \"audiobooks\" (folder view under \"Local\").",
+      "finished": "Finished",
+      "progress": "Chapter {{chapter}} of {{chapters}} · {{progress}} %",
+      "chapters_one": "{{count}} chapter",
+      "chapters_other": "{{count}} chapters",
+      "restart": "Play from the beginning",
+      "mark-finished": "Mark as finished",
+      "mark-unfinished": "Mark as not finished",
+      "menu": "Actions for {{title}}",
+      "progress-label": "Progress of {{title}}"
+    },
+    "radio": {
+      "empty": "No stations yet. Add a station with its stream address.",
+      "add": "Add station",
+      "edit": "Edit station",
+      "name": "Name",
+      "url": "Stream address",
+      "url-help": "Address of the stream or of a .m3u/.pls file",
+      "logo": "Logo address (optional)",
+      "menu": "Actions for {{name}}",
+      "delete-title": "Delete {{name}}?",
+      "delete-text": "Cards playing this station stop working."
+    },
+    "podcasts": {
+      "empty": "No podcasts yet. Subscribe to a podcast with the address of its feed.",
+      "add": "Subscribe to podcast",
+      "subscribe": "Subscribe",
+      "url": "Feed address (RSS)",
+      "url-help": "The address of the podcast's feed, not of its website",
+      "name": "Name",
+      "name-help": "Leave empty to use the feed's name",
+      "episodes_one": "{{count}} episode · {{unheard}} unheard",
+      "episodes_other": "{{count}} episodes · {{unheard}} unheard",
+      "refresh": "Refresh episodes",
+      "rename": "Rename",
+      "unsubscribe": "Unsubscribe",
+      "menu": "Actions for {{name}}",
+      "play-newest": "Play newest unheard episode",
+      "no-episodes": "This podcast has no episodes.",
+      "heard": "heard",
+      "mark-heard": "Mark as heard",
+      "mark-unheard": "Mark as unheard",
+      "episode-menu": "Actions for {{title}}",
+      "progress-label": "Progress of {{title}}",
+      "unsubscribe-title": "Unsubscribe from {{name}}?",
+      "unsubscribe-text": "Cards playing this podcast stop working."
     }
   },
   "navigation": {

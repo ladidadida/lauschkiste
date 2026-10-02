@@ -31,7 +31,11 @@
           "prev_song": "Vorheriger Song",
           "shuffle": "Zufallswiedergabe",
           "repeat": "Wiedergabe wiederholen",
-          "toggle": "Abspielen/Pause umschalten"
+          "toggle": "Abspielen/Pause umschalten",
+          "audiobook_play": "Fortsetzen, wo es aufgehört hat",
+          "audiobook_restart": "Von vorn abspielen",
+          "radio_play": "Sender abspielen",
+          "podcast_play": "Folge abspielen"
         }
       },
       "controls-selector": {
@@ -45,7 +49,10 @@
           "audio": "Audio & Lautstärke",
           "host": "System",
           "timers": "Timer",
-          "synchronisation": "Synchronisation"
+          "synchronisation": "Synchronisation",
+          "audiobooks": "Hörbuch abspielen",
+          "radio": "Radio abspielen",
+          "podcasts": "Podcast abspielen"
         }
       },
       "actions": {
@@ -95,7 +102,25 @@
             "label-enable": "Aktivieren",
             "label-disable": "Deaktivieren"
           }
+        },
+        "audiobooks": {
+          "book": "Hörbuch",
+          "none": "Keine Hörbücher vorhanden"
+        },
+        "radio": {
+          "station": "Sender",
+          "none": "Keine Sender vorhanden"
+        },
+        "podcasts": {
+          "podcast": "Podcast",
+          "episode": "Folge",
+          "newest-unheard": "Neueste ungehörte Folge",
+          "none": "Keine Podcasts abonniert"
         }
+      },
+      "item-select": {
+        "placeholder": "Bitte auswählen",
+        "unknown": "Nicht mehr vorhanden ({{value}})"
       }
     },
     "dialogs": {
@@ -139,10 +164,14 @@
       "albums": "Alben",
       "folders": "Ordner",
       "playlists": "Playlists",
-      "tracks": "Titel"
+      "tracks": "Titel",
+      "audiobooks": "Hörbücher",
+      "radio": "Radio",
+      "podcasts": "Podcasts"
     },
     "sources": {
-      "mpd": "Lokal"
+      "mpd": "Lokal",
+      "local": "Lokal"
     },
     "overview": {
       "group": "{{source}}: {{view}}",
@@ -222,6 +251,58 @@
       "empty-library": "Deine Bibliothek ist noch leer!",
       "no-songs-in-album": "Komisch, in diesem Album gibt es keine Songs.",
       "assign-to-card": "Dieses Album registrieren"
+    },
+    "content": {
+      "more": "Weitere Aktionen",
+      "save-error": "Speichern fehlgeschlagen."
+    },
+    "audiobooks": {
+      "empty": "Noch keine Hörbücher. Lege jedes Hörbuch als eigenen Ordner in „audiobooks“ ab (Ordneransicht unter „Lokal“).",
+      "finished": "Fertig gehört",
+      "progress": "Kapitel {{chapter}} von {{chapters}} · {{progress}} %",
+      "chapters_one": "{{count}} Kapitel",
+      "chapters_other": "{{count}} Kapitel",
+      "restart": "Von vorn abspielen",
+      "mark-finished": "Als fertig markieren",
+      "mark-unfinished": "Als nicht gehört markieren",
+      "menu": "Aktionen für {{title}}",
+      "progress-label": "Fortschritt von {{title}}"
+    },
+    "radio": {
+      "empty": "Noch keine Sender. Füge einen Sender mit seiner Stream-Adresse hinzu.",
+      "add": "Sender hinzufügen",
+      "edit": "Sender bearbeiten",
+      "name": "Name",
+      "url": "Stream-Adresse",
+      "url-help": "Adresse des Streams oder einer .m3u/.pls-Datei",
+      "logo": "Logo-Adresse (optional)",
+      "menu": "Aktionen für {{name}}",
+      "delete-title": "{{name}} löschen?",
+      "delete-text": "Karten, die diesen Sender abspielen, funktionieren danach nicht mehr."
+    },
+    "podcasts": {
+      "empty": "Noch keine Podcasts. Abonniere einen Podcast mit der Adresse seines Feeds.",
+      "add": "Podcast abonnieren",
+      "subscribe": "Abonnieren",
+      "url": "Feed-Adresse (RSS)",
+      "url-help": "Die Adresse des Podcast-Feeds, nicht der Webseite",
+      "name": "Name",
+      "name-help": "Leer lassen, um den Namen aus dem Feed zu übernehmen",
+      "episodes_one": "{{count}} Folge · {{unheard}} ungehört",
+      "episodes_other": "{{count}} Folgen · {{unheard}} ungehört",
+      "refresh": "Folgen aktualisieren",
+      "rename": "Umbenennen",
+      "unsubscribe": "Abbestellen",
+      "menu": "Aktionen für {{name}}",
+      "play-newest": "Neueste ungehörte Folge abspielen",
+      "no-episodes": "Dieser Podcast hat keine Folgen.",
+      "heard": "gehört",
+      "mark-heard": "Als gehört markieren",
+      "mark-unheard": "Als ungehört markieren",
+      "episode-menu": "Aktionen für {{title}}",
+      "progress-label": "Fortschritt von {{title}}",
+      "unsubscribe-title": "{{name}} abbestellen?",
+      "unsubscribe-text": "Karten, die diesen Podcast abspielen, funktionieren danach nicht mehr."
     }
   },
   "navigation": {

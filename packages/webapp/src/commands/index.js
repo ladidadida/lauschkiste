@@ -83,6 +83,81 @@ const commands = {
     argKeys: ['position'],
   },
 
+  // Audiobooks
+  audiobooksList: {
+    rest: { method: 'GET', path: '/api/v1/audiobooks' },
+  },
+  audiobook_play: {
+    rest: { method: 'POST', path: '/api/v1/audiobooks/play' },
+    cardAction: 'audiobooks.play',
+    argKeys: ['book'],
+  },
+  audiobook_restart: {
+    rest: { method: 'POST', path: '/api/v1/audiobooks/restart' },
+    cardAction: 'audiobooks.restart',
+    argKeys: ['book'],
+  },
+  audiobookSetFinished: {
+    rest: { method: 'POST', path: '/api/v1/audiobooks/set_finished' },
+    argKeys: ['book', 'finished'],
+  },
+
+  // Radio
+  radioStations: {
+    rest: { method: 'GET', path: '/api/v1/radio/stations' },
+  },
+  addRadioStation: {
+    rest: { method: 'POST', path: '/api/v1/radio/stations' },
+    argKeys: ['name', 'url', 'logo'],
+  },
+  updateRadioStation: {
+    rest: { method: 'PUT', path: '/api/v1/radio/stations/{station}' },
+    argKeys: ['station', 'name', 'url', 'logo'],
+  },
+  deleteRadioStation: {
+    rest: { method: 'DELETE', path: '/api/v1/radio/stations/{station}' },
+    argKeys: ['station'],
+  },
+  radio_play: {
+    rest: { method: 'POST', path: '/api/v1/radio/play' },
+    cardAction: 'radio.play',
+    argKeys: ['station'],
+  },
+
+  // Podcasts
+  podcastsList: {
+    rest: { method: 'GET', path: '/api/v1/podcasts' },
+  },
+  podcastEpisodes: {
+    rest: { method: 'GET', path: '/api/v1/podcasts/{podcast}/episodes' },
+    argKeys: ['podcast'],
+  },
+  addPodcast: {
+    rest: { method: 'POST', path: '/api/v1/podcasts' },
+    argKeys: ['url', 'name'],
+  },
+  renamePodcast: {
+    rest: { method: 'PUT', path: '/api/v1/podcasts/{podcast}' },
+    argKeys: ['podcast', 'name'],
+  },
+  deletePodcast: {
+    rest: { method: 'DELETE', path: '/api/v1/podcasts/{podcast}' },
+    argKeys: ['podcast'],
+  },
+  refreshPodcasts: {
+    rest: { method: 'POST', path: '/api/v1/podcasts/refresh' },
+    argKeys: ['podcast'],
+  },
+  podcast_play: {
+    rest: { method: 'POST', path: '/api/v1/podcasts/play' },
+    cardAction: 'podcasts.play',
+    argKeys: ['podcast', 'episode'],
+  },
+  podcastSetHeard: {
+    rest: { method: 'POST', path: '/api/v1/podcasts/set_heard' },
+    argKeys: ['podcast', 'episode', 'heard'],
+  },
+
   // Volume
   getVolume: {
     rest: { method: 'GET', path: '/api/v1/volume' },

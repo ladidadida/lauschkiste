@@ -23,15 +23,22 @@ const Display = () => {
     <Grid container>
       <Typography sx={dontBreak} component="h5" variant="h5">
         {hasSong
-          ? (playerstatus?.title || t('player.display.unknown-title'))
+          ? (playerstatus?.title || playerstatus?.name || t('player.display.unknown-title'))
           : t('player.display.no-song-in-queue')
         }
       </Typography>
-      <Typography sx={dontBreak} variant="subtitle1" color="textSecondary">
-        {hasSong && (playerstatus?.artist || t('player.display.unknown-artist')) }
-        <span style={{ marginLeft: '5px', marginRight: '5px' }}>&bull;</span>
-        {hasSong && (playerstatus?.album || playerstatus?.file) }
-      </Typography>
+      {hasSong && playerstatus?.name &&
+        <Typography sx={dontBreak} variant="subtitle1" color="textSecondary">
+          {playerstatus.name}
+        </Typography>
+      }
+      {hasSong && !playerstatus?.name &&
+        <Typography sx={dontBreak} variant="subtitle1" color="textSecondary">
+          {playerstatus?.artist || t('player.display.unknown-artist')}
+          <span style={{ marginLeft: '5px', marginRight: '5px' }}>&bull;</span>
+          {playerstatus?.album || playerstatus?.file}
+        </Typography>
+      }
     </Grid>
   );
 };

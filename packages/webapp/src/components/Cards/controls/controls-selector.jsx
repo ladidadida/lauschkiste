@@ -11,6 +11,9 @@ import SelectTimers from './actions/timers';
 import SelectAudio from './actions/audio';
 import { buildActionData } from '../utils';
 import SelectHost from './actions/host';
+import SelectAudiobooks from './actions/audiobooks';
+import SelectPodcasts from './actions/podcasts';
+import SelectRadio from './actions/radio';
 
 const ControlsSelector = ({
   actionData,
@@ -64,6 +67,27 @@ const ControlsSelector = ({
           <SelectPlayMusic
             actionData={actionData}
             cardId={cardId}
+          />
+        }
+
+        {actionData.action === 'audiobooks' &&
+          <SelectAudiobooks
+            actionData={actionData}
+            handleActionDataChange={handleActionDataChange}
+          />
+        }
+
+        {actionData.action === 'radio' &&
+          <SelectRadio
+            actionData={actionData}
+            handleActionDataChange={handleActionDataChange}
+          />
+        }
+
+        {actionData.action === 'podcasts' &&
+          <SelectPodcasts
+            actionData={actionData}
+            handleActionDataChange={handleActionDataChange}
           />
         }
 
