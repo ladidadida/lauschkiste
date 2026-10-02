@@ -6,7 +6,7 @@ audiobook. Its files are the chapters, played in file name order (`2.mp3` before
 An audiobook continues where it stopped, going back a few seconds so the listener finds back in.
 The position is saved while playing, when pausing and when Lauschkiste shuts down. Once the last
 chapter has played to the end, the audiobook counts as finished and starts from the beginning the
-next time. Shuffle and repeat are switched off while an audiobook plays and come back afterwards.
+next time. Chapters always play in order, regardless of shuffle and repeat.
 
 ## Cards
 
