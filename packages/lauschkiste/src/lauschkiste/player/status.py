@@ -14,6 +14,8 @@ class PlayerStatus(BaseModel):
     elapsed: float = 0.0
     duration: Optional[float] = None
     title: Optional[str] = None
+    #: Name of a stream (radio station)
+    name: Optional[str] = None
     artist: Optional[str] = None
     album: Optional[str] = None
     albumartist: Optional[str] = None
@@ -58,6 +60,7 @@ def status_from_backend(raw: Mapping[str, Any], provider: str) -> PlayerStatus:
         elapsed=_number(raw.get('elapsed')) or 0.0,
         duration=_number(raw.get('duration')),
         title=_text(raw.get('title')),
+        name=_text(raw.get('name')),
         artist=_text(raw.get('artist')),
         album=_text(raw.get('album')),
         albumartist=_text(raw.get('albumartist')),

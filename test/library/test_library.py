@@ -25,7 +25,7 @@ def test_upload_is_published_atomically_and_rejects_duplicates(music_library):
     upload.finish()
 
     assert (album / 'song.mp3').read_bytes() == b'audio data'
-    assert not list(album.glob('.phoniebox-upload-*'))
+    assert not list(album.glob('.lauschkiste-upload-*'))
 
     with pytest.raises(LibraryError) as error:
         library.start_upload('Album', 'song.mp3')
@@ -42,14 +42,12 @@ def test_cancelled_upload_removes_temporary_and_reserved_files(music_library):
     upload.abort()
 
     assert not (root / 'cancelled.flac').exists()
-    assert not list(root.glob('.phoniebox-upload-*'))
+    assert not list(root.glob('.lauschkiste-upload-*'))
 
 
 @pytest.mark.parametrize('name', [
     'track.MP3',
     'playlist.m3u8',
-    'station.livestream.txt',
-    'show.podcast.txt',
     'cover.webp',
 ])
 def test_supported_library_file_types_are_accepted(music_library, name):
@@ -61,7 +59,7 @@ def test_supported_library_file_types_are_accepted(music_library, name):
     assert not (root / name).exists()
 
 
-@pytest.mark.parametrize('name', ['notes.txt', 'archive.zip', '.hidden.mp3', '../track.mp3'])
+@pytest.mark.parametrize('name', ['notes.txt', 'station.livestream.txt', 'archive.zip', '.hidden.mp3', '../track.mp3'])
 def test_unsupported_or_invalid_file_names_are_rejected(music_library, name):
     library, _, _ = music_library
 
@@ -90,9 +88,8 @@ def test_list_entries_includes_manageable_files_and_skips_external_symlinks(musi
     (root / 'Album').mkdir()
     (root / 'track.mp3').touch()
     (root / 'cover.jpg').touch()
-    (root / 'station.livestream.txt').touch()
     (root / 'notes.pdf').touch()
-    (root / '.phoniebox-upload-part').touch()
+    (root / '.lauschkiste-upload-part').touch()
     outside = tmp_path / 'outside'
     outside.mkdir()
     (root / 'external').symlink_to(outside, target_is_directory=True)
@@ -101,11 +98,6 @@ def test_list_entries_includes_manageable_files_and_skips_external_symlinks(musi
         {'name': 'Album', 'relpath': 'Album', 'type': 'directory'},
         {'name': 'cover.jpg', 'relpath': 'cover.jpg', 'type': 'image'},
         {'name': 'notes.pdf', 'relpath': 'notes.pdf', 'type': 'other'},
-        {
-            'name': 'station.livestream.txt',
-            'relpath': 'station.livestream.txt',
-            'type': 'stream',
-        },
         {'name': 'track.mp3', 'relpath': 'track.mp3', 'type': 'file'},
     ]
 
@@ -157,7 +149,7 @@ def test_upload_does_not_replace_file_created_during_transfer(music_library):
 
     assert error.value.code == 'duplicate_name'
     assert reserved.read_bytes() == b'other writer'
-    assert not list(root.glob('.phoniebox-upload-*'))
+    assert not list(root.glob('.lauschkiste-upload-*'))
 
 
 def test_update_returns_mpd_job_identifier(music_library):

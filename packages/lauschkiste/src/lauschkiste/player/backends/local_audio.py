@@ -36,6 +36,9 @@ from lauschkiste.nv_manager import nv_manager
 logger = logging.getLogger('lauschkiste.PlayerLocalAudio')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
+STREAM_TIMEOUT = (10.0, 30.0)
+STREAM_OPTIONS = {'icy': '1', 'reconnect': '1', 'reconnect_streamed': '1', 'reconnect_delay_max': '30'}
+
 class PlayerLocalAudio:
     """Decode-and-output player backend. See module docstring for the state machine."""
 
@@ -56,6 +59,7 @@ class PlayerLocalAudio:
         self._index = -1
         self._position = 0.0
         self._duration = None
+        self._stream_metadata: dict = {}
         self._state = 'stop'           # 'play' | 'pause' | 'stop'
         self._random = False
         self._repeat_mode = 'off'      # 'off' | 'repeat' | 'single'
@@ -136,8 +140,13 @@ class PlayerLocalAudio:
         failed to decode at all -- either way, the caller should move on), False if `_abort`
         interrupted it early."""
         logger.info(f"Playing '{path}' from {start_position:.3f}s")
+        self._stream_metadata = {}
         try:
-            container = av.open(path)
+            if '://' in path:
+                container = av.open(path, timeout=STREAM_TIMEOUT, options=STREAM_OPTIONS)
+                self._stream_metadata = dict(container.metadata)
+            else:
+                container = av.open(path)
         except Exception as e:
             logger.error(f"Could not open '{path}': {e.__class__.__name__}: {e}")
             return True
@@ -162,10 +171,13 @@ class PlayerLocalAudio:
             except Exception as e:
                 logger.warning(f"Seek to {start_position:.3f}s failed, starting from the top: {e}")
         self._sink.open(SAMPLE_RATE, CHANNELS)
+        is_stream = '://' in (container.name or '')
         try:
-            for frame in container.decode(stream):
+            for count, frame in enumerate(container.decode(stream)):
                 if self._abort.is_set():
                     return False
+                if is_stream and count % 50 == 0:
+                    self._stream_metadata = dict(container.metadata)
                 for rframe in resampler.resample(frame):
                     if self._abort.is_set():
                         return False
@@ -222,7 +234,7 @@ class PlayerLocalAudio:
         with self._cv:
             index, position, state, queue_len = self._index, self._position, self._state, len(self._queue)
             current_file = self._queue[index] if 0 <= index < queue_len else None
-        return {
+        status = {
             'state': state,
             'song': str(index),
             'pos': str(index),
@@ -236,6 +248,12 @@ class PlayerLocalAudio:
             'single': '1' if self._repeat_mode == 'single' else '0',
             'provider': 'local_audio',
         }
+        metadata = self._stream_metadata
+        if metadata.get('StreamTitle'):
+            status['title'] = metadata['StreamTitle']
+        if metadata.get('icy-name'):
+            status['name'] = metadata['icy-name']
+        return status
 
     def get_player_type_and_version(self):
         return f"lauschkiste-local-audio (pyav {av.__version__}, sounddevice {sd.__version__})"

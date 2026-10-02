@@ -32,7 +32,6 @@ AUDIO_EXTENSIONS = frozenset({
 })
 PLAYLIST_EXTENSIONS = frozenset({'.m3u', '.m3u8', '.pls'})
 COVER_EXTENSIONS = frozenset({'.gif', '.jpeg', '.jpg', '.png', '.webp'})
-TEXT_FILE_ENDINGS = ('livestream.txt', 'podcast.txt')
 SUPPORTED_EXTENSIONS = AUDIO_EXTENSIONS | PLAYLIST_EXTENSIONS | COVER_EXTENSIONS
 
 
@@ -94,20 +93,13 @@ def _validate_name(name, *, file_name=False):
 
 
 def _validate_file_type(name):
-    lower_name = name.casefold()
-    if lower_name.endswith(TEXT_FILE_ENDINGS):
-        return
-    if Path(lower_name).suffix not in SUPPORTED_EXTENSIONS:
+    if Path(name.casefold()).suffix not in SUPPORTED_EXTENSIONS:
         raise LibraryError(415, 'unsupported_file_type', f"'{name}' is not a supported library file.")
 
 
 def _entry_type(name):
     lower_name = name.casefold()
     suffix = Path(lower_name).suffix
-    if lower_name.endswith('livestream.txt'):
-        return 'stream'
-    if lower_name.endswith('podcast.txt'):
-        return 'podcast'
     if suffix in AUDIO_EXTENSIONS:
         return 'file'
     if suffix in PLAYLIST_EXTENSIONS:
@@ -264,7 +256,7 @@ class MusicLibrary:
         temporary_path = None
         try:
             temporary_fd, temporary_name = tempfile.mkstemp(
-                prefix='.phoniebox-upload-',
+                prefix='.lauschkiste-upload-',
                 suffix='.part',
                 dir=parent,
             )

@@ -1,0 +1,279 @@
+{
+  "events": {
+    "changed": {
+      "properties": {
+        "stations": {
+          "items": {
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "logo": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "name": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "url"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "stations"
+      ],
+      "type": "object"
+    }
+  },
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "radio",
+  "operations": {
+    "add_station": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/radio/stations",
+      "returns": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ],
+        "type": "object"
+      }
+    },
+    "delete_station": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "station": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "station"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "DELETE",
+      "path": "/api/v1/radio/stations/{station}",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "list_stations": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/radio/stations",
+      "returns": {
+        "items": {
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "logo": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "name": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "name",
+            "url"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "play": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "station": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "station"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/radio/play",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "update_station": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "station": {
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "station"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "PUT",
+      "path": "/api/v1/radio/stations/{station}",
+      "returns": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "logo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "name": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "url"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "requires": {
+    "player": null
+  }
+}

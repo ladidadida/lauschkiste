@@ -91,6 +91,9 @@ audiobooks:
   # Each folder in library/audiobooks is an audiobook; it continues where it stopped, going back
   # rewind_sec seconds
   rewind_sec: 10
+radio:
+  # Stations (name, URL, logo); edited through the web app or the API
+  stations_file: settings/radio.yaml
 library:
   # The library, with music/ and audiobooks/ below
   path: library

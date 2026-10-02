@@ -5,11 +5,9 @@ order. The position is kept per audiobook in ``audiobooks.state_file``. Shuffle 
 switched off while an audiobook plays and restored afterwards.
 """
 
-import json
 import logging
 import os
 import re
-import tempfile
 import threading
 import time
 from pathlib import Path
@@ -19,6 +17,7 @@ from pydantic import BaseModel
 
 import lauschkiste.library
 import lauschkiste.paths
+import lauschkiste.statefile as statefile
 from lauschkiste.contract import CoreModule, OperationError, action, query
 
 logger = logging.getLogger('lauschkiste.audiobooks')
@@ -94,29 +93,18 @@ class Audiobooks(CoreModule):
     # -- state file -----------------------------------------------------------------------------
 
     def _load(self) -> Dict[str, Dict[str, Any]]:
-        try:
-            data = json.loads(self._path.read_text())
-        except FileNotFoundError:
-            return {}
-        except (OSError, ValueError) as error:
-            logger.error(f"Could not read audiobook positions from '{self._path}': {error}")
-            return {}
-        return {book: entry for book, entry in data.items() if isinstance(entry, dict)} if isinstance(data, dict) else {}
+        return {book: entry for book, entry in statefile.read_json(self._path).items() if isinstance(entry, dict)}
 
     def _save(self) -> None:
         with self._save_lock:
             with self._lock:
                 if not self._dirty:
                     return
-                content = json.dumps(self._positions, indent=2, sort_keys=True)
+                data = {book: dict(entry) for book, entry in self._positions.items()}
                 self._dirty = False
                 self._saved_at = time.monotonic()
             try:
-                self._path.parent.mkdir(parents=True, exist_ok=True)
-                fd, tmp = tempfile.mkstemp(dir=self._path.parent, prefix='.audiobooks-')
-                with os.fdopen(fd, 'w') as stream:
-                    stream.write(content)
-                os.replace(tmp, self._path)
+                statefile.write_json(self._path, data)
             except OSError as error:
                 logger.error(f"Could not save audiobook positions to '{self._path}': {error}")
 

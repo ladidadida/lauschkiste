@@ -88,6 +88,14 @@
     * [toggle\_output](#lauschkiste.volume.Volume.toggle_output)
     * [fade\_out](#lauschkiste.volume.Volume.fade_out)
 * [lauschkiste.nv\_manager](#lauschkiste.nv_manager)
+* [lauschkiste.radio](#lauschkiste.radio)
+  * [streams\_in\_playlist](#lauschkiste.radio.streams_in_playlist)
+  * [Radio](#lauschkiste.radio.Radio)
+    * [list\_stations](#lauschkiste.radio.Radio.list_stations)
+    * [add\_station](#lauschkiste.radio.Radio.add_station)
+    * [update\_station](#lauschkiste.radio.Radio.update_station)
+    * [delete\_station](#lauschkiste.radio.Radio.delete_station)
+    * [play](#lauschkiste.radio.Radio.play)
 * [lauschkiste.publishing.bus](#lauschkiste.publishing.bus)
   * [EventBus](#lauschkiste.publishing.bus.EventBus)
     * [publish](#lauschkiste.publishing.bus.EventBus.publish)
@@ -148,6 +156,8 @@
   * [PortAudioSink](#lauschkiste.audio_output.PortAudioSink)
   * [play\_file](#lauschkiste.audio_output.play_file)
 * [lauschkiste.core\_modules](#lauschkiste.core_modules)
+* [lauschkiste.statefile](#lauschkiste.statefile)
+  * [write\_text](#lauschkiste.statefile.write_text)
 * [lauschkiste.input\_devices](#lauschkiste.input_devices)
   * [Evdev](#lauschkiste.input_devices.Evdev)
     * [key\_downs](#lauschkiste.input_devices.Evdev.key_downs)
@@ -301,6 +311,8 @@
     * [get\_default\_backend](#lauschkiste.player.module.Player.get_default_backend)
     * [select\_backend](#lauschkiste.player.module.Player.select_backend)
 * [lauschkiste.player.status](#lauschkiste.player.status)
+  * [PlayerStatus](#lauschkiste.player.status.PlayerStatus)
+    * [name](#lauschkiste.player.status.PlayerStatus.name)
   * [status\_from\_backend](#lauschkiste.player.status.status_from_backend)
 * [lauschkiste.player](#lauschkiste.player)
 * [lauschkiste.player.backend](#lauschkiste.player.backend)
@@ -1243,6 +1255,101 @@ Lower the volume to zero over ``seconds``, stop playback, then restore the volum
 
 # lauschkiste.nv\_manager
 
+<a id="lauschkiste.radio"></a>
+
+# lauschkiste.radio
+
+The radio core module: internet radio stations, one per card.
+
+Stations are kept in ``radio.stations_file``. A station URL may point to the stream itself or to an
+``.m3u``/``.pls`` playlist, which is resolved to its first stream when the station is played.
+
+
+<a id="lauschkiste.radio.streams_in_playlist"></a>
+
+#### streams\_in\_playlist
+
+```python
+def streams_in_playlist(text: str) -> List[str]
+```
+
+Stream URLs of an ``.m3u`` or ``.pls`` playlist, in order.
+
+
+<a id="lauschkiste.radio.Radio"></a>
+
+## Radio Objects
+
+```python
+class Radio(CoreModule)
+```
+
+Internet radio stations.
+
+
+<a id="lauschkiste.radio.Radio.list_stations"></a>
+
+#### list\_stations
+
+```python
+@query(path='/stations')
+def list_stations() -> List[Station]
+```
+
+All stations, by name.
+
+
+<a id="lauschkiste.radio.Radio.add_station"></a>
+
+#### add\_station
+
+```python
+@action(path='/stations', status_code=201)
+def add_station(name: str, url: str, logo: Optional[str] = None) -> Station
+```
+
+Add a station; its id is derived from the name.
+
+
+<a id="lauschkiste.radio.Radio.update_station"></a>
+
+#### update\_station
+
+```python
+@action(method='PUT', path='/stations/{station}')
+def update_station(station: str,
+                   name: Optional[str] = None,
+                   url: Optional[str] = None,
+                   logo: Optional[str] = None) -> Station
+```
+
+Change a station; fields left out stay unchanged, an empty ``logo`` removes the logo.
+
+
+<a id="lauschkiste.radio.Radio.delete_station"></a>
+
+#### delete\_station
+
+```python
+@action(method='DELETE', path='/stations/{station}')
+def delete_station(station: str) -> None
+```
+
+Delete a station. Cards playing it stop working.
+
+
+<a id="lauschkiste.radio.Radio.play"></a>
+
+#### play
+
+```python
+@action()
+def play(station: str) -> None
+```
+
+Play a station.
+
+
 <a id="lauschkiste.publishing.bus"></a>
 
 # lauschkiste.publishing.bus
@@ -1328,18 +1435,8 @@ Playlists are build from directory content in the following way:
 a directory is parsed and files are added to the playlist in the following way
 
 1. files are added in alphabetic order
-2. files ending with ``*livestream.txt`` are unpacked and the containing URL(s) are added verbatim to the playlist
-3. files ending with ``*podcast.txt`` are unpacked and the containing Podcast URL(s) are expanded and added to the playlist
-4. files ending with ``*.m3u`` are treated as folder playlist. Regular folder processing is suspended and the playlist
+2. files ending with ``*.m3u`` are treated as folder playlist. Regular folder processing is suspended and the playlist
    is build solely from the ``*.m3u`` content. Only the alphabetically first ``*.m3u`` is processed. URLs are added verbatim
-   to the playlist except for ``*.xml`` and ``*.podcast`` URLS, which are expanded first
-
-An directory may contain a mixed set of files and multiple ``*.txt`` files, e.g.
-
-    01-livestream.txt
-    02-livestream.txt
-    music.mp3
-    podcast.txt
 
 All files are treated as music files and are added to the playlist, except those:
 
@@ -1353,7 +1450,7 @@ In recursive mode, the playlist is generated by concatenating all sub-folder pla
 in alphabetic order. Symbolic links are being followed. The above rules are enforced on a per-folder bases.
 This means, one ``*.m3u`` file per sub-folder is processed (if present).
 
-In ``*.txt`` and ``*.m3u`` files, all lines starting with ``#`` are ignored.
+In ``*.m3u`` files, all lines starting with ``#`` are ignored.
 
 
 <a id="lauschkiste.playlistgenerator.TYPE_DECODE"></a>
@@ -2079,6 +2176,24 @@ Decode ``path`` and play it to the end (or until ``should_stop()``), blocking.
 # lauschkiste.core\_modules
 
 The core modules the daemon always starts. Order is irrelevant, ``requires`` decides.
+
+
+<a id="lauschkiste.statefile"></a>
+
+# lauschkiste.statefile
+
+Small state files of core modules (JSON or YAML), written atomically.
+
+
+<a id="lauschkiste.statefile.write_text"></a>
+
+#### write\_text
+
+```python
+def write_text(path: Path, text: str) -> None
+```
+
+Write ``text`` via a temporary file and rename it, so a crash never leaves a truncated file.
 
 
 <a id="lauschkiste.input_devices"></a>
@@ -3856,6 +3971,21 @@ Stop the current backend and switch to another one.
 # lauschkiste.player.status
 
 Typed player status, independent of the backend that produced it.
+
+
+<a id="lauschkiste.player.status.PlayerStatus"></a>
+
+## PlayerStatus Objects
+
+```python
+class PlayerStatus(BaseModel)
+```
+
+<a id="lauschkiste.player.status.PlayerStatus.name"></a>
+
+#### name
+
+Name of a stream (radio station)
 
 
 <a id="lauschkiste.player.status.status_from_backend"></a>

@@ -72,6 +72,17 @@
           ],
           "default": null
         },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "playlist_length": {
           "default": 0,
           "type": "integer"
@@ -165,7 +176,7 @@
       "toggle": "(self) -> None"
     }
   },
-  "interface_version": "2.0",
+  "interface_version": "2.1",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -565,6 +576,17 @@
             "type": "number"
           },
           "file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "name": {
             "anyOf": [
               {
                 "type": "string"

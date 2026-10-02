@@ -41,6 +41,7 @@ def local_audio_backend(**attrs):
     backend._index = -1
     backend._position = 0.0
     backend._duration = None
+    backend._stream_metadata = {}
     backend._state = 'stop'
     backend._random = False
     backend._repeat_mode = 'off'

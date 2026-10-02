@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Body, HTTPException, Path, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
+from pydantic import ConfigDict, create_model
 
 from lauschkiste.contract.declarations import Operation
 from lauschkiste.contract.errors import ActionError, OperationError
@@ -52,17 +53,25 @@ def _endpoint(executor, handle: ModuleHandle, op: Operation):
                                         default=marker, annotation=op.param_types[p.name]))
 
     body_fields = [p for p in op.params if p.name not in path_params] if op.kind == 'action' else []
+    body_model = op.args_model
+    if body_fields and path_params:
+        fields: Dict[str, Any] = {
+            p.name: (op.param_types[p.name], ... if p.default is inspect.Parameter.empty else p.default)
+            for p in body_fields
+        }
+        body_model = create_model(op.args_model.__name__.removesuffix('Args') + 'Body',
+                                  __config__=ConfigDict(extra='forbid'), **fields)
     if body_fields:
         body_required = any(p.default is inspect.Parameter.empty for p in body_fields)
         params.append(inspect.Parameter('body', inspect.Parameter.KEYWORD_ONLY,
                                         default=Body(... if body_required else None),
-                                        annotation=op.args_model if body_required else Optional[op.args_model]))
+                                        annotation=body_model if body_required else Optional[body_model]))
 
     async def endpoint(**received):
         body = received.pop('body', None)
         kwargs = dict(received)
         if body_fields:
-            model = body if body is not None else op.args_model()
+            model = body if body is not None else body_model()
             kwargs.update({p.name: getattr(model, p.name) for p in body_fields})
         return await _run(executor, handle, op, kwargs)
 

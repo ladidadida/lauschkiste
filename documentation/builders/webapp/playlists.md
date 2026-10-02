@@ -1,6 +1,6 @@
-# Playlists, Livestreams and Podcasts
+# Playlists
 
-By default, Lauschkiste represents music based on its metadata like album name, artist or song name. The hierarchy and order of songs is determined by their original definition, e.g. order of songs within an album. If you prefer a specific list of songs to be played, you can use playlists (files ending with `*.m3u`). Lauschkiste also supports livestreams and podcasts (if connected to the internet) through playlists.
+By default, Lauschkiste represents music based on its metadata like album name, artist or song name. The hierarchy and order of songs is determined by their original definition, e.g. order of songs within an album. If you prefer a specific list of songs to be played, you can use playlists (files ending with `*.m3u`). Radio stations are set up separately, see [Radio](../radio.md).
 
 ## Playlists
 
@@ -63,82 +63,3 @@ In Lauschkiste Web App, .m3u playlists do not show up as individual files. In or
 1. Browse to the folder you created (representing your playlist) and click on it.
 
 You are essentially assigning a folder (just like any other conventional folder) to your card representing the content of your playlist.
-
-## Livestreams
-
-In order to play radio livestreams on your Lauschkiste, you use playlists to register your livestream and make it accessible.
-
-### Using livestream.txt playlist in Lauschkiste
-
-1. [Follow the steps above](#using-m3u-playlists-in-lauschkiste) to add a playlist to your Lauschkiste (make sure you have created individual folders).
-1. When creating the playlist file, make sure it's called or at least ends with `livestream.txt` instead of `.m3u` (Examples: `awesome-livestream.txt`, `livestream.txt`).
-1. Add URLs of your livestreams just like you would add songs in `.m3u` playlists.
-
-You can now assign livestreams to cards [following the example](#assigning-a-m3u-playlist-to-a-card) of playlists.
-
-#### Example folder structure and playlist names for livestreams
-
-```text
-└── library/music
-    ├── wdr-kids
-    │   └── wdr-kids-livestream.txt
-    ├── energy
-    │   └── cool-livestream.txt
-    └── classic
-        └── livestream.txt
-```
-
-#### Example of livestream.txt
-
-```txt
-https://wdr-diemaus-live.icecastssl.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3
-http://channels.webradio.antenne.de/hits-fuer-kids
-```
-
-## Podcasts
-
-Just like you add livestreams to Lauschkiste, you can also add individual Podcasts or entire Podcast feeds to Lauschkiste.
-
-You have 3 options to play Podcasts
-
-1. Create a playlist and reference individual direct URLs to Podcast episodes (just like [livestreams](#livestreams))
-1. Provide a Podcast RSS feed
-1. Download the MP3 and add them like normal songs to your Lauschkiste. This also makes them available offline.
-
-We will explain options 1 and 2 more closely.
-
-### Using podcast.txt playlist in Lauschkiste
-
-1. [Follow the steps above](#using-m3u-playlists-in-lauschkiste) to add a playlist to your Lauschkiste (make sure you have created individual folders).
-1. When creating the playlist file, make sure it's called or at least ends with `podcast.txt` instead of `.m3u`. (Examples: `awesome-podcast.txt`, `podcast.txt`).
-1. Add links to your individual podcast episodes just like you would with songs in .m3u playlists
-1. As an alternative, you can provide a single RSS feed (XML). Lauschkiste will expand the file and refer to all episodes listed within this file.
-
-#### Example folder structure and playlist names for podcasts
-
-```text
-└── library/music
-    ├── die-maus
-    │   └── die-maus-podcast.txt
-    ├── miras-welt
-    │   └── cool-podcast.txt
-    └── kakadu
-        └── podcast.txt
-```
-
-#### Example of podcast.txt for individual episodes
-
-```txt
-https://podcastb11277.podigee.io/94-ich-ware-gerne-beliebt-wie-geht-das
-https://podcastb11277.podigee.io/91-wieso-kann-ich-nicht-den-ganzen-tag-fernsehen
-```
-
-#### Example of podcast.txt for RSS feeds (XML)
-
-```txt
-https://kinder.wdr.de/radio/diemaus/audio/diemaus-60/diemaus-60-106.podcast
-```
-
-```txt
-http://www.kakadu.de/podcast-kakadu.2730.de.podcast.xml
-```

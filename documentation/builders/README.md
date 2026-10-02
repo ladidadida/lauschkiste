@@ -19,6 +19,7 @@
   * [Copying music](./copying-music.md): web app, SFTP, Samba
   * [Network share / Samba](./samba.md)
 * [Audiobooks](./audiobooks.md)
+* [Radio](./radio.md)
 
 ## Hardware Components
 
@@ -35,7 +36,7 @@
 * Application
   * [Cover Art](./webapp/cover-art.md)
 * Music
-  * [Playlists, Livestreams and Podcasts](./webapp/playlists-livestreams-podcasts.md)
+  * [Playlists](./webapp/playlists.md)
 
 ## Advanced
 

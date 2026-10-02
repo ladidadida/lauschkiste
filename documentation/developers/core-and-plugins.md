@@ -66,11 +66,11 @@ and cover art only covers embedded MP3 (ID3) images through the mpd backend. The
   active backend.
 
 Already backend-independent and staying as is: folder playlists
-(`lauschkiste.playlistgenerator.PlaylistCollector`, including `.m3u`, `*livestream.txt` and
-`*podcast.txt`) and file management (upload, folders, delete).
+(`lauschkiste.playlistgenerator.PlaylistCollector`, including `.m3u`) and file management (upload,
+folders, delete). Audiobooks, radio and podcasts are separate core modules, see
+[Content types](content-types.md).
 
-Not planned for now: saved user playlists, ReplayGain, gapless playback, crossfade. Whether
-livestream and podcast URLs play through PyAV is still to be verified.
+Not planned for now: saved user playlists, ReplayGain, gapless playback, crossfade.
 
 The RFID *reader framework* (reader thread, same-id delay, card removal, dispatch) is core; only
 the hardware drivers are plugins. Without a reader plugin the core runs fine, cards can still be

@@ -29,7 +29,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '2.0'
+    interface_version = '2.1'
     concurrency = 'threadsafe'
     requires = ('library',)
 
