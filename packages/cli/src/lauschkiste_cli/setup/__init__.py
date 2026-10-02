@@ -104,8 +104,8 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
           yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask; reuse earlier answers or defaults"),
           force: bool = typer.Option(False, "--force", help="Apply steps even if they look complete"),
           list_steps: bool = typer.Option(False, "--list", help="List the steps and exit"),
-          conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
-                                              help="Jukebox configuration file")) -> None:
+          conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_name("CONF"),
+                                              help="Configuration file")) -> None:
     """Set up this machine for Lauschkiste (packages, service, Samba, hotspot, ...).
 
     Every step checks first and only changes what is missing, so running it again is safe.

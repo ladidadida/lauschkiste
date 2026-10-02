@@ -11,14 +11,14 @@ from lauschkiste.misc import loggingext
 def run(
     conf: Optional[Path] = typer.Option(
         None, "-c", "--conf",
-        envvar=lauschkiste.paths.env_names("CONF"),
+        envvar=lauschkiste.paths.env_name("CONF"),
         file_okay=True, dir_okay=False,
         help="Configuration file (default: $LAUSCHKISTE_HOME/settings/lauschkiste.yaml). Created from "
              "the default template on first run if it doesn't exist yet.",
     ),
     logger_conf: Optional[Path] = typer.Option(
         None, "-l", "--logger",
-        envvar=lauschkiste.paths.env_names("LOGGER_CONF"),
+        envvar=lauschkiste.paths.env_name("LOGGER_CONF"),
         file_okay=True, dir_okay=False,
         help="Logger configuration file (default: $LAUSCHKISTE_HOME/settings/logger.yaml). Created from "
              "the default template on first run if it doesn't exist yet.",
@@ -37,7 +37,7 @@ def run(
         help="Write out all artifacts and auto-generated help files",
     ),
     home: Optional[Path] = typer.Option(
-        None, "--home", envvar=lauschkiste.paths.env_names("HOME"),
+        None, "--home", envvar=lauschkiste.paths.env_name("HOME"),
         help="Directory with all data (settings, music, logs). "
              "Default: $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).",
     ),
@@ -63,8 +63,8 @@ def run(
             str(logger_conf), str(lauschkiste.paths.resource('default-settings', 'logger.default.yaml')))
         logger = loggingext.configure_from_file(str(logger_conf))
 
-    logger.info(f"Jukebox home '{lauschkiste.paths.home()}', configuration file '{conf}'")
+    logger.info(f"Home '{lauschkiste.paths.home()}', configuration file '{conf}'")
     from lauschkiste.daemon import get_daemon  # heavy (web server); only `run` needs it
 
-    myjukebox = get_daemon(str(conf), artifacts)
-    myjukebox.run()
+    daemon = get_daemon(str(conf), artifacts)
+    daemon.run()

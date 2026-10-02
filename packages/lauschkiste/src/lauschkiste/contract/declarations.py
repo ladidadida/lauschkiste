@@ -10,7 +10,7 @@ from pydantic import BaseModel, ConfigDict, create_model
 
 from lauschkiste.contract.errors import ContractError
 
-_OPERATION_ATTR = '__jukebox_operation__'
+_OPERATION_ATTR = '__lauschkiste_operation__'
 
 
 @dataclass(frozen=True)
@@ -148,7 +148,7 @@ class ExtensionPointSpec:
     def __get__(self, instance, owner=None):
         if instance is None:
             return self
-        store = instance.__dict__.setdefault('_jukebox_extension_points', {})
+        store = instance.__dict__.setdefault('_lauschkiste_extension_points', {})
         if self.name not in store:
             store[self.name] = ExtensionPoint(self.name, self.protocol)
         return store[self.name]

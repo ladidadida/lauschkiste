@@ -75,7 +75,7 @@ class Module:
 
     @classmethod
     def operations(cls) -> Dict[str, Operation]:
-        cache = cls.__dict__.get('_jukebox_operations')
+        cache = cls.__dict__.get('_lauschkiste_operations')
         if cache is not None:
             return cache
         ops = {}
@@ -87,7 +87,7 @@ class Module:
                 if op.name in ops:
                     raise ContractError(f"{cls.name}: two operations are named '{op.name}'")
                 ops[op.name] = op
-        cls._jukebox_operations = ops
+        cls._lauschkiste_operations = ops
         return ops
 
     @classmethod

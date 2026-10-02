@@ -9,7 +9,6 @@ from lauschkiste_cli.setup.base import Context, Question, Step
 from lauschkiste_cli.setup.system import SetupError, StepSkipped
 
 SERVICE = 'lauschkiste.service'
-LEGACY_SERVICE = 'jukebox-daemon.service'
 
 
 def wanted_plugins(ctx: Context) -> List[str]:
@@ -53,7 +52,6 @@ class ServiceStep(Step):
                  default=lambda ctx: ctx.system.is_raspberry_pi()),
     )
     UNIT_PATH = '~/.config/systemd/user/' + SERVICE
-    LEGACY_UNIT_PATH = '~/.config/systemd/user/' + LEGACY_SERVICE
 
     def relevant(self, ctx):
         return ctx.system.which('systemctl') is not None
@@ -92,15 +90,10 @@ class ServiceStep(Step):
             problems.append(f'{SERVICE} is not enabled')
         if ctx.answer('start_at_boot') and not self._lingering(ctx):
             problems.append('user services do not start at boot (no lingering)')
-        if ctx.system.exists(self.LEGACY_UNIT_PATH) or ctx.system.unit_enabled(LEGACY_SERVICE, user=True):
-            problems.append(f'the old {LEGACY_SERVICE} is still installed')
         return problems
 
     def apply(self, ctx):
         system = ctx.system
-        if system.exists(self.LEGACY_UNIT_PATH) or system.unit_enabled(LEGACY_SERVICE, user=True):
-            system.run('systemctl', '--user', 'disable', '--now', LEGACY_SERVICE, check=False)
-            system.remove(self.LEGACY_UNIT_PATH)
         unit_changed = system.read(self.UNIT_PATH) != self.unit(ctx)
         system.write(self.UNIT_PATH, self.unit(ctx))
         system.run('systemctl', '--user', 'daemon-reload')

@@ -154,13 +154,13 @@ def restart_service() -> None:
 
 
 def update(release: str = typer.Option('latest', "--version", help="Release tag to install (package installs)"),
-           repo: str = typer.Option(DEFAULT_REPO, "--repo", envvar=lauschkiste.paths.env_names("REPO"),
+           repo: str = typer.Option(DEFAULT_REPO, "--repo", envvar=lauschkiste.paths.env_name("REPO"),
                                     help="GitHub repository"),
            check: bool = typer.Option(False, "--check", help="Only report whether an update is available"),
            setup: bool = typer.Option(True, "--setup/--no-setup",
                                       help="Re-apply `lauschctl setup` with the stored answers afterwards"),
-           conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
-                                               help="Jukebox configuration file")) -> None:
+           conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_name("CONF"),
+                                               help="Configuration file")) -> None:
     """Update Lauschkiste: newer release, or `git pull` + `uv sync` in a source checkout."""
     config_path = conf or lauschkiste.paths.config_file()
     root = checkout()

@@ -16,12 +16,9 @@ DEFAULT_SOUNDS = {'startup_sound': 'startupsound.wav', 'shutdown_sound': 'shutdo
 
 
 def sound_path(value: str, key: str = 'startup_sound') -> Path:
-    """``default`` or ``resources/audio/<file>``: a packaged sound; anything else: a path below the home."""
+    """``default``: the packaged sound; anything else: a path (relative ones below the home)."""
     if value == 'default':
         return lauschkiste.paths.resource('audio', DEFAULT_SOUNDS[key])
-    parts = tuple(part for part in Path(value).parts if part != '..')
-    if parts[:2] == ('resources', 'audio'):
-        return lauschkiste.paths.resource('audio', *parts[2:])
     return lauschkiste.paths.resolve(value)
 
 

@@ -8,7 +8,7 @@ import typer
 import lauschkiste.cfghandler
 import lauschkiste.paths
 from lauschkiste_cli.setup.base import Question, Step
-from lauschkiste_cli.setup.system import SetupError, StepSkipped, has_marker
+from lauschkiste_cli.setup.system import SetupError, StepSkipped
 
 
 class MpdStep(Step):
@@ -164,7 +164,7 @@ class KioskStep(Step):
     def check(self, ctx):
         system = ctx.system
         problems = [f'{path} is not set up' for path in (self.BASHRC, self.AUTOSTART, self._update_check_file(ctx))
-                    if not has_marker(system.read(path) or '', self.MARKER)]
+                    if self.MARKER not in (system.read(path) or '')]
         if system.is_raspberry_pi() and not system.exists(self.AUTOLOGIN):
             problems.append('console autologin is not enabled')
         return problems

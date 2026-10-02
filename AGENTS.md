@@ -89,7 +89,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `/api/v1/library/*`; the local source id is `local`.
 - **Paths** (`lauschkiste.paths`): all runtime data lives in `LAUSCHKISTE_HOME` (`--home`, `$LAUSCHKISTE_HOME`,
   default `$XDG_DATA_HOME/lauschkiste`; this checkout's `.env` sets it to `shared/`). Relative paths in
-  the configuration resolve against it (a legacy leading `shared/` or `../../shared/` is dropped); never resolve paths
+  the configuration resolve against it; never resolve paths
   against the working directory or the checkout. Packaged files (default settings, sounds, service
   templates) live in `lauschkiste/resources/`, read via `lauschkiste.paths.resource()`. The web app is
   served from `api.webapp_dir` / `$LAUSCHKISTE_WEBAPP_DIR`, else from the package, else (source checkout) from

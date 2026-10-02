@@ -2,7 +2,7 @@
 
 CURRENT_USER="${SUDO_USER:-$(whoami)}"
 
-modprobe_file="/etc/modprobe.d/disable_driver_jukebox_nfcpy.conf"
+modprobe_file="/etc/modprobe.d/disable_driver_lauschkiste_nfcpy.conf"
 
 if [ -e "$modprobe_file" ]; then
     sudo rm -f "$modprobe_file"

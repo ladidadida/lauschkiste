@@ -11,8 +11,7 @@ runner = CliRunner()
 
 @pytest.fixture
 def home(tmp_path, monkeypatch):
-    for name in lauschkiste.paths.env_names('CONF'):
-        monkeypatch.delenv(name, raising=False)
+    monkeypatch.delenv(lauschkiste.paths.env_name('CONF'), raising=False)
     monkeypatch.setenv(lauschkiste.paths.HOME_ENV, str(tmp_path))
     lauschkiste.paths.set_home(None)
     yield tmp_path

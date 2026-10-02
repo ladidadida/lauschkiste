@@ -141,10 +141,8 @@ optimisation. Steps needing root run their commands through `sudo`.
    its wheels are installed with `uv pip` into the running environment, so other installed plugins
    stay, and the extras of enabled plugins are kept. Afterwards `lauschctl setup --yes` runs in a new
    process (the updated steps) and an active service is restarted. `--check` only reports.
-   Configuration migrations: none needed so far. Old relative paths (`shared/...`,
-   `../../shared/...`, `../../resources/audio/...`) are handled where paths are resolved, and the
-   card database converts itself on start. A versioned migration step gets added with the first
-   incompatible configuration change.
+   Configuration migrations: none needed so far; a versioned migration step gets added with the
+   first incompatible configuration change.
 7. **Remove the Bash installer** -- *done*: `migrate_to_cli/` (installer, RFID and audio tools,
    now `lauschctl setup rfid` / `lauschctl setup audio`; the HifiBerry script is the `sound_card`
    question of `lauschctl setup raspi`), its Debian CI (`ci/ci-debian.Dockerfile`,

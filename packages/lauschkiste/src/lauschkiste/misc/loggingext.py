@@ -40,7 +40,6 @@ import lauschkiste.misc.simplecolors as sc
 from ruamel.yaml import YAML
 
 ROOT_LOGGER = 'lauschkiste'
-LEGACY_ROOT_LOGGER = 'jb'
 
 
 class ColorFilter(logging.Filter):
@@ -154,28 +153,13 @@ def configure_default(level=logging.DEBUG, name=ROOT_LOGGER, with_publisher=Fals
     return logger
 
 
-def _migrate_legacy_names(cfg: dict) -> dict:
-    """Logger configurations from before the renaming: ``jb.*`` loggers, ``jukebox.*`` classes."""
-    loggers = cfg.get('loggers') or {}
-    for name in list(loggers):
-        if name == LEGACY_ROOT_LOGGER or name.startswith(LEGACY_ROOT_LOGGER + '.'):
-            loggers.setdefault(ROOT_LOGGER + name[len(LEGACY_ROOT_LOGGER):], loggers[name])
-            del loggers[name]
-    for section in ('handlers', 'filters', 'formatters'):
-        for entry in (cfg.get(section) or {}).values():
-            factory = entry.get('()') if isinstance(entry, dict) else None
-            if isinstance(factory, str) and factory.startswith('jukebox.'):
-                entry['()'] = 'lauschkiste.' + factory[len('jukebox.'):]
-    return cfg
-
-
 def configure_from_file(filename=None):
     if filename is None:
         return configure_default(level=logging.WARNING)
     yaml = YAML(typ='safe')
     try:
         with open(filename) as stream:
-            cfg = _migrate_legacy_names(yaml.load(stream))
+            cfg = yaml.load(stream)
         for handler in (cfg.get('handlers') or {}).values():
             if 'filename' in handler:
                 path = lauschkiste.paths.resolve(handler['filename'])

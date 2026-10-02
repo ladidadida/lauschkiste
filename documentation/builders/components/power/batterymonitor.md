@@ -15,8 +15,10 @@ plugins:
       warning_voltage: 3300     # mV, runs warning_action once
       shutdown_voltage: 3000    # mV, shuts the Pi down
       interval_sec: 10
-      warning_action: {action: jingle.play, args: {sound: resources/audio/battery_low.wav}}
+      warning_action: {action: jingle.play, args: {sound: sounds/battery_low.wav}}
 ```
+
+`sounds/battery_low.wav` is a file of your own, relative to the Lauschkiste home.
 
 Readings are smoothed and published as `raspberry_pi.battery` (`voltage_mv`, `soc`, `warning`); the
 web app shows them in the settings. The ADS1015 driver of the old battery monitor has not been

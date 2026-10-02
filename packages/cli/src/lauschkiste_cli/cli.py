@@ -14,7 +14,7 @@ def load_env() -> None:
     if not path:
         return
     for key, value in dotenv_values(path).items():
-        if key.startswith(('LAUSCHKISTE_', 'JUKEBOX_')) and key not in os.environ and value is not None:
+        if key.startswith('LAUSCHKISTE_') and key not in os.environ and value is not None:
             if key.split('_', 1)[1] in ('HOME', 'WEBAPP_DIR', 'CONF', 'LOGGER_CONF'):
                 value = str(Path(path).parent / Path(value).expanduser())
             os.environ[key] = value
@@ -37,7 +37,7 @@ HOME_HELP = ("Directory with all data (settings, music, logs). "
 
 
 def main(home: Optional[Path] = typer.Option(
-        None, "--home", envvar=lauschkiste.paths.env_names("HOME"), help=HOME_HELP)) -> None:
+        None, "--home", envvar=lauschkiste.paths.env_name("HOME"), help=HOME_HELP)) -> None:
     lauschkiste.paths.set_home(home)
 
 
@@ -64,7 +64,3 @@ server.command()(run)
 
 #: `lauschctl`: everything else
 ctl = _management_app("lauschctl", "Manage Lauschkiste: setup, plugins, updates.")
-
-#: `jukebox`: the name before the renaming (`jukebox run` = `lauschkiste`); removed after 0.1
-legacy = _management_app("jukebox", "Old name of lauschctl; `lauschkiste` starts the server like `lauschkiste`.")
-legacy.command(name="run")(run)

@@ -1,4 +1,4 @@
-# RPi-Jukebox-RFID Version 3
+# Lauschkiste
 # Copyright (c) See file LICENSE in project root folder
 """
 Add GPIO input devices and output devices to the RFID Mock Reader GUI

@@ -14,7 +14,7 @@ import lauschkiste.paths
 
 app = typer.Typer(help="Manage plugins.", no_args_is_help=True)
 
-ConfOption = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_names("CONF"),
+ConfOption = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_name("CONF"),
                           help="Configuration file (default: $LAUSCHKISTE_HOME/settings/lauschkiste.yaml)")
 
 

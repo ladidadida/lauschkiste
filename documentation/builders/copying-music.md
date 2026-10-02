@@ -23,8 +23,7 @@ SSH.
 | macOS | FileZilla or [Cyberduck](https://cyberduck.io/); or in a terminal `scp -r "My Album" <user>@<your-pi>:lauschkiste/audiofolders/` |
 | Linux | the file manager: `sftp://<user>@<your-pi>/home/<user>/lauschkiste/audiofolders` |
 
-On a Raspberry Pi the music folder is `~/lauschkiste/audiofolders` (or `~/jukebox/audiofolders` on
-installations from before the renaming).
+On a Raspberry Pi the music folder is `~/lauschkiste/audiofolders`.
 
 ## Samba (network share)
 

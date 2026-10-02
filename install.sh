@@ -11,8 +11,8 @@
 #   --version TAG      release to install (default: the latest release)
 #   --wheels DIR       install the wheels in DIR instead of downloading a release
 #   --repo OWNER/NAME  GitHub repository (default: ladidadida/lauschkiste)
-#   --home DIR         LAUSCHKISTE_HOME (default: ~/lauschkiste on a Raspberry Pi -- or an existing
-#                      ~/jukebox --, ~/.local/share/lauschkiste elsewhere, DIR/shared with --source)
+#   --home DIR         LAUSCHKISTE_HOME (default: ~/lauschkiste on a Raspberry Pi,
+#                      ~/.local/share/lauschkiste elsewhere, DIR/shared with --source)
 #   --yes              don't ask, use defaults (also passed to `lauschctl setup`)
 #   --no-setup         only install, don't run `lauschctl setup`
 
@@ -134,10 +134,6 @@ install_package() {
     for wheel in "$wheels"/*.whl; do
         [[ "$wheel" == "$cli" ]] || with+=(--with "$wheel")
     done
-    if uv tool list 2>/dev/null | grep -q '^jukebox-cli '; then
-        log "Removing the installation from before the renaming (jukebox-cli); your data stays"
-        uv tool uninstall jukebox-cli
-    fi
     log "Installing the Lauschkiste package"
     uv tool install --force --python python3 "$cli" "${with[@]}"
     CTL="$(uv tool dir --bin)/lauschctl"
@@ -186,12 +182,7 @@ choose_home() {
         if [[ "$MODE" == source ]]; then
             HOME_DIR="${SOURCE_DIR}/shared"
         elif is_raspberry_pi; then
-            # Installations from before the renaming keep their data where it is
-            if [[ -d "${HOME}/jukebox" && ! -d "${HOME}/lauschkiste" ]]; then
-                HOME_DIR="${HOME}/jukebox"
-            else
-                HOME_DIR="${HOME}/lauschkiste"
-            fi
+            HOME_DIR="${HOME}/lauschkiste"
         else
             return 0
         fi

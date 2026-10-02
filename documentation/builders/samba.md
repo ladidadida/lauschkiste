@@ -15,10 +15,6 @@ The step installs Samba and shares the music folder (`audiofolders` in the Lausc
 Samba password (at least 8 characters) for your user; with `--yes` and no password set yet, the
 step is skipped until you run it interactively.
 
-Installations from before version 0.1 shared the whole home directory with the password
-`raspberry`. Running `lauschctl setup samba` again limits the share to the music folder; change the
-password with `sudo smbpasswd -a <your-username>`.
-
 ## Connect
 
 Open your network environment and select your Lauschkiste, or enter the address directly:

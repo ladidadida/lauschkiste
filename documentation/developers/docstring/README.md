@@ -168,13 +168,9 @@
   * [convert](#lauschkiste.legacy_actions.convert)
   * [bind\_action](#lauschkiste.legacy_actions.bind_action)
 * [lauschkiste.paths](#lauschkiste.paths)
-  * [env\_names](#lauschkiste.paths.env_names)
-  * [getenv](#lauschkiste.paths.getenv)
   * [home](#lauschkiste.paths.home)
   * [set\_home](#lauschkiste.paths.set_home)
-  * [strip\_legacy\_prefix](#lauschkiste.paths.strip_legacy_prefix)
   * [resolve](#lauschkiste.paths.resolve)
-  * [config\_file](#lauschkiste.paths.config_file)
   * [resource](#lauschkiste.paths.resource)
 * [lauschkiste.daemon](#lauschkiste.daemon)
   * [DEFAULT\_CONFIG\_TEMPLATE](#lauschkiste.daemon.DEFAULT_CONFIG_TEMPLATE)
@@ -363,7 +359,7 @@ The jingle core module: startup and shutdown sounds, and playing a sound on dema
 def sound_path(value: str, key: str = 'startup_sound') -> Path
 ```
 
-``default`` or ``resources/audio/<file>``: a packaged sound; anything else: a path below the home.
+``default``: the packaged sound; anything else: a path (relative ones below the home).
 
 
 <a id="lauschkiste.jingle.Jingle"></a>
@@ -2316,34 +2312,7 @@ All runtime data lives below one directory::
     $LAUSCHKISTE_HOME/audiofolders/  the music library
     $LAUSCHKISTE_HOME/logs/  cache/  playlists/
 
-Relative paths in the configuration are resolved against ``LAUSCHKISTE_HOME``. A leading ``shared/``,
-also behind ``../`` (the checkout layout before the home directory existed, relative to the
-repository root or to ``src/jukebox``), is dropped, so old configurations keep working.
-
-Installations from before the renaming keep working: ``JUKEBOX_*`` environment variables, a
-``jukebox`` data directory and ``settings/jukebox.yaml`` are used when the new ones don't exist.
-
-
-<a id="lauschkiste.paths.env_names"></a>
-
-#### env\_names
-
-```python
-def env_names(name: str) -> list
-```
-
-``['LAUSCHKISTE_<name>', 'JUKEBOX_<name>']``, e.g. for typer's ``envvar``.
-
-
-<a id="lauschkiste.paths.getenv"></a>
-
-#### getenv
-
-```python
-def getenv(name: str) -> Optional[str]
-```
-
-``$LAUSCHKISTE_<name>``, else the pre-renaming ``$JUKEBOX_<name>``.
+Relative paths in the configuration are resolved against ``LAUSCHKISTE_HOME``.
 
 
 <a id="lauschkiste.paths.home"></a>
@@ -2368,17 +2337,6 @@ def set_home(path: Union[str, Path, None]) -> None
 Use ``path`` as home (None: determine it again from the environment).
 
 
-<a id="lauschkiste.paths.strip_legacy_prefix"></a>
-
-#### strip\_legacy\_prefix
-
-```python
-def strip_legacy_prefix(path: Path) -> Path
-```
-
-``shared/x`` or ``../../shared/x`` -> ``x``; anything else unchanged.
-
-
 <a id="lauschkiste.paths.resolve"></a>
 
 #### resolve
@@ -2388,17 +2346,6 @@ def resolve(value: Union[str, Path]) -> Path
 ```
 
 A configured path: absolute or ``~`` as given, relative ones below the home.
-
-
-<a id="lauschkiste.paths.config_file"></a>
-
-#### config\_file
-
-```python
-def config_file() -> Path
-```
-
-``settings/lauschkiste.yaml``, or ``settings/jukebox.yaml`` of an older installation.
 
 
 <a id="lauschkiste.paths.resource"></a>

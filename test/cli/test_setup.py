@@ -223,28 +223,6 @@ def test_ffmpeg_libraries_for_piwheels(tmp_path, home, extras, monkeypatch, arch
     assert ('ffmpeg' in PackagesStep().packages(ctx)) is expected
 
 
-def test_blocks_and_service_from_before_the_renaming(tmp_path, home, extras):
-    system = FakeSystem(tmp_path / 'root', pi=True)
-    system.write('/boot/firmware/config.txt', 'dtparam=audio=on\n\n## Jukebox Boot Config\ndisable_splash=1\n')
-    system.write('/etc/samba/smb.conf', f'[global]\n\n## Jukebox Samba Config\n[jukebox]\n  path={home}\n')
-    system.outputs[('pdbedit', '-L')] = 'pi:1000:'
-    system.write('~/.config/systemd/user/jukebox-daemon.service', '[Unit]\n')
-    system.enabled_user.add('jukebox-daemon.service')
-    system.write('/etc/update-motd.d/99-rpi-jukebox-rfid-welcome', 'old')
-
-    failed, _ = setup_run(system, home, answers={'samba': True})
-    assert failed == 0
-    assert 'Lauschkiste Boot Config' not in system.read('/boot/firmware/config.txt')
-    smb = system.read('/etc/samba/smb.conf')
-    assert smb.count('Samba Config') == 1 and '[jukebox]' not in smb and smb.startswith('[global]\n')
-    assert f'path={home / "audiofolders"}\n' in smb
-    assert not system.exists('~/.config/systemd/user/jukebox-daemon.service')
-    assert 'jukebox-daemon.service' not in system.enabled_user
-    assert 'lauschkiste.service' in system.enabled_user
-    assert not system.exists('/etc/update-motd.d/99-rpi-jukebox-rfid-welcome')
-    assert system.exists('/etc/update-motd.d/99-lauschkiste-welcome')
-
-
 def test_service_is_started_and_restarted_after_a_unit_change(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root')
     setup_run(system, home, names=['service'])
@@ -284,7 +262,8 @@ def test_samba_asks_for_a_password_and_never_sets_a_default(tmp_path, home, extr
 
 def test_replace_block_keeps_the_rest_of_the_file(tmp_path):
     system = FakeSystem(tmp_path / 'root')
-    system.write('/etc/x.conf', '[global]\n  a=1\n\n## Jukebox Samba Config\n[jukebox]\n  path=/old\n\n[other]\n  b=2\n')
+    system.write('/etc/x.conf', '[global]\n  a=1\n\n## Lauschkiste Samba Config\n[lauschkiste]\n'
+                                 '  path=/old\n  x=1\n\n[other]\n  b=2\n')
     system.replace_block('/etc/x.conf', '## Lauschkiste Samba Config', '[lauschkiste]\n  path=/new')
     assert system.read('/etc/x.conf') == ('[global]\n  a=1\n\n## Lauschkiste Samba Config\n[lauschkiste]\n'
                                           '  path=/new\n\n[other]\n  b=2\n')

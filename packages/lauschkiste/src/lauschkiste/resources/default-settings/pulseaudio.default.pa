@@ -18,14 +18,14 @@
 # This startup script is used only if PulseAudio is started per-user
 # (i.e. not in system mode)
 
-# Note: This file has been modified slightly for use with the RPi-Jukebox-RFID project
+# Note: This file has been modified slightly for use with Lauschkiste
 
 .fail
 
 ### Automatically restore the volume of streams and devices
 load-module module-device-restore
-# Jukebox: Don't restore the device from last session, but use default-sink
-# Anyway, Jukebox service overrides the default device based on it's settings
+# Lauschkiste: Don't restore the device from last session, but use default-sink
+# Anyway, the Lauschkiste service overrides the default device based on it's settings
 load-module module-stream-restore restore_device=false
 load-module module-card-restore
 
@@ -146,6 +146,6 @@ load-module module-filter-apply
 #set-default-sink output
 #set-default-source input
 
-### Configuration by Jukebox's Tool may come below
+### Configuration by Lauschkiste's tools may come below
 # Run `lauschctl setup audio` for configuration
 

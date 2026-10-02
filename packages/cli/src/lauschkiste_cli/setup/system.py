@@ -13,21 +13,10 @@ import typer
 PathLike = Union[str, Path]
 
 
-#: Marker prefix in system files; blocks written before the renaming start with the legacy one
-MARKER_PREFIX = '## Lauschkiste'
-LEGACY_MARKER_PREFIX = '## Jukebox'
-
-
-def has_marker(text: str, marker: str) -> bool:
-    """``marker`` or its pre-renaming form occurs in ``text``."""
-    return marker in text or marker.replace(MARKER_PREFIX, LEGACY_MARKER_PREFIX, 1) in text
-
-
 def _block_span(lines: List[str], marker: str):
     """(start, end) of a marked block: the marker line, one ``[section]`` line, then indented lines."""
-    legacy = marker.replace(MARKER_PREFIX, LEGACY_MARKER_PREFIX, 1)
     for start, line in enumerate(lines):
-        if line.strip() in (marker, legacy):
+        if line.strip() == marker:
             end = start + 1
             if end < len(lines) and lines[end].startswith('['):
                 end += 1
@@ -83,7 +72,7 @@ class System:
     def append_block(self, path: PathLike, marker: str, block: str, root: bool = False) -> bool:
         """Append ``marker`` + ``block`` unless the file already contains ``marker``."""
         current = self.read(path) or ''
-        if has_marker(current, marker):
+        if marker in current:
             return False
         separator = '' if not current or current.endswith('\n') else '\n'
         self.write(path, f"{current}{separator}\n{marker}\n{block.rstrip()}\n", root=root)
@@ -91,13 +80,13 @@ class System:
 
     def read_block(self, path: PathLike, marker: str) -> Optional[str]:
         """The block ``append_block`` added (marker line through the indented lines of its first
-        section), also one with the pre-renaming marker; None if there is none."""
+        section); None if there is none."""
         lines = (self.read(path) or '').split('\n')
         span = _block_span(lines, marker)
         return None if span is None else '\n'.join(lines[span[0]:span[1]])
 
     def replace_block(self, path: PathLike, marker: str, block: str, root: bool = False) -> None:
-        """Replace the block marked ``marker`` (or its pre-renaming form) in place, else append it."""
+        """Replace the block marked ``marker`` in place, else append it."""
         lines = (self.read(path) or '').split('\n')
         span = _block_span(lines, marker)
         if span is None:

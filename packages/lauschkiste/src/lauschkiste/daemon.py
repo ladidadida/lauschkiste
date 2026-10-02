@@ -110,7 +110,7 @@ class Daemon:
             logger.info(f"Shutdown time: {((time.time_ns() - time_start) / 1000000.0):.3f} ms")
             sys.exit(0)
         elif count == 2:
-            print("Waiting for closing down procedure to complete. Pressing Ctrl-C again will close Jukebox down immediately.")
+            print("Waiting for closing down procedure to complete. Pressing Ctrl-C again stops Lauschkiste immediately.")
         if count == 3:
             sys.exit(1)
 

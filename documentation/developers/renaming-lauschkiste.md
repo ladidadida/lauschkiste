@@ -36,14 +36,9 @@ contain the name and stay as they are, so cards, the web app and API clients are
 
 ## Existing installations
 
-Only test installations of this fork exist, so compatibility is kept small and temporary (one
-release, then removed):
-
-- `LAUSCHKISTE_HOME` falls back to `JUKEBOX_HOME`; the default home falls back to an existing
-  `~/jukebox` / `$XDG_DATA_HOME/jukebox`.
-- `settings/lauschkiste.yaml` falls back to an existing `settings/jukebox.yaml`.
-- `lauschkiste setup` (service step) disables and removes `jukebox-daemon.service` when it finds it.
-- Configurations from upstream Phoniebox installs keep working as today (paths below `shared/`).
+None: there were no users yet, so Lauschkiste does not know the old names at all (no fallbacks
+for `JUKEBOX_*`, `~/jukebox`, `jukebox.yaml`, the `jukebox-daemon` service or `jb.*` loggers).
+Support for people moving over from a Phoniebox can be built later if needed.
 
 ## Versioning
 

@@ -20,7 +20,6 @@ lauschkiste = { workspace = true }
 [project.scripts]
 lauschkiste = "lauschkiste_cli.cli:server"
 lauschctl = "lauschkiste_cli.cli:ctl"
-jukebox = "lauschkiste_cli.cli:legacy"
 
 [build-system]
 requires = ["hatchling"]

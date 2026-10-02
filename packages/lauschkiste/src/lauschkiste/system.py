@@ -92,13 +92,13 @@ def _read_log(handler_name: str) -> str:
         try:
             if os.path.getsize(h.baseFilename) == 0:
                 return (f"Log file {h.baseFilename} is empty. (Is the RotatingFileHandler configured as "
-                        f"handler sink for jb in logger.yaml?)")
+                        f"handler sink for lauschkiste in logger.yaml?)")
             mtime = os.path.getmtime(h.baseFilename)
             stime = get_daemon().start_time
             # 3 seconds tolerance between file creation and recording the start time
             if mtime - stime < -3:
-                return (f"Log file {h.baseFilename} too old for this Jukebox start! "
-                        f"Is the RotatingFileHandler configured as handler sink for jb in logger.yaml?")
+                return (f"Log file {h.baseFilename} too old for this start! "
+                        f"Is the RotatingFileHandler configured as handler sink for lauschkiste in logger.yaml?")
             with open(h.baseFilename) as stream:
                 return stream.read()
         except Exception as e:

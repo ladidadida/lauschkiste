@@ -1,8 +1,6 @@
 # Update
 
 - [Updating Lauschkiste](#updating-lauschkiste)
-- [Coming from an installation before the renaming](#coming-from-an-installation-before-the-renaming)
-- [Coming from an installation with the old installer](#coming-from-an-installation-with-the-old-installer)
 - [Migration path from Phoniebox 2](#migration-path-from-phoniebox-2)
 
 ## Updating Lauschkiste
@@ -22,39 +20,7 @@ Afterwards `lauschctl setup --yes` re-applies the setup with your earlier answer
 service definition) and a running Lauschkiste service is restarted.
 
 Your data -- music, settings, cards -- lives in the Lauschkiste home (`lauschctl home` shows it)
-and is not touched by an update. Cards in the old format are converted when Lauschkiste starts
-(with a backup of the card database).
-
-## Coming from an installation before the renaming
-
-Lauschkiste was called "jukebox" before version 0.1 (commands `jukebox run` / `jukebox setup`,
-service `jukebox-daemon`, data in `~/jukebox`). Such installations keep working:
-
-- Run `install.sh` again (or `jukebox update`, which still exists for one release). The data
-  directory `~/jukebox` (and `settings/jukebox.yaml`, `JUKEBOX_HOME`) stays in use.
-- `lauschctl setup` replaces the `jukebox-daemon` service with `lauschkiste`, and recognizes the
-  blocks it added to system files before, so nothing is added twice.
-- The `jukebox` command still works for one release; use `lauschkiste` and `lauschctl` instead.
-
-## Coming from an installation with the old installer
-
-Installations made with the old `install-jukebox.sh` keep their data in
-`~/RPi-Jukebox-RFID/shared`. Either keep using that checkout as a source installation:
-
-```bash
-cd ~/RPi-Jukebox-RFID && git remote set-url origin https://github.com/ladidadida/lauschkiste.git && git pull
-curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash -s -- --source ~/RPi-Jukebox-RFID
-```
-
-or install the package and point it at the old data:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash -s -- --home ~/RPi-Jukebox-RFID/shared
-```
-
-Paths written by the old installer (`../../shared/...`) are understood. The old service
-(`/usr/lib/systemd/user/jukebox-daemon.service`) is replaced by `lauschkiste.service`, which
-`lauschctl setup` writes to `~/.config/systemd/user/`.
+and is not touched by an update.
 
 ## Migration path from Phoniebox 2
 

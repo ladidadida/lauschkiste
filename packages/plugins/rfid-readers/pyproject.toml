@@ -1,7 +1,7 @@
 [project]
 name = "lauschkiste-plugin-rfid-readers"
 version = "0.1.0a2"
-description = "Jukebox plugins: RFID reader drivers (one plugin per driver)"
+description = "Lauschkiste plugins: RFID reader drivers (one plugin per driver)"
 license = "MIT"
 requires-python = ">=3.11"
 dependencies = [

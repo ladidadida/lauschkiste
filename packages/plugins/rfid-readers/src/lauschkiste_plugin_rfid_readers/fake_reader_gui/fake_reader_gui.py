@@ -1,4 +1,4 @@
-# RPi-Jukebox-RFID Version 3
+# Lauschkiste
 # Copyright (c) See file LICENSE in project root folder
 import os
 import signal

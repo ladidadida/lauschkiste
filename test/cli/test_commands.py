@@ -2,7 +2,7 @@ import re
 
 from typer.testing import CliRunner
 
-from lauschkiste_cli.cli import ctl, legacy, server
+from lauschkiste_cli.cli import ctl, server
 
 runner = CliRunner()
 
@@ -26,7 +26,3 @@ def test_lauschctl_has_the_management_commands_but_not_run():
         assert command in plain(result.output)
     assert runner.invoke(ctl, ['run', '--help']).exit_code != 0
 
-
-def test_old_jukebox_command_still_offers_run_and_setup():
-    assert runner.invoke(legacy, ['run', '--help']).exit_code == 0
-    assert runner.invoke(legacy, ['setup', '--list']).exit_code == 0

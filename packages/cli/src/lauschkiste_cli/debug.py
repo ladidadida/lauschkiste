@@ -30,7 +30,7 @@ def sniff(
         help="Subscribe to these topic tree(s). If omitted, all topics are subscribed.",
     ),
 ) -> None:
-    """Monitor all messages sent from Jukebox through the publishing interface."""
+    """Monitor all messages Lauschkiste publishes (events)."""
     try:
         asyncio.run(_sniff(port, topics))
     except KeyboardInterrupt:
