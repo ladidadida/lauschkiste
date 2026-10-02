@@ -5,12 +5,12 @@ const backendData = {
   get_folder_content: [
     {
       name: 'Albums',
-      relpath: 'Music/Rock/Albums',
+      relpath: 'music/Rock/Albums',
       type: 'directory',
     },
     {
       name: 'sample.mp3',
-      relpath: 'Music/Rock/sample.mp3',
+      relpath: 'music/Rock/sample.mp3',
       type: 'file',
     },
   ],
@@ -337,7 +337,7 @@ const routes = [
   },
   {
     name: 'library',
-    path: '/#/library',
+    path: '/#/library/music/albums',
     ready: '#library',
     text: 'Discovery',
   },
@@ -365,7 +365,7 @@ for (const route of routes) {
     await expectStableLayout(page);
     if (route.name === 'library') {
       await expectAbove(
-        page.getByRole('tab', { name: 'Overview' }),
+        page.getByRole('tab', { name: 'Music' }),
         page.getByText('Discovery', { exact: true }),
       );
     }
@@ -386,7 +386,7 @@ test('bottom navigation changes routes', async ({ page }) => {
   await page.goto('/');
 
   await page.getByRole('link', { name: 'Library' }).click();
-  await expect(page).toHaveURL(/#\/library\/overview$/);
+  await expect(page).toHaveURL(/#\/library\/continue$/);
 
   await page.getByRole('link', { name: 'Cards' }).click();
   await expect(page).toHaveURL(/#\/cards$/);
@@ -424,24 +424,35 @@ test('player backdrop covers its full width across the md breakpoint', async ({ 
 test('encoded library folder routes preserve the folder path', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   const { libraryCalls } = await mockBackend(page);
-  await page.goto('/#/library/folders/Music%2FRock');
+  await page.goto('/#/library/music/folders/music%2FRock');
 
-  await expect.poll(() => libraryCalls).toContain('Music/Rock');
-  await expect(page).toHaveURL(/#\/library\/local\/folders\/Music%2FRock$/);
+  await expect.poll(() => libraryCalls).toContain('music/Rock');
+  await expect(page).toHaveURL(/#\/library\/music\/folders\/music%2FRock$/);
   await expect(page.getByRole('link', { name: 'Library' })).toHaveClass(/Mui-selected/);
   await expect(page.getByText('sample.mp3')).toBeVisible();
   await expectStableLayout(page);
   expect(consoleErrors).toEqual([]);
 });
 
-test('local library tabs replace the current nested route', async ({ page }) => {
+test('folder views stay within their type folder', async ({ page }) => {
+  const consoleErrors = collectConsoleErrors(page);
+  const { libraryCalls } = await mockBackend(page);
+  await page.goto('/#/library/music/folders/..%2Fsettings');
+
+  await expect(page).toHaveURL(/#\/library\/music\/folders\/music$/);
+  await expect.poll(() => libraryCalls).toContain('music');
+  expect(libraryCalls).not.toContain('../settings');
+  expect(consoleErrors).toEqual([]);
+});
+
+test('music views replace the current nested route', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   await mockBackend(page);
-  await page.goto('/#/library/local/folders/Music%2FRock?cardId=123');
+  await page.goto('/#/library/music/folders/music%2FRock?cardId=123');
 
   await page.getByRole('tab', { name: 'Albums' }).click();
 
-  await expect(page).toHaveURL(/#\/library\/local\/albums\?cardId=123$/);
+  await expect(page).toHaveURL(/#\/library\/music\/albums\?cardId=123$/);
   await expect(page.getByText('Discovery', { exact: true })).toBeVisible();
   expect(consoleErrors).toEqual([]);
 });
@@ -449,13 +460,10 @@ test('local library tabs replace the current nested route', async ({ page }) => 
 test('library playback preserves provider and content URI', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   const { apiCalls } = await mockBackend(page, { streamingLibrary: true });
-  await page.goto('/#/library');
+  await page.goto('/#/library/music/albums');
 
-  await expect(
-    page.getByRole('heading', { name: 'Streaming Playlists' }),
-  ).toBeVisible();
-  await page.getByRole('tab', { name: 'Streaming' }).click();
-  await expect(page).toHaveURL(/#\/library\/streaming\/playlists$/);
+  await page.getByRole('button', { name: 'Streaming' }).click();
+  await expect(page.getByText('Discovery', { exact: true })).toHaveCount(0);
 
   await page.getByText('Bedtime Stories', { exact: true }).click();
   await expect(page.getByText('Chapter One', { exact: true })).toBeVisible();

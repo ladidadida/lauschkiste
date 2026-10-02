@@ -15,7 +15,7 @@ import { flatByAlbum } from '../../../../utils/utils';
 
 import AlbumList from "./album-list";
 
-// Albums of all sources; filter chips per source once there is more than one.
+// Albums and playlists of all music sources; filter chips per source once there is more than one.
 const Albums = ({ musicFilter, sources = [] }) => {
   const { t } = useTranslation();
   const { state: { [LIBRARY_SCANNED_TOPIC]: lastScan } = {} } = useContext(PubSubContext);
@@ -31,7 +31,7 @@ const Albums = ({ musicFilter, sources = [] }) => {
       // A rescan reloads the list in place, without the spinner
       if (lastScan === undefined) setIsLoading(true);
       setError(null);
-      const { result, error: requestError } = await request('libraryItems', { content_types: ['album'] });
+      const { result, error: requestError } = await request('libraryItems');
       if (!isCurrent) return;
       setIsLoading(false);
       if (result) setAlbums(result.reduce(flatByAlbum, []));
