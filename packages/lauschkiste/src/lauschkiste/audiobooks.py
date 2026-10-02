@@ -60,10 +60,10 @@ class Audiobooks(CoreModule):
     requires = ('library', 'player')
 
     def __init__(self):
-        self._ctx = None
+        self._ctx: Any = None
         self._lock = threading.Lock()
         self._save_lock = threading.Lock()
-        self._path: Optional[Path] = None
+        self._path = Path(DEFAULT_STATE_FILE)
         self._rewind = 10.0
         self._save_interval = 10.0
         self._positions: Dict[str, Dict[str, Any]] = {}
@@ -74,7 +74,7 @@ class Audiobooks(CoreModule):
         self._activated_at = 0.0
         self._last: Optional[Dict[str, float]] = None
         self._modes: Optional[Dict[str, bool]] = None
-        self._worker = None
+        self._worker: Any = None
 
     # -- lifecycle ------------------------------------------------------------------------------
 
