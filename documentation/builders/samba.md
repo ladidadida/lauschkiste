@@ -1,30 +1,37 @@
 # Samba
 
-The Web App can upload files or complete folder trees, create folders, and
-delete files or folders in the audio library. Samba is therefore optional and
-disabled by default.
+Samba makes the music folder a network drive in Windows Explorer, the macOS Finder or a Linux file
+manager. It is optional and off by default: the web app and SFTP can copy music too, see
+[Copying music](copying-music.md).
 
-Enable Samba during installation when you want direct network access to the
-complete `./shared/` directory. It is exposed as the `lauschkiste` network share
-and includes both the audio library and configuration files.
+## Enable
+
+```bash
+lauschctl setup samba
+```
+
+The step installs Samba and shares the music folder (`audiofolders` in the Lauschkiste home) as
+`lauschkiste`. Settings, the card database and logs are not shared. The first time, it asks for a
+Samba password (at least 8 characters) for your user; with `--yes` and no password set yet, the
+step is skipped until you run it interactively.
+
+Installations from before version 0.1 shared the whole home directory with the password
+`raspberry`. Running `lauschctl setup samba` again limits the share to the music folder; change the
+password with `sudo smbpasswd -a <your-username>`.
 
 ## Connect
 
-To access the share open your OS network environment and select your Lauschkiste device.
-Alternatively directly access it via url with the file explorer (e.g. Windows `\\<ip-address-of-your-lauschkiste>`, MacOS `smb://<ip-address-of-your-lauschkiste>`).
+Open your network environment and select your Lauschkiste, or enter the address directly:
 
-See also
+* Windows: `\\<ip-address-of-your-lauschkiste>\lauschkiste`
+* macOS: `smb://<ip-address-of-your-lauschkiste>/lauschkiste` (Finder: Go, Connect to Server),
+  see also [Apple's guide](https://support.apple.com/guide/mac-help/mchlp1140/mac)
+* Linux: `smb://<ip-address-of-your-lauschkiste>/lauschkiste`
 
-* [MacOS](https://support.apple.com/lt-lt/guide/mac-help/mchlp1140/mac)
+Log in with your user name on the Pi and the Samba password.
 
-## User name / Password
+## Change the password
 
-As login credentials use the same username you used to run the installation with. The password is `raspberry`.
-You can change the password anytime using the command `sudo smbpasswd -a "<your-username>"`.
-
-## Copying music
-
-Copy albums into the `audiofolders` folder of the share. The library notices new, changed and
-removed files by itself and rescans a few seconds after copying has finished
-(`library.watch` / `library.watch_interval_sec` in `lauschkiste.yaml`); the refresh button in the web
-app's library view starts a rescan right away.
+```bash
+sudo smbpasswd -a <your-username>
+```

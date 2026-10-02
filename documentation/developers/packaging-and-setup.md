@@ -121,7 +121,8 @@ optimisation. Steps needing root run their commands through `sudo`.
    - Autologin is only set up for the kiosk mode, which needs it.
    - Autohotspot supports NetworkManager only (Bookworm and later); dhcpcd systems don't offer
      the step.
-   - The Samba share is called `lauschkiste` and shares `LAUSCHKISTE_HOME`.
+   - The Samba share is called `lauschkiste` and shares only the music folder; the password is
+     asked for (no default), files keep normal permissions.
    - `rfid` runs the interactive reader configuration and is skipped with `--yes`.
    - Runtime packages only: the default player needs neither ffmpeg nor mpg123; the PipeWire
      stack is installed on a Pi only (desktops bring their own sound server).

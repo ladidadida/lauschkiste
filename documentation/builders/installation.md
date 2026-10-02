@@ -49,9 +49,8 @@ After a successful installation, [configure your Lauschkiste](configuration.md).
 > consider running the installation in `screen` or `tmux`, so a dropped SSH connection doesn't
 > interrupt it.
 
-The Web App can upload files or complete folder trees, organize the audio library, and delete
-files or folders, so Samba is off by default. Choose Samba when you also want direct network
-access to the complete Lauschkiste home, including configuration files. See [Samba](samba.md).
+Music gets onto the box through the web app, SFTP (with your Pi login) or an optional Samba
+share of the music folder, see [Copying music](copying-music.md).
 
 ### Options
 

@@ -23,6 +23,20 @@ def has_marker(text: str, marker: str) -> bool:
     return marker in text or marker.replace(MARKER_PREFIX, LEGACY_MARKER_PREFIX, 1) in text
 
 
+def _block_span(lines: List[str], marker: str):
+    """(start, end) of a marked block: the marker line, one ``[section]`` line, then indented lines."""
+    legacy = marker.replace(MARKER_PREFIX, LEGACY_MARKER_PREFIX, 1)
+    for start, line in enumerate(lines):
+        if line.strip() in (marker, legacy):
+            end = start + 1
+            if end < len(lines) and lines[end].startswith('['):
+                end += 1
+            while end < len(lines) and lines[end][:1] in (' ', '\t'):
+                end += 1
+            return start, end
+    return None
+
+
 class SetupError(Exception):
     pass
 
@@ -74,6 +88,23 @@ class System:
         separator = '' if not current or current.endswith('\n') else '\n'
         self.write(path, f"{current}{separator}\n{marker}\n{block.rstrip()}\n", root=root)
         return True
+
+    def read_block(self, path: PathLike, marker: str) -> Optional[str]:
+        """The block ``append_block`` added (marker line through the indented lines of its first
+        section), also one with the pre-renaming marker; None if there is none."""
+        lines = (self.read(path) or '').split('\n')
+        span = _block_span(lines, marker)
+        return None if span is None else '\n'.join(lines[span[0]:span[1]])
+
+    def replace_block(self, path: PathLike, marker: str, block: str, root: bool = False) -> None:
+        """Replace the block marked ``marker`` (or its pre-renaming form) in place, else append it."""
+        lines = (self.read(path) or '').split('\n')
+        span = _block_span(lines, marker)
+        if span is None:
+            self.append_block(path, marker, block, root=root)
+            return
+        lines[span[0]:span[1]] = [marker, *block.rstrip().split('\n')]
+        self.write(path, '\n'.join(lines), root=root)
 
     def remove(self, path: PathLike, root: bool = False) -> None:
         target = self.path(path)

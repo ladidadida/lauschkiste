@@ -117,6 +117,7 @@ def test_second_run_changes_nothing(tmp_path, home, extras):
 
 def test_pi_setup(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
+    system.outputs[('pdbedit', '-L')] = 'pi:1000:'
     failed, ctx = setup_run(system, home, answers={'disable_onboard_audio': True, 'samba': True})
     assert failed == 0
     assert 'raspberry_pi' in ctx.enabled_plugins()
@@ -130,17 +131,17 @@ def test_pi_setup(tmp_path, home, extras):
     assert 'bluetooth.service' not in system.enabled
     assert 'static ip_address=192.168.1.50/24' in system.read('/etc/dhcpcd.conf')
     smb = system.read('/etc/samba/smb.conf')
-    assert f'path={home}' in smb and smb.count('## Lauschkiste Samba Config') == 1
+    assert f'path={home / "audiofolders"}\n' in smb and smb.count('## Lauschkiste Samba Config') == 1
+    assert 'force user=pi' in smb and '0777' not in smb
     assert system.exists('/etc/update-motd.d/99-lauschkiste-welcome')
 
 
 def test_answers_are_stored_without_secrets(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
-    setup_run(system, home, answers={'samba': True, 'samba_password': 'secret'})
+    setup_run(system, home, answers={'samba': True})
     stored = Answers(home / 'settings' / 'setup.yaml').load()
     assert stored['samba'] is True
     assert stored['optimize_boot'] is True
-    assert 'samba_password' not in stored
 
 
 def test_check_changes_nothing(tmp_path, home, extras):
@@ -234,7 +235,9 @@ def test_blocks_and_service_from_before_the_renaming(tmp_path, home, extras):
     failed, _ = setup_run(system, home, answers={'samba': True})
     assert failed == 0
     assert 'Lauschkiste Boot Config' not in system.read('/boot/firmware/config.txt')
-    assert 'Lauschkiste Samba Config' not in system.read('/etc/samba/smb.conf')
+    smb = system.read('/etc/samba/smb.conf')
+    assert smb.count('Samba Config') == 1 and '[jukebox]' not in smb and smb.startswith('[global]\n')
+    assert f'path={home / "audiofolders"}\n' in smb
     assert not system.exists('~/.config/systemd/user/jukebox-daemon.service')
     assert 'jukebox-daemon.service' not in system.enabled_user
     assert 'lauschkiste.service' in system.enabled_user
@@ -261,3 +264,29 @@ def test_missing_extras_of_enabled_plugins_are_reinstalled(tmp_path, home, extra
     failed, _ = setup_run(system, home, names=['plugins'])
     assert failed == 0
     assert extras == ['lauschkiste-plugin-rfid-readers[rc522-spi]']
+
+
+def test_samba_asks_for_a_password_and_never_sets_a_default(tmp_path, home, extras, monkeypatch):
+    from lauschkiste_cli.setup.steps import extras as extras_steps
+    system = FakeSystem(tmp_path / 'root')
+    failed, _ = setup_run(system, home, names=['samba'], answers={'samba': True})
+    assert failed == 0
+    assert not any(c[0] == 'smbpasswd' for c in system.commands)
+
+    passwords = iter(['short', 'long enough'])
+    monkeypatch.setattr(extras_steps.typer, 'prompt', lambda *a, **k: next(passwords))
+    ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml', answers={'samba': True})
+    extras_steps.SambaStep().apply(ctx)
+    smbpasswd = [c for c in system.commands if c[0] == 'smbpasswd']
+    assert smbpasswd == [('smbpasswd', '-s', '-a', 'pi')]
+    assert extras_steps.SambaStep().check(ctx) == []
+
+
+def test_replace_block_keeps_the_rest_of_the_file(tmp_path):
+    system = FakeSystem(tmp_path / 'root')
+    system.write('/etc/x.conf', '[global]\n  a=1\n\n## Jukebox Samba Config\n[jukebox]\n  path=/old\n\n[other]\n  b=2\n')
+    system.replace_block('/etc/x.conf', '## Lauschkiste Samba Config', '[lauschkiste]\n  path=/new')
+    assert system.read('/etc/x.conf') == ('[global]\n  a=1\n\n## Lauschkiste Samba Config\n[lauschkiste]\n'
+                                          '  path=/new\n\n[other]\n  b=2\n')
+    assert system.read_block('/etc/x.conf', '## Lauschkiste Samba Config') == (
+        '## Lauschkiste Samba Config\n[lauschkiste]\n  path=/new')
