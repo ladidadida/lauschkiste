@@ -50,6 +50,9 @@ class FakeDriver:
         return FakeReader(self.cards)
 
 
+MANAGERS = []
+
+
 @pytest.fixture
 def setup(tmp_path):
     main = lauschkiste.cfghandler.get_handler('lauschkiste')
@@ -91,6 +94,7 @@ def setup(tmp_path):
     manager.load()
     manager.start()
     manager.ready()
+    MANAGERS.append(manager)
     yield ctrl, driver, events
     for thread in manager.stop():
         thread.join(2)
@@ -112,7 +116,7 @@ def test_swiped_card_runs_its_action(setup):
     driver.cards.put('0001')
     assert wait_for(lambda: ctrl.play_folder.called)
     ctrl.play_folder.assert_called_once_with('Rock', False)
-    assert ('rfid.card_detected', {'card_id': '0001', 'registered': True}) in events
+    assert ('rfid.card_detected', {'card_id': '0001', 'registered': True, 'learned': False}) in events
 
 
 def test_card_without_args_runs(setup):
@@ -124,5 +128,27 @@ def test_card_without_args_runs(setup):
 def test_unknown_card_is_published_as_unregistered(setup):
     ctrl, driver, events = setup
     driver.cards.put('9999')
-    assert wait_for(lambda: ('rfid.card_detected', {'card_id': '9999', 'registered': False}) in events)
+    assert wait_for(lambda: ('rfid.card_detected', {'card_id': '9999', 'registered': False, 'learned': False}) in events)
     ctrl.play_folder.assert_not_called()
+
+
+def test_learning_reports_the_next_card_without_running_it(setup):
+    ctrl, driver, events = setup
+    rfid = MANAGERS[-1].handle('rfid')
+    rfid.invoke('learn', 30)
+    driver.cards.put('0001')
+    assert wait_for(lambda: ('rfid.card_detected', {'card_id': '0001', 'registered': True, 'learned': True}) in events)
+    time.sleep(0.3)
+    ctrl.play_folder.assert_not_called()
+
+    driver.cards.put('0002')
+    assert wait_for(lambda: ctrl.next.called)
+
+
+def test_stop_learning(setup):
+    ctrl, driver, _ = setup
+    rfid = MANAGERS[-1].handle('rfid')
+    rfid.invoke('learn')
+    rfid.invoke('stop_learning')
+    driver.cards.put('0001')
+    assert wait_for(lambda: ctrl.play_folder.called)

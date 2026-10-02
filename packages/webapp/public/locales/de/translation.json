@@ -379,6 +379,16 @@
       "nothing": "Nichts gefunden.",
       "albums": "Alben",
       "songs": "Titel"
+    },
+    "card": {
+      "title": "Auf Karte legen",
+      "place": "Lege jetzt die Karte auf, die „{{title}}“ abspielen soll.",
+      "overwrite": "Karte {{card}} ist schon belegt. Überschreiben?",
+      "overwrite-confirm": "Überschreiben",
+      "done": "Karte {{card}} spielt jetzt „{{title}}“.",
+      "error": "Die Karte konnte nicht gespeichert werden.",
+      "unknown": "Unbekannte Karte {{card}} aufgelegt.",
+      "learn": "Anlernen"
     }
   },
   "settings": {

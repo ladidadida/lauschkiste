@@ -22,6 +22,13 @@ const commands = {
     rest: { method: 'GET', path: '/api/v1/library/search' },
     argKeys: ['query'],
   },
+  rfidLearn: {
+    rest: { method: 'POST', path: '/api/v1/rfid/learn' },
+    argKeys: ['seconds'],
+  },
+  rfidStopLearning: {
+    rest: { method: 'POST', path: '/api/v1/rfid/learn/stop' },
+  },
   cardsList: {
     rest: { method: 'GET', path: '/api/v1/cards' },
   },

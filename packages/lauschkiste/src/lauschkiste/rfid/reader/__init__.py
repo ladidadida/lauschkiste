@@ -13,7 +13,7 @@ from pydantic import BaseModel
 
 import lauschkiste.cfghandler
 import lauschkiste.paths
-from lauschkiste.contract import CoreModule, event, extension_point, query
+from lauschkiste.contract import CoreModule, action, event, extension_point, query
 
 log = logging.getLogger('lauschkiste.rfid')
 
@@ -31,6 +31,8 @@ class ReaderDriver(Protocol):
 class CardDetected(BaseModel):
     card_id: str
     registered: bool
+    #: Detected while learning: its action did not run
+    learned: bool = False
 
 
 class CardRemovalTimer(threading.Thread):
@@ -128,7 +130,7 @@ class Rfid(CoreModule):
     """RFID readers: detect cards and run their actions."""
 
     name = 'rfid'
-    interface_version = '1.0'
+    interface_version = '1.1'
     requires = ('cards',)
 
     card_detected = event('card_detected', CardDetected)
@@ -137,6 +139,8 @@ class Rfid(CoreModule):
     def __init__(self):
         self._ctx = None
         self._runners: Dict[str, ReaderRunner] = {}
+        self._learn_lock = threading.Lock()
+        self._learn_until = 0.0
 
     def start(self, ctx) -> None:
         self._ctx = ctx
@@ -172,6 +176,14 @@ class Rfid(CoreModule):
         return self._ctx.modules.cards.get_card(card_id)
 
     def dispatch(self, card_id: str, card) -> None:
+        with self._learn_lock:
+            learning = time.monotonic() < self._learn_until
+            self._learn_until = 0.0
+        if learning:
+            log.info(f"Learned card '{card_id}'")
+            self._ctx.publish(self.card_detected,
+                              CardDetected(card_id=card_id, registered=card is not None, learned=True))
+            return
         self._ctx.publish(self.card_detected, CardDetected(card_id=card_id, registered=card is not None))
         if card is None:
             log.info(f"Unknown card: '{card_id}'")
@@ -183,6 +195,18 @@ class Rfid(CoreModule):
         return self._ctx.actions.bind(entry, where, log)
 
     # -- operations -----------------------------------------------------------------------------
+
+    @action(path='/learn')
+    def learn(self, seconds: float = 60.0) -> None:
+        """Report the next card within ``seconds`` (``learned``) without running its action."""
+        with self._learn_lock:
+            self._learn_until = time.monotonic() + max(0.0, min(float(seconds), 600.0))
+
+    @action(path='/learn/stop')
+    def stop_learning(self) -> None:
+        """End learning; cards run their actions again."""
+        with self._learn_lock:
+            self._learn_until = 0.0
 
     @query(path='/readers')
     def list_readers(self) -> Dict[str, str]:

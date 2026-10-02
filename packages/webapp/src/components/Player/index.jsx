@@ -5,6 +5,7 @@ import Grid from '@mui/material/Grid';
 import Cover from './cover';
 import Controls from './controls';
 import PlayerActions from './actions';
+import UnknownCard from './unknown-card';
 import Display from './display';
 import SeekBar from './seekbar';
 import Volume from './volume';
@@ -88,6 +89,7 @@ const Player = () => {
           <SeekBar />
           <Controls />
           <PlayerActions />
+          <UnknownCard context={playerstatus?.context} />
           <Volume />
         </Grid>
       </Grid>

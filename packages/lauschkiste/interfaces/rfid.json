@@ -5,6 +5,10 @@
         "card_id": {
           "type": "string"
         },
+        "learned": {
+          "default": false,
+          "type": "boolean"
+        },
         "registered": {
           "type": "boolean"
         }
@@ -21,10 +25,28 @@
       "create_reader": "(self, reader_cfg_key: str) -> Any"
     }
   },
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "core",
   "name": "rfid",
   "operations": {
+    "learn": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "seconds": {
+            "default": 60.0,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/rfid/learn",
+      "returns": {
+        "type": "null"
+      }
+    },
     "list_readers": {
       "args": {
         "additionalProperties": false,
@@ -39,6 +61,19 @@
           "type": "string"
         },
         "type": "object"
+      }
+    },
+    "stop_learning": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/rfid/learn/stop",
+      "returns": {
+        "type": "null"
       }
     }
   },

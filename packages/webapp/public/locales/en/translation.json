@@ -379,6 +379,16 @@
       "nothing": "Nothing found.",
       "albums": "Albums",
       "songs": "Songs"
+    },
+    "card": {
+      "title": "Put on a card",
+      "place": "Place the card that should play \"{{title}}\" now.",
+      "overwrite": "Card {{card}} is already in use. Overwrite it?",
+      "overwrite-confirm": "Overwrite",
+      "done": "Card {{card}} now plays \"{{title}}\".",
+      "error": "The card could not be saved.",
+      "unknown": "Unknown card {{card}} placed.",
+      "learn": "Register"
     }
   },
   "settings": {
