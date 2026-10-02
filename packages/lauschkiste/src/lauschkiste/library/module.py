@@ -129,7 +129,7 @@ class Library(CoreModule):
     """Music library: files, index with metadata, cover art; further sources plug in at ``library.sources``."""
 
     name = 'library'
-    interface_version = '1.0'
+    interface_version = '1.1'
     concurrency = 'threadsafe'
 
     scanned = event('scanned', LibraryScanned)
@@ -339,6 +339,11 @@ class Library(CoreModule):
             songs = self._index.album_songs(albumartist or None, album, lauschkiste.paths.MUSIC_DIR)
             return [self._local_song(song) for song in songs]
         return [song_from_source(provider, song) for song in source.list_songs(albumartist, album, content_uri) or []]
+
+    @query(path='/folder-songs')
+    def list_folder_songs(self, folder: str) -> List[Song]:
+        """Songs of the local library below ``folder``."""
+        return [self._local_song(song) for song in self._index.songs_below(folder)]
 
     @query(path='/song')
     def get_song(self, song_url: str, provider: Optional[str] = None) -> Optional[Song]:

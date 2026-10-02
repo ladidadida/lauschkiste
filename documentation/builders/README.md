@@ -18,6 +18,7 @@
 * File Management
   * [Copying music](./copying-music.md): web app, SFTP, Samba
   * [Network share / Samba](./samba.md)
+* [Audiobooks](./audiobooks.md)
 
 ## Hardware Components
 

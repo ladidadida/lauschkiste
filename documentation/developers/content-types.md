@@ -1,6 +1,7 @@
 # Content types (draft)
 
-Status: decided, implementation in progress (audiobooks first).
+Status: decided. Done: library layout, audiobooks (core module, no web app view yet). Open: radio,
+podcasts, web app.
 
 Lauschkiste plays more than albums. Audiobooks, podcasts and radio behave differently and should be
 handled as separate content types, each with its own place in the library, its own playback rules

@@ -75,8 +75,8 @@ class Mpd(Plugin):
     """Registers the ``mpd`` player backend and its database as library source."""
 
     name = 'mpd'
-    interface_version = '1.0'
-    requires = {'player': '>=1.0,<2', 'library': '>=1.0,<2'}
+    interface_version = '1.1'
+    requires = {'player': '>=2.0,<3', 'library': '>=1.0,<2'}
 
     def start(self, ctx) -> None:
         from lauschkiste_plugin_mpd.backend import PlayerMPD

@@ -29,7 +29,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '1.0'
+    interface_version = '2.0'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -204,6 +204,13 @@ class Player(CoreModule):
         if not songs:
             raise OperationError(404, 'unknown_album', f"No songs found for '{album}' by '{albumartist}'")
         self._coordinator.play_files([song.file for song in songs])
+
+    @action(path='/files')
+    def play_files(self, files: List[str], start: int = 0, position: float = 0.0) -> None:
+        """Play files of the library, from ``position`` seconds into the file at index ``start``."""
+        if not files:
+            raise OperationError(422, 'no_files', 'No files to play')
+        self._coordinator.play_files(files, start, position)
 
     @action(path='/queue')
     def queue_load(self, folder: str) -> None:

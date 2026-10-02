@@ -39,6 +39,7 @@
     * [list\_sources](#lauschkiste.library.module.Library.list_sources)
     * [list\_items](#lauschkiste.library.module.Library.list_items)
     * [list\_songs](#lauschkiste.library.module.Library.list_songs)
+    * [list\_folder\_songs](#lauschkiste.library.module.Library.list_folder_songs)
     * [get\_song](#lauschkiste.library.module.Library.get_song)
     * [search](#lauschkiste.library.module.Library.search)
     * [get\_song\_cover](#lauschkiste.library.module.Library.get_song_cover)
@@ -67,6 +68,12 @@
     * [delete\_card](#lauschkiste.rfid.cards.Cards.delete_card)
 * [lauschkiste.rfid.cardutils](#lauschkiste.rfid.cardutils)
   * [card\_command\_to\_str](#lauschkiste.rfid.cardutils.card_command_to_str)
+* [lauschkiste.audiobooks](#lauschkiste.audiobooks)
+  * [Audiobooks](#lauschkiste.audiobooks.Audiobooks)
+    * [list\_books](#lauschkiste.audiobooks.Audiobooks.list_books)
+    * [play](#lauschkiste.audiobooks.Audiobooks.play)
+    * [restart](#lauschkiste.audiobooks.Audiobooks.restart)
+    * [set\_finished](#lauschkiste.audiobooks.Audiobooks.set_finished)
 * [lauschkiste.volume](#lauschkiste.volume)
   * [PlayerMixer](#lauschkiste.volume.PlayerMixer)
   * [PulseMixer](#lauschkiste.volume.PulseMixer)
@@ -279,6 +286,7 @@
     * [play\_card](#lauschkiste.player.module.Player.play_card)
     * [play\_single](#lauschkiste.player.module.Player.play_single)
     * [play\_album](#lauschkiste.player.module.Player.play_album)
+    * [play\_files](#lauschkiste.player.module.Player.play_files)
     * [queue\_load](#lauschkiste.player.module.Player.queue_load)
     * [update](#lauschkiste.player.module.Player.update)
     * [update\_wait](#lauschkiste.player.module.Player.update_wait)
@@ -699,6 +707,18 @@ def list_songs(albumartist: str,
 Songs of an album, in track order.
 
 
+<a id="lauschkiste.library.module.Library.list_folder_songs"></a>
+
+#### list\_folder\_songs
+
+```python
+@query(path='/folder-songs')
+def list_folder_songs(folder: str) -> List[Song]
+```
+
+Songs of the local library below ``folder``.
+
+
 <a id="lauschkiste.library.module.Library.get_song"></a>
 
 #### get\_song
@@ -996,6 +1016,76 @@ def card_command_to_str(entry: Mapping[str, Any],
 ```
 
 ``[action(args)]``, plus the card flags when ``long`` is set.
+
+
+<a id="lauschkiste.audiobooks"></a>
+
+# lauschkiste.audiobooks
+
+The audiobooks core module: audiobooks in ``library/audiobooks``, continued where they stopped.
+
+Each folder directly below ``audiobooks`` is one audiobook, its files are the chapters in file name
+order. The position is kept per audiobook in ``audiobooks.state_file``. Shuffle and repeat are
+switched off while an audiobook plays and restored afterwards.
+
+
+<a id="lauschkiste.audiobooks.Audiobooks"></a>
+
+## Audiobooks Objects
+
+```python
+class Audiobooks(CoreModule)
+```
+
+Audiobooks: play, continue, start over, mark as finished.
+
+
+<a id="lauschkiste.audiobooks.Audiobooks.list_books"></a>
+
+#### list\_books
+
+```python
+@query(path='/')
+def list_books() -> List[Audiobook]
+```
+
+All audiobooks with their progress.
+
+
+<a id="lauschkiste.audiobooks.Audiobooks.play"></a>
+
+#### play
+
+```python
+@action()
+def play(book: str) -> None
+```
+
+Play an audiobook where it stopped (from the beginning when it is new or finished).
+
+
+<a id="lauschkiste.audiobooks.Audiobooks.restart"></a>
+
+#### restart
+
+```python
+@action()
+def restart(book: str) -> None
+```
+
+Play an audiobook from the beginning.
+
+
+<a id="lauschkiste.audiobooks.Audiobooks.set_finished"></a>
+
+#### set\_finished
+
+```python
+@action()
+def set_finished(book: str, finished: bool = True) -> None
+```
+
+Mark an audiobook as finished (or not); either way it starts from the beginning next time.
 
 
 <a id="lauschkiste.volume"></a>
@@ -3360,10 +3450,10 @@ Stop the current backend and select another registered backend.
 #### play\_files
 
 ```python
-def play_files(paths)
+def play_files(paths, start=0, position=0.0)
 ```
 
-Play a list of songs (paths below the music library, absolute or relative).
+Play a list of songs (paths below the library, absolute or relative).
 
 
 <a id="lauschkiste.player.module"></a>
@@ -3591,6 +3681,20 @@ def play_album(albumartist: str,
 Play an album of the library or of a backend's own catalog (``provider``).
 
 
+<a id="lauschkiste.player.module.Player.play_files"></a>
+
+#### play\_files
+
+```python
+@action(path='/files')
+def play_files(files: List[str],
+               start: int = 0,
+               position: float = 0.0) -> None
+```
+
+Play files of the library, from ``position`` seconds into the file at index ``start``.
+
+
 <a id="lauschkiste.player.module.Player.queue_load"></a>
 
 #### queue\_load
@@ -3806,10 +3910,14 @@ Receive the raw status mapping whenever it changes (only forwarded while active)
 #### play\_files
 
 ```python
-def play_files(paths: List[str]) -> None
+def play_files(paths: List[str],
+               start: int = 0,
+               position: float = 0.0) -> None
 ```
 
-Replace the queue with ``paths`` (absolute or relative to the music library) and play.
+Replace the queue with ``paths`` (absolute or relative to the library) and play from
+
+``position`` seconds into the entry at index ``start``.
 
 
 <a id="lauschkiste.player.backends.local_audio"></a>

@@ -148,7 +148,7 @@
       "next": "(self) -> None",
       "pause": "(self, state: int = 1) -> None",
       "play": "(self) -> None",
-      "play_files": "(self, paths: List[str]) -> None",
+      "play_files": "(self, paths: List[str], start: int = 0, position: float = 0.0) -> None",
       "play_folder": "(self, folder: str, recursive: bool = False) -> None",
       "play_second_swipe": "(self) -> None",
       "play_single": "(self, song_url: str) -> None",
@@ -165,7 +165,7 @@
       "toggle": "(self) -> None"
     }
   },
-  "interface_version": "1.0",
+  "interface_version": "2.0",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -404,6 +404,37 @@
       "kind": "action",
       "method": "POST",
       "path": "/api/v1/player/play_card",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "play_files": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "position": {
+            "default": 0.0,
+            "type": "number"
+          },
+          "start": {
+            "default": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "files"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/player/files",
       "returns": {
         "type": "null"
       }

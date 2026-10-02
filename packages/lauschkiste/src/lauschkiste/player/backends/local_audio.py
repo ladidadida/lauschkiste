@@ -384,15 +384,15 @@ class PlayerLocalAudio:
                 self._state = 'stop'
         self._status_store.save_to_json()
 
-    def play_files(self, paths):
+    def play_files(self, paths, start=0, position=0.0):
         root = os.path.expanduser(lauschkiste.library.root() or '')
         queue = [p if os.path.isabs(p) or '://' in p else os.path.join(root, p) for p in paths]
         with self._cv:
             self._queue = queue
             self._last_played_folder = ''
             if queue:
-                self._index = 0
-                self._position = 0.0
+                self._index = min(max(int(start), 0), len(queue) - 1)
+                self._position = max(float(position), 0.0)
                 self._state = 'play'
                 self._abort.set()
                 self._cv.notify_all()

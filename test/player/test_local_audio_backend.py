@@ -286,3 +286,16 @@ def test_portaudio_sink_plays_short_sounds_on_close(monkeypatch):
     sink.write(b'\x00' * 100)
     sink.close()
     assert streams[0].events == ['start', 100, 'stop', 'close']
+
+
+def test_play_files_starts_at_entry_and_position(tmp_path, monkeypatch):
+    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    backend = local_audio_backend()
+
+    backend.play_files(['a/01.mp3', 'a/02.mp3'], 1, 42.5)
+
+    assert backend._queue == [str(tmp_path / 'a' / '01.mp3'), str(tmp_path / 'a' / '02.mp3')]
+    assert (backend._index, backend._position, backend._state) == (1, 42.5, 'play')
+
+    backend.play_files(['a/01.mp3'], 5)
+    assert (backend._index, backend._position) == (0, 0.0)

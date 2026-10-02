@@ -216,6 +216,10 @@ class LibraryIndex:
         return self._songs('WHERE album = ? AND COALESCE(albumartist, artist) = ? AND substr(path, 1, ?) = ?',
                            (album, albumartist, len(prefix), prefix))
 
+    def songs_below(self, folder: str) -> List[Dict[str, Any]]:
+        prefix = _prefix(folder)
+        return self._songs('WHERE substr(path, 1, ?) = ?', (len(prefix), prefix))
+
     def song(self, relpath: str) -> Optional[Dict[str, Any]]:
         songs = self._songs('WHERE path = ?', (relpath,))
         return songs[0] if songs else None

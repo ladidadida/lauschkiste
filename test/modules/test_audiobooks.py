@@ -1,0 +1,208 @@
+import json
+import time
+from fractions import Fraction
+from unittest.mock import Mock, call
+
+import av
+import pytest
+
+import lauschkiste.audiobooks
+from lauschkiste.audiobooks import Audiobooks
+from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.contract import OperationError
+from lauschkiste.contract.manager import ModuleManager
+from lauschkiste.library.module import Library
+from lauschkiste.player.module import Player
+from lauschkiste.publishing.bus import EventBus
+
+
+def write_flac(path, **tags):
+    from mutagen.flac import FLAC
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with av.open(str(path), 'w', format='flac') as container:
+        stream = container.add_stream('flac', rate=8000)
+        stream.layout = 'mono'
+        frame = av.AudioFrame(format='s16', layout='mono', samples=800)
+        frame.planes[0].update(bytes(frame.planes[0].buffer_size))
+        frame.rate = 8000
+        frame.time_base = Fraction(1, 8000)
+        frame.pts = 0
+        for packet in stream.encode(frame):
+            container.mux(packet)
+        for packet in stream.encode(None):
+            container.mux(packet)
+    audio = FLAC(str(path))
+    for key, value in tags.items():
+        audio[key] = value
+    audio.save()
+
+
+def wait_for(predicate, timeout=5.0):
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline:
+        if predicate():
+            return True
+        time.sleep(0.02)
+    return predicate()
+
+
+BOOK = ['audiobooks/Pippi/2.flac', 'audiobooks/Pippi/10.flac', 'audiobooks/Pippi/11.flac']
+
+
+@pytest.fixture
+def library_dir(tmp_path):
+    root = tmp_path / 'library'
+    for file in BOOK:
+        write_flac(root / file, album='Pippi Langstrumpf')
+    write_flac(root / 'audiobooks' / 'Emil' / '01.flac')
+    write_flac(root / 'music' / 'Rock' / '01.flac', album='Loud')
+    return root
+
+
+@pytest.fixture
+def setup(tmp_path, library_dir, monkeypatch):
+    monkeypatch.setattr(lauschkiste.audiobooks, 'ACTIVATION_GRACE_SEC', 0)
+    ctrl = Mock()
+    ctrl.get_active_backend.return_value = 'local_audio'
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': 'music/Rock/01.flac', 'random': '1', 'repeat': '0'}
+
+    class TestPlayer(Player):
+        def start(self, ctx):
+            self._ctx = ctx
+            self._coordinator = ctrl
+
+        def ready(self):
+            pass
+
+        def stop(self):
+            return []
+
+    state_file = tmp_path / 'audiobooks.json'
+    cfg = ConfigHandler('test')
+    cfg.config_dict({'library': {'path': str(library_dir), 'index': str(tmp_path / 'index.sqlite'),
+                                 'cover_cache': str(tmp_path / 'covers'), 'watch': False},
+                     'audiobooks': {'state_file': str(state_file), 'save_interval_sec': 0}})
+    bus = EventBus()
+    events = []
+    bus.register(lambda topic, payload: events.append(topic))
+    managers = []
+
+    def start():
+        manager = ModuleManager([Library, TestPlayer, Audiobooks], cfg, bus, plugins={}, strict=True)
+        manager.load()
+        manager.start()
+        manager.ready()
+        managers.append(manager)
+        assert wait_for(lambda: 'library.scanned' in events)
+        events.clear()
+        return manager.handle('audiobooks')
+
+    def status(**values):
+        bus.publish('player.status', {'provider': 'local_audio', 'state': 'play', **values})
+
+    yield start, ctrl, status, state_file
+    for manager in managers:
+        manager.stop()
+
+
+def test_lists_audiobooks_with_chapters_in_file_name_order(setup):
+    start, _, _, _ = setup
+    books = start().invoke('list_books')
+    assert [(b.book, b.title, b.chapters, b.chapter, b.listened, b.finished) for b in books] == [
+        ('Emil', 'Emil', 1, 0, 0.0, False),
+        ('Pippi', 'Pippi Langstrumpf', 3, 0, 0.0, False),
+    ]
+    assert books[1].duration == pytest.approx(0.3, abs=0.03)
+
+
+def test_play_continues_where_it_stopped_and_restores_shuffle(setup):
+    start, ctrl, status, state_file = setup
+    audiobooks = start()
+
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0)
+    ctrl.shuffle.assert_called_once_with('disable')
+
+    status(file=BOOK[1], elapsed='70.0', duration='300')
+    status(file=BOOK[1], state='pause', elapsed='75.5', duration='300')
+    assert wait_for(lambda: state_file.exists() and json.loads(state_file.read_text())['Pippi']['elapsed'] == 75.5)
+
+    status(file='music/Rock/01.flac')
+    assert wait_for(lambda: call('enable') in ctrl.shuffle.call_args_list)
+    book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
+    assert (book.chapter, book.elapsed) == (1, 75.5)
+
+    ctrl.play_files.reset_mock()
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.play_files.assert_called_once_with(BOOK, 1, 65.5)
+
+
+def test_position_survives_a_restart(setup):
+    start, ctrl, status, state_file = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    status(file=BOOK[2], elapsed='20', duration='300')
+    assert wait_for(lambda: state_file.exists())
+
+    ctrl.play_files.reset_mock()
+    ctrl.playerstatus.return_value = {'state': 'stop'}
+    start().invoke('play', 'Pippi')
+    ctrl.play_files.assert_called_once_with(BOOK, 2, 10.0)
+
+
+def test_playing_the_active_book_again_keeps_playing_or_resumes(setup):
+    start, ctrl, _, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.play_files.reset_mock()
+
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': BOOK[0]}
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.playerstatus.return_value = {'state': 'pause', 'file': BOOK[0]}
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.play_files.assert_not_called()
+    ctrl.play.assert_called_once()
+
+    audiobooks.invoke('restart', 'Pippi')
+    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0)
+
+
+def test_reaching_the_end_marks_the_book_finished(setup):
+    start, ctrl, status, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    status(file=BOOK[2], elapsed='295', duration='300')
+    status(file=BOOK[2], state='stop', elapsed='0', duration='300')
+    book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
+    assert book.finished and book.listened == book.duration
+
+    ctrl.play_files.reset_mock()
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0)
+
+
+def test_stopping_in_the_middle_keeps_the_position(setup):
+    start, _, status, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    status(file=BOOK[0], elapsed='12', duration='300')
+    status(file=BOOK[0], state='stop', elapsed='0', duration='300')
+    book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
+    assert (book.finished, book.chapter, book.elapsed) == (False, 0, 12.0)
+
+
+def test_set_finished_and_back(setup):
+    start, _, _, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('set_finished', 'Emil')
+    assert [b.finished for b in audiobooks.invoke('list_books') if b.book == 'Emil'] == [True]
+    audiobooks.invoke('set_finished', 'Emil', False)
+    assert [b.finished for b in audiobooks.invoke('list_books') if b.book == 'Emil'] == [False]
+
+
+@pytest.mark.parametrize('book, status', [('Nope', 404), ('../music', 422), ('', 422)])
+def test_unknown_or_invalid_books(setup, book, status):
+    start, _, _, _ = setup
+    with pytest.raises(OperationError) as error:
+        start().invoke('play', book)
+    assert error.value.status == status

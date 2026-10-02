@@ -7,7 +7,7 @@ named arguments:
 ```yaml
 action: player.play_folder
 args:
-  folder: path/to/folder
+  folder: music/path/to/folder
 ```
 
 `args` can be left out when the action has no arguments or all of them have defaults:
@@ -30,6 +30,7 @@ Frequently used actions of the core:
 | `player.play_folder` | `folder`, `recursive` (default false) | play a folder |
 | `player.play_album` | `albumartist`, `album` | play an album |
 | `player.play_single` | `song_url` | play one song |
+| `audiobooks.play` | `book` | continue an audiobook, see [Audiobooks](audiobooks.md) |
 | `player.play`, `player.pause`, `player.toggle`, `player.stop` | | playback |
 | `player.next`, `player.prev` | | skip |
 | `player.shuffle`, `player.repeat` | `option` (default `toggle`) | playback modes |

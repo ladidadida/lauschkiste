@@ -1,0 +1,147 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "audiobooks",
+  "operations": {
+    "list_books": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/audiobooks",
+      "returns": {
+        "items": {
+          "properties": {
+            "book": {
+              "type": "string"
+            },
+            "chapter": {
+              "default": 0,
+              "type": "integer"
+            },
+            "chapters": {
+              "type": "integer"
+            },
+            "cover_url": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "duration": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "elapsed": {
+              "default": 0.0,
+              "type": "number"
+            },
+            "finished": {
+              "default": false,
+              "type": "boolean"
+            },
+            "listened": {
+              "default": 0.0,
+              "type": "number"
+            },
+            "title": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "book",
+            "title",
+            "chapters"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "play": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobooks/play",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "restart": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobooks/restart",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "set_finished": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          },
+          "finished": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobooks/set_finished",
+      "returns": {
+        "type": "null"
+      }
+    }
+  },
+  "requires": {
+    "library": null,
+    "player": null
+  }
+}
