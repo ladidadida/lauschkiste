@@ -176,6 +176,11 @@ def test_player_plays_library_albums_as_files(modules):
     ctrl.list_backends.return_value = ['local_audio']
     manager.handle('player').invoke('play_album', 'The Band', 'Loud', None, 'local')
     ctrl.play_files.assert_called_once_with(['music/Rock/01.flac', 'music/Rock/02.flac'])
+    ctrl.get_active_backend.return_value = 'local_audio'
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': 'music/Rock/01.flac', 'song': '0'}
+    context = manager.handle('player').invoke('playerstatus').context
+    assert (context.kind, context.title, context.action) == ('music', 'Loud', 'player.play_album')
+    assert context.args == {'albumartist': 'The Band', 'album': 'Loud', 'provider': 'local'}
 
 
 def test_player_status_gets_library_metadata(modules, music):

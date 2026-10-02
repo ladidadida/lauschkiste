@@ -1,8 +1,16 @@
 """Typed player status, independent of the backend that produced it."""
 
-from typing import Any, Literal, Mapping, Optional
+from typing import Any, Dict, Literal, Mapping, Optional
 
 from pydantic import BaseModel
+
+
+class PlaybackContext(BaseModel):
+    """What is playing: its content type, a title, and the card action that plays it."""
+    kind: Literal['music', 'audiobook', 'podcast', 'radio']
+    title: Optional[str] = None
+    action: Optional[str] = None
+    args: Dict[str, Any] = {}
 
 
 class PlayerStatus(BaseModel):
@@ -24,6 +32,7 @@ class PlayerStatus(BaseModel):
     repeat: bool = False
     single: bool = False
     cover_url: Optional[str] = None
+    context: Optional[PlaybackContext] = None
 
 
 def _flag(value: Any) -> bool:

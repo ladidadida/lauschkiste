@@ -190,4 +190,6 @@ class Radio(CoreModule):
     @action()
     def play(self, station: str) -> None:
         """Play a station."""
-        self._ctx.modules.player.play_files([self._stream_url(self._get(station).url)])
+        entry = self._get(station)
+        self._ctx.modules.player.play_files([self._stream_url(entry.url)], context={
+            'kind': 'radio', 'title': entry.name, 'action': 'radio.play', 'args': {'station': station}})

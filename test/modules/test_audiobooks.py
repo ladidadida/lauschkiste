@@ -97,6 +97,8 @@ def setup(tmp_path, library_dir, monkeypatch):
         events.clear()
         return manager.handle('audiobooks')
 
+    start.managers = managers
+
     def status(**values):
         bus.publish('player.status', {'provider': 'local_audio', 'state': 'play', **values})
 
@@ -121,6 +123,10 @@ def test_play_continues_where_it_stopped(setup):
 
     audiobooks.invoke('play', 'Pippi')
     ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0, True)
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': BOOK[0], 'song': '0'}
+    context = start.managers[-1].handle('player').invoke('playerstatus').context
+    assert (context.kind, context.title, context.action, context.args) == (
+        'audiobook', 'Pippi Langstrumpf', 'audiobooks.play', {'book': 'Pippi'})
 
     status(file=BOOK[1], elapsed='70.0', duration='300')
     status(file=BOOK[1], state='pause', elapsed='75.5', duration='300')
@@ -177,6 +183,10 @@ def test_reaching_the_end_marks_the_book_finished(setup):
     ctrl.play_files.reset_mock()
     audiobooks.invoke('play', 'Pippi')
     ctrl.play_files.assert_called_once_with(BOOK, 0, 0.0, True)
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': BOOK[0], 'song': '0'}
+    context = start.managers[-1].handle('player').invoke('playerstatus').context
+    assert (context.kind, context.title, context.action, context.args) == (
+        'audiobook', 'Pippi Langstrumpf', 'audiobooks.play', {'book': 'Pippi'})
 
 
 def test_stopping_in_the_middle_keeps_the_position(setup):

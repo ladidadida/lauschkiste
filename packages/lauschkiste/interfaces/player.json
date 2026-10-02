@@ -35,6 +35,58 @@
           ],
           "default": null
         },
+        "context": {
+          "anyOf": [
+            {
+              "properties": {
+                "action": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "args": {
+                  "additionalProperties": true,
+                  "default": {},
+                  "type": "object"
+                },
+                "kind": {
+                  "enum": [
+                    "music",
+                    "audiobook",
+                    "podcast",
+                    "radio"
+                  ],
+                  "type": "string"
+                },
+                "title": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "cover_url": {
           "anyOf": [
             {
@@ -176,7 +228,7 @@
       "toggle": "(self) -> None"
     }
   },
-  "interface_version": "3.0",
+  "interface_version": "3.1",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -423,6 +475,58 @@
       "args": {
         "additionalProperties": false,
         "properties": {
+          "context": {
+            "anyOf": [
+              {
+                "properties": {
+                  "action": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "args": {
+                    "additionalProperties": true,
+                    "default": {},
+                    "type": "object"
+                  },
+                  "kind": {
+                    "enum": [
+                      "music",
+                      "audiobook",
+                      "podcast",
+                      "radio"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "files": {
             "items": {
               "type": "string"
@@ -546,6 +650,58 @@
             "anyOf": [
               {
                 "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "context": {
+            "anyOf": [
+              {
+                "properties": {
+                  "action": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "args": {
+                    "additionalProperties": true,
+                    "default": {},
+                    "type": "object"
+                  },
+                  "kind": {
+                    "enum": [
+                      "music",
+                      "audiobook",
+                      "podcast",
+                      "radio"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "type": "object"
               },
               {
                 "type": "null"

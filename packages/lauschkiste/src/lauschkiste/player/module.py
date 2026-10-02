@@ -10,7 +10,7 @@ from pydantic import BaseModel
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.player.backend import PlayerBackend
 from lauschkiste.player.coordinator import PlayerCoordinator
-from lauschkiste.player.status import PlayerStatus, status_from_backend
+from lauschkiste.player.status import PlaybackContext, PlayerStatus, status_from_backend
 
 logger = logging.getLogger('lauschkiste.player')
 
@@ -29,7 +29,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '3.0'
+    interface_version = '3.1'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -43,6 +43,7 @@ class Player(CoreModule):
         self._metadata_lock = threading.Lock()
         self._metadata_file: Optional[str] = None
         self._metadata: Dict[str, Any] = {}
+        self._context: Optional[PlaybackContext] = None
 
     # -- lifecycle ------------------------------------------------------------------------------
 
@@ -85,9 +86,17 @@ class Player(CoreModule):
     def _with_metadata(self, status: PlayerStatus) -> PlayerStatus:
         if not status.file:
             return status
-        missing = {key: value for key, value in self._song_metadata(status.file).items()
-                   if value is not None and getattr(status, key) is None}
-        return status.model_copy(update=missing) if missing else status
+        update = {key: value for key, value in self._song_metadata(status.file).items()
+                  if value is not None and getattr(status, key) is None}
+        with self._metadata_lock:
+            update['context'] = self._context
+        return status.model_copy(update=update)
+
+    def _set_context(self, kind: str, title: Optional[str], action: str, args: Dict[str, Any]) -> None:
+        context = PlaybackContext(kind=kind, title=title, action=action,
+                                  args={key: value for key, value in args.items() if value is not None})
+        with self._metadata_lock:
+            self._context = context
 
     def ready(self) -> None:
         if self._configured_backend not in self.backends:
@@ -181,22 +190,29 @@ class Player(CoreModule):
     @action(path='/folder')
     def play_folder(self, folder: str, recursive: bool = False) -> None:
         """Play a folder of the music library."""
+        self._set_context('music', folder.rstrip('/').rsplit('/', 1)[-1], 'player.play_folder',
+                          {'folder': folder, 'recursive': recursive or None})
         self._coordinator.play_folder(folder, recursive)
 
     @action()
     def play_card(self, folder: str, recursive: bool = False) -> None:
         """Play a folder; a second swipe of the same card runs the second-swipe action."""
+        self._set_context('music', folder.rstrip('/').rsplit('/', 1)[-1], 'player.play_folder',
+                          {'folder': folder, 'recursive': recursive or None})
         self._coordinator.play_card(folder, recursive)
 
     @action(path='/song')
     def play_single(self, song_url: str, provider: Optional[str] = None) -> None:
         """Play a single song."""
+        self._set_context('music', None, 'player.play_single', {'song_url': song_url, 'provider': provider})
         self._coordinator.play_single(song_url, provider)
 
     @action(path='/album')
     def play_album(self, albumartist: str, album: str, content_uri: Optional[str] = None,
                    provider: Optional[str] = None) -> None:
         """Play an album of the library or of a backend's own catalog (``provider``)."""
+        self._set_context('music', album, 'player.play_album', {'albumartist': albumartist, 'album': album,
+                                                                 'content_uri': content_uri, 'provider': provider})
         if provider and provider in self.backends:
             self._coordinator.play_album(albumartist, album, content_uri, provider)
             return
@@ -206,11 +222,15 @@ class Player(CoreModule):
         self._coordinator.play_files([song.file for song in songs])
 
     @action(path='/files')
-    def play_files(self, files: List[str], start: int = 0, position: float = 0.0, ordered: bool = False) -> None:
+    def play_files(self, files: List[str], start: int = 0, position: float = 0.0, ordered: bool = False,
+                   context: Optional[PlaybackContext] = None) -> None:
         """Play files of the library (or URLs), from ``position`` seconds into the file at index ``start``;
-        ``ordered`` plays them in order, ignoring shuffle and repeat."""
+        ``ordered`` plays them in order, ignoring shuffle and repeat. ``context`` says what is played
+        (shown by the web app; without it, music)."""
         if not files:
             raise OperationError(422, 'no_files', 'No files to play')
+        with self._metadata_lock:
+            self._context = PlaybackContext.model_validate(context) if context else PlaybackContext(kind='music')
         self._coordinator.play_files(files, start, position, ordered)
 
     @action(path='/queue')

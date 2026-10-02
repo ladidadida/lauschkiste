@@ -96,7 +96,7 @@ class ResumeTracker:
 
     # -- playback -------------------------------------------------------------------------------
 
-    def play(self, key: str, files: List[str], resume: bool = True) -> None:
+    def play(self, key: str, files: List[str], resume: bool = True, context: Optional[Dict[str, Any]] = None) -> None:
         """Play an item: where it stopped (``resume``), else from the beginning. The item that is
         already playing keeps playing, a paused one continues."""
         player = self._ctx.modules.player
@@ -116,7 +116,7 @@ class ResumeTracker:
         if not entry.get('finished') and entry.get('file') in files:
             start = files.index(entry['file'])
             position = max(0.0, _number(entry.get('elapsed')) - self._rewind)
-        player.play_files(files, start, position, True)
+        player.play_files(files, start, position, True, context)
         with self._lock:
             self._key, self._files, self._last = key, list(files), None
             self._activated_at = time.monotonic()

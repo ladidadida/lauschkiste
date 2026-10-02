@@ -403,7 +403,10 @@ class Podcasts(CoreModule):
             chosen = next((e for e in episodes if e.id == episode), None)
             if chosen is None:
                 raise OperationError(404, 'unknown_episode', f"Podcast '{podcast}' has no episode '{episode}'")
-        self._resume.play(f'{podcast}/{chosen.id}', [chosen.url])
+        name = self._get(podcast).get('name') or podcast
+        self._resume.play(f'{podcast}/{chosen.id}', [chosen.url], context={
+            'kind': 'podcast', 'title': f'{name}: {chosen.title}', 'action': 'podcasts.play',
+            'args': {'podcast': podcast, 'episode': chosen.id}})
 
     @action()
     def set_heard(self, podcast: str, episode: str, heard: bool = True) -> None:

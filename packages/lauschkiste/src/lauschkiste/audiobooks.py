@@ -110,15 +110,20 @@ class Audiobooks(CoreModule):
                                     cover_url=cover_url))
         return result
 
+    def _context(self, book: str) -> Dict[str, Any]:
+        songs = self._songs(book)
+        title = next((song.album for song in songs if song.album), None) or book
+        return {'kind': 'audiobook', 'title': title, 'action': 'audiobooks.play', 'args': {'book': book}}
+
     @action()
     def play(self, book: str) -> None:
         """Play an audiobook where it stopped (from the beginning when it is new or finished)."""
-        self._resume.play(book, self._chapter_files(book))
+        self._resume.play(book, self._chapter_files(book), context=self._context(book))
 
     @action()
     def restart(self, book: str) -> None:
         """Play an audiobook from the beginning."""
-        self._resume.play(book, self._chapter_files(book), resume=False)
+        self._resume.play(book, self._chapter_files(book), resume=False, context=self._context(book))
 
     @action()
     def set_finished(self, book: str, finished: bool = True) -> None:

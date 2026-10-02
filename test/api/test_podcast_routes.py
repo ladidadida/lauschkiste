@@ -118,6 +118,11 @@ def test_play_newest_unheard_then_continue(podcasts):
 
     assert client.post('/api/v1/podcasts/play', json={'podcast': 'kakadu'}).status_code == 204
     ctrl.play_files.assert_called_once_with(['https://example.org/2.mp3'], 0, 0.0, True)
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': 'https://example.org/2.mp3', 'song': '0'}
+    assert client.get('/api/v1/player/status').json()['context'] == {
+        'kind': 'podcast', 'title': 'Kakadu: Newer', 'action': 'podcasts.play',
+        'args': {'podcast': 'kakadu', 'episode': newer}}
+    ctrl.playerstatus.return_value = {'state': 'stop'}
 
     client.post('/api/v1/podcasts/set_heard', json={'podcast': 'kakadu', 'episode': newer})
     ctrl.play_files.reset_mock()
