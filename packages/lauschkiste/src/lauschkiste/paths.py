@@ -3,7 +3,7 @@
 All runtime data lives below one directory::
 
     $LAUSCHKISTE_HOME/settings/      configuration, card database, library index, status files
-    $LAUSCHKISTE_HOME/audiofolders/  the music library
+    $LAUSCHKISTE_HOME/library/       the library: music/, audiobooks/
     $LAUSCHKISTE_HOME/logs/  cache/  playlists/
 
 Relative paths in the configuration are resolved against ``LAUSCHKISTE_HOME``.
@@ -17,6 +17,9 @@ from typing import Optional, Union
 ENV_PREFIX = 'LAUSCHKISTE_'
 HOME_ENV = ENV_PREFIX + 'HOME'
 CONFIG_FILE = 'lauschkiste.yaml'
+LIBRARY_DIR = 'library'
+MUSIC_DIR = 'music'
+AUDIOBOOKS_DIR = 'audiobooks'
 
 _home: Optional[Path] = None
 
@@ -56,6 +59,11 @@ def resolve(value: Union[str, Path]) -> Path:
     if path.is_absolute():
         return path
     return home() / path
+
+
+def library_dir(configured: Union[str, Path, None] = None) -> Path:
+    """The library (``library.path``, by default ``library`` in the home)."""
+    return resolve(configured or LIBRARY_DIR)
 
 
 def settings_dir() -> Path:

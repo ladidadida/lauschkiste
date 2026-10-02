@@ -37,7 +37,7 @@ packages/          uv workspace members
 docker/            Dockerfiles + compose files for a non-Pi development environment
 install.sh         Installer (curl | bash): base packages, uv, Lauschkiste (release wheels or --source),
                    then `lauschctl setup`
-shared/            LAUSCHKISTE_HOME when running from this checkout (see .env): settings, audiofolders,
+shared/            LAUSCHKISTE_HOME when running from this checkout (see .env): settings, library,
                    playlists, logs, cache
 documentation/     Project docs: builders/ (end users/installers) and developers/ (contributors)
 test/              Python unit tests (pytest)

@@ -43,7 +43,7 @@ def write_flac(path, seconds=0.2, picture=None, **tags):
 
 @pytest.fixture
 def music(tmp_path):
-    root = tmp_path / 'music'
+    root = tmp_path / 'library' / 'music'
     write_flac(root / 'Rock' / '02.flac', title='Second', artist='Band', album='Loud', tracknumber='2',
                albumartist='The Band')
     write_flac(root / 'Rock' / '01.flac', title='First', artist='Band', album='Loud', tracknumber='1',
@@ -70,7 +70,7 @@ def modules(tmp_path, music):
             return []
 
     cfg = ConfigHandler('test')
-    cfg.config_dict({'library': {'path': str(music), 'index': str(tmp_path / 'index.sqlite'),
+    cfg.config_dict({'library': {'path': str(music.parent), 'index': str(tmp_path / 'index.sqlite'),
                                  'cover_cache': str(tmp_path / 'covers')}})
     bus = EventBus()
     events = []
@@ -102,7 +102,7 @@ def test_scan_indexes_tags_and_durations(modules):
     scanned = [payload for topic, payload in events if topic == 'library.scanned']
     assert scanned[-1] == {'songs': 4, 'added': 4, 'updated': 0, 'removed': 0}
 
-    song = library(manager).invoke('get_song', 'Quiet/song.flac')
+    song = library(manager).invoke('get_song', 'music/Quiet/song.flac')
     assert song.title == 'Lullaby'
     assert song.artist == 'Singer'
     assert song.duration == pytest.approx(0.5, abs=0.05)
@@ -117,32 +117,32 @@ def test_albums_and_songs_in_track_order(modules):
     ]
     songs = library(manager).invoke('list_songs', 'The Band', 'Loud')
     assert [s.title for s in songs] == ['First', 'Second']
-    assert songs[0].file == 'Rock/01.flac'
+    assert songs[0].file == 'music/Rock/01.flac'
 
 
 def test_song_lookup_accepts_absolute_paths(modules, music):
     manager, _, _ = modules
     song = library(manager).invoke('get_song', str(music / 'Rock' / '02.flac'))
     assert song.title == 'Second'
-    assert library(manager).invoke('get_song', 'Rock/missing.flac') is None
+    assert library(manager).invoke('get_song', 'music/Rock/missing.flac') is None
     assert library(manager).invoke('get_song', 'http://radio.example/stream') is None
 
 
 def test_search(modules):
     manager, _, _ = modules
     assert [s.title for s in library(manager).invoke('search', 'lulla')] == ['Lullaby']
-    assert {s.file for s in library(manager).invoke('search', 'Rock/')} == {'Rock/01.flac', 'Rock/02.flac'}
+    assert {s.file for s in library(manager).invoke('search', 'music/Rock/')} == {'music/Rock/01.flac', 'music/Rock/02.flac'}
 
 
 def test_covers_from_embedded_picture_and_folder_image(modules, tmp_path):
     manager, _, _ = modules
-    embedded = library(manager).invoke('get_song_cover', 'Rock/01.flac').cover_url
+    embedded = library(manager).invoke('get_song_cover', 'music/Rock/01.flac').cover_url
     assert embedded.startswith('/api/v1/library/covers/') and embedded.endswith('.png')
     assert (tmp_path / 'covers' / embedded.rsplit('/', 1)[1]).read_bytes() == PNG
 
-    folder = library(manager).invoke('get_song_cover', 'Quiet/song.flac').cover_url
+    folder = library(manager).invoke('get_song_cover', 'music/Quiet/song.flac').cover_url
     assert folder.endswith('.jpg')
-    assert library(manager).invoke('get_song_cover', 'Loose/untagged.flac').cover_url is None
+    assert library(manager).invoke('get_song_cover', 'music/Loose/untagged.flac').cover_url is None
 
     album = library(manager).invoke('get_album_cover', 'The Band', 'Loud').cover_url
     assert album == embedded
@@ -159,11 +159,23 @@ def test_rescan_picks_up_changes(modules, music):
     assert scanned == {'songs': 4, 'added': 1, 'updated': 0, 'removed': 1}
 
 
+def test_albums_come_from_the_music_folder_only(modules, music):
+    manager, _, events = modules
+    assert (music.parent / 'audiobooks').is_dir()
+    write_flac(music.parent / 'audiobooks' / 'Book' / '01.flac', title='Chapter 1', album='Book', artist='Author')
+    events.clear()
+    library(manager).invoke('refresh')
+    assert wait_for(lambda: any(topic == 'library.scanned' for topic, _ in events))
+    assert 'Book' not in [i.album for i in library(manager).invoke('list_items')]
+    assert library(manager).invoke('list_songs', 'Author', 'Book') == []
+    assert library(manager).invoke('get_song', 'audiobooks/Book/01.flac').title == 'Chapter 1'
+
+
 def test_player_plays_library_albums_as_files(modules):
     manager, ctrl, _ = modules
     ctrl.list_backends.return_value = ['local_audio']
     manager.handle('player').invoke('play_album', 'The Band', 'Loud', None, 'local')
-    ctrl.play_files.assert_called_once_with(['Rock/01.flac', 'Rock/02.flac'])
+    ctrl.play_files.assert_called_once_with(['music/Rock/01.flac', 'music/Rock/02.flac'])
 
 
 def test_player_status_gets_library_metadata(modules, music):

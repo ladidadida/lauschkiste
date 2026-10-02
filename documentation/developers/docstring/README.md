@@ -48,6 +48,7 @@
   * [CoverCache](#lauschkiste.library.covers.CoverCache)
     * [cover\_for](#lauschkiste.library.covers.CoverCache.cover_for)
 * [lauschkiste.library](#lauschkiste.library)
+  * [root](#lauschkiste.library.root)
 * [lauschkiste.rfid.reader](#lauschkiste.rfid.reader)
   * [ReaderDriver](#lauschkiste.rfid.reader.ReaderDriver)
     * [create\_reader](#lauschkiste.rfid.reader.ReaderDriver.create_reader)
@@ -168,6 +169,7 @@
   * [home](#lauschkiste.paths.home)
   * [set\_home](#lauschkiste.paths.set_home)
   * [resolve](#lauschkiste.paths.resolve)
+  * [library\_dir](#lauschkiste.paths.library_dir)
   * [resource](#lauschkiste.paths.resource)
 * [lauschkiste.daemon](#lauschkiste.daemon)
   * [DEFAULT\_CONFIG\_TEMPLATE](#lauschkiste.daemon.DEFAULT_CONFIG_TEMPLATE)
@@ -293,8 +295,6 @@
 * [lauschkiste.player.status](#lauschkiste.player.status)
   * [status\_from\_backend](#lauschkiste.player.status.status_from_backend)
 * [lauschkiste.player](#lauschkiste.player)
-  * [MusicLibPath](#lauschkiste.player.MusicLibPath)
-  * [get\_music\_library\_path](#lauschkiste.player.get_music_library_path)
 * [lauschkiste.player.backend](#lauschkiste.player.backend)
   * [PlayerBackend](#lauschkiste.player.backend.PlayerBackend)
     * [set\_status\_callback](#lauschkiste.player.backend.PlayerBackend.set_status_callback)
@@ -439,10 +439,10 @@ Bring the index in line with the files on disk. Concurrent calls run one after a
 #### albums
 
 ```python
-def albums() -> List[Dict[str, Any]]
+def albums(folder: str = '') -> List[Dict[str, Any]]
 ```
 
-Albums grouped by album artist (falling back to the artist) and album title.
+Albums below ``folder``, grouped by album artist (falling back to the artist) and album title.
 
 
 <a id="lauschkiste.library.watch"></a>
@@ -795,7 +795,18 @@ File name in the cache of the song's cover, or None when it has none.
 
 # lauschkiste.library
 
-The music library: file management, index, metadata and cover art.
+The library: file management, index, metadata and cover art.
+
+
+<a id="lauschkiste.library.root"></a>
+
+#### root
+
+```python
+def root() -> str
+```
+
+The library directory, from ``library.path``.
 
 
 <a id="lauschkiste.rfid.reader"></a>
@@ -2261,7 +2272,7 @@ Where Lauschkiste keeps its data (``LAUSCHKISTE_HOME``) and its packaged resourc
 All runtime data lives below one directory::
 
     $LAUSCHKISTE_HOME/settings/      configuration, card database, library index, status files
-    $LAUSCHKISTE_HOME/audiofolders/  the music library
+    $LAUSCHKISTE_HOME/library/       the library: music/, audiobooks/
     $LAUSCHKISTE_HOME/logs/  cache/  playlists/
 
 Relative paths in the configuration are resolved against ``LAUSCHKISTE_HOME``.
@@ -2298,6 +2309,17 @@ def resolve(value: Union[str, Path]) -> Path
 ```
 
 A configured path: absolute or ``~`` as given, relative ones below the home.
+
+
+<a id="lauschkiste.paths.library_dir"></a>
+
+#### library\_dir
+
+```python
+def library_dir(configured: Union[str, Path, None] = None) -> Path
+```
+
+The library (``library.path``, by default ``library`` in the home).
 
 
 <a id="lauschkiste.paths.resource"></a>
@@ -3747,26 +3769,7 @@ Build a :class:`PlayerStatus` from a backend's raw (mpd-style) status mapping.
 
 # lauschkiste.player
 
-<a id="lauschkiste.player.MusicLibPath"></a>
-
-## MusicLibPath Objects
-
-```python
-class MusicLibPath()
-```
-
-The music library directory: `player.music_library_path`, by default `audiofolders`.
-
-
-<a id="lauschkiste.player.get_music_library_path"></a>
-
-#### get\_music\_library\_path
-
-```python
-def get_music_library_path()
-```
-
-Get the music library path
+Playback: the player core module, its backends and the coordinator between them.
 
 
 <a id="lauschkiste.player.backend"></a>

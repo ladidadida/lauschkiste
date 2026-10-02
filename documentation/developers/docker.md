@@ -33,7 +33,7 @@ need to adapt some of those commands to your needs.
     * Override/Merge the values from the following [Override file](../../docker/config/lauschkiste.overrides.yaml) in your `lauschkiste.yaml`.
     * **\[Currently required\]** Update all relative paths (`../..`) in to `/home/pi/lauschkiste`.
 
-4. Change directory into the `./shared/audiofolders`
+4. Change directory into the `./shared/library/music`
     and copy a set of MP3 files into this folder (for more fun when
     testing).
 
@@ -327,7 +327,7 @@ The following command can be run on a Mac.
 docker build -f docker/Dockerfile.lauschkiste -t lauschkiste .
 docker run -it --rm \
     -v $(PWD)/packages/lauschkiste:/home/pi/lauschkiste/packages/lauschkiste \
-    -v $(PWD)/shared/audiofolders:/home/pi/lauschkiste/shared/audiofolders \
+    -v $(PWD)/shared/library:/home/pi/lauschkiste/shared/library \
     -v ~/.config/pulse:/root/.config/pulse \
     -e PULSE_SERVER=tcp:host.docker.internal:4713 \
     --name lauschkiste lauschkiste

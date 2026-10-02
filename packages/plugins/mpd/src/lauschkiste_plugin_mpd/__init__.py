@@ -16,7 +16,7 @@ import logging
 import lauschkiste.cfghandler
 import lauschkiste.misc as misc
 import lauschkiste.paths
-import lauschkiste.player
+import lauschkiste.library
 from lauschkiste.contract import Plugin
 
 logger = logging.getLogger('lauschkiste.mpd')
@@ -86,7 +86,7 @@ class Mpd(Plugin):
         if _setting(ctx, 'library', 'update_on_startup'):
             backend.update()
         if _setting(ctx, 'library', 'check_user_rights'):
-            music_library_path = lauschkiste.player.get_music_library_path()
+            music_library_path = lauschkiste.library.root()
             if music_library_path is not None:
                 logger.info(f"Change user rights for {music_library_path}")
                 misc.recursive_chmod(music_library_path, mode_files=0o666, mode_dirs=0o777)

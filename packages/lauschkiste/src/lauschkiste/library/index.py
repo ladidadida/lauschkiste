@@ -86,6 +86,11 @@ def _sort_number(value: Optional[str]) -> int:
         return 0
 
 
+def _prefix(folder: str) -> str:
+    folder = folder.strip('/')
+    return f'{folder}/' if folder else ''
+
+
 class LibraryIndex:
     def __init__(self, db_path: str, root_provider: Callable[[], Optional[str]]):
         self._root_provider = root_provider
@@ -191,20 +196,25 @@ class LibraryIndex:
         songs.sort(key=lambda s: (_sort_number(s['disc']), _sort_number(s['track']), s['path'].casefold()))
         return songs
 
-    def albums(self) -> List[Dict[str, Any]]:
-        """Albums grouped by album artist (falling back to the artist) and album title."""
+    def albums(self, folder: str = '') -> List[Dict[str, Any]]:
+        """Albums below ``folder``, grouped by album artist (falling back to the artist) and album title."""
+        prefix = _prefix(folder)
         with self._lock:
             rows = self._db.execute(
                 "SELECT COALESCE(albumartist, artist) AS albumartist, album, COUNT(*) AS songs,"
-                " MIN(path) AS first_song FROM songs WHERE album IS NOT NULL"
+                " MIN(path) AS first_song FROM songs WHERE album IS NOT NULL AND substr(path, 1, ?) = ?"
                 " GROUP BY COALESCE(albumartist, artist), album"
-                " ORDER BY LOWER(COALESCE(albumartist, artist, '')), LOWER(album)").fetchall()
+                " ORDER BY LOWER(COALESCE(albumartist, artist, '')), LOWER(album)",
+                (len(prefix), prefix)).fetchall()
         return [dict(row) for row in rows]
 
-    def album_songs(self, albumartist: Optional[str], album: str) -> List[Dict[str, Any]]:
+    def album_songs(self, albumartist: Optional[str], album: str, folder: str = '') -> List[Dict[str, Any]]:
+        prefix = _prefix(folder)
         if albumartist is None:
-            return self._songs('WHERE album = ? AND albumartist IS NULL AND artist IS NULL', (album,))
-        return self._songs('WHERE album = ? AND COALESCE(albumartist, artist) = ?', (album, albumartist))
+            return self._songs('WHERE album = ? AND albumartist IS NULL AND artist IS NULL AND substr(path, 1, ?) = ?',
+                               (album, len(prefix), prefix))
+        return self._songs('WHERE album = ? AND COALESCE(albumartist, artist) = ? AND substr(path, 1, ?) = ?',
+                           (album, albumartist, len(prefix), prefix))
 
     def song(self, relpath: str) -> Optional[Dict[str, Any]]:
         songs = self._songs('WHERE path = ?', (relpath,))

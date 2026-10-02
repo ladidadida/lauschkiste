@@ -131,7 +131,7 @@ def test_pi_setup(tmp_path, home, extras):
     assert 'bluetooth.service' not in system.enabled
     assert 'static ip_address=192.168.1.50/24' in system.read('/etc/dhcpcd.conf')
     smb = system.read('/etc/samba/smb.conf')
-    assert f'path={home / "audiofolders"}\n' in smb and smb.count('## Lauschkiste Samba Config') == 1
+    assert f'path={home / "library"}\n' in smb and smb.count('## Lauschkiste Samba Config') == 1
     assert 'force user=pi' in smb and '0777' not in smb
     assert system.exists('/etc/update-motd.d/99-lauschkiste-welcome')
 
@@ -169,7 +169,7 @@ def test_mpd_and_hotspot(tmp_path, home, extras):
     assert failed == 0
     assert 'mpd' in ctx.enabled_plugins()
     assert 'mpd.service' in system.read('~/.config/systemd/user/lauschkiste.service')
-    assert str(home / 'audiofolders') in system.read('~/.config/mpd/mpd.conf')
+    assert str(home / 'library') in system.read('~/.config/mpd/mpd.conf')
     script = system.read('/usr/bin/autohotspot')
     assert "ap_ssid='Lauschkiste_jukebox'" in script and "wdev0='wlan0'" in script
     assert 'autohotspot.timer' in system.enabled

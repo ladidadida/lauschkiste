@@ -50,7 +50,7 @@ After a successful installation, [configure your Lauschkiste](configuration.md).
 > interrupt it.
 
 Music gets onto the box through the web app, SFTP (with your Pi login) or an optional Samba
-share of the music folder, see [Copying music](copying-music.md).
+share of the library, see [Copying music](copying-music.md).
 
 ### Options
 

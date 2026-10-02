@@ -13,7 +13,7 @@ services:
       - PULSE_SERVER=tcp:host.docker.internal:4713
     restart: unless-stopped
     volumes:
-      - ../shared/audiofolders:/root/lauschkiste/shared/audiofolders
+      - ../shared/library:/root/lauschkiste/shared/library
       - ../shared/playlists:/root/.config/mpd/playlists
       - ./config/docker.mpd.conf:/root/.config/mpd/mpd.conf
 

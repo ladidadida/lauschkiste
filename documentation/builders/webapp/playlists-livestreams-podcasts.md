@@ -22,8 +22,8 @@ A .m3u playlist is a simple text document with each song file listed on a separa
 
 ```text
 # Absolute
-/home/<username>/lauschkiste/audiofolders/Simone Sommerland/Die 30 besten Kindergartenlieder/08 - Pitsch, patsch, Pinguin.mp3
-/home/<username>/lauschkiste/audiofolders/Simone Sommerland/Die 30 besten Spiel- Und Bewegungslieder/12 - Das rote Pferd.mp3
+/home/<username>/lauschkiste/library/music/Simone Sommerland/Die 30 besten Kindergartenlieder/08 - Pitsch, patsch, Pinguin.mp3
+/home/<username>/lauschkiste/library/music/Simone Sommerland/Die 30 besten Spiel- Und Bewegungslieder/12 - Das rote Pferd.mp3
 # Relative
 Bibi und Tina/bibi-tina-jetzt-in-echt-kinofilm-soundtrack/bibi-tina-jetzt-in-echt-kinofilm-soundtrack-7-ordinary-girl.mp3
 ```
@@ -37,7 +37,7 @@ Lauschkiste Web App handles the playlists in a way that it allows you to browse 
 
 Based on the note above, we suggest to use m3u playlists like this, especially if you like to manage multiple playlists.
 
-1. In the `audiofolders` directory (or any sub-directory), create a new folder.
+1. In the `library/music` directory (or any sub-directory), create a new folder.
 1. In this new folder, copy your .m3u playlist. Make sure the links to the respective songs are correct.
 1. Open the Web App. Under `Library`, select the `Folder` view and browse to the new folder you created.
 1. You should now be able to browse and play the content of the playlist.
@@ -45,7 +45,7 @@ Based on the note above, we suggest to use m3u playlists like this, especially i
 #### Example folder structure
 
 ```text
-└── audiofolders
+└── library/music
     ├── wake-up-songs
     │   └── playlist.m3u
     └── lullabies-sleep-well
@@ -79,7 +79,7 @@ You can now assign livestreams to cards [following the example](#assigning-a-m3u
 #### Example folder structure and playlist names for livestreams
 
 ```text
-└── audiofolders
+└── library/music
     ├── wdr-kids
     │   └── wdr-kids-livestream.txt
     ├── energy
@@ -117,7 +117,7 @@ We will explain options 1 and 2 more closely.
 #### Example folder structure and playlist names for podcasts
 
 ```text
-└── audiofolders
+└── library/music
     ├── die-maus
     │   └── die-maus-podcast.txt
     ├── miras-welt

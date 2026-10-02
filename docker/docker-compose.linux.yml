@@ -8,7 +8,7 @@ services:
     environment:
       - PULSE_SERVER=unix:/tmp/pulse-sock
     volumes:
-      - ../shared/audiofolders:/home/pi/lauschkiste/shared/audiofolders
+      - ../shared/library:/home/pi/lauschkiste/shared/library
       - ../shared/playlists:/home/pi/.config/mpd/playlists
       - ./config/docker.mpd.conf:/home/pi/.config/mpd/mpd.conf
       - $XDG_RUNTIME_DIR/pulse/native:/tmp/pulse-sock

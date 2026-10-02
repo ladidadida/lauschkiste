@@ -3,7 +3,7 @@ import threading
 import wave
 from unittest.mock import Mock
 
-import lauschkiste.player
+import lauschkiste.library
 from lauschkiste.audio_output import PortAudioSink, scale_volume
 from lauschkiste.player.backends.local_audio import PlayerLocalAudio
 
@@ -137,7 +137,7 @@ def test_decode_track_corrupt_file_is_skipped_not_raised(tmp_path):
 def test_play_folder_builds_queue_and_starts_playing(tmp_path, monkeypatch):
     (tmp_path / '01.mp3').touch()
     (tmp_path / '02.mp3').touch()
-    monkeypatch.setattr(lauschkiste.player, 'get_music_library_path', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
 
     backend.play_folder('.')
@@ -149,7 +149,7 @@ def test_play_folder_builds_queue_and_starts_playing(tmp_path, monkeypatch):
 
 
 def test_play_folder_with_no_content_stops(tmp_path, monkeypatch):
-    monkeypatch.setattr(lauschkiste.player, 'get_music_library_path', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
 
     backend.play_folder('.')

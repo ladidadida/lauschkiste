@@ -28,7 +28,7 @@ class MpdStep(Step):
 
     def conf(self) -> str:
         template = lauschkiste.paths.resource('default-settings', 'mpd.default.conf').read_text()
-        return (template.replace('%%LAUSCHKISTE_AUDIOFOLDERS_PATH%%', str(lauschkiste.paths.resolve('audiofolders')))
+        return (template.replace('%%LAUSCHKISTE_LIBRARY_PATH%%', str(lauschkiste.paths.library_dir()))
                 .replace('%%LAUSCHKISTE_PLAYLISTS_PATH%%', str(lauschkiste.paths.resolve('playlists'))))
 
     def check(self, ctx):
@@ -49,8 +49,8 @@ class MpdStep(Step):
         current = system.read(self.CONF)
         if current is not None and current != self.conf():
             system.write(self.CONF + '.backup', current)
-        for folder in ('audiofolders', 'playlists'):
-            lauschkiste.paths.resolve(folder).mkdir(parents=True, exist_ok=True)
+        for folder in (lauschkiste.paths.library_dir(), lauschkiste.paths.resolve('playlists')):
+            folder.mkdir(parents=True, exist_ok=True)
         system.write(self.CONF, self.conf())
         system.run('systemctl', '--user', 'daemon-reload')
         system.run('systemctl', '--user', 'enable', 'mpd.socket', 'mpd.service')
@@ -84,16 +84,15 @@ class SambaStep(Step):
             else ctx.system.output('pdbedit', '-L')
         return any(line.split(':')[0] == ctx.system.user for line in users.splitlines())
 
-    def _music_folder(self, ctx) -> str:
-        configured = ctx.load_config().getn('player', 'music_library_path', default='audiofolders')
-        return str(lauschkiste.paths.resolve(configured))
+    def _library_folder(self, ctx) -> str:
+        return str(lauschkiste.paths.library_dir(ctx.load_config().getn('library', 'path', default=None)))
 
     def _block(self, ctx) -> str:
         """Only the music: settings, card database and logs stay off the network."""
         return (
             '[lauschkiste]\n'
             '  comment=Lauschkiste music\n'
-            f'  path={self._music_folder(ctx)}\n'
+            f'  path={self._library_folder(ctx)}\n'
             '  browseable=yes\n'
             '  writeable=yes\n'
             '  guest ok=no\n'

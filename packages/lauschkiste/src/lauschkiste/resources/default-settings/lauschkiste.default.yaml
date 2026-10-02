@@ -71,8 +71,6 @@ player:
   # 'mpd' delegates to an external mpd server instead (requires the mpd plugin, see plugins: above,
   # and a running mpd instance).
   backend: local_audio
-  # Root of the music library
-  music_library_path: audiofolders
   second_swipe_action:
     # One of: 'toggle', 'play', 'skip', 'rewind', 'replay', 'replay_if_stopped', 'none'
     alias: toggle
@@ -90,13 +88,14 @@ player:
   # volume (see mpd_client.setvol), unrelated to this.
   volume: 100
 library:
-  # Index of the music library (tags, durations) and extracted cover art. The music itself is in
-  # player.music_library_path.
+  # The library, with music/ and audiobooks/ below
+  path: library
+  # Index of the library (tags, durations) and extracted cover art
   index: settings/library.sqlite
   cover_cache: cache/covers
   scan_on_startup: true
   # Rescan automatically after files were added, changed or removed outside the web app
-  # (Samba, USB stick, ...), once the music folder has been quiet for watch_interval_sec
+  # (Samba, USB stick, ...), once the library has been quiet for watch_interval_sec
   watch: true
   watch_interval_sec: 5
 api:

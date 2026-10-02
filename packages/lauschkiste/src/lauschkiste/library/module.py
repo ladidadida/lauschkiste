@@ -11,7 +11,6 @@ from pydantic import BaseModel
 from starlette.requests import Request
 
 import lauschkiste.paths
-import lauschkiste.player
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.library.covers import CoverCache
 from lauschkiste.library.files import MAX_UPLOAD_SIZE, LibraryError, MusicLibrary
@@ -151,17 +150,16 @@ class Library(CoreModule):
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        path = ctx.config.get('path', default=None)
-        root_provider = (lambda: str(lauschkiste.paths.resolve(path))) if path else lauschkiste.player.get_music_library_path
+        configured = ctx.config.get('path', default=None)
+        root_provider = lambda: str(lauschkiste.paths.library_dir(configured))  # noqa: E731
         self._index = LibraryIndex(str(lauschkiste.paths.resolve(ctx.config.get('index', default=DEFAULT_INDEX))),
                                    root_provider)
         self._covers = CoverCache(str(lauschkiste.paths.resolve(ctx.config.get('cover_cache',
                                                                                   default=DEFAULT_COVER_CACHE))))
         self._files = MusicLibrary(root_provider, self._refresh_all)
         self._root_provider = root_provider
-        root = root_provider()
-        if root:
-            Path(root).expanduser().mkdir(parents=True, exist_ok=True)
+        for folder in (lauschkiste.paths.MUSIC_DIR, lauschkiste.paths.AUDIOBOOKS_DIR):
+            (Path(root_provider()) / folder).mkdir(parents=True, exist_ok=True)
         self._executor = ctx.executor('scan')
         self._file_executor = ctx.executor('files')
 
@@ -321,7 +319,7 @@ class Library(CoreModule):
             if source is None:
                 if content_types is None or 'album' in content_types:
                     items.extend(LibraryItem(provider=LOCAL_SOURCE, albumartist=a['albumartist'], album=a['album'])
-                                 for a in self._index.albums())
+                                 for a in self._index.albums(lauschkiste.paths.MUSIC_DIR))
                 continue
             try:
                 items.extend(LibraryItem.model_validate({**item, 'provider': name})
@@ -338,7 +336,8 @@ class Library(CoreModule):
         """Songs of an album, in track order."""
         source = self._source(provider)
         if source is None:
-            return [self._local_song(song) for song in self._index.album_songs(albumartist or None, album)]
+            songs = self._index.album_songs(albumartist or None, album, lauschkiste.paths.MUSIC_DIR)
+            return [self._local_song(song) for song in songs]
         return [song_from_source(provider, song) for song in source.list_songs(albumartist, album, content_uri) or []]
 
     @query(path='/song')

@@ -1,6 +1,6 @@
 # Samba
 
-Samba makes the music folder a network drive in Windows Explorer, the macOS Finder or a Linux file
+Samba makes the library a network drive in Windows Explorer, the macOS Finder or a Linux file
 manager. It is optional and off by default: the web app and SFTP can copy music too, see
 [Copying music](copying-music.md).
 
@@ -10,7 +10,7 @@ manager. It is optional and off by default: the web app and SFTP can copy music 
 lauschctl setup samba
 ```
 
-The step installs Samba and shares the music folder (`audiofolders` in the Lauschkiste home) as
+The step installs Samba and shares the library (`library` in the Lauschkiste home, with `music` and `audiobooks`) as
 `lauschkiste`. Settings, the card database and logs are not shared. The first time, it asks for a
 Samba password (at least 8 characters) for your user; with `--yes` and no password set yet, the
 step is skipped until you run it interactively.

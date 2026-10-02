@@ -24,7 +24,7 @@ import sounddevice as sd
 from av.audio.resampler import AudioResampler
 
 import lauschkiste.paths
-import lauschkiste.player
+import lauschkiste.library
 import lauschkiste.cfghandler
 import lauschkiste.utils as utils
 import lauschkiste.multitimer as multitimer
@@ -360,12 +360,12 @@ class PlayerLocalAudio:
             self.second_swipe_action()
 
     def get_folder_content(self, folder: str):
-        plc = playlistgenerator.PlaylistCollector(lauschkiste.player.get_music_library_path())
+        plc = playlistgenerator.PlaylistCollector(lauschkiste.library.root())
         plc.get_directory_content(folder)
         return plc.playlist
 
     def play_folder(self, folder: str, recursive: bool = False) -> None:
-        plc = playlistgenerator.PlaylistCollector(lauschkiste.player.get_music_library_path())
+        plc = playlistgenerator.PlaylistCollector(lauschkiste.library.root())
         plc.parse(folder, recursive)
         paths = list(plc)
         with self._cv:
@@ -385,7 +385,7 @@ class PlayerLocalAudio:
         self._status_store.save_to_json()
 
     def play_files(self, paths):
-        root = os.path.expanduser(lauschkiste.player.get_music_library_path() or '')
+        root = os.path.expanduser(lauschkiste.library.root() or '')
         queue = [p if os.path.isabs(p) or '://' in p else os.path.join(root, p) for p in paths]
         with self._cv:
             self._queue = queue
@@ -411,7 +411,7 @@ class PlayerLocalAudio:
             return [{'file': path, 'pos': str(i)} for i, path in enumerate(self._queue)]
 
     def list_all_dirs(self):
-        base = os.path.expanduser(lauschkiste.player.get_music_library_path())
+        base = os.path.expanduser(lauschkiste.library.root())
         result = []
         for root, _dirs, files in os.walk(base):
             for f in files:

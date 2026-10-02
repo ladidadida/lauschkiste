@@ -39,7 +39,7 @@ Architektur. Es existiert parallel weiter die stabile Version 2 im `main`-Zweig 
 ├── install.sh                  Installer (curl | bash): Basis-Pakete, uv, Lauschkiste, `lauschctl setup`
 ├── docker/                     Dockerfiles + docker-compose für eine Nicht-Pi-Entwicklungsumgebung
 ├── resources/                  Default-Settings, systemd-Services, Beispiel-Audio, Autohotspot-Configs
-├── shared/                     Laufzeitdaten: audiofolders, playlists, settings, logs
+├── shared/                     Laufzeitdaten: library, playlists, settings, logs
 │                                (wird in Docker gemountet, enthält die vom Nutzer editierbare
 │                                 lauschkiste.yaml)
 ├── documentation/               Projektdokumentation
@@ -144,7 +144,7 @@ Es gibt zwei grundsätzliche Wege:
    Boot-Optimierung ein; jeder Schritt prüft zuerst und ändert nur, was fehlt.
 3. Alle Daten liegen in `LAUSCHKISTE_HOME` (auf dem Pi `~/lauschkiste`): `settings/lauschkiste.yaml`
    (Vorlage: `packages/lauschkiste/src/lauschkiste/resources/default-settings/lauschkiste.default.yaml`),
-   Musik in `audiofolders/`.
+   Musik in `library/music/`, Hörbücher in `library/audiobooks/`.
 
 ### 2. Lokale Entwicklungsumgebung (Docker, ohne Pi-Hardware)
 
@@ -154,7 +154,7 @@ Für Beiträge, die keine GPIO-/RFID-Hardware benötigen — siehe `documentatio
 git clone https://github.com/ladidadida/lauschkiste.git
 cp ./resources/default-settings/lauschkiste.default.yaml ./shared/settings/lauschkiste.yaml
 # lauschkiste.yaml mit docker/config/lauschkiste.overrides.yaml zusammenführen
-# MP3-Testdateien nach ./shared/audiofolders kopieren
+# MP3-Testdateien nach ./shared/library/music kopieren
 docker-compose -f docker/docker-compose.yml up   # ggf. plattformspezifische Compose-Datei (mac/linux)
 ```
 

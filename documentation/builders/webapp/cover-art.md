@@ -23,7 +23,7 @@ Suppose none of your files currently include embedded cover art, the example bel
 #### Example Folder Structure
 
 ```text
-└── audiofolders
+└── library/music
     ├── Simone Sommerland
     │   ├── 01 Aramsamsam.mp3
     │   ├── 02 Das Rote Pferd.mp3

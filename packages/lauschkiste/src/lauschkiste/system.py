@@ -15,7 +15,7 @@ from pydantic import BaseModel
 
 import lauschkiste
 import lauschkiste.cfghandler
-import lauschkiste.player
+import lauschkiste.library
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 from lauschkiste.daemon import get_daemon
 
@@ -156,7 +156,7 @@ class System(CoreModule):
     @query(path='/health')
     def get_health(self) -> SystemHealth:
         """CPU temperature (where available) and disk usage of the music library's file system."""
-        root = lauschkiste.player.get_music_library_path() or '/'
+        root = lauschkiste.library.root() or '/'
         path = Path(root).expanduser()
         usage = shutil.disk_usage(path if path.exists() else '/')
         return SystemHealth(cpu_temperature=cpu_temperature(), disk_total=usage.total, disk_used=usage.used,

@@ -1,7 +1,8 @@
 # Copying music
 
-There are three ways to get music onto Lauschkiste. Whatever you use, put each album or audiobook
-in its own folder below `audiofolders` (in the Lauschkiste home, `lauschctl home` shows where).
+There are three ways to get music onto Lauschkiste. Whatever you use, put each album in its own
+folder below `library/music` and each audiobook in its own folder below `library/audiobooks` (in
+the Lauschkiste home, `lauschctl home` shows where).
 The library notices new, changed and removed files by itself and rescans a few seconds after
 copying has finished; the refresh button in the web app's library view starts a rescan right away.
 
@@ -20,12 +21,12 @@ SSH.
 | On | Use |
 | --- | --- |
 | Windows | [WinSCP](https://winscp.net/) or [FileZilla](https://filezilla-project.org/): protocol SFTP, host `<your-pi>`, port 22 |
-| macOS | FileZilla or [Cyberduck](https://cyberduck.io/); or in a terminal `scp -r "My Album" <user>@<your-pi>:lauschkiste/audiofolders/` |
-| Linux | the file manager: `sftp://<user>@<your-pi>/home/<user>/lauschkiste/audiofolders` |
+| macOS | FileZilla or [Cyberduck](https://cyberduck.io/); or in a terminal `scp -r "My Album" <user>@<your-pi>:lauschkiste/library/music/` |
+| Linux | the file manager: `sftp://<user>@<your-pi>/home/<user>/lauschkiste/library` |
 
-On a Raspberry Pi the music folder is `~/lauschkiste/audiofolders`.
+On a Raspberry Pi the library is `~/lauschkiste/library`.
 
 ## Samba (network share)
 
 If you prefer a regular network drive in Windows Explorer or the macOS Finder, enable Samba with
-`lauschctl setup samba`. It shares only the music folder. See [Samba](samba.md).
+`lauschctl setup samba`. It shares only the library. See [Samba](samba.md).

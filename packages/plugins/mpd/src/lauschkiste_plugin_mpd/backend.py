@@ -87,7 +87,7 @@ import threading
 import logging
 import time
 from pathlib import Path
-import lauschkiste.player
+import lauschkiste.library
 import lauschkiste.cfghandler
 import lauschkiste.utils as utils
 import lauschkiste.multitimer as multitimer
@@ -304,7 +304,7 @@ class PlayerMPD:
     # MPD can play absolute paths but can find songs in its database only by relative path
     # This function aims to prepare the song_url accordingly
     def harmonize_mpd_url(self, song_url):
-        _music_library_path_absolute = os.path.expanduser(lauschkiste.player.get_music_library_path())
+        _music_library_path_absolute = os.path.expanduser(lauschkiste.library.root())
         song_url = song_url.replace(f'{_music_library_path_absolute}/', '')
 
         return song_url
@@ -530,7 +530,7 @@ class PlayerMPD:
             self.second_swipe_action()
 
     def get_single_coverart(self, song_url):
-        mp3_file_path = Path(lauschkiste.player.get_music_library_path(), song_url).expanduser()
+        mp3_file_path = Path(lauschkiste.library.root(), song_url).expanduser()
         cache_filename = self.coverart_cache_manager.get_cache_filename(mp3_file_path)
 
         return cache_filename
@@ -555,7 +555,7 @@ class PlayerMPD:
 
         :param folder: Folder path relative to music library path
         """
-        plc = playlistgenerator.PlaylistCollector(lauschkiste.player.get_music_library_path())
+        plc = playlistgenerator.PlaylistCollector(lauschkiste.library.root())
         plc.get_directory_content(folder)
         return plc.playlist
 
@@ -574,7 +574,7 @@ class PlayerMPD:
             logger.info(f"Play folder: '{folder}'")
             self.mpd_client.clear()
 
-            plc = playlistgenerator.PlaylistCollector(lauschkiste.player.get_music_library_path())
+            plc = playlistgenerator.PlaylistCollector(lauschkiste.library.root())
             plc.parse(folder, recursive)
             uri = '--unset--'
             try:
