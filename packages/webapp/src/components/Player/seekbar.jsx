@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import PlayerContext from '../../context/player/context';
 import { PLAYER_STATUS_TOPIC } from '../../config';
+import { contentKind } from './playback-context';
 import {
   progressToTime,
   timeToProgress,
@@ -53,12 +54,14 @@ const SeekBar = () => {
     }
   }, [isSeeking, playerstatus?.elapsed, timeTotal]);
 
+  if (contentKind(playerstatus?.context) === 'radio') return null;
+
   return <>
     <Grid container>
       <Grid size="grow">
         <Slider
           aria-labelledby={t('player.seekbar.song-position')}
-          disabled={!playerstatus?.title}
+          disabled={!timeTotal}
           onChange={handleSeekToPosition}
           onChangeCommitted={playFromNewTime}
           size="small"

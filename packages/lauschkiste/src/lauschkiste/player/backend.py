@@ -31,6 +31,9 @@ class PlayerBackend(Protocol):
 
     def repeat(self, option: str = 'toggle') -> None: ...
 
+    def stop_after_current(self, enabled: bool = True) -> None:
+        """Stop once the current entry has played to its end."""
+
     def play_single(self, song_url: str) -> None: ...
 
     def play_folder(self, folder: str, recursive: bool = False) -> None: ...

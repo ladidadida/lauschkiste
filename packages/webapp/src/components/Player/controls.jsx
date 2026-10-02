@@ -10,12 +10,16 @@ import SkipNextRoundedIcon from '@mui/icons-material/SkipNextRounded';
 import ShuffleRoundedIcon from '@mui/icons-material/ShuffleRounded';
 import RepeatRoundedIcon from '@mui/icons-material/RepeatRounded';
 import RepeatOneRoundedIcon from '@mui/icons-material/RepeatOneRounded';
+import Forward30RoundedIcon from '@mui/icons-material/Forward30Rounded';
+import Replay30RoundedIcon from '@mui/icons-material/Replay30Rounded';
 
 import PlayerContext from '../../context/player/context';
 import request from '../../utils/request';
 import { PLAYER_STATUS_TOPIC } from '../../config';
+import { contentKind } from './playback-context';
 
-// TODO: Should be broken up in sub-modules
+const SKIP_SECONDS = 30;
+
 const Controls = () => {
   const { t } = useTranslation();
   const {
@@ -52,6 +56,16 @@ const Controls = () => {
   }, [playerstatus, setState]);
 
   const iconStyles = { padding: '7px' };
+  const kind = contentKind(playerstatus?.context);
+  const isMusic = kind === 'music';
+  const isSpoken = kind === 'audiobook' || kind === 'podcast';
+  const hasTracks = kind !== 'radio' && (isMusic || (playerstatus?.playlist_length || 0) > 1);
+
+  const skip = (seconds) => {
+    const elapsed = playerstatus?.elapsed || 0;
+    const duration = playerstatus?.duration || Infinity;
+    request('seek', { position: Math.max(0, Math.min(elapsed + seconds, duration - 1)).toFixed(3) });
+  };
 
   const labelShuffle = () => (
     isShuffle
@@ -75,7 +89,7 @@ const Controls = () => {
       }}
     >
 
-      {/* Shuffle */}
+      {isMusic &&
       <IconButton
         aria-label={labelShuffle()}
         color={isShuffle ? 'primary' : undefined}
@@ -86,8 +100,22 @@ const Controls = () => {
       >
         <ShuffleRoundedIcon style={{ fontSize: 22 }} />
       </IconButton>
+      }
 
-      {/* Skip to previous song */}
+      {isSpoken &&
+        <IconButton
+          aria-label={t('player.controls.back-30')}
+          disabled={!songIsScheduled}
+          onClick={() => skip(-SKIP_SECONDS)}
+          size="large"
+          sx={iconStyles}
+          title={t('player.controls.back-30')}
+        >
+          <Replay30RoundedIcon style={{ fontSize: 28 }} />
+        </IconButton>
+      }
+
+      {hasTracks &&
       <IconButton
         aria-label={t('player.controls.prev_song')}
         disabled={!songIsScheduled}
@@ -98,8 +126,8 @@ const Controls = () => {
       >
         <SkipPreviousRoundedIcon style={{ fontSize: 35 }} />
       </IconButton>
+      }
 
-      {/* Play */}
       {!isPlaying &&
         <IconButton
           aria-label={t('player.controls.play')}
@@ -112,7 +140,6 @@ const Controls = () => {
           <PlayCircleFilledRoundedIcon style={{ fontSize: 75 }} />
         </IconButton>
       }
-      {/* Pause */}
       {isPlaying &&
         <IconButton
           aria-label={t('player.controls.pause')}
@@ -125,7 +152,7 @@ const Controls = () => {
         </IconButton>
       }
 
-      {/* Skip to next song */}
+      {hasTracks &&
       <IconButton
         aria-label={t('player.controls.next_song')}
         disabled={!songIsScheduled}
@@ -136,8 +163,22 @@ const Controls = () => {
       >
         <SkipNextRoundedIcon style={{ fontSize: 35 }} />
       </IconButton>
+      }
 
-      {/* Repeat */}
+      {isSpoken &&
+        <IconButton
+          aria-label={t('player.controls.forward-30')}
+          disabled={!songIsScheduled}
+          onClick={() => skip(SKIP_SECONDS)}
+          size="large"
+          sx={iconStyles}
+          title={t('player.controls.forward-30')}
+        >
+          <Forward30RoundedIcon style={{ fontSize: 28 }} />
+        </IconButton>
+      }
+
+      {isMusic &&
       <IconButton
         aria-label={labelRepeat()}
         color={isRepeat ? 'primary' : undefined}
@@ -155,6 +196,7 @@ const Controls = () => {
           <RepeatOneRoundedIcon style={{ fontSize: 22 }} />
         }
       </IconButton>
+      }
 
     </Grid>
   );

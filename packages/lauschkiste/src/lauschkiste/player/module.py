@@ -29,7 +29,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '3.1'
+    interface_version = '4.0'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -164,6 +164,12 @@ class Player(CoreModule):
     def repeat(self, option: str = 'toggle') -> None:
         """Repeat mode: 'toggle', 'enable', 'enable_repeat_single' or 'disable'."""
         self._coordinator.repeat(option)
+
+    @action(path='/stop-after-current')
+    def stop_after_current(self, enabled: bool = True) -> None:
+        """Stop once the current song, chapter or episode has played to its end (sleep timer)."""
+        self._coordinator.stop_after_current(enabled)
+        self._publish_status(self._coordinator.get_active_backend() or '', self._coordinator.playerstatus())
 
     @action(path='/rewind')
     def rewind(self) -> None:

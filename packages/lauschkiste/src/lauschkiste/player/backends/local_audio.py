@@ -64,6 +64,7 @@ class PlayerLocalAudio:
         self._random = False
         self._repeat_mode = 'off'      # 'off' | 'repeat' | 'single'
         self._ordered = False          # play the queue in order, ignoring shuffle and repeat
+        self._stop_after_current = False
         self._volume = int(cfg.getn('player', 'volume', default=100))
         self._last_played_folder = self._status_store.get('last_played_folder', '')
 
@@ -121,7 +122,11 @@ class PlayerLocalAudio:
                     # play_folder) -- it already set _index/_position/_state to what it wants.
                     continue
                 repeat_mode = 'off' if self._ordered else self._repeat_mode
-                if repeat_mode == 'single':
+                if self._stop_after_current:
+                    self._stop_after_current = False
+                    self._state = 'stop'
+                    self._position = 0.0
+                elif repeat_mode == 'single':
                     self._position = 0.0
                 elif self._random and not self._ordered and len(self._queue) > 1:
                     self._index = random.randrange(len(self._queue))
@@ -250,6 +255,7 @@ class PlayerLocalAudio:
             'random': '1' if random_on else '0',
             'repeat': '1' if repeat_mode in ('repeat', 'single') else '0',
             'single': '1' if repeat_mode == 'single' else '0',
+            'stop_after_current': '1' if self._stop_after_current else '0',
             'provider': 'local_audio',
         }
         metadata = self._stream_metadata
@@ -272,6 +278,7 @@ class PlayerLocalAudio:
 
     def stop(self):
         with self._cv:
+            self._stop_after_current = False
             self._state = 'stop'
             self._position = 0.0
             self._abort.set()
@@ -352,6 +359,10 @@ class PlayerLocalAudio:
                 self._repeat_mode = 'off'
             else:
                 logger.error(f"'{option}' does not exist for 'repeat'")
+
+    def stop_after_current(self, enabled=True):
+        with self._cv:
+            self._stop_after_current = bool(enabled)
 
     def get_current_song(self, param):
         return self._status_dict()

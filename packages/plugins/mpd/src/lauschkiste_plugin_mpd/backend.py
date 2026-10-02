@@ -517,6 +517,10 @@ class PlayerMPD:
             self.mpd_client.repeat(saved['repeat'])
             self.mpd_client.single(saved['single'])
 
+    def stop_after_current(self, enabled=True):
+        with self.mpd_lock:
+            self.mpd_client.single('oneshot' if enabled else 0)
+
     def play_single(self, song_url):
         with self.mpd_lock:
             self._set_ordered(False)

@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 
 import Cover from './cover';
 import Controls from './controls';
+import PlayerActions from './actions';
 import Display from './display';
 import SeekBar from './seekbar';
 import Volume from './volume';
@@ -86,6 +87,7 @@ const Player = () => {
           <Display />
           <SeekBar />
           <Controls />
+          <PlayerActions />
           <Volume />
         </Grid>
       </Grid>

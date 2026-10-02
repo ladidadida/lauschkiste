@@ -46,6 +46,7 @@ def local_audio_backend(**attrs):
     backend._random = False
     backend._repeat_mode = 'off'
     backend._ordered = False
+    backend._stop_after_current = False
     backend._volume = 100
     backend._last_played_folder = ''
     backend._status_store = _FakeStatusStore()
@@ -197,6 +198,7 @@ def test_playerstatus_shape():
         'random': '0',
         'repeat': '0',
         'single': '0',
+        'stop_after_current': '0',
         'provider': 'local_audio',
     }
     assert backend.get_current_song(None) == status
@@ -316,3 +318,11 @@ def test_ordered_files_ignore_shuffle_and_repeat_until_other_content(tmp_path, m
     backend.play_single('b/song.mp3')
     status = backend.playerstatus()
     assert (status['random'], status['repeat']) == ('1', '1')
+
+
+def test_stop_after_current_is_reported_and_cleared_by_stop():
+    backend = local_audio_backend()
+    backend.stop_after_current(True)
+    assert backend.playerstatus()['stop_after_current'] == '1'
+    backend.stop()
+    assert backend.playerstatus()['stop_after_current'] == '0'

@@ -331,7 +331,9 @@
         "enable": "Enable Playlist repeat",
         "enable-single": "Enable Song repeat",
         "disable": "Disable repeat"
-      }
+      },
+      "back-30": "Back 30 seconds",
+      "forward-30": "Forward 30 seconds"
     },
     "cover": {
       "title": "Cover Art",
@@ -340,7 +342,9 @@
     "display": {
       "unknown-title": "Unknown title",
       "unknown-artist": "Unknown artists",
-      "no-song-in-queue": "No song in queue"
+      "no-song-in-queue": "No song in queue",
+      "chapter": "Chapter {{chapter}} of {{chapters}}",
+      "show-in-library": "Show in the library"
     },
     "seekbar": {
       "song-position": "Current position"
@@ -349,6 +353,25 @@
       "slider": "Volume Slider",
       "mute": "Mute volume",
       "unmute": "Unmute volume"
+    },
+    "sleep": {
+      "title": "Sleep timer",
+      "fade": "Fade out slowly at the end",
+      "off": "Timer off",
+      "minutes_one": "In {{count}} minute",
+      "minutes_other": "In {{count}} minutes",
+      "end-of": {
+        "music": "At the end of the song",
+        "audiobook": "At the end of the chapter",
+        "podcast": "At the end of the episode",
+        "radio": ""
+      },
+      "end": {
+        "music": "End of song",
+        "audiobook": "End of chapter",
+        "podcast": "End of episode",
+        "radio": ""
+      }
     }
   },
   "settings": {

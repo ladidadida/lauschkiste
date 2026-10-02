@@ -174,6 +174,10 @@
           ],
           "type": "string"
         },
+        "stop_after_current": {
+          "default": false,
+          "type": "boolean"
+        },
         "title": {
           "anyOf": [
             {
@@ -225,10 +229,11 @@
       "set_volume": "(self, volume: int) -> int",
       "shuffle": "(self, option: str = 'toggle') -> None",
       "stop": "(self) -> None",
+      "stop_after_current": "(self, enabled: bool = True) -> None",
       "toggle": "(self) -> None"
     }
   },
-  "interface_version": "3.1",
+  "interface_version": "4.0",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -796,6 +801,10 @@
             ],
             "type": "string"
           },
+          "stop_after_current": {
+            "default": false,
+            "type": "boolean"
+          },
           "title": {
             "anyOf": [
               {
@@ -1053,6 +1062,24 @@
       "kind": "action",
       "method": "POST",
       "path": "/api/v1/player/stop",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "stop_after_current": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/player/stop-after-current",
       "returns": {
         "type": "null"
       }

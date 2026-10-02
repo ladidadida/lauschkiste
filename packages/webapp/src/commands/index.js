@@ -77,7 +77,11 @@ const commands = {
     cardAction: 'player.repeat',
     argKeys: ['option'],
   },
-  seek: {
+  stop_after_current: {
+    rest: { method: 'POST', path: '/api/v1/player/stop-after-current' },
+    argKeys: ['enabled'],
+  },
+    seek: {
     // Renamed kwarg new_time -> position to match the REST body; only caller is seekbar.jsx.
     rest: { method: 'POST', path: '/api/v1/player/seek' },
     argKeys: ['position'],

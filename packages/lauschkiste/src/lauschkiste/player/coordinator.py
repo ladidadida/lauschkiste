@@ -179,6 +179,9 @@ class PlayerCoordinator:
     def repeat(self, option='toggle'):
         return self._call_active('repeat', option)
 
+    def stop_after_current(self, enabled=True):
+        return self._call_active('stop_after_current', enabled)
+
     def get_current_song(self, param):
         return self._call_active('get_current_song', param)
 

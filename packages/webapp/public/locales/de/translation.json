@@ -331,7 +331,9 @@
         "enable": "Wiedergabeliste Wiederholen aktivieren",
         "enable-single": "Song Wiederholen aktivieren",
         "disable": "Wiederholen deaktivieren"
-      }
+      },
+      "back-30": "30 Sekunden zurück",
+      "forward-30": "30 Sekunden vor"
     },
     "cover": {
       "title": "Cover Art",
@@ -340,7 +342,9 @@
     "display": {
       "unknown-title": "Unbekannter Titel",
       "unknown-artist": "Unbekannter Künstler",
-      "no-song-in-queue": "Es wird kein Titel abgespielt"
+      "no-song-in-queue": "Es wird kein Titel abgespielt",
+      "chapter": "Kapitel {{chapter}} von {{chapters}}",
+      "show-in-library": "In der Bibliothek zeigen"
     },
     "seekbar": {
       "song-position": "Aktuelle Position"
@@ -349,6 +353,25 @@
       "slider": "Lautstärkeregler",
       "mute": "Stumm schalten",
       "unmute": "Stumm schalten deaktivieren"
+    },
+    "sleep": {
+      "title": "Einschlaf-Timer",
+      "fade": "Am Ende langsam ausblenden",
+      "off": "Timer aus",
+      "minutes_one": "In {{count}} Minute",
+      "minutes_other": "In {{count}} Minuten",
+      "end-of": {
+        "music": "Am Ende des Titels",
+        "audiobook": "Am Ende des Kapitels",
+        "podcast": "Am Ende der Folge",
+        "radio": ""
+      },
+      "end": {
+        "music": "Titelende",
+        "audiobook": "Kapitelende",
+        "podcast": "Folgenende",
+        "radio": ""
+      }
     }
   },
   "settings": {
