@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Mapping, Optional
 
 from pydantic import BaseModel
 
-import lauschkiste.legacy_actions as legacy_actions
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.player.backend import PlayerBackend
 from lauschkiste.player.coordinator import PlayerCoordinator
@@ -102,7 +101,7 @@ class Player(CoreModule):
             return
         if 'action' not in entry and entry.get('alias', 'custom') != 'custom':
             return
-        action = legacy_actions.bind_action(self._ctx.actions, entry, 'player.second_swipe_action', logger)
+        action = self._ctx.actions.bind(entry, 'player.second_swipe_action', logger)
         if action is not None:
             self._coordinator.set_second_swipe_action(action)
 

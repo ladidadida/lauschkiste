@@ -36,12 +36,10 @@ def fake_backend_class(created):
 
 @pytest.mark.parametrize('config, expected_host', [
     ({'plugins': {'mpd': {'host': 'music.local'}}}, 'music.local'),
-    ({'plugins': {'mpd': {}}, 'playermpd': {'host': 'legacy.local'}}, 'legacy.local'),
 ])
 def test_mpd_plugin_registers_its_backend(monkeypatch, tmp_path, config, expected_host):
     created = []
     monkeypatch.setattr(lauschkiste_plugin_mpd.backend, 'PlayerMPD', fake_backend_class(created))
-    monkeypatch.setattr(lauschkiste_plugin_mpd, 'cfg_main', _cfg(config))
     config = {**config, 'player': {'backend': 'mpd'},
               'library': {'path': str(tmp_path), 'index': str(tmp_path / 'index.sqlite'),
                           'cover_cache': str(tmp_path / 'covers'), 'scan_on_startup': False}}

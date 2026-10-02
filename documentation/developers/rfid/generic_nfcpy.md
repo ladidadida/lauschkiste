@@ -31,7 +31,7 @@ rfid:
       place_not_swipe:
         enabled: false
         card_removal_action:
-          alias: pause
+          action: player.pause
 ```
 
 For possible values see the `path` parameter in this [nfcpy documentation](https://nfcpy.readthedocs.io/en/latest/modules/clf.html#nfc.clf.ContactlessFrontend.open)

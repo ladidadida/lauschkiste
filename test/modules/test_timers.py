@@ -53,9 +53,3 @@ def test_unknown_timer_and_invalid_timeout(timers):
     assert error.value.status == 404
     with pytest.raises(OperationError):
         handle.invoke('start', 'beep', -1)
-
-
-def test_legacy_timer_card_maps_to_start(timers):
-    from lauschkiste.legacy_actions import convert
-    converted, _ = convert({'alias': 'timer_stop_player', 'args': [900]}, lambda a: ['timer', 'wait_seconds'])
-    assert converted == {'action': 'timers.start', 'args': {'timer': 'stop_player', 'wait_seconds': 900}}

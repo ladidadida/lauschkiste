@@ -55,7 +55,7 @@ rfid:
         place_not_swipe:
             enabled: true|false
             card_removal_action:
-                alias: pause
+                action: player.pause
 ```
 
 For each reader, there is an entry `read_XX`.

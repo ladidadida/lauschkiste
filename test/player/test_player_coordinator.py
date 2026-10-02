@@ -4,8 +4,6 @@ from unittest.mock import Mock, call, sentinel
 import pytest
 
 from lauschkiste.player.coordinator import PlayerCoordinator
-import lauschkiste.legacy_actions as legacy_actions
-from lauschkiste.player.module import Player
 
 
 def backend_with(**methods):
@@ -273,15 +271,6 @@ def test_playerstatus_is_returned_without_translation():
     )
 
     assert coordinator.playerstatus() is player_status
-
-
-def test_legacy_player_aliases_map_to_existing_player_actions():
-    actions = {op.id for op in Player.operations().values() if op.kind == 'action'}
-    player_aliases = {alias: target for alias, (target, _) in legacy_actions.ALIASES.items()
-                      if target.startswith('player.')}
-    assert player_aliases
-    for alias, target in player_aliases.items():
-        assert target in actions, alias
 
 
 def test_exit_closes_all_backends_in_reverse_registration_order():

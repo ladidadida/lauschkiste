@@ -2,7 +2,7 @@
 
 import logging
 import threading
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Mapping, Optional, Tuple
 
 from pydantic import ValidationError
 
@@ -73,6 +73,20 @@ class ActionCatalog:
             logger.error(f"Action '{action_id}' with args {args} failed: {error.__class__.__name__}: {error}",
                          exc_info=not isinstance(error, ActionError))
             return None
+
+    def bind(self, entry: Any, where: str, log: logging.Logger) -> Optional[Callable[[], Any]]:
+        """A callable running a configured action (``{'action': <id>, 'args': {...}}``), or None
+        (logged) if the entry is invalid."""
+        if not isinstance(entry, Mapping) or not isinstance(entry.get('action'), str):
+            log.error(f"{where}: expected 'action: <module>.<action>' (and optional 'args'), got {entry!r}")
+            return None
+        action_id, args = entry['action'], entry.get('args') or {}
+        try:
+            self.validate(action_id, args)
+        except Exception as error:
+            log.error(f"{where}: {error}")
+            return None
+        return lambda: self.call_ignore_errors(action_id, args)
 
     def describe(self) -> List[Dict[str, Any]]:
         with self._lock:

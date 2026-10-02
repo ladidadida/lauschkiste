@@ -21,7 +21,6 @@ from typing import Any, Callable, Dict, List, Optional
 
 from pydantic import BaseModel
 
-import lauschkiste.legacy_actions as legacy_actions
 from lauschkiste.contract import CoreModule, event, query
 
 logger = logging.getLogger('lauschkiste.input')
@@ -163,27 +162,23 @@ class InputDevices(CoreModule):
 
     def _bindings(self, device: str, keys: Dict[Any, Any]) -> Dict[int, _Binding]:
         catalog = self._ctx.actions
-
-        def param_names(action_id):
-            return [p.name for p in catalog.operation(action_id).params] if action_id in catalog else None
-
         bindings = {}
         for key, entry in keys.items():
             code = self._evdev_code(key)
             if code is None:
                 logger.error(f"Input '{device}': unknown key '{key}'")
                 continue
-            converted, problem = legacy_actions.convert(entry if isinstance(entry, dict) else {}, param_names)
-            if converted is None:
-                logger.error(f"Input '{device}', key '{key}': {problem}")
+            if not isinstance(entry, dict) or not isinstance(entry.get('action'), str):
+                logger.error(f"Input '{device}', key '{key}': expected 'action: <module>.<action>', got {entry!r}")
                 continue
+            args = entry.get('args') or {}
             try:
-                catalog.validate(converted['action'], converted['args'])
+                catalog.validate(entry['action'], args)
             except Exception as error:
                 if device != MEDIA_KEYS_DEVICE:
                     logger.error(f"Input '{device}', key '{key}': {error}")
                 continue
-            bindings[code] = _Binding(converted['action'], converted['args'])
+            bindings[code] = _Binding(entry['action'], args)
         return bindings
 
     def _evdev_code(self, key) -> Optional[int]:

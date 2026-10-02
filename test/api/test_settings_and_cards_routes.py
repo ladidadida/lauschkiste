@@ -37,8 +37,8 @@ def main_cfg():
 def cards_file(tmp_path):
     path = tmp_path / 'cards.yaml'
     path.write_text(dump_yaml({
-        '0001': {'alias': 'play_folder', 'args': ['Rock']},
-        '0002': {'package': 'player', 'plugin': 'ctrl', 'method': 'next'},
+        '0001': {'action': 'player.play_folder', 'args': {'folder': 'Rock'}},
+        '0002': {'action': 'player.next'},
         '0003': {'alias': 'set_volume', 'args': [12]},
         '0004': {'action': 'player.toggle'},
     }))
@@ -70,16 +70,6 @@ def test_set_settings(client, main_cfg):
 def test_set_settings_rejects_unknown_keys(client):
     response = client.put('/api/v1/settings', json={'settings': {'show_covers': 'maybe'}})
     assert response.status_code == 422
-
-
-def test_legacy_cards_are_migrated_with_backup(client, cards_file):
-    stored = load_yaml(cards_file)
-    assert stored['0001'] == {'action': 'player.play_folder', 'args': {'folder': 'Rock'}}
-    assert stored['0002'] == {'action': 'player.next', 'args': {}}
-    assert stored['0003'] == {'alias': 'set_volume', 'args': [12]}
-    backups = list(cards_file.parent.glob('cards.yaml.bak-*'))
-    assert len(backups) == 1
-    assert load_yaml(backups[0])['0001'] == {'alias': 'play_folder', 'args': ['Rock']}
 
 
 def test_list_cards(client):

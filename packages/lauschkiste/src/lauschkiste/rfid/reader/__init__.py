@@ -12,7 +12,6 @@ from typing import Any, Callable, Dict, List, Optional, Protocol
 from pydantic import BaseModel
 
 import lauschkiste.cfghandler
-import lauschkiste.legacy_actions as legacy_actions
 import lauschkiste.paths
 from lauschkiste.contract import CoreModule, event, extension_point, query
 
@@ -181,7 +180,7 @@ class Rfid(CoreModule):
 
     def resolve_config_action(self, entry, where: str) -> Optional[Callable[[], Any]]:
         """Turn a configured action (new or old format) into a callable, or None if invalid."""
-        return legacy_actions.bind_action(self._ctx.actions, entry, where, log)
+        return self._ctx.actions.bind(entry, where, log)
 
     # -- operations -----------------------------------------------------------------------------
 

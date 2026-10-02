@@ -20,7 +20,6 @@ import lauschkiste.player
 from lauschkiste.contract import Plugin
 
 logger = logging.getLogger('lauschkiste.mpd')
-cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 DEFAULTS = {
     'host': 'localhost',
@@ -30,11 +29,9 @@ DEFAULTS = {
 
 
 def _setting(ctx, *keys):
-    """Own config section first, then the pre-plugin ``playermpd`` section, then the default."""
+    """Own config section, else the default."""
     missing = object()
     value = ctx.config.get(*keys, default=missing)
-    if value is missing:
-        value = cfg_main.getn('playermpd', *keys, default=missing)
     if value is missing:
         value = DEFAULTS
         for key in keys:

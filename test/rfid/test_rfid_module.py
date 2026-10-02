@@ -56,7 +56,7 @@ def setup(tmp_path):
     main.config_dict({})
     (tmp_path / 'cards.yaml').write_text(
         "'0001':\n  action: player.play_folder\n  args:\n    folder: Rock\n"
-        "'0002':\n  alias: next_song\n"
+        "'0002':\n  action: player.next\n"
     )
     (tmp_path / 'rfid.yaml').write_text("rfid:\n  readers:\n    usb:\n      module: fake\n      same_id_delay: 0\n")
 
@@ -115,7 +115,7 @@ def test_swiped_card_runs_its_action(setup):
     assert ('rfid.card_detected', {'card_id': '0001', 'registered': True}) in events
 
 
-def test_migrated_legacy_card_runs(setup):
+def test_card_without_args_runs(setup):
     ctrl, driver, _ = setup
     driver.cards.put('0002')
     assert wait_for(lambda: ctrl.next.called)

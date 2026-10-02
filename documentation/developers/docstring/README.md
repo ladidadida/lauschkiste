@@ -164,9 +164,6 @@
     * [close](#lauschkiste.multitimer.GenericTimerClass.close)
   * [GenericEndlessTimerClass](#lauschkiste.multitimer.GenericEndlessTimerClass)
     * [get\_state](#lauschkiste.multitimer.GenericEndlessTimerClass.get_state)
-* [lauschkiste.legacy\_actions](#lauschkiste.legacy_actions)
-  * [convert](#lauschkiste.legacy_actions.convert)
-  * [bind\_action](#lauschkiste.legacy_actions.bind_action)
 * [lauschkiste.paths](#lauschkiste.paths)
   * [home](#lauschkiste.paths.home)
   * [set\_home](#lauschkiste.paths.set_home)
@@ -210,6 +207,7 @@
 * [lauschkiste.contract.catalog](#lauschkiste.contract.catalog)
   * [ActionCatalog](#lauschkiste.contract.catalog.ActionCatalog)
     * [validate](#lauschkiste.contract.catalog.ActionCatalog.validate)
+    * [bind](#lauschkiste.contract.catalog.ActionCatalog.bind)
 * [lauschkiste.contract.context](#lauschkiste.contract.context)
   * [ModuleConfig](#lauschkiste.contract.context.ModuleConfig)
   * [ModuleProxy](#lauschkiste.contract.context.ModuleProxy)
@@ -903,9 +901,7 @@ Look at template_new_reader.py for documentation how to integrate a new RFID rea
 
 The RFID card database: which action a card triggers.
 
-Entries are stored as ``action: <module>.<action>`` plus named ``args``. Entries in the pre-contract
-format (alias or package/plugin/method) are converted once all modules are ready; the original
-file is kept as a backup.
+Entries are stored as ``action: <module>.<action>`` plus named ``args``.
 
 
 <a id="lauschkiste.rfid.cards.Cards"></a>
@@ -2256,50 +2252,6 @@ def get_state() -> Dict[str, Any]
 Return the periodic timer state.
 
 
-<a id="lauschkiste.legacy_actions"></a>
-
-# lauschkiste.legacy\_actions
-
-Conversion of pre-contract commands to action ids.
-
-Before the core/plugin contract, card entries and config actions were stored either as an alias
-(``alias: play_card``) or as ``package``/``plugin``/``method`` plus positional ``args`` and
-``kwargs``. The contract stores ``action: <module>.<action>`` plus named ``args``.
-
-
-<a id="lauschkiste.legacy_actions.convert"></a>
-
-#### convert
-
-```python
-def convert(
-        entry: Mapping,
-        param_names=None) -> Tuple[Optional[Dict[str, Any]], Optional[str]]
-```
-
-Convert a legacy command to ``{'action': ..., 'args': {...}}`` (card flags are kept).
-
-**Arguments**:
-
-- `param_names`: callable ``action_id -> list of parameter names`` or None if unknown;
-needed only to name positional arguments
-
-**Returns**:
-
-``(converted, None)`` or ``(None, reason)``
-
-<a id="lauschkiste.legacy_actions.bind_action"></a>
-
-#### bind\_action
-
-```python
-def bind_action(catalog, entry, where: str,
-                logger) -> Optional[Callable[[], Any]]
-```
-
-A callable running a configured action (either format), or None (logged) if it's invalid.
-
-
 <a id="lauschkiste.paths"></a>
 
 # lauschkiste.paths
@@ -2863,6 +2815,20 @@ def validate(action_id: str, args: Optional[dict] = None) -> Dict[str, Any]
 ```
 
 Check that ``action_id`` exists and ``args`` fit its signature. Returns coerced args.
+
+
+<a id="lauschkiste.contract.catalog.ActionCatalog.bind"></a>
+
+#### bind
+
+```python
+def bind(entry: Any, where: str,
+         log: logging.Logger) -> Optional[Callable[[], Any]]
+```
+
+A callable running a configured action (``{'action': <id>, 'args': {...}}``), or None
+
+(logged) if the entry is invalid.
 
 
 <a id="lauschkiste.contract.context"></a>
@@ -3789,11 +3755,7 @@ Build a :class:`PlayerStatus` from a backend's raw (mpd-style) status mapping.
 class MusicLibPath()
 ```
 
-Determine the music library directory.
-
-Primarily from `player.music_library_path` config (backend-agnostic). Falls back to parsing
-`music_directory` out of mpd.conf only when the mpd backend is active and no explicit path was
-configured -- keeps existing mpd installs working without a migration step.
+The music library directory: `player.music_library_path`, by default `audiofolders`.
 
 
 <a id="lauschkiste.player.get_music_library_path"></a>

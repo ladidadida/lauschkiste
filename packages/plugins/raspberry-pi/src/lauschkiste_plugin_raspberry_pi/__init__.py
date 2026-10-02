@@ -28,8 +28,6 @@ import subprocess
 import threading
 from typing import List, Optional
 
-import lauschkiste.cfghandler
-import lauschkiste.legacy_actions as legacy_actions
 from lauschkiste.contract import OperationError, Plugin, action, event, query
 
 from lauschkiste_plugin_raspberry_pi import health
@@ -38,7 +36,6 @@ from lauschkiste_plugin_raspberry_pi.battery import (
 )
 
 logger = logging.getLogger('lauschkiste.raspberry_pi')
-cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 
 class RaspberryPi(Plugin):
@@ -55,24 +52,17 @@ class RaspberryPi(Plugin):
         self._gpio = None
         self._battery: Optional[BatteryMonitor] = None
 
-    def _setting(self, key, legacy_keys=(), default=None):
-        """Own setting first, then the pre-plugin ``host`` section, then the default."""
-        missing = object()
-        value = self._ctx.config.get(key, default=missing)
-        if value is missing and legacy_keys:
-            value = cfg_main.getn('host', *legacy_keys, default=missing)
-        return default if value is missing else value
+    def _setting(self, key, default=None):
+        return self._ctx.config.get(key, default=default)
 
     # -- lifecycle ------------------------------------------------------------------------------
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        if self._setting('hdmi_power_down', ('rpi', 'hdmi_power_down'), False):
+        if self._setting('hdmi_power_down', False):
             health.hdmi_power_down()
-        legacy_disable = cfg_main.getn('host', 'wlan_power', 'disable_power_down', default=None)
-        power_save = self._setting('wlan_power_save', default=None if legacy_disable is None else not legacy_disable)
-        if power_save is False:
-            health.disable_wlan_power_save(self._setting('wlan_interface', ('wlan_power', 'card'), 'wlan0'))
+        if self._setting('wlan_power_save', None) is False:
+            health.disable_wlan_power_save(self._setting('wlan_interface', 'wlan0'))
 
     def ready(self) -> None:
         gpio_config = self._ctx.config.get('gpio', default=None) or {}
@@ -91,7 +81,7 @@ class RaspberryPi(Plugin):
         return [thread] if thread is not None else []
 
     def _bind(self, entry):
-        return legacy_actions.bind_action(self._ctx.actions, entry, 'raspberry_pi.gpio', logger)
+        return self._ctx.actions.bind(entry, 'raspberry_pi.gpio', logger)
 
     def _create_battery_monitor(self, config) -> BatteryMonitor:
         driver = config.get('driver', 'ina219')
@@ -113,7 +103,7 @@ class RaspberryPi(Plugin):
             on_shutdown=self.shutdown)
 
     def _power(self, command: List[str], what: str) -> None:
-        if self._setting('debug_mode', ('debug_mode',), False):
+        if self._setting('debug_mode', False):
             logger.info(f"debug_mode: not running '{' '.join(command)}' ({what})")
             return
         logger.info(what)

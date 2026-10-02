@@ -11,11 +11,9 @@ from typing import Any, Dict, List, Optional, Protocol
 
 from pydantic import BaseModel
 
-import lauschkiste.cfghandler
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 
 logger = logging.getLogger('lauschkiste.volume')
-cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 
 class Output(BaseModel):
@@ -160,12 +158,7 @@ class PulseMixer:
 
 
 def _setting(ctx, *keys, default=None):
-    """Own config section first, then the pre-contract ``pulse`` section, then the default."""
-    missing = object()
-    value = ctx.config.get(*keys, default=missing)
-    if value is missing:
-        value = cfg_main.getn('pulse', *keys, default=missing)
-    return default if value is missing else value
+    return ctx.config.get(*keys, default=default)
 
 
 def _clamp(value: int, low: int, high: int) -> int:

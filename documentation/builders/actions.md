@@ -39,17 +39,3 @@ Arguments are checked when an action is configured (a card is registered through
 the API); a card with an unknown action or wrong arguments is rejected. Cards whose action is
 temporarily unavailable (e.g. its plugin is disabled) stay in the card database and work again
 once the plugin is enabled.
-
-## Old format
-
-Before the core/plugin contract, actions were written as an *alias* or as
-`package`/`plugin`/`method` with positional `args` and `kwargs`:
-
-```yaml
-alias: play_card
-args: [path/to/folder]
-```
-
-This format is still read. The card database is converted to the new format automatically on
-start-up (the original file is kept as `cards.yaml.bak-<date>`); entries whose action isn't
-available yet keep their old format until it is.

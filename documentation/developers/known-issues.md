@@ -29,7 +29,5 @@ nothing else on the system needs them.
 
 ## Configuration
 
-In `lauschkiste.yaml` (and all other config files):
-Always use relative path from the repository root (Lauschkiste daemon's working directory), but do not use relative paths with `~/`.
-
-**Sole** exception is in `playermpd.mpd_conf`.
+Relative paths in `lauschkiste.yaml` (and all other config files) are resolved against the
+Lauschkiste home (`lauschctl home`); absolute paths and paths starting with `~/` are used as given.

@@ -74,22 +74,6 @@ def test_configured_device_keys_run_actions(start_modules, recorder, recorder_ca
     assert FakeEvdev.devices[0].closed
 
 
-def test_legacy_key_mapping_and_reconnect(start_modules, recorder, recorder_calls, wait_for):
-    pad = FakeDevice('Pad', '/dev/input/event5', [288])
-    FakeEvdev.devices = [pad]
-    config = {'input': {'devices': {'pad': {'device_name': 'Pad', 'exact': True,
-                                            'keys': {288: {'package': 'recorder', 'plugin': 'beep'}}}}}}
-    manager, _ = start_modules([recorder, FakeInput], config)
-    handle = manager.handle('input')
-    assert wait_for(lambda: handle.invoke('list_devices')[0].connected)
-    pad.presses.put(None)
-    assert wait_for(lambda: not handle.invoke('list_devices')[0].connected)
-    FakeEvdev.devices = [FakeDevice('Pad', '/dev/input/event6', [288])]
-    assert wait_for(lambda: handle.invoke('list_devices')[0].path == '/dev/input/event6')
-    FakeEvdev.devices[0].presses.put(288)
-    assert wait_for(lambda: recorder_calls == [('beep', 1)])
-
-
 def test_media_keys_attach_to_devices_with_media_keys(start_modules, fake_player, coordinator, wait_for):
     from lauschkiste.volume import Volume
     mouse = FakeDevice('Mouse', '/dev/input/event2', [272])

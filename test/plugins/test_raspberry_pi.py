@@ -76,16 +76,6 @@ def test_shutdown_runs_the_system_command(monkeypatch):
     manager.stop()
 
 
-def test_legacy_host_debug_mode(monkeypatch):
-    popen = Mock()
-    monkeypatch.setattr(subprocess, 'Popen', popen)
-    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({'host': {'debug_mode': True}})
-    manager, _ = start({})
-    manager.catalog.call('raspberry_pi.reboot')
-    popen.assert_not_called()
-    manager.stop()
-
-
 def test_state_of_charge():
     assert state_of_charge(3000, 3000, 4200) == 0
     assert state_of_charge(3600, 3000, 4200) == 50
@@ -134,16 +124,14 @@ def test_gpio_buttons_run_actions():
     try:
         manager, _ = start({'gpio': {'enabled': True, 'buttons': {
             'next': {'pin': 5, 'action': 'recorder.hit', 'args': {'what': 'press'}, 'bounce_time': None},
-            'legacy': {'pin': 6, 'package': 'recorder', 'plugin': 'hit', 'bounce_time': None},
         }}})
         pin = factory.pin(5)
         pin.drive_low()
         pin.drive_high()
-        factory.pin(6).drive_low()
         deadline = time.monotonic() + 2
-        while time.monotonic() < deadline and len(Recorder.calls) < 2:
+        while time.monotonic() < deadline and not Recorder.calls:
             time.sleep(0.01)
-        assert sorted(Recorder.calls) == ['press', 'x']
+        assert Recorder.calls == ['press']
         manager.stop()
     finally:
         gpiozero.Device.pin_factory = None

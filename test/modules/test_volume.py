@@ -148,14 +148,3 @@ def test_pulse_mixer_scales_by_volume_limit_and_switches_outputs(start_modules, 
     assert outputs.active == 'secondary'
     assert pulse.default == 'headset'
     assert pulse.moved == [(7, 1)]
-
-
-def test_legacy_pulse_section_is_read(start_modules, coordinator, pulse, fake_player):
-    import lauschkiste.volume
-    legacy = lauschkiste.volume.cfg_main
-    legacy.config_dict({'pulse': {'soft_max_volume': 40}})
-    try:
-        manager, _ = start_modules([fake_player, Volume], {})
-        assert manager.handle('volume').invoke('get_volume').soft_max_volume == 40
-    finally:
-        legacy.config_dict({})

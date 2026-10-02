@@ -1,26 +1,20 @@
 """The RFID card database: which action a card triggers.
 
-Entries are stored as ``action: <module>.<action>`` plus named ``args``. Entries in the pre-contract
-format (alias or package/plugin/method) are converted once all modules are ready; the original
-file is kept as a backup.
+Entries are stored as ``action: <module>.<action>`` plus named ``args``.
 """
 
 import logging
-import shutil
-import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
 import lauschkiste.cfghandler
-import lauschkiste.legacy_actions as legacy_actions
 import lauschkiste.paths
 from lauschkiste.contract import ActionError, CoreModule, OperationError, action, event, query
 
 log = logging.getLogger('lauschkiste.cards')
 cfg_cards = lauschkiste.cfghandler.get_handler('cards')
-cfg_main = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 DEFAULT_DATABASE = 'settings/cards.yaml'
 
@@ -61,8 +55,7 @@ class Cards(CoreModule):
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        legacy_path = cfg_main.getn('rfid', 'card_database', default=None)
-        self._path = str(lauschkiste.paths.resolve(ctx.config.get('database', default=legacy_path or DEFAULT_DATABASE)))
+        self._path = str(lauschkiste.paths.resolve(ctx.config.get('database', default=DEFAULT_DATABASE)))
         try:
             cfg_cards.load(self._path)
         except FileNotFoundError:
@@ -75,9 +68,6 @@ class Cards(CoreModule):
             log.error(f"Ignoring non-string card IDs in the card database: {illegal}")
         self._announce_change()
 
-    def ready(self) -> None:
-        self._migrate_legacy_entries()
-
     def stop(self):
         cfg_cards.save(only_if_changed=True)
         return []
@@ -85,49 +75,12 @@ class Cards(CoreModule):
     def _announce_change(self) -> None:
         self._ctx.publish(self.changed, CardsChanged(changed_at=datetime.now(timezone.utc).isoformat()))
 
-    # -- legacy format --------------------------------------------------------------------------
-
-    def _param_names(self, action_id: str):
-        catalog = self._ctx.actions
-        if action_id not in catalog:
-            return None
-        return [p.name for p in catalog.operation(action_id).params]
-
-    def _migrate_legacy_entries(self) -> None:
-        with cfg_cards:
-            legacy = {card_id: entry for card_id, entry in cfg_cards.items()
-                      if isinstance(entry, dict) and legacy_actions.is_legacy(entry)}
-            if not legacy:
-                return
-            converted = {}
-            for card_id, entry in legacy.items():
-                new_entry, problem = legacy_actions.convert(entry, self._param_names)
-                if new_entry is None:
-                    log.warning(f"Card '{card_id}' keeps its old format: {problem}")
-                else:
-                    converted[card_id] = new_entry
-            if not converted:
-                return
-            backup = f"{self._path}.bak-{time.strftime('%Y%m%d-%H%M%S')}"
-            try:
-                shutil.copyfile(self._path, backup)
-            except OSError as error:
-                log.error(f"Not migrating the card database, backup to '{backup}' failed: {error}")
-                return
-            for card_id, new_entry in converted.items():
-                cfg_cards[card_id] = new_entry
-            cfg_cards.save(only_if_changed=False)
-        log.info(f"Migrated {len(converted)} cards to the action format (backup: '{backup}')")
-        self._announce_change()
-
     # -- helpers --------------------------------------------------------------------------------
 
     def _check(self, entry: Any):
         """Return ``(CardEntry or None, error or None)`` for a stored entry."""
         if not isinstance(entry, dict):
             return None, 'invalid entry'
-        if legacy_actions.is_legacy(entry):
-            return None, 'old card format; the action it refers to is not available'
         try:
             card = CardEntry.model_validate(entry)
         except Exception as error:

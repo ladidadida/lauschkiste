@@ -369,23 +369,13 @@ in `lauschkiste.yaml`):
   ignore_card_removal_action: false
 ```
 
-- `action` is a card action id (`<module>.<action>`), from core or an enabled plugin. The former
-  aliases (`play_card`, `toggle`, ...) map to action ids.
-- `args` is a mapping validated against the action's model. Positional `args` no longer exist.
+- `action` is a card action id (`<module>.<action>`), from core or an enabled plugin.
+- `args` is a mapping validated against the action's model.
 - Registering a card through the API validates the action and its arguments; invalid requests are
   rejected with 422.
 - Unknown or invalid entries on load (e.g. a plugin that is not enabled) are kept in the file,
   logged and reported by `GET /api/v1/cards` with an `error` field, never silently dropped. They
   become valid again once the plugin is enabled.
-
-**Migration.** When `cards.yaml` contains old-format entries, it is rewritten once on load and the
-original is kept as `cards.yaml.bak-<timestamp>`:
-
-- `alias: <name>` -> the action id the alias pointed to.
-- `package/plugin/method` -> `<package>.<method>` when that action exists (e.g.
-  `player/ctrl/play_folder` -> `player.play_folder`).
-- Positional `args` -> named `args` using the action's parameter order.
-- Anything that can't be mapped stays as-is and is flagged as above.
 
 ## What goes away
 
@@ -408,7 +398,7 @@ original is kept as `cards.yaml.bak-<timestamp>`:
    point, `rfid.card_detected`). REST paths the webapp uses stayed the same except
    `DELETE /api/v1/cards/{card_id}`; topics were renamed (`playerstatus` -> `player.status`,
    `rfid.card_id` -> `rfid.card_detected`, `core.*` -> `system.info`) and the webapp follows.
-   Card dispatch goes through the action catalog; `cards.yaml` is migrated with a backup.
+   Card dispatch goes through the action catalog.
 3. **First bundled plugins** -- *done*: `packages/plugins/mpd` (player backend) and
    `packages/plugins/rfid-readers` (one plugin per driver in one package; driver dependencies are
    extras of that package). The core has no optional dependencies left. The RFID reader
@@ -431,15 +421,13 @@ original is kept as `cards.yaml.bak-<timestamp>`:
    `raspberry-pi` plugin), `jingle` (startup/shutdown sound through the same PortAudio output as
    `local_audio`, `jingle.play` for cards), system info in `system` (IP addresses, disk usage, CPU
    temperature, periodic `system.health`, `say_my_ip`, `restart_service`), and `input` (evdev
-   devices by name with key -> action mappings, optional media keys). Old `pulse:` settings are
-   still read. Not carried over: the idle-shutdown timer (belongs to the `raspberry-pi` plugin)
+   devices by name with key -> action mappings, optional media keys). Not carried over: the idle-shutdown timer (belongs to the `raspberry-pi` plugin)
    and the separate `evdev.yaml` file (device mappings now live under `input:`).
 7. **`raspberry-pi` plugin** -- *done*: `packages/plugins/raspberry-pi` with `shutdown`/`reboot`
    (with `debug_mode`), GPIO via gpiozero (buttons with optional hold action, rotary encoders, a
    status LED; `gpio` extra), a battery monitor (INA219 via the `battery-ina219` extra, or a
    simulator; `raspberry_pi.battery` event, warning action, shutdown below a threshold), and
-   firmware health (`vcgencmd get_throttled`, HDMI power-down, WLAN power saving). Old `host:`
-   settings are still read. The installer enables the plugin and installs the `gpio` extra; the web
+   firmware health (`vcgencmd get_throttled`, HDMI power-down, WLAN power saving). The installer enables the plugin and installs the `gpio` extra; the web
    app shows shutdown/reboot only when `raspberry_pi.shutdown` is available. Not carried over: the
    ADS1015 battery driver, the OnOff SHIM script, the idle-shutdown timer and the old `gpio.yaml`
    format. Autohotspot moves to the installer/`lauschctl setup` track instead.

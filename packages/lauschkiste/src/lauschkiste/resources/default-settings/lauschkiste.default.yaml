@@ -99,10 +99,6 @@ library:
   # (Samba, USB stick, ...), once the music folder has been quiet for watch_interval_sec
   watch: true
   watch_interval_sec: 5
-playermpd:
-  # Only read by lauschkiste.player to find the music library in mpd.conf when player.music_library_path
-  # is not set. The mpd plugin's own settings live under plugins.mpd.
-  mpd_conf: ~/.config/mpd/mpd.conf
 api:
   # 0.0.0.0 (all interfaces): nginx used to be the only thing reachable from the LAN, reverse
   # proxying to a loopback-only API server. There is no separate reverse proxy anymore -- this
