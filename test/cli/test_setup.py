@@ -107,6 +107,13 @@ def test_pc_setup_installs_packages_and_service(tmp_path, home, extras):
     assert extras == []
 
 
+def test_network_stays_on_dhcp_by_default(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    assert setup_run(system, home)[0] == 0
+    assert 'static ip_address' not in (system.read('/etc/dhcpcd.conf') or '')
+    assert not any('nmcli' in command for command in system.commands)
+
+
 def test_second_run_changes_nothing(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
     assert setup_run(system, home)[0] == 0
@@ -118,7 +125,8 @@ def test_second_run_changes_nothing(tmp_path, home, extras):
 def test_pi_setup(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
     system.outputs[('pdbedit', '-L')] = 'pi:1000:'
-    failed, ctx = setup_run(system, home, answers={'disable_onboard_audio': True, 'samba': True})
+    failed, ctx = setup_run(system, home, answers={'disable_onboard_audio': True, 'samba': True,
+                                                   'static_ip': True})
     assert failed == 0
     assert 'raspberry_pi' in ctx.enabled_plugins()
     assert extras == ['lauschkiste-plugin-raspberry-pi[gpio]']

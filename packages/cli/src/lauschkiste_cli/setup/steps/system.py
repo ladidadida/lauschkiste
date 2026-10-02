@@ -128,7 +128,7 @@ class BootStep(Step):
                  when=lambda a: a.get('optimize_boot')),
         Question('disable_ipv6', 'Disable IPv6?', default=True, when=lambda a: a.get('optimize_boot')),
         Question('static_ip', 'Use the current IP address as static address (faster network start)?',
-                 default=True, when=lambda a: a.get('optimize_boot') and not a.get('autohotspot')),
+                 default=False, when=lambda a: a.get('optimize_boot') and not a.get('autohotspot')),
     )
     MARKER = '## Lauschkiste Boot Config'
     DHCP_MARKER = '## Lauschkiste DHCP Config'
