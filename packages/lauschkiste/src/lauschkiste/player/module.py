@@ -3,14 +3,14 @@
 import logging
 import threading
 from functools import partial
-from typing import Any, Dict, List, Literal, Mapping, Optional
+from typing import Any, Dict, List, Mapping, Optional
 
 from pydantic import BaseModel
 
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.player.backend import PlayerBackend
 from lauschkiste.player.coordinator import PlayerCoordinator
-from lauschkiste.player.status import PlaybackContext, PlayerStatus, status_from_backend
+from lauschkiste.player.status import ContentKind, PlaybackContext, PlayerStatus, status_from_backend
 
 logger = logging.getLogger('lauschkiste.player')
 
@@ -92,7 +92,7 @@ class Player(CoreModule):
             update['context'] = self._context
         return status.model_copy(update=update)
 
-    def _set_context(self, kind: Literal['music', 'audiobook', 'podcast', 'radio'], title: Optional[str], action: str, args: Dict[str, Any]) -> None:
+    def _set_context(self, kind: ContentKind, title: Optional[str], action: str, args: Dict[str, Any]) -> None:
         context = PlaybackContext(kind=kind, title=title, action=action,
                                   args={key: value for key, value in args.items() if value is not None})
         with self._metadata_lock:

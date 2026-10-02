@@ -5,9 +5,12 @@ from typing import Any, Dict, Literal, Mapping, Optional
 from pydantic import BaseModel
 
 
+ContentKind = Literal['music', 'audiobook', 'podcast', 'radio']
+
+
 class PlaybackContext(BaseModel):
     """What is playing: its content type, a title, and the card action that plays it."""
-    kind: Literal['music', 'audiobook', 'podcast', 'radio']
+    kind: ContentKind
     title: Optional[str] = None
     action: Optional[str] = None
     args: Dict[str, Any] = {}
