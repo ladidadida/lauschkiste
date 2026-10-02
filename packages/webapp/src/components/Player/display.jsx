@@ -22,7 +22,8 @@ const lines = (status, t) => {
   const { context } = status;
   const kind = contentKind(context);
   if (kind === 'radio') {
-    return [status.name || context?.title || t('player.display.unknown-title'), status.title];
+    const station = status.name || context?.title || t('player.display.unknown-title');
+    return [station, status.title !== station ? status.title : null];
   }
   if (kind === 'audiobook') {
     const chapter = status.playlist_length > 1

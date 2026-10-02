@@ -389,6 +389,17 @@
       "error": "The card could not be saved.",
       "unknown": "Unknown card {{card}} placed.",
       "learn": "Register"
+    },
+    "queue": {
+      "title": {
+        "music": "Up next",
+        "audiobook": "Chapters",
+        "podcast": "Up next",
+        "radio": ""
+      }
+    },
+    "speed": {
+      "title": "Playback speed"
     }
   },
   "settings": {

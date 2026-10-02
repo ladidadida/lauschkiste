@@ -31,9 +31,10 @@ const Player = () => {
 
   useEffect(() => {
     const getCoverArt = async () => {
+      // The status names the playback backend; the built-in one plays the local library
       const { result } = await request('getSingleCoverArt', {
         song_url: file,
-        provider,
+        provider: provider === 'local_audio' ? undefined : provider,
       });
       const coverUrl = result?.cover_url;
       if (coverUrl) {

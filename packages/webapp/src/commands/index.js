@@ -88,6 +88,17 @@ const commands = {
     cardAction: 'player.repeat',
     argKeys: ['option'],
   },
+  playerQueue: {
+    rest: { method: 'GET', path: '/api/v1/player/queue' },
+  },
+  jump: {
+    rest: { method: 'POST', path: '/api/v1/player/jump' },
+    argKeys: ['position'],
+  },
+  setSpeed: {
+    rest: { method: 'POST', path: '/api/v1/player/speed' },
+    argKeys: ['speed'],
+  },
   stop_after_current: {
     rest: { method: 'POST', path: '/api/v1/player/stop-after-current' },
     argKeys: ['enabled'],

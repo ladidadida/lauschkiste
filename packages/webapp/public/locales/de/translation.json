@@ -389,6 +389,17 @@
       "error": "Die Karte konnte nicht gespeichert werden.",
       "unknown": "Unbekannte Karte {{card}} aufgelegt.",
       "learn": "Anlernen"
+    },
+    "queue": {
+      "title": {
+        "music": "Als Nächstes",
+        "audiobook": "Kapitel",
+        "podcast": "Als Nächstes",
+        "radio": ""
+      }
+    },
+    "speed": {
+      "title": "Abspielgeschwindigkeit"
     }
   },
   "settings": {
