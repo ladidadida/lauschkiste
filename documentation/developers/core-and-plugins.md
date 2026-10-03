@@ -232,6 +232,23 @@ Passed to `start()`; the only way a module reaches the rest of the system:
   shut down by the framework.
 - `ctx.logger` - `jb.<name>`.
 
+### Settings
+
+A module declares its config section as a pydantic model, `settings = MySettings`. Field titles,
+descriptions and limits (`Field(..., ge=0, le=100, title=..., description=...)`) end up in the
+JSON schema the web app renders as a form; an `ActionEntry` field (action plus arguments, from
+`lauschkiste.contract`) is shown as an action picker. The models are only the description: modules
+keep reading `ctx.config` with the same defaults.
+
+- `GET /api/v1/settings/modules` lists schema and current values of every running module with
+  settings, `PUT /api/v1/settings/modules/<name>` with `{"values": {...}}` validates the given
+  fields and writes them to the config file right away.
+- After a change the module's `settings_changed(changed)` hook runs; it returns True if the change
+  takes effect immediately. Otherwise `GET /api/v1/settings/restart` reports that a restart is
+  needed (`system.restart_service`).
+- `GET /api/v1/plugins` lists installed plugins (enabled, running, problem, missing extras);
+  `PUT /api/v1/plugins/<name>` with `{"enabled": true}` enables one (after a restart).
+
 ## Loading and enabling
 
 **Core modules** are listed in code in the `lauschkiste` package. They always start; there is no

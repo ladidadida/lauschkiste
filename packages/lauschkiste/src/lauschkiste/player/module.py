@@ -3,9 +3,9 @@
 import logging
 import threading
 from functools import partial
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Literal, Mapping, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.player.backend import PlayerBackend
@@ -15,6 +15,24 @@ from lauschkiste.player.status import ContentKind, PlaybackContext, PlayerStatus
 logger = logging.getLogger('lauschkiste.player')
 
 DEFAULT_BACKEND = 'local_audio'
+
+
+class SecondSwipe(BaseModel):
+    alias: Literal['toggle', 'play', 'skip', 'rewind', 'replay', 'replay_if_stopped', 'none'] = Field(
+        'none', title='Same card placed again',
+        description='What a folder card does when it is placed again while its folder plays')
+
+
+class PlayerSettings(BaseModel):
+    backend: str = Field(DEFAULT_BACKEND, title='Player backend',
+                         description="'local_audio' plays directly; 'mpd' needs the mpd plugin")
+    volume: int = Field(100, ge=0, le=100, title='Player volume',
+                        description='Of the local_audio backend, on top of the system volume')
+    second_swipe_action: SecondSwipe = Field(default_factory=SecondSwipe, title='Second swipe')
+    end_of_playlist_next_action: Literal['none', 'stop', 'rewind'] = Field(
+        'none', title='At the end of the playlist')
+    stopped_prev_action: Literal['none', 'prev', 'rewind'] = Field('prev', title='"Previous" while stopped')
+    stopped_next_action: Literal['none', 'next', 'rewind'] = Field('next', title='"Next" while stopped')
 
 
 class VolumeLevel(BaseModel):
@@ -40,6 +58,7 @@ class Player(CoreModule):
     concurrency = 'threadsafe'
     requires = ('library',)
 
+    settings = PlayerSettings
     status = event('status', PlayerStatus)
     backends = extension_point('backends', PlayerBackend)
 

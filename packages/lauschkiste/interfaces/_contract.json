@@ -30,6 +30,8 @@
     "ready": "(self) -> None",
     "required_modules": "(cls) -> Dict[str, str | None]",
     "requires": "attribute",
+    "settings": "attribute",
+    "settings_changed": "(self, changed: Dict[str, Any]) -> bool",
     "start": "(self, ctx: 'Context') -> None",
     "stop": "(self) -> List[threading.Thread]",
     "validate_declaration": "(cls) -> None"
@@ -46,7 +48,7 @@
     "extras": "attribute",
     "validate_declaration": "(cls) -> None"
   },
-  "contract_version": "2.0",
+  "contract_version": "2.1",
   "functions": {
     "action": "(func: Callable | None = None, *, method: str = 'POST', path: str | None = None, exclusive: bool = True, name: str | None = None, status_code: int | None = None)",
     "event": "(name: str, model: Type[pydantic.main.BaseModel]) -> lauschkiste.contract.declarations.EventSpec",

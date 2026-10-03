@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Protocol
 
 from fastapi.responses import FileResponse, JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from starlette.requests import Request
 
 import lauschkiste.paths
@@ -42,6 +42,13 @@ class LibrarySource(Protocol):
         """URL of the song's cover (absolute or relative to the web app), or None."""
 
     def refresh(self) -> None: ...
+
+
+class LibrarySettings(BaseModel):
+    scan_on_startup: bool = Field(True, title='Scan the library on start')
+    watch: bool = Field(True, title='Notice changed files',
+                        description='Rescan after files were added, changed or removed outside the web app')
+    watch_interval_sec: float = Field(5, ge=1, le=300, title='Wait before rescanning (seconds)')
 
 
 class LibraryView(BaseModel):
@@ -132,6 +139,7 @@ class Library(CoreModule):
     interface_version = '1.1'
     concurrency = 'threadsafe'
 
+    settings = LibrarySettings
     scanned = event('scanned', LibraryScanned)
     sources = extension_point('sources', LibrarySource)
 

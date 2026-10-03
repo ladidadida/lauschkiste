@@ -13,6 +13,8 @@ Enable with ``player.backend: mpd`` and::
 
 import logging
 
+from pydantic import BaseModel, Field
+
 import lauschkiste.cfghandler
 import lauschkiste.misc as misc
 import lauschkiste.paths
@@ -40,6 +42,17 @@ def _setting(ctx, *keys):
 
 
 COVER_ROUTE = '/api/v1/mpd/covers'
+
+
+class MpdLibrarySettings(BaseModel):
+    update_on_startup: bool = Field(True, title='Update the mpd database on start')
+    check_user_rights: bool = Field(True, title='Fix file permissions of the library on start')
+
+
+class MpdSettings(BaseModel):
+    host: str = Field(DEFAULTS['host'], title='mpd host')
+    status_file: str = Field(DEFAULTS['status_file'], title='Status file')
+    library: MpdLibrarySettings = Field(default_factory=MpdLibrarySettings, title='Library')
 
 
 class MpdLibrarySource:
@@ -77,6 +90,7 @@ class Mpd(Plugin):
     name = 'mpd'
     interface_version = '1.4'
     requires = {'player': '>=5.0,<6', 'library': '>=1.0,<2'}
+    settings = MpdSettings
 
     def start(self, ctx) -> None:
         from lauschkiste_plugin_mpd.backend import PlayerMPD

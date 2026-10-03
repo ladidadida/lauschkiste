@@ -123,7 +123,7 @@ def test_gpio_buttons_run_actions():
     gpiozero.Device.pin_factory = factory
     try:
         manager, _ = start({'gpio': {'enabled': True, 'buttons': {
-            'next': {'pin': 5, 'action': 'recorder.hit', 'args': {'what': 'press'}, 'bounce_time': None},
+            'next': {'pin': 5, 'on_press': {'action': 'recorder.hit', 'args': {'what': 'press'}}, 'bounce_time': None},
         }}})
         pin = factory.pin(5)
         pin.drive_low()

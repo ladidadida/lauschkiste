@@ -12,12 +12,11 @@ from lauschkiste.contract.catalog import ActionCatalog
 from lauschkiste.contract.context import Context, ModuleConfig, ModulesView, strict_mode_default
 from lauschkiste.contract.errors import ContractError
 from lauschkiste.contract.module import CoreModule, Module, Plugin
+from lauschkiste.contract.plugins import ENTRY_POINT_GROUP
+from lauschkiste.contract.settings import SettingsStore
 from lauschkiste.contract.version import CONTRACT_VERSION
 
 logger = logging.getLogger('lauschkiste.contract')
-
-ENTRY_POINT_GROUP = 'lauschkiste.plugins'
-
 
 def discover_plugins() -> Dict[str, Callable[[], type]]:
     """Installed plugins by entry-point name. Loading (importing) happens only when enabled."""
@@ -67,6 +66,7 @@ class ModuleManager:
         self._handles: Dict[str, ModuleHandle] = {}
         self._order: List[str] = []
         self.failed: Dict[str, str] = {}
+        self.settings = SettingsStore(self, cfg)
 
     # -- loading --------------------------------------------------------------------------------
 

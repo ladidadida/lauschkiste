@@ -4,6 +4,9 @@ import logging
 import signal
 import threading
 from pathlib import Path
+from typing import Optional
+
+from pydantic import BaseModel, Field
 
 import lauschkiste.paths
 from lauschkiste.audio_output import play_file
@@ -22,12 +25,22 @@ def sound_path(value: str, key: str = 'startup_sound') -> Path:
     return lauschkiste.paths.resolve(value)
 
 
+class JingleSettings(BaseModel):
+    startup_sound: str = Field('default', title='Startup sound',
+                               description="'default', a file in the home, or empty for none")
+    shutdown_sound: str = Field('default', title='Shutdown sound',
+                                description="'default', a file in the home, or empty for none")
+    volume: Optional[int] = Field(None, ge=0, le=100, title='Jingle volume',
+                                  description='Percent of the current volume (empty: 100)')
+
+
 class Jingle(CoreModule):
     """Plays the startup sound when ready and the shutdown sound when stopping."""
 
     name = 'jingle'
     interface_version = '1.0'
     concurrency = 'threadsafe'
+    settings = JingleSettings
 
     def __init__(self):
         self._ctx = None
@@ -37,6 +50,9 @@ class Jingle(CoreModule):
     def start(self, ctx) -> None:
         self._ctx = ctx
         self._executor = ctx.executor('sound')
+
+    def settings_changed(self, changed):
+        return True
 
     def _volume(self) -> int:
         volume = self._ctx.config.get('volume', default=None)

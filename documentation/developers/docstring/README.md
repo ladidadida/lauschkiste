@@ -64,9 +64,13 @@
 * [lauschkiste.rfid.reader](#lauschkiste.rfid.reader)
   * [ReaderDriver](#lauschkiste.rfid.reader.ReaderDriver)
     * [create\_reader](#lauschkiste.rfid.reader.ReaderDriver.create_reader)
+  * [CardDetected](#lauschkiste.rfid.reader.CardDetected)
+    * [learned](#lauschkiste.rfid.reader.CardDetected.learned)
   * [CardRemovalTimer](#lauschkiste.rfid.reader.CardRemovalTimer)
   * [Rfid](#lauschkiste.rfid.reader.Rfid)
     * [resolve\_config\_action](#lauschkiste.rfid.reader.Rfid.resolve_config_action)
+    * [learn](#lauschkiste.rfid.reader.Rfid.learn)
+    * [stop\_learning](#lauschkiste.rfid.reader.Rfid.stop_learning)
     * [list\_readers](#lauschkiste.rfid.reader.Rfid.list_readers)
 * [lauschkiste.rfid.readerbase](#lauschkiste.rfid.readerbase)
   * [ReaderBaseClass](#lauschkiste.rfid.readerbase.ReaderBaseClass)
@@ -245,6 +249,7 @@
     * [lock](#lauschkiste.contract.context.Context.lock)
     * [subscribe](#lauschkiste.contract.context.Context.subscribe)
 * [lauschkiste.contract.routes](#lauschkiste.contract.routes)
+  * [add\_settings\_routes](#lauschkiste.contract.routes.add_settings_routes)
 * [lauschkiste.contract.manager](#lauschkiste.contract.manager)
   * [discover\_plugins](#lauschkiste.contract.manager.discover_plugins)
   * [ModuleHandle](#lauschkiste.contract.manager.ModuleHandle)
@@ -253,7 +258,9 @@
 * [lauschkiste.contract.module](#lauschkiste.contract.module)
   * [Module](#lauschkiste.contract.module.Module)
     * [concurrency](#lauschkiste.contract.module.Module.concurrency)
+    * [settings](#lauschkiste.contract.module.Module.settings)
     * [ready](#lauschkiste.contract.module.Module.ready)
+    * [settings\_changed](#lauschkiste.contract.module.Module.settings_changed)
     * [extra\_routes](#lauschkiste.contract.module.Module.extra_routes)
   * [CoreModule](#lauschkiste.contract.module.CoreModule)
   * [Plugin](#lauschkiste.contract.module.Plugin)
@@ -263,10 +270,21 @@
 * [lauschkiste.contract](#lauschkiste.contract)
 * [lauschkiste.contract.snapshots](#lauschkiste.contract.snapshots)
   * [check\_target](#lauschkiste.contract.snapshots.check_target)
+* [lauschkiste.contract.settings](#lauschkiste.contract.settings)
+  * [ActionEntry](#lauschkiste.contract.settings.ActionEntry)
+  * [current\_values](#lauschkiste.contract.settings.current_values)
+  * [SettingsStore](#lauschkiste.contract.settings.SettingsStore)
 * [lauschkiste.contract.errors](#lauschkiste.contract.errors)
   * [ContractError](#lauschkiste.contract.errors.ContractError)
   * [OperationError](#lauschkiste.contract.errors.OperationError)
   * [ActionError](#lauschkiste.contract.errors.ActionError)
+* [lauschkiste.contract.plugins](#lauschkiste.contract.plugins)
+  * [installed](#lauschkiste.contract.plugins.installed)
+  * [load](#lauschkiste.contract.plugins.load)
+  * [plugin\_extras](#lauschkiste.contract.plugins.plugin_extras)
+  * [missing\_extras](#lauschkiste.contract.plugins.missing_extras)
+  * [set\_enabled](#lauschkiste.contract.plugins.set_enabled)
+  * [describe](#lauschkiste.contract.plugins.describe)
 * [lauschkiste.system](#lauschkiste.system)
   * [cpu\_temperature](#lauschkiste.system.cpu_temperature)
   * [ip\_addresses](#lauschkiste.system.ip_addresses)
@@ -292,6 +310,7 @@
     * [register\_backend](#lauschkiste.player.coordinator.PlayerCoordinator.register_backend)
     * [set\_default\_backend](#lauschkiste.player.coordinator.PlayerCoordinator.set_default_backend)
     * [select\_backend](#lauschkiste.player.coordinator.PlayerCoordinator.select_backend)
+    * [set\_speed](#lauschkiste.player.coordinator.PlayerCoordinator.set_speed)
     * [play\_files](#lauschkiste.player.coordinator.PlayerCoordinator.play_files)
 * [lauschkiste.player.module](#lauschkiste.player.module)
   * [Player](#lauschkiste.player.module.Player)
@@ -304,6 +323,10 @@
     * [seek](#lauschkiste.player.module.Player.seek)
     * [shuffle](#lauschkiste.player.module.Player.shuffle)
     * [repeat](#lauschkiste.player.module.Player.repeat)
+    * [jump](#lauschkiste.player.module.Player.jump)
+    * [set\_speed](#lauschkiste.player.module.Player.set_speed)
+    * [get\_queue](#lauschkiste.player.module.Player.get_queue)
+    * [stop\_after\_current](#lauschkiste.player.module.Player.stop_after_current)
     * [rewind](#lauschkiste.player.module.Player.rewind)
     * [replay](#lauschkiste.player.module.Player.replay)
     * [replay\_if\_stopped](#lauschkiste.player.module.Player.replay_if_stopped)
@@ -327,6 +350,7 @@
     * [get\_default\_backend](#lauschkiste.player.module.Player.get_default_backend)
     * [select\_backend](#lauschkiste.player.module.Player.select_backend)
 * [lauschkiste.player.status](#lauschkiste.player.status)
+  * [PlaybackContext](#lauschkiste.player.status.PlaybackContext)
   * [PlayerStatus](#lauschkiste.player.status.PlayerStatus)
     * [name](#lauschkiste.player.status.PlayerStatus.name)
   * [status\_from\_backend](#lauschkiste.player.status.status_from_backend)
@@ -334,6 +358,8 @@
 * [lauschkiste.player.backend](#lauschkiste.player.backend)
   * [PlayerBackend](#lauschkiste.player.backend.PlayerBackend)
     * [set\_status\_callback](#lauschkiste.player.backend.PlayerBackend.set_status_callback)
+    * [jump](#lauschkiste.player.backend.PlayerBackend.jump)
+    * [stop\_after\_current](#lauschkiste.player.backend.PlayerBackend.stop_after_current)
     * [play\_files](#lauschkiste.player.backend.PlayerBackend.play_files)
 * [lauschkiste.player.backends.local\_audio](#lauschkiste.player.backends.local_audio)
   * [PlayerLocalAudio](#lauschkiste.player.backends.local_audio.PlayerLocalAudio)
@@ -523,7 +549,7 @@ interval. Polls instead of using inotify, so it works on every file system.
 
 # lauschkiste.library.files
 
-Safe file operations within the music library.
+Safe file operations within the library.
 
 
 <a id="lauschkiste.library.files.LibraryError"></a>
@@ -1021,6 +1047,21 @@ Return a reader for the reader config key: a context manager that iterates card 
 ('' on timeout) and has ``stop()``.
 
 
+<a id="lauschkiste.rfid.reader.CardDetected"></a>
+
+## CardDetected Objects
+
+```python
+class CardDetected(BaseModel)
+```
+
+<a id="lauschkiste.rfid.reader.CardDetected.learned"></a>
+
+#### learned
+
+Detected while learning: its action did not run
+
+
 <a id="lauschkiste.rfid.reader.CardRemovalTimer"></a>
 
 ## CardRemovalTimer Objects
@@ -1052,6 +1093,30 @@ def resolve_config_action(entry, where: str) -> Optional[Callable[[], Any]]
 ```
 
 Turn a configured action (new or old format) into a callable, or None if invalid.
+
+
+<a id="lauschkiste.rfid.reader.Rfid.learn"></a>
+
+#### learn
+
+```python
+@action(path='/learn')
+def learn(seconds: float = 60.0) -> None
+```
+
+Report the next card within ``seconds`` (``learned``) without running its action.
+
+
+<a id="lauschkiste.rfid.reader.Rfid.stop_learning"></a>
+
+#### stop\_learning
+
+```python
+@action(path='/learn/stop')
+def stop_learning() -> None
+```
+
+End learning; cards run their actions again.
 
 
 <a id="lauschkiste.rfid.reader.Rfid.list_readers"></a>
@@ -3277,6 +3342,18 @@ Call ``callback(topic, payload)`` for every event under ``topic_prefix``; payloa
 FastAPI routes generated from module operations, plus ``GET /api/v1/modules``.
 
 
+<a id="lauschkiste.contract.routes.add_settings_routes"></a>
+
+#### add\_settings\_routes
+
+```python
+def add_settings_routes(router: APIRouter, manager: ModuleManager,
+                        executor) -> None
+```
+
+Settings of the modules, installed plugins, and whether a restart is pending.
+
+
 <a id="lauschkiste.contract.manager"></a>
 
 # lauschkiste.contract.manager
@@ -3360,6 +3437,15 @@ Common base of :class:`CoreModule` and :class:`Plugin`. Not subclassed directly.
 'serialized': every operation runs under a per-module lock. 'threadsafe': no lock.
 
 
+<a id="lauschkiste.contract.module.Module.settings"></a>
+
+#### settings
+
+The settings of the module's config section, editable through the web app. Field titles and
+
+descriptions are shown; ``Field(json_schema_extra={'widget': 'action'})`` marks an action entry.
+
+
 <a id="lauschkiste.contract.module.Module.ready"></a>
 
 #### ready
@@ -3369,6 +3455,19 @@ def ready() -> None
 ```
 
 Called once every module has started, in start order. All actions are available now.
+
+
+<a id="lauschkiste.contract.module.Module.settings_changed"></a>
+
+#### settings\_changed
+
+```python
+def settings_changed(changed: Dict[str, Any]) -> bool
+```
+
+Settings were changed through the web app (already in ``ctx.config``). Return True if
+
+they take effect right away, False if Lauschkiste must restart for them.
 
 
 <a id="lauschkiste.contract.module.Module.extra_routes"></a>
@@ -3454,6 +3553,46 @@ def check_target(target: Target) -> Optional[str]
 Return a problem description, or None when the stored snapshot matches.
 
 
+<a id="lauschkiste.contract.settings"></a>
+
+# lauschkiste.contract.settings
+
+Module settings: read, validate and store a module's config section through its ``settings`` model.
+
+
+<a id="lauschkiste.contract.settings.ActionEntry"></a>
+
+## ActionEntry Objects
+
+```python
+class ActionEntry(BaseModel)
+```
+
+An action with its arguments, as on cards (shown as an action picker in the web app).
+
+
+<a id="lauschkiste.contract.settings.current_values"></a>
+
+#### current\_values
+
+```python
+def current_values(model: type, section: Any) -> Dict[str, Any]
+```
+
+The settings from a config section; invalid or unknown entries fall back to the defaults.
+
+
+<a id="lauschkiste.contract.settings.SettingsStore"></a>
+
+## SettingsStore Objects
+
+```python
+class SettingsStore()
+```
+
+Settings of the started modules, written to the main config file right away.
+
+
 <a id="lauschkiste.contract.errors"></a>
 
 # lauschkiste.contract.errors
@@ -3489,6 +3628,79 @@ class ActionError(Exception)
 ```
 
 An action id or its arguments are invalid.
+
+
+<a id="lauschkiste.contract.plugins"></a>
+
+# lauschkiste.contract.plugins
+
+Installed plugins: their extras, whether those are installed, and enabling them in the config.
+
+
+<a id="lauschkiste.contract.plugins.installed"></a>
+
+#### installed
+
+```python
+def installed() -> Dict[str, Any]
+```
+
+Entry points of the installed plugins by name.
+
+
+<a id="lauschkiste.contract.plugins.load"></a>
+
+#### load
+
+```python
+def load(ep)
+```
+
+(plugin class, None) or (None, reason it can't be imported).
+
+
+<a id="lauschkiste.contract.plugins.plugin_extras"></a>
+
+#### plugin\_extras
+
+```python
+def plugin_extras(name: str) -> List[str]
+```
+
+Requirements for the extras plugin ``name`` declares, e.g. ``['pkg[gpio]']``.
+
+
+<a id="lauschkiste.contract.plugins.missing_extras"></a>
+
+#### missing\_extras
+
+```python
+def missing_extras(name: str) -> List[str]
+```
+
+``plugin_extras(name)`` whose dependencies are not (all) installed in this environment.
+
+
+<a id="lauschkiste.contract.plugins.set_enabled"></a>
+
+#### set\_enabled
+
+```python
+def set_enabled(cfg, name: str, on: bool) -> bool
+```
+
+Enable or disable ``name`` in the config (disabling drops its settings); True if it changed.
+
+
+<a id="lauschkiste.contract.plugins.describe"></a>
+
+#### describe
+
+```python
+def describe(cfg, manager=None) -> List[Dict[str, Any]]
+```
+
+Installed (and enabled but missing) plugins: package, summary, enabled, running, problem, missing extras.
 
 
 <a id="lauschkiste.system"></a>
@@ -3695,7 +3907,10 @@ Mark an item as finished or forget it; either way it starts from the beginning n
 #### play
 
 ```python
-def play(key: str, files: List[str], resume: bool = True) -> None
+def play(key: str,
+         files: List[str],
+         resume: bool = True,
+         context: Optional[Dict[str, Any]] = None) -> None
 ```
 
 Play an item: where it stopped (``resume``), else from the beginning. The item that is
@@ -3764,6 +3979,17 @@ def select_backend(name: str)
 ```
 
 Stop the current backend and select another registered backend.
+
+
+<a id="lauschkiste.player.coordinator.PlayerCoordinator.set_speed"></a>
+
+#### set\_speed
+
+```python
+def set_speed(speed)
+```
+
+Optional for backends; NotImplementedError if the active one can't change the speed.
 
 
 <a id="lauschkiste.player.coordinator.PlayerCoordinator.play_files"></a>
@@ -3903,6 +4129,54 @@ def repeat(option: str = 'toggle') -> None
 Repeat mode: 'toggle', 'enable', 'enable_repeat_single' or 'disable'.
 
 
+<a id="lauschkiste.player.module.Player.jump"></a>
+
+#### jump
+
+```python
+@action(path='/jump')
+def jump(position: int) -> None
+```
+
+Play the entry at ``position`` of the queue.
+
+
+<a id="lauschkiste.player.module.Player.set_speed"></a>
+
+#### set\_speed
+
+```python
+@action(path='/speed')
+def set_speed(speed: float) -> None
+```
+
+Playback speed (0.5 to 2.0) of audiobooks and podcasts; music and radio always play at 1.0.
+
+
+<a id="lauschkiste.player.module.Player.get_queue"></a>
+
+#### get\_queue
+
+```python
+@query(path='/queue')
+def get_queue() -> List[QueueEntry]
+```
+
+The queue with title and duration from the library.
+
+
+<a id="lauschkiste.player.module.Player.stop_after_current"></a>
+
+#### stop\_after\_current
+
+```python
+@action(path='/stop-after-current')
+def stop_after_current(enabled: bool = True) -> None
+```
+
+Stop once the current song, chapter or episode has played to its end (sleep timer).
+
+
 <a id="lauschkiste.player.module.Player.rewind"></a>
 
 #### rewind
@@ -4011,12 +4285,14 @@ Play an album of the library or of a backend's own catalog (``provider``).
 def play_files(files: List[str],
                start: int = 0,
                position: float = 0.0,
-               ordered: bool = False) -> None
+               ordered: bool = False,
+               context: Optional[PlaybackContext] = None) -> None
 ```
 
 Play files of the library (or URLs), from ``position`` seconds into the file at index ``start``;
 
-``ordered`` plays them in order, ignoring shuffle and repeat.
+``ordered`` plays them in order, ignoring shuffle and repeat. ``context`` says what is played
+(shown by the web app; without it, music).
 
 
 <a id="lauschkiste.player.module.Player.queue_load"></a>
@@ -4182,6 +4458,17 @@ Stop the current backend and switch to another one.
 Typed player status, independent of the backend that produced it.
 
 
+<a id="lauschkiste.player.status.PlaybackContext"></a>
+
+## PlaybackContext Objects
+
+```python
+class PlaybackContext(BaseModel)
+```
+
+What is playing: its content type, a title, and the card action that plays it.
+
+
 <a id="lauschkiste.player.status.PlayerStatus"></a>
 
 ## PlayerStatus Objects
@@ -4242,6 +4529,28 @@ def set_status_callback(callback: Callable[[Mapping[str, Any]], None]) -> None
 ```
 
 Receive the raw status mapping whenever it changes (only forwarded while active).
+
+
+<a id="lauschkiste.player.backend.PlayerBackend.jump"></a>
+
+#### jump
+
+```python
+def jump(position: int) -> None
+```
+
+Play the queue entry at ``position``.
+
+
+<a id="lauschkiste.player.backend.PlayerBackend.stop_after_current"></a>
+
+#### stop\_after\_current
+
+```python
+def stop_after_current(enabled: bool = True) -> None
+```
+
+Stop once the current entry has played to its end.
 
 
 <a id="lauschkiste.player.backend.PlayerBackend.play_files"></a>

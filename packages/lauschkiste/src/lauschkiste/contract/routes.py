@@ -8,13 +8,22 @@ from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, Body, HTTPException, Path, Query
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
-from pydantic import ConfigDict, create_model
+from pydantic import BaseModel, ConfigDict, create_model
 
+import lauschkiste.contract.plugins as plugins
 from lauschkiste.contract.declarations import Operation
 from lauschkiste.contract.errors import ActionError, OperationError
 from lauschkiste.contract.manager import ModuleHandle, ModuleManager
 
 logger = logging.getLogger('lauschkiste.contract.routes')
+
+
+class SettingsUpdate(BaseModel):
+    values: Dict[str, Any]
+
+
+class PluginState(BaseModel):
+    enabled: bool
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:
@@ -117,6 +126,8 @@ def build_router(manager: ModuleManager, executor) -> APIRouter:
     async def list_actions():
         return manager.catalog.describe()
 
+    add_settings_routes(router, manager, executor)
+
     for handle in manager.handles():
         for op in sorted(handle.cls.operations().values(), key=lambda o: o.name):
             path = op.path(handle.is_core)
@@ -134,3 +145,49 @@ def build_router(manager: ModuleManager, executor) -> APIRouter:
             )
         handle.instance.extra_routes(router)
     return router
+
+
+def add_settings_routes(router: APIRouter, manager: ModuleManager, executor) -> None:
+    """Settings of the modules, installed plugins, and whether a restart is pending."""
+    async def blocking(func, *args):
+        try:
+            return await asyncio.get_running_loop().run_in_executor(executor, func, *args)
+        except OperationError as error:
+            return _error(error.status, error.code, error.message)
+
+    @router.get('/api/v1/settings/modules', tags=['settings'])
+    async def list_module_settings():
+        """Settings of every running module that has some: schema and current values."""
+        return await blocking(manager.settings.list)
+
+    @router.get('/api/v1/settings/modules/{name}', tags=['settings'])
+    async def get_module_settings(name: str):
+        return await blocking(manager.settings.describe, name)
+
+    @router.put('/api/v1/settings/modules/{name}', tags=['settings'])
+    async def update_module_settings(name: str, body: SettingsUpdate):
+        """Change settings (only the given ones); they are saved to the config file right away."""
+        return await blocking(manager.settings.update, name, body.values)
+
+    @router.get('/api/v1/settings/restart', tags=['settings'])
+    async def restart_state():
+        """Whether changed settings or plugins only take effect after a restart."""
+        return {'required': bool(manager.settings.restart_required),
+                'modules': sorted(manager.settings.restart_required)}
+
+    @router.get('/api/v1/plugins', tags=['settings'])
+    async def list_plugins():
+        """Installed plugins, whether they are enabled and running, and what is missing."""
+        return await blocking(plugins.describe, manager.settings.cfg, manager)
+
+    @router.put('/api/v1/plugins/{name}', tags=['settings'])
+    async def enable_plugin(name: str, body: PluginState):
+        """Enable or disable an installed plugin; takes effect after a restart."""
+        def change():
+            if body.enabled and name not in plugins.installed():
+                raise OperationError(404, 'unknown_plugin', f"Plugin '{name}' is not installed")
+            if plugins.set_enabled(manager.settings.cfg, name, body.enabled):
+                manager.settings.save()
+                manager.settings.restart_required.add(name)
+            return next(entry for entry in plugins.describe(manager.settings.cfg, manager) if entry['name'] == name)
+        return await blocking(change)

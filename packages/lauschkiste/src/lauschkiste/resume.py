@@ -55,6 +55,9 @@ class ResumeTracker:
         self._last: Optional[Dict[str, float]] = None
         self._worker = ctx.executor('resume')
 
+    def configure(self, rewind_sec: float) -> None:
+        self._rewind = rewind_sec
+
     def start(self) -> None:
         self._entries = {key: entry for key, entry in statefile.read_json(self._path).items()
                          if isinstance(entry, dict)}

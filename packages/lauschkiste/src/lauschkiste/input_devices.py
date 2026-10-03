@@ -19,7 +19,7 @@ import threading
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from lauschkiste.contract import CoreModule, event, query
 
@@ -110,12 +110,18 @@ class Evdev:
                     yield input_event.code
 
 
+class InputSettings(BaseModel):
+    media_keys: bool = Field(False, title='Media keys of all devices',
+                             description='Play/pause, next, previous and volume keys, e.g. of a Bluetooth headset')
+
+
 class InputDevices(CoreModule):
     """Keys of input devices run actions."""
 
     name = 'input'
     interface_version = '1.0'
     concurrency = 'threadsafe'
+    settings = InputSettings
 
     key_pressed = event('key_pressed', KeyPressed)
 

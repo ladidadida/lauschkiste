@@ -5,8 +5,8 @@
     gpio:
       enabled: true
       buttons:
-        next: {pin: 5, action: player.next}
-        play: {pin: 6, action: player.toggle, hold_action: {action: raspberry_pi.shutdown}, hold_time: 3}
+        next: {pin: 5, on_press: {action: player.next}}
+        play: {pin: 6, on_press: {action: player.toggle}, on_hold: {action: raspberry_pi.shutdown}, hold_time: 3}
       rotary_encoders:
         volume:
           pin_a: 17
@@ -43,8 +43,8 @@ class GpioDevices:
     def _setup(self, config: Dict[str, Any]) -> None:
         gpiozero = self._gpiozero
         for name, button in (config.get('buttons') or {}).items():
-            press = self._resolve(button)
-            hold = self._resolve(button['hold_action']) if button.get('hold_action') else None
+            press = self._resolve(button['on_press']) if button.get('on_press') else None
+            hold = self._resolve(button['on_hold']) if button.get('on_hold') else None
             if press is None and hold is None:
                 logger.error(f"GPIO button '{name}': no valid action")
                 continue

@@ -7,9 +7,9 @@ the active player backend.
 import logging
 import threading
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any, Dict, List, Literal, Optional, Protocol
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 
@@ -165,6 +165,15 @@ def _clamp(value: int, low: int, high: int) -> int:
     return max(low, min(high, int(value)))
 
 
+class VolumeSettings(BaseModel):
+    mixer: Literal['auto', 'pulse', 'player'] = Field(
+        'auto', title='Volume control',
+        description="'auto': PulseAudio/PipeWire if available, else the player's own volume")
+    startup_volume: Optional[int] = Field(None, ge=0, le=100, title='Volume after start',
+                                          description='Empty: keep the volume of the last run')
+    soft_max_volume: int = Field(100, ge=0, le=100, title='Maximum volume')
+
+
 class Volume(CoreModule):
     """Volume, mute, soft maximum and audio output."""
 
@@ -172,6 +181,7 @@ class Volume(CoreModule):
     interface_version = '1.0'
     requires = ('player',)
 
+    settings = VolumeSettings
     level = event('level', VolumeState)
     outputs_changed = event('outputs', OutputsState)
 
@@ -257,6 +267,14 @@ class Volume(CoreModule):
         """Mute or unmute; toggles when ``mute`` is left out."""
         self._mixer.set_mute(not self._mixer.is_muted() if mute is None else mute)
         return self._publish()
+
+    def settings_changed(self, changed):
+        if 'soft_max_volume' in changed:
+            self._soft_max = _clamp(changed['soft_max_volume'], 0, 100)
+            if self._mixer.get() > self._soft_max:
+                self._mixer.set(self._soft_max)
+            self._publish()
+        return 'mixer' not in changed
 
     @action(method='PUT', path='/soft-max')
     def set_soft_max_volume(self, max_volume: int) -> VolumeState:

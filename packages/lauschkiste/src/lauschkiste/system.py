@@ -11,7 +11,7 @@ import time
 from pathlib import Path
 from typing import List, Literal, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import lauschkiste
 import lauschkiste.cfghandler
@@ -23,6 +23,13 @@ logger = logging.getLogger('lauschkiste.system')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 LOG_TOPIC = 'system.log'
+
+
+class SystemSettings(BaseModel):
+    speech_voice: str = Field('en', title='Voice for reading out the IP address',
+                              description='An espeak voice, e.g. en or de')
+    health_interval_sec: float = Field(10, ge=0, le=3600, title='System status interval (seconds)',
+                                       description='0 turns the periodic status off')
 
 
 class SystemInfo(BaseModel):
@@ -114,6 +121,7 @@ class System(CoreModule):
     name = 'system'
     interface_version = '1.0'
 
+    settings = SystemSettings
     info = event('info', SystemInfo)
     health = event('health', SystemHealth)
     #: Published by lauschkiste.misc.loggingext.PubStreamHandler when configured in logger.yaml
@@ -132,6 +140,9 @@ class System(CoreModule):
             self._health_thread = threading.Thread(target=self._publish_health, args=(interval,),
                                                    name='system.health', daemon=True)
             self._health_thread.start()
+
+    def settings_changed(self, changed):
+        return 'health_interval_sec' not in changed
 
     def stop(self):
         self._stop.set()

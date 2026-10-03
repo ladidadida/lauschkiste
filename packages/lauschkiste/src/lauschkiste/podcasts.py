@@ -19,7 +19,7 @@ from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
 import requests
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import lauschkiste.paths
 import lauschkiste.statefile as statefile
@@ -36,6 +36,12 @@ FEED_MAX_BYTES = 10 * 1024 * 1024
 
 ITUNES = '{http://www.itunes.com/dtds/podcast-1.0.dtd}'
 ATOM = '{http://www.w3.org/2005/Atom}'
+
+
+class PodcastSettings(BaseModel):
+    refresh_minutes: int = Field(60, ge=5, le=1440, title='Fetch episodes again after (minutes)')
+    max_episodes: int = Field(100, ge=10, le=1000, title='Episodes kept per podcast')
+    rewind_sec: float = Field(10, ge=0, le=120, title='Go back when continuing (seconds)')
 
 
 class Podcast(BaseModel):
@@ -192,6 +198,7 @@ class Podcasts(CoreModule):
     interface_version = '1.0'
     concurrency = 'threadsafe'
     requires = ('player',)
+    settings = PodcastSettings
 
     changed = event('changed', PodcastsChanged)
 
@@ -230,6 +237,15 @@ class Podcasts(CoreModule):
     def stop(self):
         self._resume.stop()
         return []
+
+    def settings_changed(self, changed):
+        if 'refresh_minutes' in changed:
+            self._refresh_sec = float(changed['refresh_minutes']) * 60
+        if 'max_episodes' in changed:
+            self._max_episodes = int(changed['max_episodes'])
+        if 'rewind_sec' in changed:
+            self._resume.configure(float(changed['rewind_sec']))
+        return True
 
     # -- storage --------------------------------------------------------------------------------
 

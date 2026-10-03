@@ -8,13 +8,17 @@ regardless of shuffle and repeat.
 import re
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import lauschkiste.paths
 from lauschkiste.contract import CoreModule, OperationError, action, query
 from lauschkiste.resume import ResumeTracker
 
 DEFAULT_STATE_FILE = 'settings/audiobooks.json'
+
+
+class AudiobookSettings(BaseModel):
+    rewind_sec: float = Field(10, ge=0, le=120, title='Go back when continuing (seconds)')
 
 
 class Audiobook(BaseModel):
@@ -47,6 +51,7 @@ class Audiobooks(CoreModule):
     interface_version = '1.0'
     concurrency = 'threadsafe'
     requires = ('library', 'player')
+    settings = AudiobookSettings
 
     def __init__(self):
         self._ctx: Any = None
@@ -63,6 +68,11 @@ class Audiobooks(CoreModule):
     def stop(self):
         self._resume.stop()
         return []
+
+    def settings_changed(self, changed):
+        if 'rewind_sec' in changed:
+            self._resume.configure(float(changed['rewind_sec']))
+        return True
 
     # -- library --------------------------------------------------------------------------------
 

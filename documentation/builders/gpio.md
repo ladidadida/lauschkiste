@@ -2,7 +2,8 @@
 
 GPIO buttons, rotary encoders and a status LED on a Raspberry Pi are part of the `raspberry_pi`
 plugin (enabled by the installer). They need the plugin's `gpio` extra, which the installer
-installs (`uv sync --inexact --extra gpio`).
+installs (`uv sync --inexact --extra gpio`). The web app edits them under Settings → Plugins →
+Raspberry Pi; in the config file they look like this:
 
 ```yaml
 plugins:
@@ -12,12 +13,12 @@ plugins:
       buttons:
         next:
           pin: 5                   # BCM numbering
-          action: player.next
+          on_press: {action: player.next}
         play:
           pin: 6
-          action: player.toggle
-          hold_action: {action: raspberry_pi.shutdown}
-          hold_time: 3             # seconds for hold_action
+          on_press: {action: player.toggle}
+          on_hold: {action: raspberry_pi.shutdown}
+          hold_time: 3             # seconds for on_hold
           bounce_time: 0.05
           pull_up: true            # button connects the pin to GND
       rotary_encoders:
@@ -29,7 +30,7 @@ plugins:
       status_led: 25               # on while Lauschkiste runs
 ```
 
-Any [action](actions.md) can be used. With a `hold_action`, a short press runs `action` when the
-button is released and a long press runs only `hold_action`.
+Any [action](actions.md) can be used. With `on_hold`, a short press runs `on_press` when the
+button is released and a long press runs only `on_hold`.
 
 The old `gpio.yaml` format (`gpioz`) is not read anymore.

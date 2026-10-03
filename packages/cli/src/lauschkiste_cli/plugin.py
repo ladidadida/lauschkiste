@@ -3,13 +3,13 @@
 import shutil
 import subprocess
 import sys
-from importlib.metadata import entry_points
 from pathlib import Path
 from typing import List, Optional
 
 import typer
 
 import lauschkiste.cfghandler
+import lauschkiste.contract.plugins as plugins
 import lauschkiste.paths
 
 app = typer.Typer(help="Manage plugins.", no_args_is_help=True)
@@ -33,16 +33,11 @@ def _enabled(cfg) -> dict:
 
 
 def _installed():
-    from lauschkiste.contract.manager import ENTRY_POINT_GROUP
-    return {ep.name: ep for ep in entry_points(group=ENTRY_POINT_GROUP)}
+    return plugins.installed()
 
 
 def _load(ep):
-    """(plugin class, None) or (None, reason it can't be imported)."""
-    try:
-        return ep.load(), None
-    except Exception as error:
-        return None, f"{error.__class__.__name__}: {error}"
+    return plugins.load(ep)
 
 
 def install_requirements(requirements: List[str]) -> None:
@@ -56,46 +51,8 @@ def install_requirements(requirements: List[str]) -> None:
     subprocess.run(command, check=True)
 
 
-def plugin_extras(name: str) -> List[str]:
-    """Requirements for the extras plugin ``name`` declares, e.g. ``['pkg[gpio]']``."""
-    ep = _installed().get(name)
-    if ep is None or ep.dist is None:
-        return []
-    cls, _ = _load(ep)
-    extras = tuple(getattr(cls, 'extras', ()) or ()) if cls is not None else ()
-    return [f"{ep.dist.name}[{','.join(extras)}]"] if extras else []
-
-
-def missing_extras(name: str) -> List[str]:
-    """``plugin_extras(name)`` whose dependencies are not (all) installed in this environment."""
-    from importlib.metadata import PackageNotFoundError, distribution
-
-    from packaging.markers import default_environment
-    from packaging.requirements import Requirement
-
-    missing = []
-    for requirement in plugin_extras(name):
-        wanted = Requirement(requirement)
-        try:
-            declared = distribution(wanted.name).requires or []
-        except PackageNotFoundError:
-            missing.append(requirement)
-            continue
-        for extra in wanted.extras:
-            environment = {**default_environment(), 'extra': extra}
-            for line in declared:
-                dependency = Requirement(line)
-                if dependency.marker is None or not dependency.marker.evaluate(environment):
-                    continue
-                try:
-                    distribution(dependency.name)
-                except PackageNotFoundError:
-                    missing.append(requirement)
-                    break
-            else:
-                continue
-            break
-    return missing
+plugin_extras = plugins.plugin_extras
+missing_extras = plugins.missing_extras
 
 
 def add_to_config(path: Path, names: List[str]) -> List[str]:

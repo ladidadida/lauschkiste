@@ -2,10 +2,11 @@
 
 import re
 import threading
-from typing import TYPE_CHECKING, ClassVar, Dict, List, Mapping, Tuple, Union
+from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Mapping, Optional, Tuple, Type, Union
 
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.version import InvalidVersion, Version
+from pydantic import BaseModel
 
 from lauschkiste.contract.declarations import EventSpec, ExtensionPointSpec, Operation, operation_spec
 from lauschkiste.contract.errors import ContractError
@@ -28,6 +29,9 @@ class Module:
     #: 'serialized': every operation runs under a per-module lock. 'threadsafe': no lock.
     concurrency: ClassVar[str] = 'serialized'
     is_core: ClassVar[bool] = False
+    #: The settings of the module's config section, editable through the web app. Field titles and
+    #: descriptions are shown; ``Field(json_schema_extra={'widget': 'action'})`` marks an action entry.
+    settings: ClassVar[Optional[Type[BaseModel]]] = None
 
     def start(self, ctx: 'Context') -> None:
         pass
@@ -37,6 +41,11 @@ class Module:
 
     def stop(self) -> List[threading.Thread]:
         return []
+
+    def settings_changed(self, changed: Dict[str, Any]) -> bool:
+        """Settings were changed through the web app (already in ``ctx.config``). Return True if
+        they take effect right away, False if Lauschkiste must restart for them."""
+        return False
 
     def extra_routes(self, router) -> None:
         """Escape hatch for routes the declarations can't express (e.g. streaming uploads).

@@ -31,6 +31,7 @@ from typing import List, Optional
 from lauschkiste.contract import OperationError, Plugin, action, event, query
 
 from lauschkiste_plugin_raspberry_pi import health
+from lauschkiste_plugin_raspberry_pi.settings import RaspberryPiSettings
 from lauschkiste_plugin_raspberry_pi.battery import (
     BatteryMonitor, BatteryState, Ina219Reader, SimulatedReader,
 )
@@ -44,6 +45,7 @@ class RaspberryPi(Plugin):
     name = 'raspberry_pi'
     interface_version = '1.0'
     extras = ('gpio',)
+    settings = RaspberryPiSettings
 
     battery = event('battery', BatteryState)
 

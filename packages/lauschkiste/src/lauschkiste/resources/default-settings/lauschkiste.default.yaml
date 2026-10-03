@@ -17,8 +17,8 @@ plugins: {}
 #     gpio:
 #       enabled: true
 #       buttons:
-#         next: {pin: 5, action: player.next}
-#         play: {pin: 6, action: player.toggle, hold_action: {action: raspberry_pi.shutdown}, hold_time: 3}
+#         next: {pin: 5, on_press: {action: player.next}}
+#         play: {pin: 6, on_press: {action: player.toggle}, on_hold: {action: raspberry_pi.shutdown}, hold_time: 3}
 #       rotary_encoders:
 #         volume:
 #           pin_a: 17
