@@ -41,7 +41,7 @@ const CardsOverview = () => {
 
   return (
     <Grid container id="cards" size={12}>
-      <Header title={t('cards.overview.cards')} />
+      <Header backLink="/settings/cards" title={t('cards.overview.cards')} />
       <Grid
         container
         size={12}

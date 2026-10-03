@@ -268,6 +268,35 @@ const commands = {
     cardAction: 'raspberry_pi.reboot',
   },
 
+  // Settings
+  moduleSettings: {
+    rest: { method: 'GET', path: '/api/v1/settings/modules/{name}' },
+    argKeys: ['name'],
+  },
+  updateModuleSettings: {
+    rest: { method: 'PUT', path: '/api/v1/settings/modules/{name}' },
+    argKeys: ['name', 'values'],
+  },
+  moduleSettingsList: {
+    rest: { method: 'GET', path: '/api/v1/settings/modules' },
+  },
+  restartState: {
+    rest: { method: 'GET', path: '/api/v1/settings/restart' },
+  },
+  restartService: {
+    rest: { method: 'POST', path: '/api/v1/system/restart_service' },
+  },
+  pluginsList: {
+    rest: { method: 'GET', path: '/api/v1/plugins' },
+  },
+  setPluginEnabled: {
+    rest: { method: 'PUT', path: '/api/v1/plugins/{name}' },
+    argKeys: ['name', 'enabled'],
+  },
+  rfidReaders: {
+    rest: { method: 'GET', path: '/api/v1/rfid/readers' },
+  },
+
   // Misc
   getAppSettings: {
     rest: { method: 'GET', path: '/api/v1/settings' },

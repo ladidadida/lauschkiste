@@ -93,7 +93,7 @@ def describe(cfg, manager=None) -> List[Dict[str, Any]]:
             cls, problem = load(ep)
             if ep.dist is not None:
                 entry['package'], entry['version'] = ep.dist.name, ep.dist.version
-            entry['summary'] = (getattr(cls, '__doc__', None) or '').strip().split('\n', 1)[0] if cls else ''
+            entry['summary'] = (getattr(cls, '__doc__', None) or '').strip().split('\n', 1)[0].replace('``', '') if cls else ''
             entry['problem'] = problem or (manager.failed.get(name) if manager else None)
             entry['missing_extras'] = missing_extras(name)
         result.append(entry)

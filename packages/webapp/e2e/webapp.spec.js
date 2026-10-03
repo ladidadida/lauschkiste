@@ -159,6 +159,14 @@ async function mockBackend(
     '/api/v1/player/status': () => socketEvents['player.status'],
     '/api/v1/actions': () => [{ id: 'player.play', description: '', args: {} }],
     '/api/v1/settings': () => ({ show_covers: showCovers }),
+    '/api/v1/settings/modules/audiobooks': () => ({
+      name: 'audiobooks', kind: 'core', title: 'Audiobooks', restart_required: false,
+      schema: { properties: { rewind_sec: { type: 'number', minimum: 0, maximum: 120, default: 10,
+        title: 'Go back when continuing (seconds)' } } },
+      values: { rewind_sec: 10 },
+    }),
+    '/api/v1/plugins': () => [{ name: 'raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-raspberry-pi',
+      version: '0.1.0', summary: 'Raspberry Pi hardware.', problem: null, missing_extras: [] }],
     '/api/v1/system/ip-addresses': () => ({ addresses: ['192.168.1.42'] }),
     '/api/v1/timers': () => [
       socketEvents['timers.changed'],
@@ -349,7 +357,7 @@ const routes = [
   },
   {
     name: 'settings',
-    path: '/#/settings',
+    path: '/#/settings/status',
     ready: '#settings',
     text: '3.7.0-alpha',
   },
@@ -388,11 +396,13 @@ test('bottom navigation changes routes', async ({ page }) => {
   await page.getByRole('link', { name: 'Library' }).click();
   await expect(page).toHaveURL(/#\/library\/continue$/);
 
-  await page.getByRole('link', { name: 'Cards' }).click();
-  await expect(page).toHaveURL(/#\/cards$/);
-
   await page.getByRole('link', { name: 'Settings' }).click();
   await expect(page).toHaveURL(/#\/settings$/);
+
+  await page.getByRole('link', { name: /^Cards/ }).click();
+  await page.getByRole('link', { name: 'Open the card list' }).click();
+  await expect(page).toHaveURL(/#\/cards$/);
+  await expect(page.getByRole('link', { name: 'Settings' })).toHaveClass(/Mui-selected/);
   expect(consoleErrors).toEqual([]);
 });
 
@@ -523,18 +533,33 @@ test('saving a card sends its action id and named arguments', async ({ page }) =
   expect(consoleErrors).toEqual([]);
 });
 
-test('settings show available timers and switch audio outputs', async ({ page }) => {
+test('playback settings switch audio outputs and save module settings', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   const { apiCalls } = await mockBackend(page);
-  await page.goto('/#/settings');
+  await page.goto('/#/settings/playback');
 
-  await expect(page.getByText('Stop player', { exact: true }).first()).toBeVisible();
-  await expect(page.getByText('Fade volume', { exact: false }).first()).toBeVisible();
-  await expect(page.getByText('Shut Down', { exact: true })).toHaveCount(0);
+  const rewind = page.getByLabel('Go back when continuing (seconds)');
+  await rewind.fill('25');
+  await page.getByRole('button', { name: 'Save' }).first().click();
+  await expect.poll(() => (
+    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/settings/modules/audiobooks')?.body
+  )).toEqual({ values: { rewind_sec: 25 } });
 
   await page.getByLabel('Bluetooth headset').check();
   await expect.poll(() => (
     apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/volume/outputs/active')?.body
   )).toEqual({ name: 'secondary' });
+  expect(consoleErrors).toEqual([]);
+});
+
+test('plugins can be switched on', async ({ page }) => {
+  const consoleErrors = collectConsoleErrors(page);
+  const { apiCalls } = await mockBackend(page);
+  await page.goto('/#/settings/plugins');
+
+  await page.getByRole('switch', { name: 'raspberry_pi on/off' }).click();
+  await expect.poll(() => (
+    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/raspberry_pi')?.body
+  )).toEqual({ enabled: true });
   expect(consoleErrors).toEqual([]);
 });

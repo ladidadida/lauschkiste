@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import HomeIcon from '@mui/icons-material/Home';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import SettingsIcon from '@mui/icons-material/Settings';
@@ -16,25 +15,19 @@ const navigationItems = [
   {
     icon: HomeIcon,
     labelKey: 'navigation.start',
-    matchPattern: { path: '/', end: true },
+    matchPatterns: [{ path: '/', end: true }],
     to: '/',
   },
   {
     icon: MusicNoteIcon,
     labelKey: 'navigation.library',
-    matchPattern: { path: '/library/*' },
+    matchPatterns: [{ path: '/library/*' }],
     to: '/library',
-  },
-  {
-    icon: BookmarksIcon,
-    labelKey: 'navigation.cards',
-    matchPattern: { path: '/cards/*' },
-    to: '/cards',
   },
   {
     icon: SettingsIcon,
     labelKey: 'navigation.settings',
-    matchPattern: { path: '/settings/*' },
+    matchPatterns: [{ path: '/settings/*' }, { path: '/cards/*' }],
     to: '/settings',
   },
 ];
@@ -42,8 +35,8 @@ const navigationItems = [
 export default function Navigation() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
-  const value = navigationItems.find(({ matchPattern }) => (
-    matchPath(matchPattern, pathname)
+  const value = navigationItems.find(({ matchPatterns }) => (
+    matchPatterns.some((pattern) => matchPath(pattern, pathname))
   ))?.to ?? false;
 
   return (

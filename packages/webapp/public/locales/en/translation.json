@@ -403,7 +403,6 @@
     }
   },
   "settings": {
-    "feature-not-enabled": "🚧 This feature is not yet enabled.",
     "dialogs": {
       "reboot": {
         "title": "Reboot",
@@ -433,45 +432,6 @@
       "show_covers": {
         "title": "Show Cover Art"
       }
-    },
-    "timers": {
-      "option-label-timeslot": "{{value}} min",
-      "option-label-off": "Off",
-      "title": "Timers",
-      "stop-player": {
-        "title": "Stop player",
-        "label": "Stops playback after the timer has ended."
-      },
-      "shutdown": {
-        "title": "Shut Down",
-        "label": "Shuts Lauschkiste down when the timer has ended."
-      },
-      "fade-volume": {
-        "title": "Fade volume and stop",
-        "label": "Fades out the volume when the timer has ended and then stops playback."
-      },
-      "idle-shutdown": {
-        "title": "Idle Shut Down",
-        "label": "Shuts Lauschkiste down after it was idle for a given time."
-      },
-      "ended": "Done",
-      "set": "Set timer",
-      "cancel": "Cancel",
-      "paused": "Paused",
-      "dialog": {
-        "title": "Set {{value}} timer",
-        "description": "Choose the amount of minutes you want the action to be performed.",
-        "start": "Start timer",
-        "cancel": "Cancel"
-      }
-    },
-    "secondswipe": {
-      "title": "Second Swipe",
-      "description": "Second action after the same card swiped again",
-      "restart": "Restart playlist",
-      "toggle": "Toggle pause / play",
-      "skip": "Skip to next track",
-      "ignore": "Ignore audio playout triggers, only system commands"
     },
     "status": {
       "title": "System",
@@ -512,6 +472,129 @@
     },
     "systemcontrols": {
       "title": "System Controls"
+    },
+    "sections": {
+      "status": {
+        "title": "Status",
+        "subtitle": "Version, IP address, temperature, storage"
+      },
+      "playback": {
+        "title": "Playback & audio",
+        "subtitle": "Outputs, volume, player, audiobooks, podcasts"
+      },
+      "cards": {
+        "title": "Cards",
+        "subtitle": "Card list, behaviour, reader"
+      },
+      "library": {
+        "title": "Library",
+        "subtitle": "Covers, scanning, network share"
+      },
+      "plugins": {
+        "title": "Plugins",
+        "subtitle": "Switch extensions on and off, GPIO, battery, mpd"
+      },
+      "system": {
+        "title": "System",
+        "subtitle": "Restart, shut down, voice of announcements"
+      }
+    },
+    "form": {
+      "new-entry": "Name of a new entry",
+      "add": "Add",
+      "on": "On",
+      "off": "Off",
+      "default": "System default",
+      "no-action": "No action",
+      "choose-action": "Choose an action",
+      "unknown-action": "Not available: {{action}}",
+      "saved": "Saved.",
+      "save-error": "Could not save."
+    },
+    "restart": {
+      "required": "Some changes only take effect after Lauschkiste restarts.",
+      "button": "Restart now",
+      "running": "Lauschkiste is restarting …"
+    },
+    "cards": {
+      "list": "Card list",
+      "list-help": "All registered cards. The quickest way to register a card is \"Put on a card\" in the player.",
+      "open-list": "Open the card list",
+      "behaviour": "Behaviour",
+      "readers": "Readers",
+      "no-readers": "No reader set up.",
+      "readers-help": "Set up readers on the box with \"lauschctl setup rfid\"."
+    },
+    "library": {
+      "share": "Network share (Samba)",
+      "share-help": "The library can be shared as a network drive: run \"lauschctl setup samba\" on the box. Its settings will move here later."
+    },
+    "system": {
+      "service": "Restart Lauschkiste",
+      "restart-help": "Restarts only the Lauschkiste service, not the whole box."
+    },
+    "plugins": {
+      "help": "Plugins add hardware and sources to Lauschkiste. Changes take effect after a restart.",
+      "none": "No plugins installed.",
+      "running": "running",
+      "not-running": "not started",
+      "enable": "{{name}} on/off",
+      "settings": "Settings of {{name}}",
+      "settings-title": "Settings",
+      "missing-extras": "Required packages are missing. On the box: \"lauschctl plugin enable {{name}} --with-extras\".",
+      "names": {
+        "raspberry_pi": "Raspberry Pi",
+        "mpd": "mpd",
+        "rfid_rc522_spi": "RFID: RC522 (SPI)",
+        "rfid_generic_usb": "RFID: USB reader",
+        "rfid_pn532_i2c_py532": "RFID: PN532 (I²C)",
+        "rfid_rdm6300_serial": "RFID: RDM6300 (serial)",
+        "rfid_generic_nfcpy": "RFID: nfcpy",
+        "rfid_mfrc522_i2c": "RFID: MFRC522 (I²C)",
+        "rfid_fake_reader_gui": "RFID: test reader"
+      }
+    },
+    "modules": {
+      "volume": "Volume",
+      "player": "Player",
+      "audiobooks": "Audiobooks",
+      "podcasts": "Podcasts",
+      "jingle": "Startup and shutdown sound",
+      "input": "Keys of input devices",
+      "library": "Library",
+      "system": "System"
+    },
+    "values": {
+      "auto": "Automatic",
+      "pulse": "PulseAudio/PipeWire",
+      "player": "The player itself",
+      "none": "Nothing",
+      "stop": "Stop",
+      "rewind": "From the beginning",
+      "prev": "Previous song",
+      "next": "Next song",
+      "toggle": "Pause/continue",
+      "play": "Keep playing",
+      "skip": "Next song",
+      "replay": "Restart the folder",
+      "replay_if_stopped": "Restart if stopped",
+      "ina219": "INA219",
+      "simulator": "Simulator"
+    },
+    "fields": {
+      "player": {
+        "second_swipe_action": {
+          "label": "Same card placed again",
+          "alias": {
+            "label": "What happens",
+            "help": "For folder cards while their folder plays. Audiobook cards always continue."
+          }
+        }
+      }
+    },
+    "timers": {
+      "option-label-off": "Off",
+      "option-label-timeslot": "{{value}} min"
     }
   }
 }

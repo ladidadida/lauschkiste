@@ -403,7 +403,6 @@
     }
   },
   "settings": {
-    "feature-not-enabled": "🚧 Diese Funktion ist noch nicht aktiviert.",
     "dialogs": {
       "reboot": {
         "title": "Neustart",
@@ -433,45 +432,6 @@
       "show_covers": {
         "title": "Cover anzeigen"
       }
-    },
-    "timers": {
-      "option-label-timeslot": "{{value}} min",
-      "option-label-off": "Aus",
-      "title": "Timer",
-      "stop-player": {
-        "title": "Wiedergabe stoppen",
-        "label": "Stoppt die Wiedergabe nach Ablauf des Timers."
-      },
-      "shutdown": {
-        "title": "Herunterfahren",
-        "label": "Fährt die Lauschkiste nach Ablauf des Timers herunter."
-      },
-      "fade-volume": {
-        "title": "Leiser werden und stoppen",
-        "label": "Blendet die Lautstärke nach Ablauf des Timers aus und stoppt dann die Wiedergabe."
-      },
-      "idle-shutdown": {
-        "title": "Leerlaufabschaltung",
-        "label": "Fährt die Lauschkiste herunter, nachdem sie für eine bestimmte Zeit im Leerlauf war."
-      },
-      "set": "Timer erstellen",
-      "cancel": "Abbrechen",
-      "paused": "Pausiert",
-      "ended": "Beendet",
-      "dialog": {
-        "title": "{{value}} Timer erstellen",
-        "description": "Wähle die Anzahl der Minuten nachdem die Aktion ausgeführt werden soll.",
-        "start": "Timer starten",
-        "cancel": "Abbrechen"
-      }
-    },
-    "secondswipe": {
-      "title": "Erneute Aktivierung (Second Swipe)",
-      "description": "Aktion, wenn dieselbe Karte ein weiteres Mal aktiviert wird",
-      "restart": "Wiedergabeliste neu starten",
-      "toggle": "Pause / Wiedergabe umschalten",
-      "skip": "Zum nächsten Track springen",
-      "ignore": "Nur Systembefehle mehrfach ausführen"
     },
     "status": {
       "title": "Systemstatus",
@@ -510,6 +470,312 @@
     },
     "systemcontrols": {
       "title": "Systemsteuerung"
+    },
+    "sections": {
+      "status": {
+        "title": "Status",
+        "subtitle": "Version, IP-Adresse, Temperatur, Speicher"
+      },
+      "playback": {
+        "title": "Wiedergabe & Audio",
+        "subtitle": "Ausgänge, Lautstärke, Player, Hörbücher, Podcasts"
+      },
+      "cards": {
+        "title": "Karten",
+        "subtitle": "Kartenliste, Verhalten, Lesegerät"
+      },
+      "library": {
+        "title": "Bibliothek",
+        "subtitle": "Cover, Scannen, Netzwerkfreigabe"
+      },
+      "plugins": {
+        "title": "Plugins",
+        "subtitle": "Erweiterungen an- und ausschalten, GPIO, Akku, mpd"
+      },
+      "system": {
+        "title": "System",
+        "subtitle": "Neustart, Herunterfahren, Sprache der Ansagen"
+      }
+    },
+    "form": {
+      "new-entry": "Name für neuen Eintrag",
+      "add": "Hinzufügen",
+      "on": "An",
+      "off": "Aus",
+      "default": "Systemvorgabe",
+      "no-action": "Keine Aktion",
+      "choose-action": "Aktion wählen",
+      "unknown-action": "Nicht verfügbar: {{action}}",
+      "saved": "Gespeichert.",
+      "save-error": "Speichern fehlgeschlagen."
+    },
+    "restart": {
+      "required": "Einige Änderungen wirken erst nach einem Neustart von Lauschkiste.",
+      "button": "Jetzt neu starten",
+      "running": "Lauschkiste startet neu …"
+    },
+    "cards": {
+      "list": "Kartenliste",
+      "list-help": "Alle angelernten Karten. Neue Karten lernst du am einfachsten im Player mit „Auf Karte legen“ an.",
+      "open-list": "Kartenliste öffnen",
+      "behaviour": "Verhalten",
+      "readers": "Lesegeräte",
+      "no-readers": "Kein Lesegerät eingerichtet.",
+      "readers-help": "Lesegeräte richtest du auf der Box mit „lauschctl setup rfid“ ein."
+    },
+    "library": {
+      "share": "Netzwerkfreigabe (Samba)",
+      "share-help": "Die Bibliothek lässt sich als Netzlaufwerk freigeben: auf der Box „lauschctl setup samba“ ausführen. Einstellungen dafür kommen später hierher."
+    },
+    "system": {
+      "service": "Lauschkiste neu starten",
+      "restart-help": "Startet nur den Lauschkiste-Dienst neu, nicht die ganze Box."
+    },
+    "plugins": {
+      "help": "Plugins erweitern Lauschkiste um Hardware und Quellen. Änderungen wirken nach einem Neustart.",
+      "none": "Keine Plugins installiert.",
+      "running": "läuft",
+      "not-running": "nicht gestartet",
+      "enable": "{{name}} an/aus",
+      "settings": "Einstellungen von {{name}}",
+      "settings-title": "Einstellungen",
+      "missing-extras": "Benötigte Pakete fehlen. Auf der Box: „lauschctl plugin enable {{name}} --with-extras“.",
+      "names": {
+        "raspberry_pi": "Raspberry Pi",
+        "mpd": "mpd",
+        "rfid_rc522_spi": "RFID: RC522 (SPI)",
+        "rfid_generic_usb": "RFID: USB-Leser",
+        "rfid_pn532_i2c_py532": "RFID: PN532 (I²C)",
+        "rfid_rdm6300_serial": "RFID: RDM6300 (seriell)",
+        "rfid_generic_nfcpy": "RFID: nfcpy",
+        "rfid_mfrc522_i2c": "RFID: MFRC522 (I²C)",
+        "rfid_fake_reader_gui": "RFID: Test-Leser"
+      }
+    },
+    "modules": {
+      "volume": "Lautstärke",
+      "player": "Player",
+      "audiobooks": "Hörbücher",
+      "podcasts": "Podcasts",
+      "jingle": "Start- und Endton",
+      "input": "Tasten von Eingabegeräten",
+      "library": "Bibliothek",
+      "system": "System"
+    },
+    "values": {
+      "auto": "Automatisch",
+      "pulse": "PulseAudio/PipeWire",
+      "player": "Player selbst",
+      "none": "Nichts",
+      "stop": "Stoppen",
+      "rewind": "Von vorn",
+      "prev": "Vorheriger Titel",
+      "next": "Nächster Titel",
+      "toggle": "Pause/Weiter",
+      "play": "Weiterspielen",
+      "skip": "Nächster Titel",
+      "replay": "Ordner neu starten",
+      "replay_if_stopped": "Neu starten, wenn gestoppt",
+      "ina219": "INA219",
+      "simulator": "Simulator"
+    },
+    "fields": {
+      "volume": {
+        "mixer": {
+          "label": "Lautstärkeregelung",
+          "help": "Automatisch: PulseAudio/PipeWire, sonst die Lautstärke des Players"
+        },
+        "startup_volume": {
+          "label": "Lautstärke nach dem Start",
+          "help": "Leer: Lautstärke vom letzten Mal"
+        },
+        "soft_max_volume": {
+          "label": "Maximale Lautstärke",
+          "help": "Prozent; höher lässt sich nicht stellen"
+        }
+      },
+      "player": {
+        "backend": {
+          "label": "Wiedergabe über",
+          "help": "„local_audio“ spielt direkt, „mpd“ braucht das mpd-Plugin"
+        },
+        "volume": {
+          "label": "Player-Lautstärke",
+          "help": "Prozent, zusätzlich zur Systemlautstärke"
+        },
+        "second_swipe_action": {
+          "label": "Gleiche Karte erneut aufgelegt",
+          "alias": {
+            "label": "Was passiert",
+            "help": "Gilt für Ordner-Karten, solange ihr Ordner läuft. Hörbuch-Karten setzen immer fort."
+          }
+        },
+        "end_of_playlist_next_action": {
+          "label": "Am Ende der Wiedergabeliste"
+        },
+        "stopped_prev_action": {
+          "label": "„Zurück“ im gestoppten Zustand"
+        },
+        "stopped_next_action": {
+          "label": "„Vor“ im gestoppten Zustand"
+        }
+      },
+      "audiobooks": {
+        "rewind_sec": {
+          "label": "Beim Fortsetzen zurückspringen (Sekunden)"
+        }
+      },
+      "podcasts": {
+        "refresh_minutes": {
+          "label": "Folgen neu laden nach (Minuten)"
+        },
+        "max_episodes": {
+          "label": "Gespeicherte Folgen je Podcast"
+        },
+        "rewind_sec": {
+          "label": "Beim Fortsetzen zurückspringen (Sekunden)"
+        }
+      },
+      "jingle": {
+        "startup_sound": {
+          "label": "Startton",
+          "help": "„default“, eine Datei im Lauschkiste-Verzeichnis oder leer für keinen"
+        },
+        "shutdown_sound": {
+          "label": "Endton",
+          "help": "„default“, eine Datei im Lauschkiste-Verzeichnis oder leer für keinen"
+        },
+        "volume": {
+          "label": "Lautstärke der Töne",
+          "help": "Prozent der aktuellen Lautstärke (leer: 100)"
+        }
+      },
+      "input": {
+        "media_keys": {
+          "label": "Medientasten aller Geräte",
+          "help": "Play/Pause, Vor, Zurück und Lautstärke, z. B. eines Bluetooth-Kopfhörers"
+        }
+      },
+      "library": {
+        "scan_on_startup": {
+          "label": "Beim Start scannen"
+        },
+        "watch": {
+          "label": "Geänderte Dateien bemerken",
+          "help": "Neu scannen, wenn Dateien z. B. über Samba hinzukommen"
+        },
+        "watch_interval_sec": {
+          "label": "Warten vor dem Scannen (Sekunden)"
+        }
+      },
+      "system": {
+        "speech_voice": {
+          "label": "Stimme für Ansagen",
+          "help": "espeak-Stimme, z. B. de oder en"
+        },
+        "health_interval_sec": {
+          "label": "Status-Intervall (Sekunden)",
+          "help": "0 schaltet die regelmäßige Statusmeldung ab"
+        }
+      },
+      "raspberry_pi": {
+        "debug_mode": {
+          "label": "Testmodus",
+          "help": "Herunterfahren und Neustart nur protokollieren"
+        },
+        "hdmi_power_down": {
+          "label": "HDMI abschalten",
+          "help": "Spart Strom ohne Bildschirm"
+        },
+        "wlan_power_save": {
+          "label": "WLAN-Stromsparen",
+          "help": "Aus hält die Box erreichbar"
+        },
+        "wlan_interface": {
+          "label": "WLAN-Schnittstelle"
+        },
+        "gpio": {
+          "label": "GPIO",
+          "enabled": {
+            "label": "GPIO verwenden"
+          },
+          "buttons": {
+            "label": "Tasten",
+            "pin": {
+              "label": "GPIO-Pin (BCM)"
+            },
+            "on_press": {
+              "label": "Beim Drücken"
+            },
+            "on_hold": {
+              "label": "Beim Halten"
+            },
+            "hold_time": {
+              "label": "Halten für (Sekunden)"
+            },
+            "pull_up": {
+              "label": "Interner Pull-up",
+              "help": "Aus für Tasten an 3,3 V"
+            },
+            "bounce_time": {
+              "label": "Entprellen (Sekunden)"
+            }
+          },
+          "rotary_encoders": {
+            "label": "Drehregler",
+            "pin_a": {
+              "label": "GPIO-Pin A"
+            },
+            "pin_b": {
+              "label": "GPIO-Pin B"
+            },
+            "clockwise": {
+              "label": "Im Uhrzeigersinn"
+            },
+            "counter_clockwise": {
+              "label": "Gegen den Uhrzeigersinn"
+            }
+          },
+          "status_led": {
+            "label": "Status-LED (Pin)",
+            "help": "Leuchtet, solange Lauschkiste läuft"
+          }
+        },
+        "battery": {
+          "label": "Akku",
+          "enabled": {
+            "label": "Akku überwachen"
+          },
+          "driver": {
+            "label": "Sensor"
+          },
+          "shunt_ohms": {
+            "label": "Shunt-Widerstand (Ohm)"
+          },
+          "empty_voltage": {
+            "label": "Leer bei (mV)"
+          },
+          "full_voltage": {
+            "label": "Voll bei (mV)"
+          },
+          "warning_voltage": {
+            "label": "Warnen unter (mV)"
+          },
+          "shutdown_voltage": {
+            "label": "Herunterfahren unter (mV)"
+          },
+          "interval_sec": {
+            "label": "Messen alle (Sekunden)"
+          },
+          "warning_action": {
+            "label": "Wenn der Akku schwach wird"
+          }
+        }
+      }
+    },
+    "timers": {
+      "option-label-off": "Aus",
+      "option-label-timeslot": "{{value}} min"
     }
   }
 }
