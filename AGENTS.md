@@ -98,7 +98,11 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   but only loaded when enabled under `plugins:`): `raspberry-pi` (shutdown/reboot, GPIO, battery,
   firmware health; the installer enables it), `mpd` (player backend) and `rfid-readers`
   (one plugin per reader driver, `rfid_<driver>`; each driver's dependencies are an extra of that
-  package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`).
+  package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`) and `samba` (the
+  library's network share and Samba password from the web app; `lauschctl setup samba` enables it).
+- **Settings:** modules and plugins describe their config section as a pydantic model
+  (`settings = ...`); the web app renders forms from its schema
+  (`/api/v1/settings/modules/<name>`), see "Settings" in `documentation/developers/core-and-plugins.md`.
 
 ## Languages, tools, conventions
 
