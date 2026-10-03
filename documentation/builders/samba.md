@@ -6,14 +6,22 @@ manager. It is optional and off by default: the web app can upload music too, se
 
 ## Enable
 
+Samba itself is installed once on the box:
+
 ```bash
 lauschctl setup samba
 ```
 
-The step installs Samba and shares the library (`library` in the Lauschkiste home, with `music` and `audiobooks`) as
-`lauschkiste`. Settings, the card database and logs are not shared. The first time, it asks for a
-Samba password (at least 8 characters) for your user; with `--yes` and no password set yet, the
-step is skipped until you run it interactively.
+The step installs Samba, shares the library (`library` in the Lauschkiste home, with `music` and
+`audiobooks`) as `lauschkiste` and enables the `samba` plugin. Settings, the card database and logs
+are not shared. It asks for a Samba password (at least 8 characters) for your user; with `--yes`
+and no password set yet, the password is left for the web app.
+
+## Web app
+
+Settings → Library → Network share switches the share on and off and sets the Samba password. This
+needs the `samba` plugin (Settings → Plugins) and password-less `sudo` for the user Lauschkiste runs
+as, which is the default on Raspberry Pi OS.
 
 ## Connect
 
@@ -25,9 +33,3 @@ Open your network environment and select your Lauschkiste, or enter the address 
 * Linux: `smb://<ip-address-of-your-lauschkiste>/lauschkiste`
 
 Log in with your user name on the Pi and the Samba password.
-
-## Change the password
-
-```bash
-sudo smbpasswd -a <your-username>
-```

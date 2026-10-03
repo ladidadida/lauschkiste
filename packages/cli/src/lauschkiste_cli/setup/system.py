@@ -40,6 +40,8 @@ class System:
         self.root = Path(root)
         #: Whether commands/writes marked as root need ``sudo``
         self.use_sudo = os.geteuid() != 0
+        #: The sudo command; ``['sudo', '-n']`` fails instead of asking for a password (no terminal)
+        self.sudo = ['sudo']
 
     # --- files -----------------------------------------------------------------------------------
 
@@ -95,6 +97,17 @@ class System:
         lines[span[0]:span[1]] = [marker, *block.rstrip().split('\n')]
         self.write(path, '\n'.join(lines), root=root)
 
+    def remove_block(self, path: PathLike, marker: str, root: bool = False) -> bool:
+        """Remove the block marked ``marker`` (and the blank line before it); False if there is none."""
+        lines = (self.read(path) or '').split('\n')
+        span = _block_span(lines, marker)
+        if span is None:
+            return False
+        start = span[0] - 1 if span[0] > 0 and not lines[span[0] - 1].strip() else span[0]
+        del lines[start:span[1]]
+        self.write(path, '\n'.join(lines), root=root)
+        return True
+
     def remove(self, path: PathLike, root: bool = False) -> None:
         target = self.path(path)
         if not target.exists():
@@ -111,7 +124,7 @@ class System:
 
     def run(self, *args: str, root: bool = False, check: bool = True, input: Optional[str] = None,
             quiet: bool = False) -> subprocess.CompletedProcess:
-        command = ['sudo', *args] if root and self.use_sudo else list(args)
+        command = [*self.sudo, *args] if root and self.use_sudo else list(args)
         if not quiet:
             typer.echo(f"  $ {' '.join(command)}")
         result = subprocess.run(command, input=input, text=True,

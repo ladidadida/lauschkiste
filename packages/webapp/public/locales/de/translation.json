@@ -524,8 +524,7 @@
       "readers-help": "Lesegeräte richtest du auf der Box mit „lauschctl setup rfid“ ein."
     },
     "library": {
-      "share": "Netzwerkfreigabe (Samba)",
-      "share-help": "Die Bibliothek lässt sich als Netzlaufwerk freigeben: auf der Box „lauschctl setup samba“ ausführen. Einstellungen dafür kommen später hierher."
+      "share": "Netzwerkfreigabe (Samba)"
     },
     "system": {
       "service": "Lauschkiste neu starten",
@@ -549,7 +548,8 @@
         "rfid_rdm6300_serial": "RFID: RDM6300 (seriell)",
         "rfid_generic_nfcpy": "RFID: nfcpy",
         "rfid_mfrc522_i2c": "RFID: MFRC522 (I²C)",
-        "rfid_fake_reader_gui": "RFID: Test-Leser"
+        "rfid_fake_reader_gui": "RFID: Test-Leser",
+        "samba": "Samba"
       }
     },
     "modules": {
@@ -776,6 +776,19 @@
     "timers": {
       "option-label-off": "Aus",
       "option-label-timeslot": "{{value}} min"
+    },
+    "samba": {
+      "plugin-off": "Die Freigabe verwaltet das Plugin „Samba“. Schalte es unter Plugins ein und starte Lauschkiste neu.",
+      "not-installed": "Samba ist auf der Box noch nicht installiert. Einmalig auf der Box „lauschctl setup samba“ ausführen.",
+      "share": "Bibliothek im Netzwerk freigeben",
+      "address": "Erreichbar unter {{address}}, Anmeldung als „{{user}}“.",
+      "outdated": "Die Freigabe ist veraltet. Einmal aus- und wieder einschalten.",
+      "password-set": "Für „{{user}}“ ist ein Samba-Passwort gesetzt.",
+      "password-missing": "Für „{{user}}“ ist noch kein Samba-Passwort gesetzt.",
+      "password": "Neues Samba-Passwort",
+      "password-help": "Mindestens {{count}} Zeichen",
+      "password-saved": "Passwort gespeichert.",
+      "error": "Das hat nicht geklappt."
     }
   }
 }

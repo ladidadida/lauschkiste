@@ -1,0 +1,119 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "plugin",
+  "name": "samba",
+  "operations": {
+    "get_status": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/samba/status",
+      "returns": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "has_password": {
+            "type": "boolean"
+          },
+          "installed": {
+            "type": "boolean"
+          },
+          "outdated": {
+            "type": "boolean"
+          },
+          "path": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "user": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "installed",
+          "shared",
+          "outdated",
+          "has_password",
+          "user",
+          "path"
+        ],
+        "type": "object"
+      }
+    },
+    "set_share": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "enabled": {
+            "default": true,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/samba/share",
+      "returns": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "has_password": {
+            "type": "boolean"
+          },
+          "installed": {
+            "type": "boolean"
+          },
+          "outdated": {
+            "type": "boolean"
+          },
+          "path": {
+            "type": "string"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "user": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "installed",
+          "shared",
+          "outdated",
+          "has_password",
+          "user",
+          "path"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "requires": {}
+}

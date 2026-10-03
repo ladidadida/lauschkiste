@@ -128,7 +128,7 @@ def test_pi_setup(tmp_path, home, extras):
     failed, ctx = setup_run(system, home, answers={'disable_onboard_audio': True, 'samba': True,
                                                    'static_ip': True})
     assert failed == 0
-    assert 'raspberry_pi' in ctx.enabled_plugins()
+    assert {'raspberry_pi', 'samba'} <= set(ctx.enabled_plugins())
     assert extras == ['lauschkiste-plugin-raspberry-pi[gpio]']
     assert system.exists('/var/lib/systemd/linger/pi')
     assert 'audio=off' in system.read('/boot/firmware/config.txt')

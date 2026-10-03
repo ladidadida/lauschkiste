@@ -17,6 +17,8 @@ def wanted_plugins(ctx: Context) -> List[str]:
         names.append('raspberry_pi')
     if ctx.answer('mpd'):
         names.append('mpd')
+    if ctx.answer('samba'):
+        names.append('samba')
     return names
 
 

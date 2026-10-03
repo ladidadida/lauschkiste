@@ -526,8 +526,7 @@
       "readers-help": "Set up readers on the box with \"lauschctl setup rfid\"."
     },
     "library": {
-      "share": "Network share (Samba)",
-      "share-help": "The library can be shared as a network drive: run \"lauschctl setup samba\" on the box. Its settings will move here later."
+      "share": "Network share (Samba)"
     },
     "system": {
       "service": "Restart Lauschkiste",
@@ -551,7 +550,8 @@
         "rfid_rdm6300_serial": "RFID: RDM6300 (serial)",
         "rfid_generic_nfcpy": "RFID: nfcpy",
         "rfid_mfrc522_i2c": "RFID: MFRC522 (I²C)",
-        "rfid_fake_reader_gui": "RFID: test reader"
+        "rfid_fake_reader_gui": "RFID: test reader",
+        "samba": "Samba"
       }
     },
     "modules": {
@@ -595,6 +595,19 @@
     "timers": {
       "option-label-off": "Off",
       "option-label-timeslot": "{{value}} min"
+    },
+    "samba": {
+      "plugin-off": "The share is managed by the \"Samba\" plugin. Switch it on under Plugins and restart Lauschkiste.",
+      "not-installed": "Samba is not installed on the box yet. Run \"lauschctl setup samba\" on the box once.",
+      "share": "Share the library on the network",
+      "address": "Reachable at {{address}}, log in as \"{{user}}\".",
+      "outdated": "The share is outdated. Switch it off and on again.",
+      "password-set": "A Samba password is set for \"{{user}}\".",
+      "password-missing": "No Samba password is set for \"{{user}}\" yet.",
+      "password": "New Samba password",
+      "password-help": "At least {{count}} characters",
+      "password-saved": "Password saved.",
+      "error": "That did not work."
     }
   }
 }

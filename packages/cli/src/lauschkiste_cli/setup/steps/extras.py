@@ -7,6 +7,8 @@ import typer
 
 import lauschkiste.cfghandler
 import lauschkiste.paths
+from lauschkiste_cli import plugin
+from lauschkiste_cli.setup import samba
 from lauschkiste_cli.setup.base import Question, Step
 from lauschkiste_cli.setup.system import SetupError, StepSkipped
 
@@ -62,12 +64,8 @@ class SambaStep(Step):
     questions = (
         Question('samba', 'Share the library (music and audiobooks) on the network via Samba (Windows/macOS file sharing)?',
                  default=False,
-                 help='Not needed for uploading music: the web app can do that, and so can SFTP with your login '
-                      '(e.g. WinSCP, FileZilla, scp).'),
+                 help='Not needed for uploading music: the web app can do that too.'),
     )
-    CONF = '/etc/samba/smb.conf'
-    MARKER = '## Lauschkiste Samba Config'
-    MIN_PASSWORD = 8
 
     def wanted(self, ctx):
         return bool(ctx.answer('samba'))
@@ -79,56 +77,35 @@ class SambaStep(Step):
         ctx.system.run('debconf-set-selections', root=True, input='samba-common samba-common/dhcp boolean false\n',
                        quiet=True, check=False)
 
-    def _has_user(self, ctx) -> bool:
-        users = ctx.system.output('sudo', '-n', 'pdbedit', '-L') if ctx.system.use_sudo \
-            else ctx.system.output('pdbedit', '-L')
-        return any(line.split(':')[0] == ctx.system.user for line in users.splitlines())
-
     def _library_folder(self, ctx) -> str:
         return str(lauschkiste.paths.library_dir(ctx.load_config().getn('library', 'path', default=None)))
 
-    def _block(self, ctx) -> str:
-        """Only the music: settings, card database and logs stay off the network."""
-        return (
-            '[lauschkiste]\n'
-            '  comment=Lauschkiste music\n'
-            f'  path={self._library_folder(ctx)}\n'
-            '  browseable=yes\n'
-            '  writeable=yes\n'
-            '  guest ok=no\n'
-            f'  valid users={ctx.system.user}\n'
-            f'  force user={ctx.system.user}\n'
-            '  create mask=0664\n'
-            '  directory mask=0775')
-
     def check(self, ctx):
         problems = []
-        current = ctx.system.read_block(self.CONF, self.MARKER)
-        if current is None:
+        if samba.current_block(ctx.system) is None:
             problems.append('no Lauschkiste share in smb.conf')
-        elif current.split('\n')[1:] != self._block(ctx).split('\n'):
+        elif not samba.is_current(ctx.system, self._library_folder(ctx)):
             problems.append('the Lauschkiste share in smb.conf is outdated')
-        if not self._has_user(ctx):
+        if not samba.has_user(ctx.system):
             problems.append(f'no Samba user {ctx.system.user}')
         return problems
 
     def _ask_password(self, ctx) -> str:
         while True:
-            password = typer.prompt(f'Samba password for {ctx.system.user} (at least {self.MIN_PASSWORD} characters)',
+            password = typer.prompt(f'Samba password for {ctx.system.user} (at least {samba.MIN_PASSWORD} characters)',
                                     hide_input=True, confirmation_prompt=True)
-            if len(password) >= self.MIN_PASSWORD:
+            if len(password) >= samba.MIN_PASSWORD:
                 return password
-            typer.echo(f'The password needs at least {self.MIN_PASSWORD} characters.')
+            typer.echo(f'The password needs at least {samba.MIN_PASSWORD} characters.')
 
     def apply(self, ctx):
-        system = ctx.system
-        if not self._has_user(ctx):
+        if not samba.has_user(ctx.system):
             if ctx.assume_yes:
-                raise StepSkipped("choosing the Samba password is interactive; run 'lauschctl setup samba' later")
-            password = self._ask_password(ctx)
-            system.run('smbpasswd', '-s', '-a', system.user, root=True, input=f'{password}\n{password}\n')
-        system.replace_block(self.CONF, self.MARKER, self._block(ctx), root=True)
-        system.run('systemctl', 'restart', 'smbd', root=True, check=False)
+                raise StepSkipped("choosing the Samba password is interactive; run 'lauschctl setup samba' later "
+                                  "or set it in the web app")
+            samba.set_password(ctx.system, self._ask_password(ctx))
+        samba.share(ctx.system, self._library_folder(ctx))
+        plugin.add_to_config(ctx.config_path, ['samba'])
 
 
 class KioskStep(Step):

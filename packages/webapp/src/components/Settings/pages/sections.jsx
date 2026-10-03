@@ -22,6 +22,7 @@ import ModuleSettings from '../form/module-settings';
 import SettingsGeneral from '../general';
 import SettingsStatus from '../status';
 import SystemControls from '../systemcontrols';
+import SambaSettings from './samba';
 import SettingsPage from './page';
 
 const StatusSettings = () => {
@@ -96,13 +97,7 @@ const LibrarySettings = () => {
     <SettingsPage title={t('settings.sections.library.title')}>
       <SettingsGeneral />
       <ModuleSettings module="library" />
-      <Card>
-        <CardHeader title={t('settings.library.share')} />
-        <Divider />
-        <CardContent>
-          <Typography variant="body2">{t('settings.library.share-help')}</Typography>
-        </CardContent>
-      </Card>
+      <SambaSettings />
     </SettingsPage>
   );
 };

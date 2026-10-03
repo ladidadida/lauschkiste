@@ -293,6 +293,17 @@ const commands = {
     rest: { method: 'PUT', path: '/api/v1/plugins/{name}' },
     argKeys: ['name', 'enabled'],
   },
+  sambaStatus: {
+    rest: { method: 'GET', path: '/api/v1/samba/status' },
+  },
+  sambaShare: {
+    rest: { method: 'POST', path: '/api/v1/samba/share' },
+    argKeys: ['enabled'],
+  },
+  sambaPassword: {
+    rest: { method: 'PUT', path: '/api/v1/samba/password' },
+    argKeys: ['password'],
+  },
   rfidReaders: {
     rest: { method: 'GET', path: '/api/v1/rfid/readers' },
   },
