@@ -18,6 +18,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 import request from '../../../utils/request';
 import Outputs from '../audio/outputs';
+import CliHint from '../cli-hint';
 import ModuleSettings from '../form/module-settings';
 import SettingsGeneral from '../general';
 import SettingsStatus from '../status';
@@ -41,6 +42,8 @@ const PlaybackSettings = () => {
       <Card>
         <CardContent><Outputs /></CardContent>
       </Card>
+      <CliHint commands={['lauschctl setup raspi', 'lauschctl setup audio']} section="audio"
+        text={t('settings.cli.audio')} />
       <ModuleSettings module="volume" />
       <ModuleSettings exclude={['second_swipe_action']} module="player" />
       <ModuleSettings module="audiobooks" />
@@ -84,9 +87,9 @@ const CardSettings = () => {
               <ListItem key={key}><ListItemText primary={driver} secondary={key} /></ListItem>
             ))}
           </List>
-          <Typography color="text.secondary" variant="body2">{t('settings.cards.readers-help')}</Typography>
         </CardContent>
       </Card>
+      <CliHint commands={['lauschctl setup rfid']} section="reader" text={t('settings.cli.reader')} />
     </SettingsPage>
   );
 };
@@ -126,6 +129,9 @@ const SystemSettings = () => {
         </CardContent>
       </Card>
       <SystemControls />
+      <CliHint commands={['lauschctl update']} section="update" text={t('settings.cli.update')} />
+      <CliHint commands={['lauschctl setup autohotspot', 'lauschctl setup boot', 'lauschctl setup kiosk']}
+        text={t('settings.cli.system')} />
     </SettingsPage>
   );
 };

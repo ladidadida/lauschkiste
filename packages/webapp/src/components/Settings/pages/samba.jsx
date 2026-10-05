@@ -18,6 +18,7 @@ import {
 } from '@mui/material';
 
 import request, { requestErrorMessage } from '../../../utils/request';
+import CliHint from '../cli-hint';
 
 const MIN_PASSWORD = 8;
 
@@ -58,7 +59,9 @@ const SambaSettings = () => {
         </Stack>
       );
     }
-    if (!status.installed) return <Typography variant="body2">{t('settings.samba.not-installed')}</Typography>;
+    if (!status.installed) {
+      return <CliHint commands={['lauschctl setup samba']} section="samba" text={t('settings.samba.not-installed')} />;
+    }
     return (
       <Stack spacing={2}>
         <FormControlLabel

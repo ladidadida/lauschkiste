@@ -315,7 +315,8 @@
     "start": "Start",
     "library": "Library",
     "cards": "Cards",
-    "settings": "Settings"
+    "settings": "Settings",
+    "help": "Help"
   },
   "player": {
     "controls": {
@@ -522,8 +523,7 @@
       "open-list": "Open the card list",
       "behaviour": "Behaviour",
       "readers": "Readers",
-      "no-readers": "No reader set up.",
-      "readers-help": "Set up readers on the box with \"lauschctl setup rfid\"."
+      "no-readers": "No reader set up."
     },
     "library": {
       "share": "Network share (Samba)"
@@ -598,7 +598,7 @@
     },
     "samba": {
       "plugin-off": "The share is managed by the \"Samba\" plugin. Switch it on under Plugins and restart Lauschkiste.",
-      "not-installed": "Samba is not installed on the box yet. Run \"lauschctl setup samba\" on the box once.",
+      "not-installed": "Samba is not installed on the box yet. Run once on the box:",
       "share": "Share the library on the network",
       "address": "Reachable at {{address}}, log in as \"{{user}}\".",
       "outdated": "The share is outdated. Switch it off and on again.",
@@ -608,6 +608,46 @@
       "password-help": "At least {{count}} characters",
       "password-saved": "Password saved.",
       "error": "That did not work."
+    },
+    "cli": {
+      "more": "More in the help",
+      "audio": "A sound card (e.g. HiFiBerry) and the outputs offered are set up on the box:",
+      "reader": "A reader is set up once on the box:",
+      "update": "Lauschkiste is updated on the box:",
+      "system": "WiFi hotspot, faster start and kiosk mode change the operating system and run on the box:"
+    }
+  },
+  "help": {
+    "not-found": "This help page does not exist.",
+    "topics": {
+      "start": {
+        "title": "Getting started",
+        "subtitle": "Upload, play, first card"
+      },
+      "player": {
+        "title": "Player",
+        "subtitle": "Controls, timer, search, putting it on a card"
+      },
+      "library": {
+        "title": "Library",
+        "subtitle": "Uploading, audiobooks, radio, podcasts, Samba"
+      },
+      "cards": {
+        "title": "Cards",
+        "subtitle": "Registering, actions, reader"
+      },
+      "settings": {
+        "title": "Settings",
+        "subtitle": "What is set where, plugins, restart"
+      },
+      "lauschctl": {
+        "title": "Commands on the box",
+        "subtitle": "lauschctl: Samba, reader, audio, update, hotspot"
+      },
+      "troubleshooting": {
+        "title": "When something doesn't work",
+        "subtitle": "No sound, a card does nothing, logs"
+      }
     }
   }
 }

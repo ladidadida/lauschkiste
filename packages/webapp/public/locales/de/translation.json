@@ -315,7 +315,8 @@
     "start": "Start",
     "library": "Bibliothek",
     "cards": "Karten",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "help": "Hilfe"
   },
   "player": {
     "controls": {
@@ -520,8 +521,7 @@
       "open-list": "Kartenliste öffnen",
       "behaviour": "Verhalten",
       "readers": "Lesegeräte",
-      "no-readers": "Kein Lesegerät eingerichtet.",
-      "readers-help": "Lesegeräte richtest du auf der Box mit „lauschctl setup rfid“ ein."
+      "no-readers": "Kein Lesegerät eingerichtet."
     },
     "library": {
       "share": "Netzwerkfreigabe (Samba)"
@@ -779,7 +779,7 @@
     },
     "samba": {
       "plugin-off": "Die Freigabe verwaltet das Plugin „Samba“. Schalte es unter Plugins ein und starte Lauschkiste neu.",
-      "not-installed": "Samba ist auf der Box noch nicht installiert. Einmalig auf der Box „lauschctl setup samba“ ausführen.",
+      "not-installed": "Samba ist auf der Box noch nicht installiert. Einmalig auf der Box ausführen:",
       "share": "Bibliothek im Netzwerk freigeben",
       "address": "Erreichbar unter {{address}}, Anmeldung als „{{user}}“.",
       "outdated": "Die Freigabe ist veraltet. Einmal aus- und wieder einschalten.",
@@ -789,6 +789,46 @@
       "password-help": "Mindestens {{count}} Zeichen",
       "password-saved": "Passwort gespeichert.",
       "error": "Das hat nicht geklappt."
+    },
+    "cli": {
+      "more": "Mehr dazu in der Hilfe",
+      "audio": "Soundkarte (z. B. HiFiBerry) und die angebotenen Ausgänge richtest du auf der Box ein:",
+      "reader": "Ein Lesegerät richtest du einmalig auf der Box ein:",
+      "update": "Lauschkiste aktualisierst du auf der Box:",
+      "system": "WLAN-Hotspot, schnellerer Start und Kiosk-Modus ändern das Betriebssystem und laufen auf der Box:"
+    }
+  },
+  "help": {
+    "not-found": "Diese Hilfeseite gibt es nicht.",
+    "topics": {
+      "start": {
+        "title": "Erste Schritte",
+        "subtitle": "Hochladen, abspielen, erste Karte"
+      },
+      "player": {
+        "title": "Player",
+        "subtitle": "Bedienung, Timer, Suche, Karte belegen"
+      },
+      "library": {
+        "title": "Bibliothek",
+        "subtitle": "Hochladen, Hörbücher, Radio, Podcasts, Samba"
+      },
+      "cards": {
+        "title": "Karten",
+        "subtitle": "Anlernen, Aktionen, Lesegerät"
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "subtitle": "Was wo eingestellt wird, Plugins, Neustart"
+      },
+      "lauschctl": {
+        "title": "Befehle auf der Box",
+        "subtitle": "lauschctl: Samba, Lesegerät, Audio, Update, Hotspot"
+      },
+      "troubleshooting": {
+        "title": "Wenn etwas nicht klappt",
+        "subtitle": "Kein Ton, Karte reagiert nicht, Protokolle"
+      }
     }
   }
 }

@@ -563,3 +563,20 @@ test('plugins can be switched on', async ({ page }) => {
   )).toEqual({ enabled: true });
   expect(consoleErrors).toEqual([]);
 });
+
+test('help pages open from the navigation and from settings hints', async ({ page }) => {
+  const consoleErrors = collectConsoleErrors(page);
+  await mockBackend(page);
+  await page.goto('/');
+
+  await page.getByRole('link', { name: 'Help' }).click();
+  await expect(page).toHaveURL(/#\/help$/);
+  await page.getByRole('link', { name: /Commands on the box/ }).click();
+  await expect(page.getByRole('heading', { name: 'Commands on the box' })).toBeVisible();
+
+  await page.goto('/#/settings/cards');
+  await page.getByRole('link', { name: 'More in the help' }).click();
+  await expect(page).toHaveURL(/#\/help\/lauschctl\?section=reader$/);
+  await expect(page.locator('#reader')).toBeInViewport();
+  expect(consoleErrors).toEqual([]);
+});

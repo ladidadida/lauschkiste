@@ -9,6 +9,7 @@ const Cards = lazy(() => import('./components/Cards'));
 const Library = lazy(() => import('./components/Library'));
 const Player = lazy(() => import('./components/Player'));
 const Settings = lazy(() => import('./components/Settings'));
+const Help = lazy(() => import('./components/Help'));
 
 const Router = () => {
   return (
@@ -36,6 +37,10 @@ const Router = () => {
           <Route
             path="settings/*"
             element={<Settings/>}
+          />
+          <Route
+            path="help/*"
+            element={<Help/>}
           />
         </Routes>
       </Grid>

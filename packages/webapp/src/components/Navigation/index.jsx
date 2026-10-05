@@ -9,6 +9,7 @@ import BottomNavigation from '@mui/material/BottomNavigation';
 import BottomNavigationAction from '@mui/material/BottomNavigationAction';
 import HomeIcon from '@mui/icons-material/Home';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutlineOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
 
 const navigationItems = [
@@ -29,6 +30,12 @@ const navigationItems = [
     labelKey: 'navigation.settings',
     matchPatterns: [{ path: '/settings/*' }, { path: '/cards/*' }],
     to: '/settings',
+  },
+  {
+    icon: HelpOutlineIcon,
+    labelKey: 'navigation.help',
+    matchPatterns: [{ path: '/help/*' }],
+    to: '/help',
   },
 ];
 
