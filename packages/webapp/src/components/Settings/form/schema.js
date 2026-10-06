@@ -25,6 +25,7 @@ const unwrap = (schema, root) => {
 
 const fieldKind = (schema) => {
   if (schema.widget === 'action') return 'action';
+  if (schema.options && schema.type === 'string') return 'options';
   if (Array.isArray(schema.enum)) return 'enum';
   if (schema.type === 'boolean') return 'boolean';
   if (schema.type === 'integer' || schema.type === 'number') return 'number';

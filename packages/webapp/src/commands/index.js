@@ -304,6 +304,10 @@ const commands = {
     rest: { method: 'PUT', path: '/api/v1/samba/password' },
     argKeys: ['password'],
   },
+  installPluginExtras: {
+    rest: { method: 'POST', path: '/api/v1/plugins/{name}/extras' },
+    argKeys: ['name'],
+  },
   rfidReaders: {
     rest: { method: 'GET', path: '/api/v1/rfid/readers' },
   },

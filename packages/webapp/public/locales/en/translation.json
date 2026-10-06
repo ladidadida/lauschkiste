@@ -510,7 +510,11 @@
       "choose-action": "Choose an action",
       "unknown-action": "Not available: {{action}}",
       "saved": "Saved.",
-      "save-error": "Could not save."
+      "save-error": "Could not save.",
+      "choose": "Please choose",
+      "not-connected": "{{value}} (not connected)",
+      "no-options": "Nothing found right now.",
+      "no-entries": "No entries."
     },
     "restart": {
       "required": "Some changes only take effect after Lauschkiste restarts.",
@@ -540,7 +544,7 @@
       "enable": "{{name}} on/off",
       "settings": "Settings of {{name}}",
       "settings-title": "Settings",
-      "missing-extras": "Required packages are missing. On the box: \"lauschctl plugin enable {{name}} --with-extras\".",
+      "missing-extras": "Required packages are missing.",
       "names": {
         "raspberry_pi": "Raspberry Pi",
         "mpd": "mpd",
@@ -552,7 +556,10 @@
         "rfid_mfrc522_i2c": "RFID: MFRC522 (I²C)",
         "rfid_fake_reader_gui": "RFID: test reader",
         "samba": "Samba"
-      }
+      },
+      "install": "Install",
+      "installing": "Installing packages, this can take a few minutes …",
+      "install-error": "Installation failed: {{error}}"
     },
     "modules": {
       "volume": "Volume",
@@ -562,7 +569,8 @@
       "jingle": "Startup and shutdown sound",
       "input": "Keys of input devices",
       "library": "Library",
-      "system": "System"
+      "system": "System",
+      "rfid": "Readers"
     },
     "values": {
       "auto": "Automatic",
@@ -588,6 +596,15 @@
           "alias": {
             "label": "What happens",
             "help": "For folder cards while their folder plays. Audiobook cards always continue."
+          }
+        }
+      },
+      "rfid": {
+        "readers": {
+          "place_not_swipe": {
+            "enabled": {
+              "help": "Taking the card off runs the action below, e.g. pause"
+            }
           }
         }
       }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -8,9 +8,6 @@ import {
   CardContent,
   CardHeader,
   Divider,
-  List,
-  ListItem,
-  ListItemText,
   Typography,
 } from '@mui/material';
 
@@ -56,11 +53,6 @@ const PlaybackSettings = () => {
 
 const CardSettings = () => {
   const { t } = useTranslation();
-  const [readers, setReaders] = useState(null);
-
-  useEffect(() => {
-    request('rfidReaders').then(({ result }) => setReaders(result || {}));
-  }, []);
 
   return (
     <SettingsPage title={t('settings.sections.cards.title')}>
@@ -75,20 +67,7 @@ const CardSettings = () => {
         </CardContent>
       </Card>
       <ModuleSettings fields={['second_swipe_action']} module="player" title={t('settings.cards.behaviour')} />
-      <Card>
-        <CardHeader title={t('settings.cards.readers')} />
-        <Divider />
-        <CardContent>
-          {readers && Object.keys(readers).length === 0 &&
-            <Typography>{t('settings.cards.no-readers')}</Typography>
-          }
-          <List dense>
-            {Object.entries(readers || {}).map(([key, driver]) => (
-              <ListItem key={key}><ListItemText primary={driver} secondary={key} /></ListItem>
-            ))}
-          </List>
-        </CardContent>
-      </Card>
+      <ModuleSettings module="rfid" title={t('settings.cards.readers')} />
       <CliHint commands={['lauschctl setup rfid']} section="reader" text={t('settings.cli.reader')} />
     </SettingsPage>
   );

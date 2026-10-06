@@ -508,7 +508,11 @@
       "choose-action": "Aktion wählen",
       "unknown-action": "Nicht verfügbar: {{action}}",
       "saved": "Gespeichert.",
-      "save-error": "Speichern fehlgeschlagen."
+      "save-error": "Speichern fehlgeschlagen.",
+      "choose": "Bitte auswählen",
+      "not-connected": "{{value}} (nicht angeschlossen)",
+      "no-options": "Gerade nichts gefunden.",
+      "no-entries": "Keine Einträge."
     },
     "restart": {
       "required": "Einige Änderungen wirken erst nach einem Neustart von Lauschkiste.",
@@ -538,7 +542,7 @@
       "enable": "{{name}} an/aus",
       "settings": "Einstellungen von {{name}}",
       "settings-title": "Einstellungen",
-      "missing-extras": "Benötigte Pakete fehlen. Auf der Box: „lauschctl plugin enable {{name}} --with-extras“.",
+      "missing-extras": "Benötigte Pakete fehlen.",
       "names": {
         "raspberry_pi": "Raspberry Pi",
         "mpd": "mpd",
@@ -550,7 +554,10 @@
         "rfid_mfrc522_i2c": "RFID: MFRC522 (I²C)",
         "rfid_fake_reader_gui": "RFID: Test-Leser",
         "samba": "Samba"
-      }
+      },
+      "install": "Installieren",
+      "installing": "Pakete werden installiert, das kann einige Minuten dauern …",
+      "install-error": "Installation fehlgeschlagen: {{error}}"
     },
     "modules": {
       "volume": "Lautstärke",
@@ -560,7 +567,8 @@
       "jingle": "Start- und Endton",
       "input": "Tasten von Eingabegeräten",
       "library": "Bibliothek",
-      "system": "System"
+      "system": "System",
+      "rfid": "Lesegeräte"
     },
     "values": {
       "auto": "Automatisch",
@@ -592,6 +600,22 @@
         "soft_max_volume": {
           "label": "Maximale Lautstärke",
           "help": "Prozent; höher lässt sich nicht stellen"
+        },
+        "outputs": {
+          "label": "Ausgänge",
+          "help": "Leer: nur der Standardausgang des Systems",
+          "alias": {
+            "label": "Name",
+            "help": "Wird in der Web-App angezeigt; leer: der Eintragsname"
+          },
+          "pulse_sink_name": {
+            "label": "Gerät",
+            "help": "Leer: Standardausgang des Systems"
+          },
+          "volume_limit": {
+            "label": "Lautstärkegrenze (%)",
+            "help": "100 % in Lauschkiste entsprechen so viel echter Lautstärke"
+          }
         }
       },
       "player": {
@@ -654,6 +678,22 @@
         "media_keys": {
           "label": "Medientasten aller Geräte",
           "help": "Play/Pause, Vor, Zurück und Lautstärke, z. B. eines Bluetooth-Kopfhörers"
+        },
+        "devices": {
+          "label": "Geräte",
+          "help": "USB-Tasten, Tastaturen, Gamepads und ihre Belegung",
+          "device_name": {
+            "label": "Gerät",
+            "help": "Name des Eingabegeräts, wie das System es meldet"
+          },
+          "exact": {
+            "label": "Genauer Name",
+            "help": "Aus: der Name muss den Text nur enthalten"
+          },
+          "keys": {
+            "label": "Tasten",
+            "help": "Tastenname (z. B. BTN_TRIGGER, KEY_A) oder Tastencode, dazu die Aktion"
+          }
         }
       },
       "library": {
@@ -769,6 +809,30 @@
           },
           "warning_action": {
             "label": "Wenn der Akku schwach wird"
+          }
+        }
+      },
+      "rfid": {
+        "readers": {
+          "label": "Lesegeräte",
+          "module": {
+            "label": "Treiber"
+          },
+          "same_id_delay": {
+            "label": "Dieselbe Karte ignorieren für (Sekunden)"
+          },
+          "log_ignored_cards": {
+            "label": "Ignorierte Karten protokollieren"
+          },
+          "place_not_swipe": {
+            "label": "Auflegen statt Wischen",
+            "enabled": {
+              "label": "Karten bleiben liegen",
+              "help": "Abnehmen der Karte löst die Aktion unten aus, z. B. Pause"
+            },
+            "card_removal_action": {
+              "label": "Wenn die Karte abgenommen wird"
+            }
           }
         }
       }

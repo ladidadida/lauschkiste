@@ -1,12 +1,21 @@
 """Installed plugins: their extras, whether those are installed, and enabling them in the config."""
 
+import logging
+import shutil
+import subprocess
+import sys
+import threading
 from importlib.metadata import PackageNotFoundError, distribution, entry_points
-from typing import Any, Dict, List
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from packaging.markers import default_environment
 from packaging.requirements import Requirement
 
 ENTRY_POINT_GROUP = 'lauschkiste.plugins'
+INSTALL_TIMEOUT_SEC = 1800
+
+logger = logging.getLogger('lauschkiste.contract.plugins')
 
 
 def installed() -> Dict[str, Any]:
@@ -59,6 +68,55 @@ def missing_extras(name: str) -> List[str]:
     return missing
 
 
+def install_command(requirements: List[str]) -> List[str]:
+    """Install into the environment Lauschkiste runs in: uv (also from ~/.local/bin) or pip."""
+    uv = shutil.which('uv') or next((str(p) for p in [Path.home() / '.local' / 'bin' / 'uv'] if p.exists()), None)
+    if uv:
+        return [uv, 'pip', 'install', '--python', sys.executable, *requirements]
+    return [sys.executable, '-m', 'pip', 'install', *requirements]
+
+
+class ExtrasInstaller:
+    """Installs the missing extras of plugins in the background, one plugin at a time."""
+
+    def __init__(self, on_installed=None):
+        self._lock = threading.Lock()
+        self._state: Dict[str, Dict[str, Any]] = {}
+        self._on_installed = on_installed
+
+    def state(self, name: str) -> Dict[str, Any]:
+        with self._lock:
+            return dict(self._state.get(name, {'installing': False, 'install_error': None}))
+
+    def start(self, name: str) -> bool:
+        """Start installing; False if nothing is missing or an installation is running."""
+        requirements = missing_extras(name)
+        with self._lock:
+            if not requirements or any(entry['installing'] for entry in self._state.values()):
+                return False
+            self._state[name] = {'installing': True, 'install_error': None}
+        threading.Thread(target=self._run, args=(name, requirements), name=f'install.{name}', daemon=True).start()
+        return True
+
+    def _run(self, name: str, requirements: List[str]) -> None:
+        command = install_command(requirements)
+        logger.info(f"Installing {', '.join(requirements)}: {' '.join(command)}")
+        error: Optional[str] = None
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, timeout=INSTALL_TIMEOUT_SEC)
+            if result.returncode != 0:
+                lines = (result.stderr or result.stdout).strip().splitlines()
+                error = lines[-1] if lines else f'exit code {result.returncode}'
+        except (OSError, subprocess.TimeoutExpired) as problem:
+            error = str(problem)
+        if error:
+            logger.error(f"Installing the extras of '{name}' failed: {error}")
+        elif self._on_installed:
+            self._on_installed(name)
+        with self._lock:
+            self._state[name] = {'installing': False, 'install_error': error}
+
+
 def enabled(cfg) -> Dict[str, Any]:
     plugins = cfg.getn('plugins', default=None)
     return plugins if isinstance(plugins, dict) else {}
@@ -77,7 +135,7 @@ def set_enabled(cfg, name: str, on: bool) -> bool:
     return True
 
 
-def describe(cfg, manager=None) -> List[Dict[str, Any]]:
+def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> List[Dict[str, Any]]:
     """Installed (and enabled but missing) plugins: package, summary, enabled, running, problem, missing extras."""
     available = installed()
     on = enabled(cfg)
@@ -96,5 +154,6 @@ def describe(cfg, manager=None) -> List[Dict[str, Any]]:
             entry['summary'] = (getattr(cls, '__doc__', None) or '').strip().split('\n', 1)[0].replace('``', '') if cls else ''
             entry['problem'] = problem or (manager.failed.get(name) if manager else None)
             entry['missing_extras'] = missing_extras(name)
+        entry.update(installer.state(name) if installer else {'installing': False, 'install_error': None})
         result.append(entry)
     return result

@@ -18,8 +18,13 @@ class ActionEntry(BaseModel):
     args: Dict[str, Any] = {}
 
 
-def config_prefix(handle) -> tuple:
-    return (handle.name,) if handle.is_core else ('plugins', handle.name)
+def storage(handle, cfg) -> tuple:
+    """(config handler, key path) of a module's settings: its section of the main config, unless the
+    module keeps them elsewhere (``settings_storage()``)."""
+    custom = getattr(handle.instance, 'settings_storage', None)
+    if callable(custom):
+        return custom()
+    return cfg, ((handle.name,) if handle.is_core else ('plugins', handle.name))
 
 
 def current_values(model: type, section: Any) -> Dict[str, Any]:
@@ -48,6 +53,8 @@ class SettingsStore:
         self._manager = manager
         self.cfg = cfg
         self.restart_required: Set[str] = set()
+        from lauschkiste.contract.plugins import ExtrasInstaller
+        self.installer = ExtrasInstaller(on_installed=self.restart_required.add)
 
     def _handle(self, name: str):
         if name not in self._manager:
@@ -60,7 +67,8 @@ class SettingsStore:
     def describe(self, name: str) -> Dict[str, Any]:
         handle = self._handle(name)
         model = handle.cls.settings
-        section = self.cfg.getn(*config_prefix(handle), default=None)
+        cfg, prefix = storage(handle, self.cfg)
+        section = cfg.getn(*prefix, default=None)
         return {
             'name': name,
             'kind': 'core' if handle.is_core else 'plugin',
@@ -79,22 +87,22 @@ class SettingsStore:
         unknown = sorted(set(values) - set(model.model_fields))
         if unknown:
             raise OperationError(422, 'unknown_setting', f"Unknown settings for '{name}': {', '.join(unknown)}")
-        prefix = config_prefix(handle)
-        merged = {**current_values(model, self.cfg.getn(*prefix, default=None)), **values}
+        cfg, prefix = storage(handle, self.cfg)
+        merged = {**current_values(model, cfg.getn(*prefix, default=None)), **values}
         try:
             validated = model.model_validate(merged).model_dump(mode='json')
         except ValidationError as error:
             raise OperationError(422, 'invalid_setting', _message(error)) from None
         changed = {key: validated[key] for key in values}
-        with self.cfg:
+        with cfg:
             for key, value in changed.items():
                 if value is None:
-                    section = self.cfg.getn(*prefix, default=None)
+                    section = cfg.getn(*prefix, default=None)
                     if isinstance(section, dict):
                         section.pop(key, None)
                 else:
-                    self.cfg.setn(*prefix, key, value=value)
-        self.save()
+                    cfg.setn(*prefix, key, value=value)
+        self.save(cfg)
         try:
             applied = bool(handle.instance.settings_changed(changed))
         except Exception:
@@ -104,7 +112,8 @@ class SettingsStore:
             self.restart_required.add(name)
         return self.describe(name)
 
-    def save(self) -> None:
-        if getattr(self.cfg, 'loaded_from', None):
-            self.cfg.save(only_if_changed=False)
+    def save(self, cfg=None) -> None:
+        cfg = cfg if cfg is not None else self.cfg
+        if getattr(cfg, 'loaded_from', None):
+            cfg.save(only_if_changed=False)
 

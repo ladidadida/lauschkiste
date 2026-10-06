@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import {
   Alert,
+  Button,
   Card,
   CardContent,
   Chip,
@@ -41,6 +42,22 @@ const PluginsSettings = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  const installing = (plugins || []).some((plugin) => plugin.installing);
+  useEffect(() => {
+    if (!installing) return undefined;
+    const timer = setInterval(load, 3000);
+    return () => clearInterval(timer);
+  }, [installing, load]);
+
+  useEffect(() => {
+    if (!installing) refresh();
+  }, [installing, refresh]);
+
+  const install = async (name) => {
+    await request('installPluginExtras', { name });
+    load();
+  };
 
   const toggle = async (name, enabled) => {
     await request('setPluginEnabled', { name, enabled });
@@ -99,9 +116,24 @@ const PluginsSettings = () => {
                           {plugin.problem}
                         </Alert>
                       }
-                      {plugin.enabled && plugin.missing_extras.length > 0 &&
-                        <Alert component="span" severity="info" sx={{ display: 'flex', marginTop: 1 }}>
-                          {t('settings.plugins.missing-extras', { name: plugin.name })}
+                      {plugin.enabled && (plugin.missing_extras.length > 0 || plugin.installing) &&
+                        <Alert
+                          action={
+                            <Button color="inherit" disabled={installing} onClick={() => install(plugin.name)} size="small">
+                              {plugin.installing ? <CircularProgress color="inherit" size={16} />
+                                : t('settings.plugins.install')}
+                            </Button>
+                          }
+                          component="span"
+                          severity="info"
+                          sx={{ display: 'flex', marginTop: 1 }}
+                        >
+                          {plugin.installing ? t('settings.plugins.installing') : t('settings.plugins.missing-extras')}
+                        </Alert>
+                      }
+                      {plugin.install_error &&
+                        <Alert component="span" severity="error" sx={{ display: 'flex', marginTop: 1 }}>
+                          {t('settings.plugins.install-error', { error: plugin.install_error })}
                         </Alert>
                       }
                     </>

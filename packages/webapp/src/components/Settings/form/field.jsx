@@ -88,6 +88,45 @@ const NumberField = ({ label, help, nullable, onChange, schema, value }) => {
   );
 };
 
+// A string chosen from options the backend lists (e.g. audio devices); the current value stays
+// selectable even when it is not among them right now.
+const OptionsField = ({ help, label, nullable, onChange, schema, value }) => {
+  const { t } = useTranslation();
+  const id = useId();
+  const [options, setOptions] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetch(schema.options)
+      .then((response) => (response.ok ? response.json() : []))
+      .then((result) => {
+        if (active) setOptions(Array.isArray(result) ? result : []);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [schema.options]);
+
+  const known = !value || options.some((option) => option.value === value);
+  return (
+    <FormControl fullWidth size="small">
+      <InputLabel id={`${id}-label`}>{label}</InputLabel>
+      <Select
+        label={label}
+        labelId={`${id}-label`}
+        onChange={(event) => onChange(event.target.value === NONE ? (nullable ? null : '') : event.target.value)}
+        value={value || NONE}
+      >
+        <MenuItem value={NONE}>{nullable ? t('settings.form.default') : t('settings.form.choose')}</MenuItem>
+        {!known && <MenuItem value={value}>{t('settings.form.not-connected', { value })}</MenuItem>}
+        {options.map((option) => <MenuItem key={option.value} value={option.value}>{option.label}</MenuItem>)}
+      </Select>
+      <FormHelperText>{options.length || known ? help : t('settings.form.no-options')}</FormHelperText>
+    </FormControl>
+  );
+};
+
 const EnumField = ({ help, kind, label, nullable, onChange, schema, value }) => {
   const { t } = useTranslation();
   const id = useId();
@@ -116,6 +155,7 @@ const EnumField = ({ help, kind, label, nullable, onChange, schema, value }) => 
 };
 
 const DictField = ({ i18nBase, label, help, onChange, path, root, schema, value }) => {
+  const fixed = Boolean(schema.fixed_keys);
   const { t } = useTranslation();
   const [name, setName] = useState('');
   const entries = Object.entries(value || {});
@@ -153,13 +193,16 @@ const DictField = ({ i18nBase, label, help, onChange, path, root, schema, value 
               value={entry}
               withoutLabel
             />
-            <Button color="error" onClick={() => remove(key)} size="small" startIcon={<DeleteIcon />} sx={{ marginTop: 1 }}>
-              {t('general.buttons.delete')}
-            </Button>
+            {!fixed &&
+              <Button color="error" onClick={() => remove(key)} size="small" startIcon={<DeleteIcon />} sx={{ marginTop: 1 }}>
+                {t('general.buttons.delete')}
+              </Button>
+            }
           </AccordionDetails>
         </Accordion>
       ))}
-      <Stack direction="row" spacing={1} sx={{ alignItems: 'center', marginTop: 1 }}>
+      {fixed && !entries.length && <Typography variant="body2">{t('settings.form.no-entries')}</Typography>}
+      {!fixed && <Stack direction="row" spacing={1} sx={{ alignItems: 'center', marginTop: 1 }}>
         <TextField
           label={t('settings.form.new-entry')}
           onChange={(event) => setName(event.target.value)}
@@ -175,7 +218,7 @@ const DictField = ({ i18nBase, label, help, onChange, path, root, schema, value 
         <IconButton aria-label={t('settings.form.add')} disabled={!name.trim()} onClick={add}>
           <AddIcon />
         </IconButton>
-      </Stack>
+      </Stack>}
     </Box>
   );
 };
@@ -203,6 +246,10 @@ const Field = ({ i18nBase, onChange, path, root, schema: rawSchema, value, witho
       schema={schema} value={value} />;
   }
 
+  if (kind === 'options') {
+    return <OptionsField help={help} label={label} nullable={nullable} onChange={onChange} schema={schema} value={value} />;
+  }
+
   if (kind === 'number') {
     return <NumberField help={help} label={label} nullable={nullable} onChange={onChange} schema={schema} value={value} />;
   }
@@ -210,6 +257,7 @@ const Field = ({ i18nBase, onChange, path, root, schema: rawSchema, value, witho
   if (kind === 'string') {
     return (
       <TextField
+        disabled={Boolean(schema.readonly)}
         fullWidth
         helperText={help}
         label={label}

@@ -9,11 +9,11 @@ import threading
 import time
 from typing import Any, Callable, Dict, List, Optional, Protocol
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 import lauschkiste.cfghandler
 import lauschkiste.paths
-from lauschkiste.contract import CoreModule, action, event, extension_point, query
+from lauschkiste.contract import ActionEntry, CoreModule, action, event, extension_point, query
 
 log = logging.getLogger('lauschkiste.rfid')
 
@@ -26,6 +26,27 @@ class ReaderDriver(Protocol):
     def create_reader(self, reader_cfg_key: str) -> Any:
         """Return a reader for the reader config key: a context manager that iterates card ids
         ('' on timeout) and has ``stop()``."""
+
+
+class PlaceNotSwipe(BaseModel):
+    enabled: bool = Field(False, title='Cards stay on the reader',
+                          description='Taking the card off runs the removal action, e.g. pause')
+    card_removal_action: Optional[ActionEntry] = Field(None, title='When the card is taken off')
+
+
+class ReaderSetting(BaseModel):
+    """How a reader behaves; its driver and wiring (``module``, ``config``) are kept as they are."""
+    model_config = ConfigDict(extra='allow')
+
+    module: str = Field(title='Driver', json_schema_extra={'readonly': True})
+    same_id_delay: float = Field(1.0, ge=0, le=60, title='Ignore the same card again for (seconds)')
+    log_ignored_cards: bool = Field(False, title='Log ignored cards')
+    place_not_swipe: PlaceNotSwipe = Field(default_factory=PlaceNotSwipe, title='Place instead of swipe')
+
+
+class RfidSettings(BaseModel):
+    readers: Dict[str, ReaderSetting] = Field(default_factory=dict, title='Readers',
+                                              json_schema_extra={'fixed_keys': True})
 
 
 class CardDetected(BaseModel):
@@ -133,6 +154,7 @@ class Rfid(CoreModule):
     interface_version = '1.1'
     requires = ('cards',)
 
+    settings = RfidSettings
     card_detected = event('card_detected', CardDetected)
     readers = extension_point('readers', ReaderDriver)
 
@@ -171,6 +193,9 @@ class Rfid(CoreModule):
         return list(self._runners.values())
 
     # -- used by the reader threads -------------------------------------------------------------
+
+    def settings_storage(self):
+        return cfg_rfid, ('rfid',)
 
     def lookup(self, card_id: str):
         return self._ctx.modules.cards.get_card(card_id)

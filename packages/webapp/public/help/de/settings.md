@@ -5,15 +5,15 @@ Alles, was nur Lauschkiste selbst betrifft, stellst du in der Web-App ein. Ände
 | Seite | Inhalt |
 | --- | --- |
 | Status | Version, IP-Adresse, Speicher, Temperatur, Akku |
-| Wiedergabe & Audio | Ausgänge, Lautstärke, Player, Hörbücher, Podcasts, Start- und Endton, Medientasten |
-| Karten | Kartenliste, Verhalten beim erneuten Auflegen, Lesegeräte |
+| Wiedergabe & Audio | Ausgänge (Name, Gerät, Lautstärkegrenze), Lautstärke, Player, Hörbücher, Podcasts, Start- und Endton, Tasten von USB-Geräten und Medientasten |
+| Karten | Kartenliste, Verhalten beim erneuten Auflegen, Lesegeräte (Sperrzeit, Auflegen statt Wischen, Aktion beim Abnehmen) |
 | Bibliothek | Cover, Einlesen, Netzlaufwerk (Samba) |
 | Plugins | Erweiterungen an- und ausschalten und einstellen, z. B. Raspberry Pi (GPIO-Tasten, Drehregler, LED, Akku) |
 | System | Ansagen, Neustart, Herunterfahren |
 
 ## Plugins
 
-Plugins erweitern Lauschkiste um Hardware und Quellen. Ein- und Ausschalten wirkt nach einem Neustart. Fehlen einem Plugin Pakete, zeigt die Plugin-Seite das an.
+Plugins erweitern Lauschkiste um Hardware und Quellen. Ein- und Ausschalten wirkt nach einem Neustart. Fehlen einem Plugin Pakete, installiert „Installieren“ auf der Plugin-Seite sie nach; das kann einige Minuten dauern.
 
 ## Was nur auf der Box geht
 

@@ -19,9 +19,9 @@ import threading
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-from lauschkiste.contract import CoreModule, event, query
+from lauschkiste.contract import ActionEntry, CoreModule, event, query
 
 logger = logging.getLogger('lauschkiste.input')
 
@@ -110,16 +110,36 @@ class Evdev:
                     yield input_event.code
 
 
+class InputDeviceSetting(BaseModel):
+    device_name: str = Field('', title='Device', json_schema_extra={'options': '/api/v1/input/available'},
+                             description='Name of the input device, as the system reports it')
+    exact: bool = Field(False, title='Exact name', description='Off: the name only needs to contain this text')
+    keys: Dict[str, ActionEntry] = Field(default_factory=dict, title='Keys',
+                                         description='Key name (e.g. BTN_TRIGGER, KEY_A) or key code, and its action')
+
+    @field_validator('keys', mode='before')
+    @classmethod
+    def _key_names(cls, value):
+        return {str(key): entry for key, entry in value.items()} if isinstance(value, dict) else value
+
+
 class InputSettings(BaseModel):
     media_keys: bool = Field(False, title='Media keys of all devices',
                              description='Play/pause, next, previous and volume keys, e.g. of a Bluetooth headset')
+    devices: Dict[str, InputDeviceSetting] = Field(default_factory=dict, title='Devices',
+                                                   description='USB buttons, keyboards, game pads and their keys')
+
+
+class Choice(BaseModel):
+    value: str
+    label: str
 
 
 class InputDevices(CoreModule):
     """Keys of input devices run actions."""
 
     name = 'input'
-    interface_version = '1.0'
+    interface_version = '1.1'
     concurrency = 'threadsafe'
     settings = InputSettings
 
@@ -244,6 +264,20 @@ class InputDevices(CoreModule):
                 watch.threads.pop(device.path, None)
 
     # -- operations -----------------------------------------------------------------------------
+
+    @query(path='/available')
+    def available_devices(self) -> List[Choice]:
+        """Names of the input devices connected right now, for configuring keys."""
+        try:
+            evdev = self._evdev or self._evdev_factory()
+            names = set()
+            for device in evdev.list_devices():
+                names.add(str(device.name))
+                device.close()
+        except Exception as error:
+            logger.debug(f"Input devices not available: {error}")
+            return []
+        return [Choice(value=name, label=name) for name in sorted(names)]
 
     @query(path='/devices')
     def list_devices(self) -> List[DeviceState]:

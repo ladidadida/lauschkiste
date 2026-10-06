@@ -17,10 +17,38 @@
     }
   },
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "core",
   "name": "input",
   "operations": {
+    "available_devices": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/input/available",
+      "returns": {
+        "items": {
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "label"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
     "list_devices": {
       "args": {
         "additionalProperties": false,

@@ -42,6 +42,9 @@ class Module:
     def stop(self) -> List[threading.Thread]:
         return []
 
+    # A module keeping its settings outside its section of the main config defines
+    # ``settings_storage(self) -> (config handler, key path)``.
+
     def settings_changed(self, changed: Dict[str, Any]) -> bool:
         """Settings were changed through the web app (already in ``ctx.config``). Return True if
         they take effect right away, False if Lauschkiste must restart for them."""

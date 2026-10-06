@@ -165,6 +165,31 @@ def _clamp(value: int, low: int, high: int) -> int:
     return max(low, min(high, int(value)))
 
 
+class Choice(BaseModel):
+    value: str
+    label: str
+
+
+def pulse_sinks() -> List[Choice]:
+    """Sinks of the PulseAudio/PipeWire server; empty if there is none."""
+    try:
+        import pulsectl
+        with pulsectl.Pulse('lauschkiste-sinks') as pulse:
+            return [Choice(value=sink.name, label=sink.description or sink.name) for sink in pulse.sink_list()]
+    except Exception as error:
+        logger.debug(f"No PulseAudio/PipeWire sinks: {error}")
+        return []
+
+
+class OutputSetting(BaseModel):
+    alias: Optional[str] = Field(None, title='Name', description='Shown in the web app; empty: the entry name')
+    pulse_sink_name: Optional[str] = Field(None, title='Device',
+                                           json_schema_extra={'options': '/api/v1/volume/sinks'},
+                                           description='Empty: the system default output')
+    volume_limit: int = Field(100, ge=1, le=100, title='Volume limit (%)',
+                              description='100 % volume of this output is this much of its real volume')
+
+
 class VolumeSettings(BaseModel):
     mixer: Literal['auto', 'pulse', 'player'] = Field(
         'auto', title='Volume control',
@@ -172,13 +197,15 @@ class VolumeSettings(BaseModel):
     startup_volume: Optional[int] = Field(None, ge=0, le=100, title='Volume after start',
                                           description='Empty: keep the volume of the last run')
     soft_max_volume: int = Field(100, ge=0, le=100, title='Maximum volume')
+    outputs: Dict[str, OutputSetting] = Field(default_factory=dict, title='Outputs',
+                                              description='Empty: the system default output only')
 
 
 class Volume(CoreModule):
     """Volume, mute, soft maximum and audio output."""
 
     name = 'volume'
-    interface_version = '1.0'
+    interface_version = '1.1'
     requires = ('player',)
 
     settings = VolumeSettings
@@ -274,7 +301,12 @@ class Volume(CoreModule):
             if self._mixer.get() > self._soft_max:
                 self._mixer.set(self._soft_max)
             self._publish()
-        return 'mixer' not in changed
+        return not {'mixer', 'outputs'} & set(changed)
+
+    @query(path='/sinks')
+    def list_sinks(self) -> List[Choice]:
+        """Audio devices of the PulseAudio/PipeWire server, for choosing outputs."""
+        return pulse_sinks()
 
     @action(method='PUT', path='/soft-max')
     def set_soft_max_volume(self, max_volume: int) -> VolumeState:

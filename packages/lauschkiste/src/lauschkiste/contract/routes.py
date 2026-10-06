@@ -147,13 +147,18 @@ def build_router(manager: ModuleManager, executor) -> APIRouter:
     return router
 
 
-def add_settings_routes(router: APIRouter, manager: ModuleManager, executor) -> None:
-    """Settings of the modules, installed plugins, and whether a restart is pending."""
+def _blocking(executor):
     async def blocking(func, *args):
         try:
             return await asyncio.get_running_loop().run_in_executor(executor, func, *args)
         except OperationError as error:
             return _error(error.status, error.code, error.message)
+    return blocking
+
+
+def add_settings_routes(router: APIRouter, manager: ModuleManager, executor) -> None:
+    """Settings of the modules and whether a restart is pending."""
+    blocking = _blocking(executor)
 
     @router.get('/api/v1/settings/modules', tags=['settings'])
     async def list_module_settings():
@@ -175,19 +180,44 @@ def add_settings_routes(router: APIRouter, manager: ModuleManager, executor) -> 
         return {'required': bool(manager.settings.restart_required),
                 'modules': sorted(manager.settings.restart_required)}
 
+    add_plugin_routes(router, manager, blocking)
+
+
+def add_plugin_routes(router: APIRouter, manager: ModuleManager, blocking) -> None:
+    """Installed plugins: list, enable or disable, install missing extras."""
+    store = manager.settings
+
+    def describe(name: str):
+        return next(entry for entry in plugins.describe(store.cfg, manager, store.installer) if entry['name'] == name)
+
+    def check_installed(name: str):
+        if name not in plugins.installed():
+            raise OperationError(404, 'unknown_plugin', f"Plugin '{name}' is not installed")
+
     @router.get('/api/v1/plugins', tags=['settings'])
     async def list_plugins():
         """Installed plugins, whether they are enabled and running, and what is missing."""
-        return await blocking(plugins.describe, manager.settings.cfg, manager)
+        return await blocking(plugins.describe, store.cfg, manager, store.installer)
 
     @router.put('/api/v1/plugins/{name}', tags=['settings'])
     async def enable_plugin(name: str, body: PluginState):
         """Enable or disable an installed plugin; takes effect after a restart."""
         def change():
-            if body.enabled and name not in plugins.installed():
-                raise OperationError(404, 'unknown_plugin', f"Plugin '{name}' is not installed")
-            if plugins.set_enabled(manager.settings.cfg, name, body.enabled):
-                manager.settings.save()
-                manager.settings.restart_required.add(name)
-            return next(entry for entry in plugins.describe(manager.settings.cfg, manager) if entry['name'] == name)
+            if body.enabled:
+                check_installed(name)
+            if plugins.set_enabled(store.cfg, name, body.enabled):
+                store.save()
+                store.restart_required.add(name)
+            return describe(name)
         return await blocking(change)
+
+    @router.post('/api/v1/plugins/{name}/extras', tags=['settings'], status_code=202)
+    async def install_extras(name: str):
+        """Install the packages a plugin is missing, in the background (see ``installing`` in the list)."""
+        def start():
+            check_installed(name)
+            if not store.installer.start(name):
+                raise OperationError(409, 'nothing_to_install',
+                                     f"Nothing to install for '{name}', or another installation is running")
+            return describe(name)
+        return await blocking(start)

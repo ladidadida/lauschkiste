@@ -18,8 +18,8 @@ def test_settings_models_have_valid_defaults_and_schema(module):
 
 def test_invalid_entries_fall_back_to_defaults():
     from lauschkiste.volume import Volume
-    values = current_values(Volume.settings, {'soft_max_volume': 300, 'mixer': 'pulse', 'outputs': {'x': {}}})
-    assert values == {'mixer': 'pulse', 'startup_volume': None, 'soft_max_volume': 100}
+    values = current_values(Volume.settings, {'soft_max_volume': 300, 'mixer': 'pulse', 'unknown': 1})
+    assert values == {'mixer': 'pulse', 'startup_volume': None, 'soft_max_volume': 100, 'outputs': {}}
 
 
 def test_gpio_example_of_the_docs_is_valid():
@@ -36,3 +36,13 @@ def test_gpio_example_of_the_docs_is_valid():
     }})
     assert values['gpio']['buttons']['play']['on_hold'] == {'action': 'raspberry_pi.shutdown', 'args': {}}
     assert values['gpio']['rotary_encoders']['volume']['clockwise']['args'] == {'step': 2}
+
+
+def test_reader_settings_keep_driver_and_wiring():
+    from lauschkiste.rfid.reader import Rfid
+    reader = {'module': 'rc522_spi', 'config': {'pin_irq': 24}, 'same_id_delay': 2,
+              'place_not_swipe': {'enabled': True, 'card_removal_action': {'action': 'player.pause'}}}
+    values = current_values(Rfid.settings, {'readers': {'read_00': reader}})
+    assert values['readers']['read_00']['config'] == {'pin_irq': 24}
+    assert values['readers']['read_00']['place_not_swipe']['card_removal_action']['action'] == 'player.pause'
+    assert Rfid.settings.model_json_schema()['properties']['readers']['fixed_keys'] is True
