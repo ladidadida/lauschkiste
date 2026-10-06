@@ -7,7 +7,7 @@ Enable the driver of each reader configured in the reader config (``module: <dri
 """
 
 import importlib
-from typing import Any, ClassVar
+from typing import Any, ClassVar, Dict, List
 
 from lauschkiste.contract import Plugin
 
@@ -20,6 +20,11 @@ class ReaderDriver:
 
     def create_reader(self, reader_cfg_key: str) -> Any:
         return self._module.ReaderClass(reader_cfg_key)
+
+    def claims(self, config: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Pins and buses a reader with this ``config`` uses (``claims(config)`` of the driver module)."""
+        claims = getattr(self._module, 'claims', None)
+        return claims(config or {}) if callable(claims) else []
 
 
 class ReaderDriverPlugin(Plugin):

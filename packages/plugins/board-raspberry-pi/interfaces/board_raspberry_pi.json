@@ -1,0 +1,57 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "plugin",
+  "name": "board_raspberry_pi",
+  "operations": {
+    "get_throttled": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/board_raspberry_pi/throttled",
+      "returns": {
+        "properties": {
+          "frequency_capped_now": {
+            "type": "boolean"
+          },
+          "frequency_capped_occurred": {
+            "type": "boolean"
+          },
+          "raw": {
+            "type": "string"
+          },
+          "throttled_now": {
+            "type": "boolean"
+          },
+          "throttled_occurred": {
+            "type": "boolean"
+          },
+          "under_voltage_now": {
+            "type": "boolean"
+          },
+          "under_voltage_occurred": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "raw",
+          "under_voltage_now",
+          "frequency_capped_now",
+          "throttled_now",
+          "under_voltage_occurred",
+          "frequency_capped_occurred",
+          "throttled_occurred"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "requires": {
+    "hardware": ">=1.0,<2"
+  }
+}

@@ -56,6 +56,15 @@ def query_customization() -> dict:
             'log_all_cards': False}
 
 
+
+def claims(config):
+    """SPI bus, and the IRQ and reset pins (BCM numbers) if they are used."""
+    result = [{'resource': f"spi{config.get('spi_bus', 0)}", 'purpose': 'RC522', 'shared': True}]
+    for key in ('pin_irq', 'pin_rst'):
+        if config.get(key):
+            result.append({'resource': str(config[key]), 'purpose': f"RC522 {key[4:].upper()}"})
+    return result
+
 class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key):
         self._logger = logging.getLogger(f'lauschkiste.rfid.522({reader_cfg_key})')

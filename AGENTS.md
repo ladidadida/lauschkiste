@@ -23,7 +23,7 @@ packages/          uv workspace members
                    input, cards, rfid), FastAPI API bridge
                    (api/), in-process event bus (publishing/), config handling. Removed former
                    components come back as core modules (volume, timers, jingle, system info,
-                   input devices) or plugins (raspberry-pi, mqtt, card sync) -- see
+                   input devices) or plugins (board support, devices, mqtt, card sync) -- see
                    documentation/developers/core-and-plugins.md.
     interfaces/    Interface snapshots of the framework contract and every core module, checked
                    by test/contract/test_snapshots.py (see "Core and plugins" below)
@@ -95,8 +95,10 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `packages/webapp/build`.
   See `documentation/developers/packaging-and-setup.md`.
 - **Bundled plugins** live in `packages/plugins/*` (uv workspace members, installed by `uv sync`
-  but only loaded when enabled under `plugins:`): `raspberry-pi` (shutdown/reboot, GPIO, battery,
-  firmware health; the installer enables it), `mpd` (player backend) and `rfid-readers`
+  but only loaded when enabled under `plugins:`): `board-raspberry-pi` (board support: pins,
+  interfaces, sound cards, power, firmware health; the installer enables it on a Pi), `devices`
+  (`gpio_controls`, `battery`, `power_button`, board-independent, see
+  `documentation/developers/hardware.md`), `mpd` (player backend) and `rfid-readers`
   (one plugin per reader driver, `rfid_<driver>`; each driver's dependencies are an extra of that
   package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`) and `samba` (the
   library's network share and Samba password from the web app; `lauschctl setup samba` enables it).

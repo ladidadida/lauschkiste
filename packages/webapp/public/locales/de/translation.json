@@ -496,6 +496,10 @@
       "system": {
         "title": "System",
         "subtitle": "Neustart, Herunterfahren, Sprache der Ansagen"
+      },
+      "hardware": {
+        "title": "Hardware",
+        "subtitle": "Board, Pin-Belegung, Soundkarte, Boot-Konfiguration"
       }
     },
     "form": {
@@ -544,7 +548,6 @@
       "settings-title": "Einstellungen",
       "missing-extras": "Benötigte Pakete fehlen.",
       "names": {
-        "raspberry_pi": "Raspberry Pi",
         "mpd": "mpd",
         "rfid_rc522_spi": "RFID: RC522 (SPI)",
         "rfid_generic_usb": "RFID: USB-Leser",
@@ -553,7 +556,11 @@
         "rfid_generic_nfcpy": "RFID: nfcpy",
         "rfid_mfrc522_i2c": "RFID: MFRC522 (I²C)",
         "rfid_fake_reader_gui": "RFID: Test-Leser",
-        "samba": "Samba"
+        "samba": "Samba",
+        "board_raspberry_pi": "Raspberry Pi",
+        "gpio_controls": "Tasten, Drehregler, LED (GPIO)",
+        "battery": "Akku",
+        "power_button": "Ein/Aus-Taster"
       },
       "install": "Installieren",
       "installing": "Pakete werden installiert, das kann einige Minuten dauern …",
@@ -585,7 +592,11 @@
       "replay": "Ordner neu starten",
       "replay_if_stopped": "Neu starten, wenn gestoppt",
       "ina219": "INA219",
-      "simulator": "Simulator"
+      "simulator": "Simulator",
+      "onoff_shim": "Pimoroni OnOff SHIM",
+      "custom": "Eigene Pins",
+      "max17048": "MAX17048",
+      "max98357a": "MAX98357A"
     },
     "fields": {
       "volume": {
@@ -718,100 +729,6 @@
           "help": "0 schaltet die regelmäßige Statusmeldung ab"
         }
       },
-      "raspberry_pi": {
-        "debug_mode": {
-          "label": "Testmodus",
-          "help": "Herunterfahren und Neustart nur protokollieren"
-        },
-        "hdmi_power_down": {
-          "label": "HDMI abschalten",
-          "help": "Spart Strom ohne Bildschirm"
-        },
-        "wlan_power_save": {
-          "label": "WLAN-Stromsparen",
-          "help": "Aus hält die Box erreichbar"
-        },
-        "wlan_interface": {
-          "label": "WLAN-Schnittstelle"
-        },
-        "gpio": {
-          "label": "GPIO",
-          "enabled": {
-            "label": "GPIO verwenden"
-          },
-          "buttons": {
-            "label": "Tasten",
-            "pin": {
-              "label": "GPIO-Pin (BCM)"
-            },
-            "on_press": {
-              "label": "Beim Drücken"
-            },
-            "on_hold": {
-              "label": "Beim Halten"
-            },
-            "hold_time": {
-              "label": "Halten für (Sekunden)"
-            },
-            "pull_up": {
-              "label": "Interner Pull-up",
-              "help": "Aus für Tasten an 3,3 V"
-            },
-            "bounce_time": {
-              "label": "Entprellen (Sekunden)"
-            }
-          },
-          "rotary_encoders": {
-            "label": "Drehregler",
-            "pin_a": {
-              "label": "GPIO-Pin A"
-            },
-            "pin_b": {
-              "label": "GPIO-Pin B"
-            },
-            "clockwise": {
-              "label": "Im Uhrzeigersinn"
-            },
-            "counter_clockwise": {
-              "label": "Gegen den Uhrzeigersinn"
-            }
-          },
-          "status_led": {
-            "label": "Status-LED (Pin)",
-            "help": "Leuchtet, solange Lauschkiste läuft"
-          }
-        },
-        "battery": {
-          "label": "Akku",
-          "enabled": {
-            "label": "Akku überwachen"
-          },
-          "driver": {
-            "label": "Sensor"
-          },
-          "shunt_ohms": {
-            "label": "Shunt-Widerstand (Ohm)"
-          },
-          "empty_voltage": {
-            "label": "Leer bei (mV)"
-          },
-          "full_voltage": {
-            "label": "Voll bei (mV)"
-          },
-          "warning_voltage": {
-            "label": "Warnen unter (mV)"
-          },
-          "shutdown_voltage": {
-            "label": "Herunterfahren unter (mV)"
-          },
-          "interval_sec": {
-            "label": "Messen alle (Sekunden)"
-          },
-          "warning_action": {
-            "label": "Wenn der Akku schwach wird"
-          }
-        }
-      },
       "rfid": {
         "readers": {
           "label": "Lesegeräte",
@@ -834,6 +751,133 @@
               "label": "Wenn die Karte abgenommen wird"
             }
           }
+        }
+      },
+      "board_raspberry_pi": {
+        "debug_mode": {
+          "label": "Testmodus",
+          "help": "Herunterfahren und Neustart nur protokollieren"
+        },
+        "hdmi_power_down": {
+          "label": "HDMI abschalten",
+          "help": "Spart Strom ohne Bildschirm"
+        },
+        "wlan_power_save": {
+          "label": "WLAN-Stromsparen",
+          "help": "Aus hält die Box erreichbar"
+        },
+        "wlan_interface": {
+          "label": "WLAN-Schnittstelle"
+        },
+        "sound_card": {
+          "label": "Soundkarte (I²S)",
+          "help": "Eine I²S-Soundkarte am Pin-Header; wirkt nach „lauschctl setup raspi“ und einem Neustart"
+        },
+        "onboard_audio": {
+          "label": "Eingebauter Ton (Kopfhörerbuchse)",
+          "help": "Aus bei externer Soundkarte (mit I²S-Soundkarte immer aus)"
+        },
+        "i2c": {
+          "label": "I²C",
+          "help": "Wird für einen Akku-Sensor auch automatisch eingeschaltet"
+        },
+        "spi": {
+          "label": "SPI",
+          "help": "Wird für einen RC522-Leser auch automatisch eingeschaltet"
+        }
+      },
+      "gpio_controls": {
+        "buttons": {
+          "label": "Tasten",
+          "pin": {
+            "label": "Pin"
+          },
+          "on_press": {
+            "label": "Beim Drücken"
+          },
+          "on_hold": {
+            "label": "Beim Halten"
+          },
+          "hold_time": {
+            "label": "Halten für (Sekunden)"
+          },
+          "pull_up": {
+            "label": "Interner Pull-up",
+            "help": "Aus für Tasten an 3,3 V"
+          },
+          "bounce_time": {
+            "label": "Entprellen (Sekunden)"
+          }
+        },
+        "rotary_encoders": {
+          "label": "Drehregler",
+          "pin_a": {
+            "label": "Pin A"
+          },
+          "pin_b": {
+            "label": "Pin B"
+          },
+          "clockwise": {
+            "label": "Im Uhrzeigersinn"
+          },
+          "counter_clockwise": {
+            "label": "Gegen den Uhrzeigersinn"
+          }
+        },
+        "status_led": {
+          "label": "Status-LED",
+          "help": "Leuchtet, solange Lauschkiste läuft"
+        }
+      },
+      "battery": {
+        "driver": {
+          "label": "Sensor"
+        },
+        "shunt_ohms": {
+          "label": "Shunt-Widerstand (Ohm)",
+          "help": "Nur INA219"
+        },
+        "empty_voltage": {
+          "label": "Leer bei (mV)",
+          "help": "Beim MAX17048 nicht nötig"
+        },
+        "full_voltage": {
+          "label": "Voll bei (mV)",
+          "help": "Beim MAX17048 nicht nötig"
+        },
+        "warning_voltage": {
+          "label": "Warnen unter (mV)"
+        },
+        "shutdown_voltage": {
+          "label": "Herunterfahren unter (mV)"
+        },
+        "interval_sec": {
+          "label": "Messen alle (Sekunden)"
+        },
+        "warning_action": {
+          "label": "Wenn der Akku schwach wird"
+        },
+        "i2c_bus": {
+          "label": "I²C-Bus",
+          "help": "Linux-Busnummer (/dev/i2c-1 ist 1)"
+        }
+      },
+      "power_button": {
+        "preset": {
+          "label": "Hardware",
+          "help": "OnOff SHIM: Taster GPIO17, Abschalten GPIO4"
+        },
+        "button_pin": {
+          "label": "Taster-Pin",
+          "help": "Nur „eigene Pins“; der Taster verbindet ihn mit Masse"
+        },
+        "poweroff_pin": {
+          "label": "Abschalt-Pin",
+          "help": "Nur „eigene Pins“; geht nach dem Herunterfahren auf Low"
+        },
+        "hold_time": {
+          "label": "Drücken für (Sekunden)",
+          "help": "So lange muss der Taster gedrückt werden"
         }
       }
     },
@@ -864,6 +908,21 @@
       "reader": "Ein Lesegerät richtest du einmalig auf der Box ein:",
       "update": "Lauschkiste aktualisierst du auf der Box:",
       "system": "WLAN-Hotspot, schnellerer Start und Kiosk-Modus ändern das Betriebssystem und laufen auf der Box:"
+    },
+    "hardware": {
+      "pin": "Pin",
+      "functions": "Funktion",
+      "used-by": "Belegt von",
+      "no-board": "Kein Board-Plugin aktiv. Auf einem Raspberry Pi schaltest du „Raspberry Pi“ unter Plugins ein.",
+      "board-settings": "Board-Einstellungen",
+      "boot-pending": "Die Boot-Konfiguration passt noch nicht zu den Einstellungen ({{changes}}). Auf der Box ausführen und danach neu starten:",
+      "conflicts": "Doppelt belegt: {{pins}}. Ein Gerät an diesen Pins funktioniert nicht.",
+      "unknown": "Unbekannte Pins: {{pins}}.",
+      "pins": "Pin-Belegung",
+      "nothing-used": "Noch keine Pins belegt.",
+      "show-free_one": "{{count}} freien Pin zeigen",
+      "show-free_other": "{{count}} freie Pins zeigen",
+      "hide-free": "Freie Pins ausblenden"
     }
   },
   "help": {

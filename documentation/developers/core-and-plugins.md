@@ -22,15 +22,17 @@ They differ only in how they are shipped, loaded and enabled.
 **Core is what makes sense on every machine Lauschkiste runs on: a regular Linux PC, a Raspberry
 Pi, a container.** Platform- or hardware-specific functionality and integrations with external
 systems are plugins. Shutting down is the typical example: on a Pi-based box it is essential, on a
-desktop PC nobody wants Lauschkiste to power the machine off, so it lives in the `raspberry-pi`
-plugin.
+desktop PC nobody wants Lauschkiste to power the machine off: the core `hardware` module only
+offers it when a board support plugin is enabled. See [Hardware](hardware.md) for boards, devices
+and pins.
 
 ## Split
 
 | Core | Plugins |
 | --- | --- |
-| Player (with the `local_audio` backend) | `raspberry-pi` (see below) |
-| Library (index, metadata, cover art, see below) | Player backend `mpd` |
+| Player (with the `local_audio` backend) | Board support: `board_raspberry_pi` |
+| Library (index, metadata, cover art, see below) | Devices: `gpio_controls`, `battery`, `power_button` |
+| Hardware (pins and buses in use, board, shutdown/reboot) | Player backend `mpd` |
 | Card database and card action dispatch | RFID reader drivers (one plugin per driver) |
 | Settings / system | MQTT |
 | System info (IP address, disk usage, CPU temperature, restart Lauschkiste service) | Card synchronisation |
@@ -39,13 +41,9 @@ plugin.
 | Jingle (startup/shutdown sound) | |
 | Input devices via evdev (USB buttons, media keys, Bluetooth headset buttons) | |
 
-The **`raspberry-pi` plugin** bundles the Pi hardware control. Its parts are enabled individually in
-its config section:
-
-- power: shutdown, reboot, OnOff SHIM / power button
-- GPIO: buttons, LEDs, rotary encoders
-- battery monitor (I2C battery HATs, one driver per HAT)
-- health: throttling/undervoltage (`vcgencmd`), HDMI power-down, WLAN power saving
+Board support plugins (one per board family) describe the board's pins and interfaces and power it
+off; device plugins (buttons, battery, power button) are board-independent and get their pins
+through the core `hardware` module. Details in [Hardware](hardware.md).
 
 **Autohotspot** is network configuration, not runtime functionality, and moves to `lauschctl setup`.
 
@@ -80,11 +78,10 @@ Core never special-cases a plugin. Where core behavior needs a platform-specific
 *action*, and plugins contribute actions:
 
 - **Timers** run an action when they expire instead of hard-wiring "shutdown". On a PC that is
-  e.g. `player.stop`; with the `raspberry-pi` plugin `raspberry_pi.shutdown` becomes available as
-  well. The same applies to cards: a "shut down" card only exists while the plugin is enabled.
+  e.g. `player.stop`; with a board plugin `hardware.shutdown` works as well. The same applies to
+  cards: a "shut down" card only works while a board plugin is enabled.
 - **Webapp:** `GET /api/v1/modules` lists the active modules with their actions and queries. The
-  webapp shows e.g. the shutdown button only if `raspberry_pi.shutdown` exists, which works the
-  same way for external plugins.
+  webapp shows e.g. the shutdown button only if a board is active (`GET /api/v1/hardware`).
 - Shutting down itself stays simple: the plugin calls `poweroff`, systemd sends SIGTERM, and the
   core runs its normal graceful shutdown (jingle, stop playback, save state).
 
@@ -272,11 +269,11 @@ and are enabled by listing them in `lauschkiste.yaml`; their config lives under 
 plugins:
   mqtt:
     host: 192.168.1.10
-  raspberry_pi:
-    power:
-      enabled: true
-    gpio:
-      enabled: false
+  board_raspberry_pi:
+    sound_card: max98357a
+  gpio_controls:
+    buttons:
+      next: {pin: GPIO5, on_press: {action: player.next}}
   rfid_reader_rdm6300:
     device: /dev/ttyS0
 ```
@@ -434,20 +431,20 @@ in `lauschkiste.yaml`):
    middleware limits all other request bodies to 1 MiB.
 6. **Remaining core modules** -- *done*: `volume` (PulseAudio/PipeWire via pulsectl, falling
    back to the player backend's volume; soft maximum, mute, outputs with per-output volume limit,
-   fade-out), `timers` (named countdowns that run an action; `shutdown` only works with the
-   `raspberry-pi` plugin), `jingle` (startup/shutdown sound through the same PortAudio output as
+   fade-out), `timers` (named countdowns that run an action; `shutdown` only works with a
+   board support plugin), `jingle` (startup/shutdown sound through the same PortAudio output as
    `local_audio`, `jingle.play` for cards), system info in `system` (IP addresses, disk usage, CPU
    temperature, periodic `system.health`, `say_my_ip`, `restart_service`), and `input` (evdev
-   devices by name with key -> action mappings, optional media keys). Not carried over: the idle-shutdown timer (belongs to the `raspberry-pi` plugin)
+   devices by name with key -> action mappings, optional media keys). Not carried over: the idle-shutdown timer
    and the separate `evdev.yaml` file (device mappings now live under `input:`).
-7. **`raspberry-pi` plugin** -- *done*: `packages/plugins/raspberry-pi` with `shutdown`/`reboot`
-   (with `debug_mode`), GPIO via gpiozero (buttons with optional hold action, rotary encoders, a
-   status LED; `gpio` extra), a battery monitor (INA219 via the `battery-ina219` extra, or a
-   simulator; `raspberry_pi.battery` event, warning action, shutdown below a threshold), and
-   firmware health (`vcgencmd get_throttled`, HDMI power-down, WLAN power saving). The installer enables the plugin and installs the `gpio` extra; the web
-   app shows shutdown/reboot only when `raspberry_pi.shutdown` is available. Not carried over: the
-   ADS1015 battery driver, the OnOff SHIM script, the idle-shutdown timer and the old `gpio.yaml`
-   format. Autohotspot moves to the installer/`lauschctl setup` track instead.
+7. **Hardware** -- *done*: core module `hardware` (pins and buses in use, conflicts,
+   shutdown/reboot through the board), board support plugin `board_raspberry_pi` (pin map,
+   interfaces, sound card/I²C/SPI/power-off pin for `config.txt` via `lauschctl setup raspi`,
+   `debug_mode`, firmware health) and the board-independent device plugins `gpio_controls`
+   (buttons, rotary encoders, status LED), `battery` (MAX17048, INA219, simulator) and
+   `power_button` (OnOff SHIM preset). See [Hardware](hardware.md). Not carried over: the ADS1015
+   battery driver, the OnOff SHIM script, the idle-shutdown timer and the old `gpio.yaml` format.
+   Autohotspot moves to the installer/`lauschctl setup` track instead.
 
 Each step leaves the daemon runnable and the test suites green.
 

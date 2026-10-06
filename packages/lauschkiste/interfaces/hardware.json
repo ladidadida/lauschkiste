@@ -1,0 +1,291 @@
+{
+  "events": {},
+  "extension_points": {
+    "boards": {
+      "boot_pending": "(self) -> List[str]",
+      "describe": "(self) -> Dict[str, Any]",
+      "gpio_line": "(self, pin: str) -> Tuple[int, int]",
+      "pin_id": "(self, value: Any) -> str | None",
+      "reboot": "(self) -> None",
+      "shutdown": "(self) -> None"
+    },
+    "claims": {
+      "claims": "(self) -> List[lauschkiste.hardware.Claim]"
+    }
+  },
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "hardware",
+  "operations": {
+    "get_state": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/hardware",
+      "returns": {
+        "properties": {
+          "board": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "boot_pending": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "conflicts": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "interfaces": {
+            "default": [],
+            "items": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "pins": {
+                  "default": [],
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "used_by": {
+                  "default": [],
+                  "items": {
+                    "properties": {
+                      "owner": {
+                        "type": "string"
+                      },
+                      "purpose": {
+                        "default": "",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "owner"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "pins": {
+            "default": [],
+            "items": {
+              "properties": {
+                "conflict": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "functions": {
+                  "default": [],
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "position": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "used_by": {
+                  "default": [],
+                  "items": {
+                    "properties": {
+                      "owner": {
+                        "type": "string"
+                      },
+                      "purpose": {
+                        "default": "",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "owner"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "label"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "unknown": {
+            "default": [],
+            "items": {
+              "properties": {
+                "owner": {
+                  "type": "string"
+                },
+                "purpose": {
+                  "default": "",
+                  "type": "string"
+                },
+                "resource": {
+                  "type": "string"
+                },
+                "shared": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "resource",
+                "owner"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      }
+    },
+    "gpio_line": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "pin": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pin"
+        ],
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/hardware/gpio-line",
+      "returns": {
+        "properties": {
+          "chip": {
+            "type": "integer"
+          },
+          "line": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "chip",
+          "line"
+        ],
+        "type": "object"
+      }
+    },
+    "pin_options": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/hardware/pin-options",
+      "returns": {
+        "items": {
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "label"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "reboot": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/hardware/reboot",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "shutdown": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/hardware/shutdown",
+      "returns": {
+        "type": "null"
+      }
+    }
+  },
+  "requires": {}
+}

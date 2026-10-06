@@ -1,22 +1,18 @@
-# OnOff SHIM by Pimorino
+# OnOff SHIM by Pimoroni
 
-> [!NOTE]
-> Not ported to the `raspberry_pi` plugin yet; the scripts below are from the previous version.
+The OnOff SHIM switches the Raspberry Pi on with a button press, shuts it down cleanly with the
+next press and then cuts the power. In Lauschkiste it is the `power_button` plugin with the preset
+"Pimoroni OnOff SHIM" (button on GPIO17, power-off on GPIO4); no Pimoroni script is needed.
 
-The OnOff SHIM from Pimorino allows you to savely start and shutdown your Raspberry Pi through a button. While you can switch of your Lauschkiste via an RFID Card (through an RPC command), it is difficult to switch it on again without cutting the physical power supply.
+1. Settings → Plugins: switch on "Power button" (and install its packages when asked), restart.
+2. Its settings: hardware "Pimoroni OnOff SHIM" (the default).
+3. On the box: `lauschctl setup raspi`, then reboot. This adds
+   `dtoverlay=gpio-poweroff,gpiopin=4,active_low=1` to `config.txt`, which cuts the power once the
+   system has halted.
 
-## Installation
-
-To install the software, open a terminal and type the following command to run the one-line-installer. A reboot will be required once the installation is finished.
-
-> [!NOTE]
-> The installation will ask you a few questions. You can safely answer with the default response.
-
-```bash
-curl https://get.pimoroni.com/onoffshim | bash
-```
-
-* [Source](https://shop.pimoroni.com/products/onoff-shim?variant=41102600138)
+A press of the button shuts Lauschkiste down like a shutdown card: playback stops, positions are
+saved, the shutdown sound plays, then the Pi halts and the SHIM switches it off. Other power
+buttons work the same way with the hardware "Own pins".
 
 ## How to manually wire OnOff SHIM
 

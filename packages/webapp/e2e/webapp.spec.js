@@ -165,13 +165,26 @@ async function mockBackend(
         title: 'Go back when continuing (seconds)' } } },
       values: { rewind_sec: 10 },
     }),
-    '/api/v1/plugins': () => [{ name: 'raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-raspberry-pi',
+    '/api/v1/hardware': () => ({
+      board: 'raspberry_pi', model: 'Raspberry Pi 3 Model B',
+      pins: [
+        { id: 'GPIO4', label: 'GPIO4 (pin 7)', position: 7, functions: ['gpio'],
+          used_by: [{ owner: 'power_button', purpose: 'power off' }], conflict: false },
+        { id: 'GPIO17', label: 'GPIO17 (pin 11)', position: 11, functions: ['gpio'],
+          used_by: [{ owner: 'power_button', purpose: 'button' }, { owner: 'gpio_controls', purpose: 'button next' }],
+          conflict: true },
+        { id: 'GPIO27', label: 'GPIO27 (pin 13)', position: 13, functions: ['gpio'], used_by: [], conflict: false },
+      ],
+      interfaces: [{ id: 'i2c1', label: 'I²C 1', pins: ['GPIO2', 'GPIO3'], used_by: [{ owner: 'battery', purpose: 'MAX17048' }] }],
+      conflicts: ['GPIO17'], unknown: [], boot_pending: ['i2c on'],
+    }),
+    '/api/v1/plugins': () => [{ name: 'board_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-board-raspberry-pi',
       version: '0.1.0', summary: 'Raspberry Pi hardware.', problem: null, missing_extras: [] }],
     '/api/v1/system/ip-addresses': () => ({ addresses: ['192.168.1.42'] }),
     '/api/v1/timers': () => [
       socketEvents['timers.changed'],
       { ...socketEvents['timers.changed'], name: 'fade_volume', action: 'volume.fade_out' },
-      { ...socketEvents['timers.changed'], name: 'shutdown', action: 'raspberry_pi.shutdown', available: false },
+      { ...socketEvents['timers.changed'], name: 'shutdown', action: 'hardware.shutdown', available: false },
     ],
     '/api/v1/volume': () => socketEvents['volume.level'],
     '/api/v1/volume/outputs': () => ({ active: 'primary', outputs: [
@@ -557,10 +570,26 @@ test('plugins can be switched on', async ({ page }) => {
   const { apiCalls } = await mockBackend(page);
   await page.goto('/#/settings/plugins');
 
-  await page.getByRole('switch', { name: 'raspberry_pi on/off' }).click();
+  await page.getByRole('switch', { name: 'board_raspberry_pi on/off' }).click();
   await expect.poll(() => (
-    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/raspberry_pi')?.body
+    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/board_raspberry_pi')?.body
   )).toEqual({ enabled: true });
+  expect(consoleErrors).toEqual([]);
+});
+
+test('hardware page shows used pins, conflicts and pending boot changes', async ({ page }) => {
+  const consoleErrors = collectConsoleErrors(page);
+  await mockBackend(page);
+  await page.goto('/#/settings/hardware');
+
+  await expect(page.getByText('Raspberry Pi 3 Model B')).toBeVisible();
+  await expect(page.getByText('I²C 1: battery: MAX17048')).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'power_button: button, gpio_controls: button next' })).toBeVisible();
+  await expect(page.getByText('Used twice: GPIO17.', { exact: false })).toBeVisible();
+  await expect(page.getByText('lauschctl setup raspi')).toBeVisible();
+  await expect(page.getByRole('cell', { name: 'GPIO27 (pin 13)' })).toBeHidden();
+  await page.getByRole('button', { name: 'Show 1 free pin' }).click();
+  await expect(page.getByRole('cell', { name: 'GPIO27 (pin 13)' })).toBeVisible();
   expect(consoleErrors).toEqual([]);
 });
 

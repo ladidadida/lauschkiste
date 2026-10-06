@@ -1,0 +1,32 @@
+[project]
+name = "lauschkiste-plugin-devices"
+version = "0.1.0a3"
+description = "Lauschkiste device plugins: GPIO buttons/encoders/LED, battery monitor, power button (board-independent)"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+  "lauschkiste",
+]
+
+[project.optional-dependencies]
+gpio = [
+  "gpiozero",
+  # gpiozero's backend for Linux GPIO chips (any board, Raspberry Pi kernels >= 6.6)
+  "lgpio; platform_machine == 'armv6l' or platform_machine == 'armv7l' or platform_machine == 'aarch64'",
+]
+battery = ["pi-ina219", "smbus2"]
+
+[project.entry-points."lauschkiste.plugins"]
+gpio_controls = "lauschkiste_plugin_devices.gpio_controls:GpioControls"
+battery = "lauschkiste_plugin_devices.battery:Battery"
+power_button = "lauschkiste_plugin_devices.power_button:PowerButton"
+
+[tool.uv.sources]
+lauschkiste = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lauschkiste_plugin_devices"]

@@ -8,7 +8,8 @@ Everything that only concerns Lauschkiste itself is set in the web app. Changes 
 | Playback & audio | outputs (name, device, volume limit), volume, player, audiobooks, podcasts, startup and shutdown sound, keys of USB devices and media keys |
 | Cards | card list, placing the same card again, readers (delay, place instead of swipe, action when the card is taken off) |
 | Library | covers, scanning, network drive (Samba) |
-| Plugins | switch extensions on and off and set them up, e.g. Raspberry Pi (GPIO buttons, rotary encoders, LED, battery) |
+| Plugins | switch extensions on and off and set them up, e.g. Raspberry Pi, GPIO buttons and rotary encoders, battery, power button |
+| Hardware | board, pins and interfaces in use, pin conflicts |
 | System | announcements, restart, shut down |
 
 ## Plugins
@@ -17,4 +18,4 @@ Plugins add hardware and sources to Lauschkiste. Switching them on or off takes 
 
 ## What only works on the box
 
-Settings of the operating system need administrator rights and are made with `lauschctl setup` on the box: sound card, installing Samba, WiFi hotspot, boot optimisation, kiosk mode, setting up the reader. See [Commands on the box](/help/lauschctl).
+Settings of the operating system need administrator rights and are made with `lauschctl setup` on the box: writing sound card, I²C/SPI and power-off pin to the boot configuration (`lauschctl setup raspi`), installing Samba, WiFi hotspot, boot optimisation, kiosk mode, setting up the reader. See [Commands on the box](/help/lauschctl).

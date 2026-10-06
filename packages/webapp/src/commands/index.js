@@ -260,12 +260,12 @@ const commands = {
     rest: { method: 'GET', path: '/api/v1/actions' },
   },
   shutdown: {
-    rest: { method: 'POST', path: '/api/v1/raspberry_pi/shutdown' },
-    cardAction: 'raspberry_pi.shutdown',
+    rest: { method: 'POST', path: '/api/v1/hardware/shutdown' },
+    cardAction: 'hardware.shutdown',
   },
   reboot: {
-    rest: { method: 'POST', path: '/api/v1/raspberry_pi/reboot' },
-    cardAction: 'raspberry_pi.reboot',
+    rest: { method: 'POST', path: '/api/v1/hardware/reboot' },
+    cardAction: 'hardware.reboot',
   },
 
   // Settings
@@ -307,6 +307,9 @@ const commands = {
   installPluginExtras: {
     rest: { method: 'POST', path: '/api/v1/plugins/{name}/extras' },
     argKeys: ['name'],
+  },
+  hardwareState: {
+    rest: { method: 'GET', path: '/api/v1/hardware' },
   },
   rfidReaders: {
     rest: { method: 'GET', path: '/api/v1/rfid/readers' },

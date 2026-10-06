@@ -6,6 +6,7 @@ pytest.importorskip('lauschkiste_plugin_rfid_readers', reason="the rfid-readers 
 
 import lauschkiste.cfghandler
 import lauschkiste_plugin_rfid_readers
+from lauschkiste.hardware import Hardware
 from lauschkiste.cfghandler import ConfigHandler
 from lauschkiste.contract.manager import ModuleManager, discover_plugins
 from lauschkiste.publishing.bus import EventBus
@@ -27,7 +28,7 @@ def start(tmp_path):
             'cards': {'database': str(tmp_path / 'cards.yaml')},
             'rfid': {'reader_config': str(tmp_path / 'rfid.yaml')},
         })
-        manager = ModuleManager([Cards, Rfid], cfg, EventBus(), plugins=discover_plugins(), strict=True)
+        manager = ModuleManager([Hardware, Cards, Rfid], cfg, EventBus(), plugins=discover_plugins(), strict=True)
         manager.load()
         manager.start()
         manager.ready()

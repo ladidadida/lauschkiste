@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 
 import { Grid } from '@mui/material';
 
+import HardwareSettings from './pages/hardware';
 import SettingsOverview from './pages/overview';
 import { PluginSettings, PluginsSettings } from './pages/plugins';
 import {
@@ -20,6 +21,7 @@ const Settings = () => (
         <Route path="library" element={<LibrarySettings />} />
         <Route path="plugins" element={<PluginsSettings />} />
         <Route path="plugins/:name" element={<PluginSettings />} />
+        <Route path="hardware" element={<HardwareSettings />} />
         <Route path="system" element={<SystemSettings />} />
       </Routes>
     </Grid>

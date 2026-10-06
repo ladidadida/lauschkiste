@@ -12,6 +12,7 @@ dev = [
   "coverage",
   "mock",
   "httpx",  # for starlette.testclient (FastAPI API server tests)
+  "gpiozero",  # GPIO device tests with its mock pins
   "ruff>=0.6",
   "pyright>=1.1",
   "pydoc-markdown",

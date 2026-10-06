@@ -6,6 +6,7 @@ from unittest.mock import Mock
 import pytest
 
 import lauschkiste.cfghandler
+from lauschkiste.hardware import Hardware
 from lauschkiste.cfghandler import ConfigHandler
 from lauschkiste.contract.manager import ModuleManager
 from lauschkiste.player.module import Player
@@ -90,7 +91,7 @@ def setup(tmp_path):
     bus = EventBus()
     events = []
     bus.register(lambda topic, payload: events.append((topic, payload)))
-    manager = ModuleManager([TestPlayer, Cards, TestRfid], cfg, bus, plugins={}, strict=True)
+    manager = ModuleManager([Hardware, TestPlayer, Cards, TestRfid], cfg, bus, plugins={}, strict=True)
     manager.load()
     manager.start()
     manager.ready()

@@ -19,7 +19,7 @@ logger = logging.getLogger('lauschkiste.timers')
 DEFAULT_TIMERS: Dict[str, Dict[str, Any]] = {
     'stop_player': {'action': 'player.stop', 'default_timeout_sec': 3600},
     'fade_volume': {'action': 'volume.fade_out', 'args': {'seconds': 30}, 'default_timeout_sec': 600},
-    'shutdown': {'action': 'raspberry_pi.shutdown', 'default_timeout_sec': 3600},
+    'shutdown': {'action': 'hardware.shutdown', 'default_timeout_sec': 3600},
 }
 
 

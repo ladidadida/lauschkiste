@@ -8,36 +8,8 @@ system:
 # Plugins to load, each with its settings. Installed plugins are only loaded when listed here.
 # See documentation/developers/core-and-plugins.md
 plugins: {}
-# Example: Raspberry Pi hardware control (the installer enables it on a Pi)
-# plugins:
-#   raspberry_pi:
-#     debug_mode: false          # log shutdown/reboot instead of doing them
-#     hdmi_power_down: false
-#     wlan_power_save: false     # false: keep WLAN reachable
-#     gpio:
-#       enabled: true
-#       buttons:
-#         next: {pin: 5, on_press: {action: player.next}}
-#         play: {pin: 6, on_press: {action: player.toggle}, on_hold: {action: raspberry_pi.shutdown}, hold_time: 3}
-#       rotary_encoders:
-#         volume:
-#           pin_a: 17
-#           pin_b: 27
-#           clockwise: {action: volume.change_volume, args: {step: 2}}
-#           counter_clockwise: {action: volume.change_volume, args: {step: -2}}
-#       status_led: 25
-#     battery:
-#       enabled: false
-#       driver: ina219
-#
-# Example: play through an external mpd server (also set player.backend: mpd)
-# plugins:
-#   mpd:
-#     host: localhost
-#     status_file: settings/music_player_status.json
-#     library:
-#       update_on_startup: true
-#       check_user_rights: true
+# Plugins and their settings are easiest set in the web app (Settings -> Plugins). The installer
+# enables the board support plugin (board_raspberry_pi on a Raspberry Pi).
 volume:
   # 'auto': PulseAudio/PipeWire if a server is reachable, otherwise the player backend's volume.
   # 'pulse' or 'player' force one of them.
@@ -126,8 +98,8 @@ cards:
   database: settings/cards.yaml
 timers:
   # Named timers run an action when they expire. Defaults (can be overridden here):
-  #   stop_player: player.stop, fade_volume: volume.fade_out, shutdown: raspberry_pi.shutdown
-  # (the shutdown timer needs the raspberry-pi plugin).
+  #   stop_player: player.stop, fade_volume: volume.fade_out, shutdown: hardware.shutdown
+  # (the shutdown timer needs a board support plugin).
   stop_player:
     default_timeout_sec: 3600
   fade_volume:

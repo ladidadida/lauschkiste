@@ -11,7 +11,7 @@ const SYSTEM_HEALTH_TOPIC = 'system.health';
 const TIMERS_TOPIC = 'timers.changed';
 const VOLUME_LEVEL_TOPIC = 'volume.level';
 
-const BATTERY_TOPIC = 'raspberry_pi.battery';
+const BATTERY_TOPIC = 'battery.state';
 
 const SUBSCRIPTIONS = [
   BATTERY_TOPIC,

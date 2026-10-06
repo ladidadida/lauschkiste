@@ -8,7 +8,8 @@ Alles, was nur Lauschkiste selbst betrifft, stellst du in der Web-App ein. Ände
 | Wiedergabe & Audio | Ausgänge (Name, Gerät, Lautstärkegrenze), Lautstärke, Player, Hörbücher, Podcasts, Start- und Endton, Tasten von USB-Geräten und Medientasten |
 | Karten | Kartenliste, Verhalten beim erneuten Auflegen, Lesegeräte (Sperrzeit, Auflegen statt Wischen, Aktion beim Abnehmen) |
 | Bibliothek | Cover, Einlesen, Netzlaufwerk (Samba) |
-| Plugins | Erweiterungen an- und ausschalten und einstellen, z. B. Raspberry Pi (GPIO-Tasten, Drehregler, LED, Akku) |
+| Plugins | Erweiterungen an- und ausschalten und einstellen, z. B. Raspberry Pi, GPIO-Tasten und Drehregler, Akku, Ein-/Aus-Taster |
+| Hardware | Platine, belegte Pins und Schnittstellen, Pin-Konflikte |
 | System | Ansagen, Neustart, Herunterfahren |
 
 ## Plugins
@@ -17,4 +18,4 @@ Plugins erweitern Lauschkiste um Hardware und Quellen. Ein- und Ausschalten wirk
 
 ## Was nur auf der Box geht
 
-Einstellungen am Betriebssystem brauchen Administratorrechte und laufen über `lauschctl setup` auf der Box: Soundkarte, Samba installieren, WLAN-Hotspot, Boot-Optimierung, Kiosk-Modus, Lesegerät einrichten. Siehe [Befehle auf der Box](/help/lauschctl).
+Einstellungen am Betriebssystem brauchen Administratorrechte und laufen über `lauschctl setup` auf der Box: Soundkarte, I²C/SPI und Abschalt-Pin in die Boot-Konfiguration schreiben (`lauschctl setup raspi`), Samba installieren, WLAN-Hotspot, Boot-Optimierung, Kiosk-Modus, Lesegerät einrichten. Siehe [Befehle auf der Box](/help/lauschctl).

@@ -1,0 +1,11 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "plugin",
+  "name": "gpio_controls",
+  "operations": {},
+  "requires": {
+    "hardware": ">=1.0,<2"
+  }
+}

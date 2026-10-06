@@ -41,7 +41,7 @@ lauschctl setup raspi
 lauschctl setup audio
 ```
 
-`raspi` sets up a sound card (e.g. HiFiBerry) and can switch the built-in headphone jack off; restart the box afterwards. `audio` chooses the outputs Lauschkiste offers.
+`raspi` writes what the settings of the Raspberry Pi plugin and the device plugins ask for to the boot configuration (`config.txt`): sound card (e.g. MAX98357A, HiFiBerry), built-in headphone jack, I²C, SPI and the power-off pin of a power button. Restart the box afterwards. Settings → Hardware shows what is still missing. `audio` chooses the outputs Lauschkiste offers.
 
 ## Update {#update}
 

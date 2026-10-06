@@ -125,13 +125,10 @@ def test_second_run_changes_nothing(tmp_path, home, extras):
 def test_pi_setup(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
     system.outputs[('pdbedit', '-L')] = 'pi:1000:'
-    failed, ctx = setup_run(system, home, answers={'disable_onboard_audio': True, 'samba': True,
-                                                   'static_ip': True})
+    failed, ctx = setup_run(system, home, answers={'samba': True, 'static_ip': True})
     assert failed == 0
-    assert {'raspberry_pi', 'samba'} <= set(ctx.enabled_plugins())
-    assert extras == ['lauschkiste-plugin-raspberry-pi[gpio]']
+    assert {'board_raspberry_pi', 'samba'} <= set(ctx.enabled_plugins())
     assert system.exists('/var/lib/systemd/linger/pi')
-    assert 'audio=off' in system.read('/boot/firmware/config.txt')
     assert 'disable_splash=1' in system.read('/boot/firmware/config.txt')
     cmdline = system.read('/boot/firmware/cmdline.txt')
     assert cmdline.startswith('console=tty1 root=PARTUUID=1234 rootwait ')
@@ -202,23 +199,35 @@ def test_audio_is_skipped_unattended_and_writes_outputs_interactively(tmp_path, 
     assert extras_steps.AudioStep().check(ctx) == []
 
 
-def test_hifiberry_replaces_other_overlays(tmp_path, home, extras):
+def _board_settings(home, settings, rfid=None):
+    import lauschkiste.statefile as statefile
+    path = home / 'settings' / 'lauschkiste.yaml'
+    config = statefile.read_yaml(path) if path.exists() else {}
+    config['plugins'] = {'board_raspberry_pi': settings}
+    statefile.write_yaml(path, config)
+    if rfid is not None:
+        statefile.write_yaml(home / 'settings' / 'rfid.yaml', rfid)
+
+
+def test_boot_configuration_follows_the_board_settings(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
     system.write('/boot/firmware/config.txt', 'dtparam=audio=on\ndtoverlay=hifiberry-dac\n[all]\n')
-    failed, _ = setup_run(system, home, names=['raspi'], answers={'sound_card': 'hifiberry-amp3'})
+    _board_settings(home, {'sound_card': 'max98357a'},
+                    {'rfid': {'readers': {'read_00': {'module': 'rc522_spi', 'config': {}}}}})
+    failed, _ = setup_run(system, home, names=['raspi'])
     assert failed == 0
     config = system.read('/boot/firmware/config.txt')
-    assert 'dtoverlay=hifiberry-amp3' in config and 'hifiberry-dac' not in config
-    assert 'audio=off' in config and '[all]' in config
+    assert 'dtoverlay=max98357a' in config and 'hifiberry-dac' not in config
+    assert 'audio=off' in config and 'dtparam=spi=on' in config and '[all]' in config
     assert system.read('/boot/firmware/config.txt.backup').startswith('dtparam=audio=on')
 
 
-def test_existing_sound_card_is_the_default(tmp_path, home, extras):
+def test_boot_configuration_unchanged_when_nothing_is_wanted(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
-    system.write('/boot/firmware/config.txt', 'dtparam=audio=off\ndtoverlay=hifiberry-dacplus\n')
-    failed, ctx = setup_run(system, home, names=['raspi'])
+    system.write('/boot/firmware/config.txt', 'dtparam=audio=on\n')
+    _board_settings(home, {})
+    failed, _ = setup_run(system, home, names=['raspi'])
     assert failed == 0
-    assert ctx.answers['sound_card'] == 'hifiberry-dacplus'
     assert not system.exists('/boot/firmware/config.txt.backup')
 
 

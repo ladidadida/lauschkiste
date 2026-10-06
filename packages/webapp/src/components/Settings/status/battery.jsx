@@ -12,7 +12,7 @@ import BatteryIcon from '../helpers/battery-icon';
 import PubSubContext from '../../../context/pubsub/context';
 import { BATTERY_TOPIC } from '../../../config';
 
-// Shown while a plugin publishes battery readings (raspberry-pi with its battery monitor enabled).
+// Shown while the battery plugin publishes readings.
 const StatusBattery = () => {
   const { t } = useTranslation();
   const { state: { [BATTERY_TOPIC]: battery } } = useContext(PubSubContext);

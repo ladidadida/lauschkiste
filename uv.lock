@@ -11,8 +11,9 @@ resolution-markers = [
 members = [
     "lauschkiste",
     "lauschkiste-cli",
+    "lauschkiste-plugin-board-raspberry-pi",
+    "lauschkiste-plugin-devices",
     "lauschkiste-plugin-mpd",
-    "lauschkiste-plugin-raspberry-pi",
     "lauschkiste-plugin-rfid-readers",
     "lauschkiste-plugin-samba",
 ]
@@ -21,6 +22,7 @@ members = [
 dev = [
     { name = "bam-tool" },
     { name = "coverage" },
+    { name = "gpiozero" },
     { name = "httpx" },
     { name = "mock" },
     { name = "pydoc-markdown" },
@@ -936,6 +938,45 @@ requires-dist = [
 ]
 
 [[package]]
+name = "lauschkiste-plugin-board-raspberry-pi"
+version = "0.1.0a3"
+source = { editable = "packages/plugins/board-raspberry-pi" }
+dependencies = [
+    { name = "lauschkiste" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "lauschkiste", editable = "packages/lauschkiste" }]
+
+[[package]]
+name = "lauschkiste-plugin-devices"
+version = "0.1.0a3"
+source = { editable = "packages/plugins/devices" }
+dependencies = [
+    { name = "lauschkiste" },
+]
+
+[package.optional-dependencies]
+battery = [
+    { name = "pi-ina219" },
+    { name = "smbus2" },
+]
+gpio = [
+    { name = "gpiozero" },
+    { name = "lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv6l' or platform_machine == 'armv7l'" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "gpiozero", marker = "extra == 'gpio'" },
+    { name = "lauschkiste", editable = "packages/lauschkiste" },
+    { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv6l' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
+    { name = "pi-ina219", marker = "extra == 'battery'" },
+    { name = "smbus2", marker = "extra == 'battery'" },
+]
+provides-extras = ["gpio", "battery"]
+
+[[package]]
 name = "lauschkiste-plugin-mpd"
 version = "0.1.0a3"
 source = { editable = "packages/plugins/mpd" }
@@ -949,32 +990,6 @@ requires-dist = [
     { name = "lauschkiste", editable = "packages/lauschkiste" },
     { name = "python-mpd2" },
 ]
-
-[[package]]
-name = "lauschkiste-plugin-raspberry-pi"
-version = "0.1.0a3"
-source = { editable = "packages/plugins/raspberry-pi" }
-dependencies = [
-    { name = "lauschkiste" },
-]
-
-[package.optional-dependencies]
-battery-ina219 = [
-    { name = "pi-ina219" },
-]
-gpio = [
-    { name = "gpiozero" },
-    { name = "lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv6l' or platform_machine == 'armv7l'" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "gpiozero", marker = "extra == 'gpio'" },
-    { name = "lauschkiste", editable = "packages/lauschkiste" },
-    { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv6l' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
-    { name = "pi-ina219", marker = "extra == 'battery-ina219'" },
-]
-provides-extras = ["gpio", "battery-ina219"]
 
 [[package]]
 name = "lauschkiste-plugin-rfid-readers"
@@ -1822,6 +1837,15 @@ name = "smbus"
 version = "1.1.post2"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/4d/5c/70e14aa4f0c586efc017e1d1aa6e2f7921eefc7602fc2d03368ff912aa91/smbus-1.1.post2.tar.gz", hash = "sha256:f96d345e0aa10053a8a4917634f1dc37ba1f656fa5cace7629b71777e90855c6", size = 104988, upload-time = "2019-03-08T16:25:59.532Z" }
+
+[[package]]
+name = "smbus2"
+version = "0.6.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/87/37/b3f7b501502c4915ba3819d1dc277bf3f5fae4a9d067caa4f502aaddd889/smbus2-0.6.1.tar.gz", hash = "sha256:2b043372abf8f6029a632c3aab36b641c5d5872b1cbad599fc68e17ac4fd90a5", size = 17274, upload-time = "2026-04-09T20:37:54.821Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/f2/c78a68bd739ac8fc608747cff73a4db3b19f3135658ed4e64374f6425cbf/smbus2-0.6.1-py2.py3-none-any.whl", hash = "sha256:650feeb27ca0ed58b07db4c10201c2a662c41305b7bf6e5fab9d888056f48180", size = 11767, upload-time = "2026-04-09T20:37:53.728Z" },
+]
 
 [[package]]
 name = "sounddevice"

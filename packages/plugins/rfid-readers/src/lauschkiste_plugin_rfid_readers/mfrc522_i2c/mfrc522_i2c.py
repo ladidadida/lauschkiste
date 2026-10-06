@@ -18,6 +18,10 @@ def query_customization() -> dict:
     return {"i2c_bus": 1, "i2c_address": 0x28, "log_all_cards": False}
 
 
+
+def claims(config):
+    return [{'resource': f"i2c{config.get('i2c_bus', 1)}", 'purpose': 'MFRC522', 'shared': True}]
+
 class ReaderClass(ReaderBaseClass):
     def __init__(self, reader_cfg_key):
         self._logger = logging.getLogger(f"lauschkiste.rfid.522i2c({reader_cfg_key})")

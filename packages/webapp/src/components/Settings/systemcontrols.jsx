@@ -10,14 +10,20 @@ import {
 
 import RebootDialog from './dialogs/reboot';
 import ShutDownDialog from './dialogs/shutdown';
-import { useAvailableActions } from '../../utils/available-actions';
+import { useEffect, useState } from 'react';
 
-// Only shown with a plugin offering shutdown/reboot (raspberry-pi).
+import request from '../../utils/request';
+
+// Only shown with a board support plugin, which can shut the box down and reboot it.
 const SystemControls = () => {
   const { t } = useTranslation();
-  const actions = useAvailableActions();
+  const [board, setBoard] = useState(null);
 
-  if (!actions.has('raspberry_pi.shutdown')) {
+  useEffect(() => {
+    request('hardwareState').then(({ result }) => setBoard(result?.board || null));
+  }, []);
+
+  if (!board) {
     return null;
   }
 

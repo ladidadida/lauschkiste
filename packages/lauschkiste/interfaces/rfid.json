@@ -25,7 +25,7 @@
       "create_reader": "(self, reader_cfg_key: str) -> Any"
     }
   },
-  "interface_version": "1.1",
+  "interface_version": "1.2",
   "kind": "core",
   "name": "rfid",
   "operations": {
@@ -78,6 +78,7 @@
     }
   },
   "requires": {
-    "cards": null
+    "cards": null,
+    "hardware": null
   }
 }

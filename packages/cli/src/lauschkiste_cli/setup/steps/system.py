@@ -1,6 +1,5 @@
 """Operating system: packages, Raspberry Pi settings, boot time, login message."""
 
-import re
 from typing import List
 
 import typer
@@ -37,44 +36,25 @@ class PackagesStep(Step):
         pass
 
 
-HIFIBERRY_BOARDS = {
-    'hifiberry-dac': 'DAC (HiFiBerry MiniAmp, I2S PCM5102A DAC)',
-    'hifiberry-dacplus': 'HiFiBerry DAC+ Standard/Pro/Amp2',
-    'hifiberry-dacplushd': 'HiFiBerry DAC2 HD',
-    'hifiberry-dacplusadc': 'HiFiBerry DAC+ ADC',
-    'hifiberry-dacplusadcpro': 'HiFiBerry DAC+ ADC Pro',
-    'hifiberry-digi': 'HiFiBerry Digi+',
-    'hifiberry-digi-pro': 'HiFiBerry Digi+ Pro',
-    'hifiberry-amp': 'HiFiBerry Amp+ (not Amp2)',
-    'hifiberry-amp3': 'HiFiBerry Amp3',
-}
-HIFIBERRY_OVERLAY = re.compile(r'^dtoverlay=(hifiberry-[\w-]+)\s*$', re.MULTILINE)
-
-
-def _configured_sound_card(ctx: Context) -> str:
-    match = HIFIBERRY_OVERLAY.search(ctx.system.read(ctx.system.boot_file('config.txt')) or '')
-    return match.group(1) if match else 'none'
-
-
-def _validate_sound_card(value: str):
-    if value == 'none' or value in HIFIBERRY_BOARDS:
-        return None
-    return f"Choose one of: none, {', '.join(HIFIBERRY_BOARDS)}"
+def _boot_wanted(ctx: Context):
+    """What config.txt needs, by the rules of the board_raspberry_pi plugin; None without it."""
+    try:
+        from lauschkiste_plugin_board_raspberry_pi import bootconfig
+    except ImportError:
+        return None, None
+    import lauschkiste.statefile
+    cfg = ctx.load_config()
+    rfid_path = lauschkiste.paths.resolve(cfg.getn('rfid', 'reader_config', default='settings/rfid.yaml'))
+    want = bootconfig.wanted({'plugins': cfg.getn('plugins', default=None) or {}},
+                             lauschkiste.statefile.read_yaml(rfid_path))
+    return bootconfig, want
 
 
 class RaspberryPiStep(Step):
+    """Boot configuration (config.txt) for the hardware set up in Lauschkiste: sound card, I²C, SPI,
+    power-off pin, on-chip audio. The settings come from the web app (board and device plugins)."""
     name = 'raspi'
-    title = 'Raspberry Pi settings'
-    questions = (
-        Question('sound_card', 'HifiBerry (or compatible I2S DAC) sound card', kind='text',
-                 default=_configured_sound_card, validate=_validate_sound_card,
-                 help='none, or one of: ' + ', '.join(f'{key} ({name})' for key, name in HIFIBERRY_BOARDS.items())),
-        Question('disable_onboard_audio', "Disable the Pi's on-chip audio (headphone jack)?", default=False,
-                 when=lambda a: a.get('sound_card', 'none') == 'none',
-                 help='Recommended with an external sound card (USB, ...); '
-                      'keep it for Bluetooth-only speakers. config.txt is backed up first.'),
-    )
-    AUDIO_ON = re.compile(r'^(dtparam=([^,\n]*,)*)audio=(on|true|yes|1)(.*)$', re.MULTILINE)
+    title = 'Raspberry Pi boot configuration'
 
     def relevant(self, ctx):
         return ctx.system.is_raspberry_pi()
@@ -82,37 +62,22 @@ class RaspberryPiStep(Step):
     def packages(self, ctx):
         return ['liblgpio-dev', 'swig']
 
-    def _card(self, ctx) -> str:
-        return ctx.answer('sound_card') or 'none'
-
-    def _onboard_off(self, ctx) -> bool:
-        return self._card(ctx) != 'none' or bool(ctx.answer('disable_onboard_audio'))
-
-    def _config(self, ctx, config: str) -> str:
-        """config.txt as this step wants it."""
-        if self._onboard_off(ctx):
-            config = self.AUDIO_ON.sub(r'\1audio=off\4', config)
-        card = self._card(ctx)
-        if card != 'none' and HIFIBERRY_OVERLAY.findall(config) != [card]:
-            config = HIFIBERRY_OVERLAY.sub('', config).rstrip('\n') + f'\ndtoverlay={card}\n'
-            config = re.sub(r'\n{3,}', '\n\n', config)
-        return config
-
     def check(self, ctx):
+        bootconfig, want = _boot_wanted(ctx)
+        if bootconfig is None:
+            return ['the board_raspberry_pi plugin package is not installed']
         config = ctx.system.read(ctx.system.boot_file('config.txt')) or ''
-        problems = []
-        if self._onboard_off(ctx) and self.AUDIO_ON.search(config):
-            problems.append('on-chip audio is enabled in config.txt')
-        if self._card(ctx) != 'none' and HIFIBERRY_OVERLAY.findall(config) != [self._card(ctx)]:
-            problems.append(f'config.txt does not load (only) the {self._card(ctx)} overlay')
-        return problems
+        return [f'config.txt: {problem}' for problem in bootconfig.pending(config, want)]
 
     def apply(self, ctx):
         system = ctx.system
         system.run('iwconfig', 'wlan0', 'power', 'off', root=True, check=False)
+        bootconfig, want = _boot_wanted(ctx)
+        if bootconfig is None:
+            raise SetupError('the board_raspberry_pi plugin package is not installed')
         path = system.boot_file('config.txt')
         config = system.read(path) or ''
-        wanted = self._config(ctx, config)
+        wanted = bootconfig.render(config, want)
         if wanted != config:
             system.write(f'{path}.backup', config, root=True)
             system.write(path, wanted, root=True)

@@ -1,0 +1,68 @@
+{
+  "events": {
+    "state": {
+      "properties": {
+        "soc": {
+          "type": "integer"
+        },
+        "voltage_mv": {
+          "type": "integer"
+        },
+        "warning": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "voltage_mv",
+        "soc",
+        "warning"
+      ],
+      "type": "object"
+    }
+  },
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "plugin",
+  "name": "battery",
+  "operations": {
+    "get_battery": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/battery",
+      "returns": {
+        "anyOf": [
+          {
+            "properties": {
+              "soc": {
+                "type": "integer"
+              },
+              "voltage_mv": {
+                "type": "integer"
+              },
+              "warning": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "voltage_mv",
+              "soc",
+              "warning"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    }
+  },
+  "requires": {
+    "hardware": ">=1.0,<2"
+  }
+}

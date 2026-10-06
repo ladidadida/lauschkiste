@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 
 import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import DeveloperBoardIcon from '@mui/icons-material/DeveloperBoard';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import InfoIcon from '@mui/icons-material/Info';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
@@ -26,6 +27,7 @@ const SECTIONS = [
   ['cards', BookmarksIcon],
   ['library', LibraryMusicIcon],
   ['plugins', ExtensionIcon],
+  ['hardware', DeveloperBoardIcon],
   ['system', PowerSettingsNewIcon],
 ];
 

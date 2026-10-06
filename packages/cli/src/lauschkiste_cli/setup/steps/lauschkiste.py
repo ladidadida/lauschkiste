@@ -14,7 +14,7 @@ SERVICE = 'lauschkiste.service'
 def wanted_plugins(ctx: Context) -> List[str]:
     names = []
     if ctx.system.is_raspberry_pi():
-        names.append('raspberry_pi')
+        names.append('board_raspberry_pi')
     if ctx.answer('mpd'):
         names.append('mpd')
     if ctx.answer('samba'):

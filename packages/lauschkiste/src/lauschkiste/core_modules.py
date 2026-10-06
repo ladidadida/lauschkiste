@@ -1,6 +1,7 @@
 """The core modules the daemon always starts. Order is irrelevant, ``requires`` decides."""
 
 from lauschkiste.audiobooks import Audiobooks
+from lauschkiste.hardware import Hardware
 from lauschkiste.input_devices import InputDevices
 from lauschkiste.jingle import Jingle
 from lauschkiste.library.module import Library
@@ -13,4 +14,18 @@ from lauschkiste.system import System
 from lauschkiste.timers import Timers
 from lauschkiste.volume import Volume
 
-CORE_MODULES = [System, Library, Player, Audiobooks, Radio, Podcasts, Volume, Timers, Jingle, InputDevices, Cards, Rfid]
+CORE_MODULES = [
+    System,
+    Hardware,
+    Library,
+    Player,
+    Audiobooks,
+    Radio,
+    Podcasts,
+    Volume,
+    Timers,
+    Jingle,
+    InputDevices,
+    Cards,
+    Rfid,
+]

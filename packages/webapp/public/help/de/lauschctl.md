@@ -41,7 +41,7 @@ lauschctl setup raspi
 lauschctl setup audio
 ```
 
-`raspi` richtet eine Soundkarte ein (z. B. HiFiBerry) und schaltet bei Bedarf den eingebauten Kopfhörerausgang ab; danach die Box neu starten. `audio` legt fest, welche Ausgänge Lauschkiste anbietet.
+`raspi` schreibt in die Boot-Konfiguration (`config.txt`), was in den Einstellungen des Raspberry-Pi-Plugins und der Geräte-Plugins gewählt ist: Soundkarte (z. B. MAX98357A, HiFiBerry), eingebauter Kopfhörerausgang, I²C, SPI und der Abschalt-Pin eines Ein-/Aus-Tasters. Danach die Box neu starten. Was noch fehlt, zeigt Einstellungen → Hardware. `audio` legt fest, welche Ausgänge Lauschkiste anbietet.
 
 ## Update {#update}
 

@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 import lauschkiste.cfghandler
 import lauschkiste.paths
 from lauschkiste.contract import ActionEntry, CoreModule, action, event, extension_point, query
+from lauschkiste.hardware import Claim
 
 log = logging.getLogger('lauschkiste.rfid')
 
@@ -151,8 +152,8 @@ class Rfid(CoreModule):
     """RFID readers: detect cards and run their actions."""
 
     name = 'rfid'
-    interface_version = '1.1'
-    requires = ('cards',)
+    interface_version = '1.2'
+    requires = ('cards', 'hardware')
 
     settings = RfidSettings
     card_detected = event('card_detected', CardDetected)
@@ -175,6 +176,7 @@ class Rfid(CoreModule):
             cfg_rfid.save(only_if_changed=False)
 
     def ready(self) -> None:
+        self._ctx.modules.hardware.claims.register('rfid', self)
         readers = cfg_rfid.getn('rfid', 'readers', default=None) or {}
         for key, reader_cfg in readers.items():
             driver_name = str(reader_cfg.get('module', '')).lower()
@@ -193,6 +195,19 @@ class Rfid(CoreModule):
         return list(self._runners.values())
 
     # -- used by the reader threads -------------------------------------------------------------
+
+    def claims(self) -> List[Claim]:
+        """Pins and buses of the configured readers whose driver says what it uses."""
+        result = []
+        readers = cfg_rfid.getn('rfid', 'readers', default=None) or {}
+        for key, reader in readers.items():
+            driver = self.readers.get(str(reader.get('module', '')).lower()) if isinstance(reader, dict) else None
+            claims = getattr(driver, 'claims', None)
+            if not callable(claims):
+                continue
+            for claim in claims(reader.get('config') or {}):
+                result.append(Claim(owner='rfid', **{**claim, 'purpose': f"reader {key}: {claim.get('purpose', '')}"}))
+        return result
 
     def settings_storage(self):
         return cfg_rfid, ('rfid',)
