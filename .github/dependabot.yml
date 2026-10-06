@@ -4,6 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    ignore:
+      # av 19 needs Python 3.12; Raspberry Pi OS Bookworm has 3.11
+      - dependency-name: "av"
+        versions: [">=19"]
 
   - package-ecosystem: "npm"
     directory: "/packages/webapp"
