@@ -24,6 +24,9 @@
   "interface_version": "1.0",
   "kind": "plugin",
   "name": "battery",
+  "needs": [
+    "i2c"
+  ],
   "operations": {
     "get_battery": {
       "args": {

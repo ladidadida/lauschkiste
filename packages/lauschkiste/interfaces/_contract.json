@@ -45,10 +45,13 @@
   },
   "Plugin": {
     "contract": "attribute",
+    "detect": "(cls, read: Callable[[str], str | None]) -> str | None",
     "extras": "attribute",
+    "needs": "attribute",
+    "provides": "attribute",
     "validate_declaration": "(cls) -> None"
   },
-  "contract_version": "2.1",
+  "contract_version": "2.2",
   "functions": {
     "action": "(func: Callable | None = None, *, method: str = 'POST', path: str | None = None, exclusive: bool = True, name: str | None = None, status_code: int | None = None)",
     "event": "(name: str, model: Type[pydantic.main.BaseModel]) -> lauschkiste.contract.declarations.EventSpec",

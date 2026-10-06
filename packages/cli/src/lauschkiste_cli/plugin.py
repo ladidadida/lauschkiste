@@ -94,15 +94,20 @@ def enable(name: str, conf: Optional[Path] = ConfOption,
     if ep is None:
         typer.echo(f"Plugin '{name}' is not installed. Installed: {', '.join(sorted(_installed())) or 'none'}", err=True)
         raise typer.Exit(1)
+    _, problem = _load(ep)
+    cfg, path = _config(conf)
+    reason = plugins.why_not_enable(cfg, name)
+    if reason:
+        typer.echo(f"Can't enable '{name}': {reason}", err=True)
+        raise typer.Exit(1)
     extras = plugin_extras(name)
     if with_extras and extras:
         install_requirements(extras)
+        _, problem = _load(ep)
     elif extras:
         typer.echo(f"Note: '{name}' needs {', '.join(extras)}; install it with --with-extras if it is missing.")
-    _, problem = _load(ep)
     if problem and not with_extras:
         typer.echo(f"Warning: '{name}' can't be loaded right now: {problem}", err=True)
-    _, path = _config(conf)
     if not add_to_config(path, [name]):
         typer.echo(f"'{name}' is already enabled in {path}")
         return

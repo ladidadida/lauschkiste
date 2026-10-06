@@ -178,8 +178,14 @@ async function mockBackend(
       interfaces: [{ id: 'i2c1', label: 'I²C 1', pins: ['GPIO2', 'GPIO3'], used_by: [{ owner: 'battery', purpose: 'MAX17048' }] }],
       conflicts: ['GPIO17'], unknown: [], boot_pending: ['i2c on'],
     }),
-    '/api/v1/plugins': () => [{ name: 'board_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-board-raspberry-pi',
-      version: '0.1.0', summary: 'Raspberry Pi hardware.', problem: null, missing_extras: [] }],
+    '/api/v1/plugins': () => [
+      { name: 'battery', enabled: false, running: false, package: 'lauschkiste-plugin-devices', version: '0.1.0',
+        summary: 'Battery monitor.', problem: null, missing_extras: [], needs: ['i2c'], provides: [],
+        blocked: { missing: ['i2c'] }, detected: null },
+      { name: 'board_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-board-raspberry-pi',
+        version: '0.1.0', summary: 'Raspberry Pi hardware.', problem: null, missing_extras: [], needs: [],
+        provides: ['board', 'gpio', 'i2c'], blocked: null, detected: 'Raspberry Pi 3 Model B' },
+    ],
     '/api/v1/system/ip-addresses': () => ({ addresses: ['192.168.1.42'] }),
     '/api/v1/timers': () => [
       socketEvents['timers.changed'],
@@ -570,6 +576,9 @@ test('plugins can be switched on', async ({ page }) => {
   const { apiCalls } = await mockBackend(page);
   await page.goto('/#/settings/plugins');
 
+  await expect(page.getByRole('switch', { name: 'battery on/off' })).toBeDisabled();
+  await expect(page.getByText('Needs I²C. Switch on the board support of your board first.')).toBeVisible();
+  await expect(page.getByText('Detected: Raspberry Pi 3 Model B')).toBeVisible();
   await page.getByRole('switch', { name: 'board_raspberry_pi on/off' }).click();
   await expect.poll(() => (
     apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/board_raspberry_pi')?.body
@@ -590,6 +599,25 @@ test('hardware page shows used pins, conflicts and pending boot changes', async 
   await expect(page.getByRole('cell', { name: 'GPIO27 (pin 13)' })).toBeHidden();
   await page.getByRole('button', { name: 'Show 1 free pin' }).click();
   await expect(page.getByRole('cell', { name: 'GPIO27 (pin 13)' })).toBeVisible();
+  expect(consoleErrors).toEqual([]);
+});
+
+test('hardware page offers a detected board when none is enabled', async ({ page }) => {
+  const consoleErrors = collectConsoleErrors(page);
+  const { apiCalls } = await mockBackend(page);
+  await page.route('**/api/v1/hardware', route => route.fulfill({
+    body: JSON.stringify({ board: null, model: null, pins: [], interfaces: [], conflicts: [], unknown: [],
+      boot_pending: [], detected: [{ name: 'board_raspberry_pi', model: 'Raspberry Pi 3 Model B' }] }),
+    contentType: 'application/json',
+  }));
+  await page.goto('/#/settings/hardware');
+
+  await expect(page.getByText(/Detected: Raspberry Pi 3 Model B/)).toBeVisible();
+  await page.getByRole('button', { name: 'Switch on' }).click();
+  await expect.poll(() => (
+    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/board_raspberry_pi')?.body
+  )).toEqual({ enabled: true });
+  await expect(page.getByText(/Board support switched on/)).toBeVisible();
   expect(consoleErrors).toEqual([]);
 });
 

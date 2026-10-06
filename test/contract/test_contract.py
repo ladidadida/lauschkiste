@@ -159,6 +159,34 @@ def test_plugins_are_opt_in():
     assert 'extra' in manager
 
 
+def test_only_one_board_and_needs_must_be_provided():
+    class BoardA(Plugin):
+        name = 'board_a'
+        provides = ('board', 'gpio')
+
+    class BoardB(Plugin):
+        name = 'board_b'
+        provides = ('board', 'gpio', 'i2c')
+
+    class Button(Plugin):
+        name = 'button'
+        needs = ('gpio',)
+
+    class Sensor(Plugin):
+        name = 'sensor'
+        needs = ('i2c',)
+
+    found = {cls.name: (lambda cls=cls: cls) for cls in (BoardA, BoardB, Button, Sensor)}
+    enabled = {'board_a': {}, 'board_b': {}, 'button': {}, 'sensor': {}}
+    manager, _, _ = make_manager([Volume], plugins=found, enabled=enabled)
+    assert 'board_a' in manager and 'button' in manager
+    assert 'board_b' not in manager and "'board_a'" in manager.failed['board_b']
+    assert 'sensor' not in manager and 'i2c' in manager.failed['sensor']
+
+    manager, _, _ = make_manager([Volume], plugins=found, enabled={'button': {}})
+    assert 'button' not in manager and 'gpio' in manager.failed['button']
+
+
 def test_plugin_problems_skip_only_the_plugin_and_its_dependents():
     class Broken(Plugin):
         name = 'broken'

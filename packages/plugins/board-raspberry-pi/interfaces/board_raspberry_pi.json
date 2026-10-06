@@ -51,6 +51,15 @@
       }
     }
   },
+  "provides": [
+    "board",
+    "gpio",
+    "i2c",
+    "i2s",
+    "poweroff",
+    "spi",
+    "uart"
+  ],
   "requires": {
     "hardware": ">=1.0,<2"
   }

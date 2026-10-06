@@ -63,6 +63,7 @@ class PowerButton(Plugin):
 
     name = 'power_button'
     interface_version = '1.0'
+    needs = ('gpio', 'poweroff')
     requires = {'hardware': '>=1.0,<2'}
     extras = ('gpio',)
     settings = PowerButtonSettings

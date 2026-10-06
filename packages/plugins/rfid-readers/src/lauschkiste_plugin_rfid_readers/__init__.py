@@ -37,11 +37,12 @@ class ReaderDriverPlugin(Plugin):
         ctx.modules.rfid.readers.register(self.driver, ReaderDriver(module))
 
 
-def _driver_plugin(class_name: str, driver: str, extras=()) -> type:
+def _driver_plugin(class_name: str, driver: str, extras=(), needs=()) -> type:
     return type(class_name, (ReaderDriverPlugin,), {
         'name': f'rfid_{driver}',
         'driver': driver,
         'extras': tuple(extras),
+        'needs': tuple(needs),
         '__module__': __name__,
         '__doc__': f"RFID reader driver '{driver}'.",
     })
@@ -50,7 +51,7 @@ def _driver_plugin(class_name: str, driver: str, extras=()) -> type:
 GenericUsb = _driver_plugin('GenericUsb', 'generic_usb')
 FakeReaderGui = _driver_plugin('FakeReaderGui', 'fake_reader_gui', ['fake-reader-gui'])
 Rdm6300Serial = _driver_plugin('Rdm6300Serial', 'rdm6300_serial', ['rdm6300-serial'])
-Rc522Spi = _driver_plugin('Rc522Spi', 'rc522_spi', ['rc522-spi'])
-Mfrc522I2c = _driver_plugin('Mfrc522I2c', 'mfrc522_i2c', ['mfrc522-i2c'])
-Pn532I2cPy532 = _driver_plugin('Pn532I2cPy532', 'pn532_i2c_py532', ['pn532-i2c-py532'])
+Rc522Spi = _driver_plugin('Rc522Spi', 'rc522_spi', ['rc522-spi'], ['spi', 'gpio'])
+Mfrc522I2c = _driver_plugin('Mfrc522I2c', 'mfrc522_i2c', ['mfrc522-i2c'], ['i2c'])
+Pn532I2cPy532 = _driver_plugin('Pn532I2cPy532', 'pn532_i2c_py532', ['pn532-i2c-py532'], ['i2c'])
 GenericNfcpy = _driver_plugin('GenericNfcpy', 'generic_nfcpy', ['generic-nfcpy'])

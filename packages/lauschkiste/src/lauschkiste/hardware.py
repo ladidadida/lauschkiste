@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 from pydantic import BaseModel
 
+import lauschkiste.contract.plugins as plugins
 from lauschkiste.contract import CoreModule, OperationError, action, extension_point, query
 
 logger = logging.getLogger('lauschkiste.hardware')
@@ -44,6 +45,11 @@ class InterfaceInfo(BaseModel):
     used_by: List[Usage] = []
 
 
+class DetectedBoard(BaseModel):
+    name: str
+    model: str
+
+
 class HardwareState(BaseModel):
     board: Optional[str] = None
     model: Optional[str] = None
@@ -52,6 +58,7 @@ class HardwareState(BaseModel):
     conflicts: List[str] = []
     unknown: List[Claim] = []
     boot_pending: List[str] = []
+    detected: List[DetectedBoard] = []
 
 
 class Choice(BaseModel):
@@ -91,7 +98,7 @@ class Hardware(CoreModule):
     """The board Lauschkiste runs on, its pins and who uses them; shutdown and reboot."""
 
     name = 'hardware'
-    interface_version = '1.0'
+    interface_version = '1.1'
     concurrency = 'threadsafe'
 
     boards = extension_point('boards', Board)
@@ -132,7 +139,7 @@ class Hardware(CoreModule):
     def state(self) -> HardwareState:
         board = self._board()
         if board is None:
-            return HardwareState(unknown=self._claims())
+            return HardwareState(unknown=self._claims(), detected=plugins.detected_boards())
         description = board.describe()
         pins = {pin['id']: PinInfo.model_validate(pin) for pin in description.get('pins', [])}
         interfaces = {entry['id']: InterfaceInfo.model_validate(entry) for entry in description.get('interfaces', [])}

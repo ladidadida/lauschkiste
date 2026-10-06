@@ -286,6 +286,11 @@ plugins:
 - `lauschctl plugin list|enable|disable|install` manages this from the command line. A plugin whose
   dependencies are optional extras of its package names them in `extras` (e.g.
   `extras = ('gpio',)`); `lauschctl plugin enable <name> --with-extras` installs them.
+- Plugins can declare capabilities they offer (`provides`) and need (`needs`), e.g. a board plugin
+  `provides = ('board', 'gpio', 'i2c')` and a battery gauge `needs = ('i2c',)`. A plugin can only be
+  enabled when the enabled plugins provide all it needs, and only one plugin may provide `board`
+  (web app, `PUT /api/v1/plugins/<name>` and `lauschctl plugin enable` refuse; at startup such a
+  plugin is skipped with a problem). See [Hardware](hardware.md).
 
 ## Versioning and compatibility
 

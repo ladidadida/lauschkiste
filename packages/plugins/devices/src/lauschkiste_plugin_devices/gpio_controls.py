@@ -179,6 +179,7 @@ class GpioControls(Plugin):
 
     name = 'gpio_controls'
     interface_version = '1.0'
+    needs = ('gpio',)
     requires = {'hardware': '>=1.0,<2'}
     extras = ('gpio',)
     settings = GpioControlsSettings

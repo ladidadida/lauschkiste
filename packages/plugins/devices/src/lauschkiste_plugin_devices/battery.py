@@ -168,6 +168,7 @@ class Battery(Plugin):
 
     name = 'battery'
     interface_version = '1.0'
+    needs = ('i2c',)
     requires = {'hardware': '>=1.0,<2'}
     extras = ('battery',)
     settings = BatterySettings

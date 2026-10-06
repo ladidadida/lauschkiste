@@ -566,7 +566,19 @@
       },
       "install": "Install",
       "installing": "Installing packages, this can take a few minutes …",
-      "install-error": "Installation failed: {{error}}"
+      "install-error": "Installation failed: {{error}}",
+      "detected": "Detected: {{model}}",
+      "blocked-board": "Only one board support can be active. Switch off “{{name}}” first.",
+      "blocked-needs": "Needs {{needs}}. Switch on the board support of your board first.",
+      "capabilities": {
+        "board": "board support",
+        "gpio": "GPIO pins",
+        "i2c": "I²C",
+        "spi": "SPI",
+        "i2s": "I²S",
+        "uart": "UART",
+        "poweroff": "power-off pin"
+      }
     },
     "modules": {
       "volume": "Volume",
@@ -661,7 +673,10 @@
       "nothing-used": "No pins are used yet.",
       "show-free_one": "Show {{count}} free pin",
       "show-free_other": "Show {{count}} free pins",
-      "hide-free": "Hide free pins"
+      "hide-free": "Hide free pins",
+      "detected": "Detected: {{model}}. Its board support is “{{name}}”.",
+      "enable-board": "Switch on",
+      "board-enabled": "Board support switched on. Restart Lauschkiste to load it."
     }
   },
   "help": {

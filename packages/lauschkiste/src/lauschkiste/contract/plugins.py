@@ -7,12 +7,13 @@ import sys
 import threading
 from importlib.metadata import PackageNotFoundError, distribution, entry_points
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Iterable, List, Optional
 
 from packaging.markers import default_environment
 from packaging.requirements import Requirement
 
 ENTRY_POINT_GROUP = 'lauschkiste.plugins'
+EXCLUSIVE = ('board',)
 INSTALL_TIMEOUT_SEC = 1800
 
 logger = logging.getLogger('lauschkiste.contract.plugins')
@@ -29,6 +30,89 @@ def load(ep):
         return ep.load(), None
     except Exception as error:
         return None, f"{error.__class__.__name__}: {error}"
+
+
+def read_text(path: str) -> Optional[str]:
+    try:
+        return Path(path).read_text()
+    except OSError:
+        return None
+
+
+def detect(cls, read=read_text) -> Optional[str]:
+    try:
+        return cls.detect(read)
+    except Exception as error:
+        logger.debug(f"Detecting the hardware of '{cls.name}' failed: {error}")
+        return None
+
+
+def _provides(cls) -> Iterable[str]:
+    return getattr(cls, 'provides', ())
+
+
+def taken_by(cls, others: Iterable[type]) -> Optional[str]:
+    """The other plugin already providing an exclusive capability of ``cls`` (e.g. the board)."""
+    for capability in EXCLUSIVE:
+        if capability in _provides(cls):
+            other = next((o for o in others if o.name != cls.name and capability in _provides(o)), None)
+            if other is not None:
+                return other.name
+    return None
+
+
+def missing_needs(cls, others: Iterable[type]) -> List[str]:
+    """Capabilities ``cls`` needs that none of ``others`` provides."""
+    provided = {capability for other in others if other.name != cls.name for capability in _provides(other)}
+    return [need for need in getattr(cls, 'needs', ()) if need not in provided]
+
+
+def blocker(cls, others: Iterable[type]) -> Optional[Dict[str, Any]]:
+    """Why ``cls`` can't run next to ``others``: ``{'taken_by': name}`` or ``{'missing': [...]}``."""
+    others = list(others)
+    taken = taken_by(cls, others)
+    if taken:
+        return {'taken_by': taken}
+    missing = missing_needs(cls, others)
+    return {'missing': missing} if missing else None
+
+
+def blocker_text(blocked: Dict[str, Any]) -> str:
+    if 'taken_by' in blocked:
+        return f"only one board plugin can be enabled, '{blocked['taken_by']}' is"
+    return f"needs {', '.join(blocked['missing'])}, which no enabled plugin provides"
+
+
+def why_not_enable(cfg, name: str) -> Optional[str]:
+    """Why the installed plugin ``name`` can't be enabled next to the enabled ones, None if it can."""
+    if name in enabled(cfg) or name not in installed():
+        return None
+    cls, _ = load(installed()[name])
+    blocked = cls is not None and blocker(cls, enabled_classes(cfg))
+    return blocker_text(blocked) if blocked else None
+
+
+def enabled_classes(cfg) -> List[type]:
+    available = installed()
+    classes = []
+    for name in enabled(cfg):
+        if name in available:
+            cls, _ = load(available[name])
+            if cls is not None:
+                classes.append(cls)
+    return classes
+
+
+def detected_boards(read=read_text) -> List[Dict[str, str]]:
+    """Installed board plugins whose board this machine is: ``[{'name', 'model'}]``."""
+    found = []
+    for name, ep in sorted(installed().items()):
+        cls, _ = load(ep)
+        if cls is not None and 'board' in _provides(cls) and hasattr(cls, 'detect'):
+            model = detect(cls, read)
+            if model:
+                found.append({'name': name, 'model': model})
+    return found
 
 
 def plugin_extras(name: str) -> List[str]:
@@ -139,12 +223,14 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
     """Installed (and enabled but missing) plugins: package, summary, enabled, running, problem, missing extras."""
     available = installed()
     on = enabled(cfg)
+    active = enabled_classes(cfg)
     result = []
     for name in sorted(set(available) | set(on)):
         ep = available.get(name)
         entry: Dict[str, Any] = {'name': name, 'enabled': name in on, 'running': bool(manager and name in manager),
                                  'package': None, 'version': None, 'summary': '', 'problem': None,
-                                 'missing_extras': []}
+                                 'missing_extras': [], 'provides': [], 'needs': [], 'blocked': None,
+                                 'detected': None}
         if ep is None:
             entry['problem'] = 'not installed'
         else:
@@ -154,6 +240,11 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
             entry['summary'] = (getattr(cls, '__doc__', None) or '').strip().split('\n', 1)[0].replace('``', '') if cls else ''
             entry['problem'] = problem or (manager.failed.get(name) if manager else None)
             entry['missing_extras'] = missing_extras(name)
+            if cls is not None:
+                entry['provides'], entry['needs'] = list(_provides(cls)), list(getattr(cls, 'needs', ()))
+                entry['detected'] = detect(cls) if hasattr(cls, 'detect') else None
+                if name not in on:
+                    entry['blocked'] = blocker(cls, active)
         entry.update(installer.state(name) if installer else {'installing': False, 'install_error': None})
         result.append(entry)
     return result

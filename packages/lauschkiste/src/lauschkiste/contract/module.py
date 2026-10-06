@@ -2,7 +2,7 @@
 
 import re
 import threading
-from typing import TYPE_CHECKING, Any, ClassVar, Dict, List, Mapping, Optional, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Mapping, Optional, Tuple, Type, Union
 
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.version import InvalidVersion, Version
@@ -135,6 +135,17 @@ class Plugin(Module):
     contract: ClassVar[str] = f">={Version(CONTRACT_VERSION).major}.0,<{Version(CONTRACT_VERSION).major + 1}"
     #: Extras of the plugin's own package it needs (installed by `lauschctl plugin enable --with-extras`)
     extras: ClassVar[Tuple[str, ...]] = ()
+    #: Capabilities it offers other plugins, e.g. ``('board', 'gpio', 'i2c')``; only one plugin may provide 'board'
+    provides: ClassVar[Tuple[str, ...]] = ()
+    #: Capabilities an enabled plugin must provide, e.g. ``('i2c',)``
+    needs: ClassVar[Tuple[str, ...]] = ()
+
+    @classmethod
+    def detect(cls, read: Callable[[str], Optional[str]]) -> Optional[str]:
+        """The hardware of this plugin found on this machine (e.g. a board model), or None.
+
+        ``read(path)`` returns a file's text or None."""
+        return None
 
     @classmethod
     def validate_declaration(cls) -> None:

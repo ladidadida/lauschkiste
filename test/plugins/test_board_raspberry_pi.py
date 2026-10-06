@@ -104,3 +104,9 @@ def test_power_off_pin_and_replaced_sound_card():
 def test_nothing_wanted_changes_nothing():
     want = bootconfig.wanted({'plugins': {'board_raspberry_pi': {}}})
     assert bootconfig.pending(CONFIG, want) == [] and bootconfig.render(CONFIG, want) == CONFIG
+
+
+def test_detects_raspberry_pi_by_its_model():
+    files = {'/proc/device-tree/model': 'Raspberry Pi 3 Model B Rev 1.2\x00'}
+    assert board_plugin.BoardRaspberryPi.detect(files.get) == 'Raspberry Pi 3 Model B Rev 1.2'
+    assert board_plugin.BoardRaspberryPi.detect({}.get) is None

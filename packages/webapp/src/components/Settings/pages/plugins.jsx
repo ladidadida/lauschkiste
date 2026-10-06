@@ -25,6 +25,12 @@ import ModuleSettings from '../form/module-settings';
 import { useRestart } from '../restart';
 import SettingsPage from './page';
 
+const blockedText = (t, blocked) => (blocked.taken_by
+  ? t('settings.plugins.blocked-board', { name: t(`settings.plugins.names.${blocked.taken_by}`, { defaultValue: blocked.taken_by }) })
+  : t('settings.plugins.blocked-needs', {
+    needs: blocked.missing.map((need) => t(`settings.plugins.capabilities.${need}`, { defaultValue: need })).join(', '),
+  }));
+
 const PluginsSettings = () => {
   const { t } = useTranslation();
   const { refresh } = useRestart();
@@ -91,7 +97,7 @@ const PluginsSettings = () => {
                     }
                     <Switch
                       checked={plugin.enabled}
-                      disabled={!plugin.package && !plugin.enabled}
+                      disabled={!plugin.enabled && (!plugin.package || Boolean(plugin.blocked))}
                       onChange={(event) => toggle(plugin.name, event.target.checked)}
                       slotProps={{ input: { 'aria-label': t('settings.plugins.enable', { name: plugin.name }) } }}
                     />
@@ -106,11 +112,18 @@ const PluginsSettings = () => {
                       {plugin.running && <Chip color="success" label={t('settings.plugins.running')} size="small" />}
                       {plugin.enabled && !plugin.running &&
                         <Chip color="warning" label={t('settings.plugins.not-running')} size="small" />}
+                      {plugin.detected && !plugin.enabled &&
+                        <Chip color="info" label={t('settings.plugins.detected', { model: plugin.detected })} size="small" />}
                     </Stack>
                   }
                   secondary={
                     <>
                       <span>{plugin.summary}</span>
+                      {plugin.blocked && !plugin.enabled &&
+                        <Alert component="span" severity="info" sx={{ display: 'flex', marginTop: 1 }}>
+                          {blockedText(t, plugin.blocked)}
+                        </Alert>
+                      }
                       {plugin.problem && plugin.enabled &&
                         <Alert component="span" severity="error" sx={{ display: 'flex', marginTop: 1 }}>
                           {plugin.problem}

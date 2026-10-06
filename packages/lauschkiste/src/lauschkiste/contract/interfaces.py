@@ -112,6 +112,8 @@ def describe_module_interface(cls: Type[Module]) -> Dict[str, Any]:
         'kind': 'core' if cls.is_core else 'plugin',
         'interface_version': cls.interface_version,
         'requires': {dep: spec for dep, spec in sorted(cls.required_modules().items())},
+        **({'provides': sorted(cls.provides)} if getattr(cls, 'provides', ()) else {}),
+        **({'needs': sorted(cls.needs)} if getattr(cls, 'needs', ()) else {}),
         'operations': ops,
         'events': events,
         'extension_points': extension_points,

@@ -12,6 +12,7 @@ from lauschkiste.contract.catalog import ActionCatalog
 from lauschkiste.contract.context import Context, ModuleConfig, ModulesView, strict_mode_default
 from lauschkiste.contract.errors import ContractError
 from lauschkiste.contract.module import CoreModule, Module, Plugin
+import lauschkiste.contract.plugins as plugins
 from lauschkiste.contract.plugins import ENTRY_POINT_GROUP
 from lauschkiste.contract.settings import SettingsStore
 from lauschkiste.contract.version import CONTRACT_VERSION
@@ -111,6 +112,25 @@ class ModuleManager:
             classes.append(cls)
         return classes
 
+    def _check_capabilities(self, classes: List[Type[Plugin]]) -> List[Type[Plugin]]:
+        kept: List[Type[Plugin]] = []
+        for cls in classes:
+            taken = plugins.taken_by(cls, kept)
+            if taken:
+                self._fail(cls.name, plugins.blocker_text({'taken_by': taken}))
+            else:
+                kept.append(cls)
+        changed = True
+        while changed:
+            changed = False
+            for cls in list(kept):
+                missing = plugins.missing_needs(cls, kept)
+                if missing:
+                    self._fail(cls.name, plugins.blocker_text({'missing': missing}))
+                    kept.remove(cls)
+                    changed = True
+        return kept
+
     def _fail(self, name: str, reason: str) -> None:
         self.failed[name] = reason
         logger.error(f"Plugin '{name}' skipped: {reason}")
@@ -161,7 +181,7 @@ class ModuleManager:
             if not (isinstance(cls, type) and issubclass(cls, CoreModule)):
                 raise ContractError(f"{cls!r} is not a CoreModule")
             cls.validate_declaration()
-        classes: List[Type[Module]] = [*self._core_classes, *self._load_plugin_classes()]
+        classes: List[Type[Module]] = [*self._core_classes, *self._check_capabilities(self._load_plugin_classes())]
         ordered = self._sort(classes)
         present = {cls.name: cls for cls in ordered}
         for cls in ordered:

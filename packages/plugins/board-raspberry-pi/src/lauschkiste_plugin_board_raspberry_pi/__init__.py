@@ -66,7 +66,13 @@ class BoardRaspberryPi(Plugin):
     name = 'board_raspberry_pi'
     interface_version = '1.0'
     requires = {'hardware': '>=1.0,<2'}
+    provides = ('board', 'gpio', 'i2c', 'spi', 'i2s', 'uart', 'poweroff')
     settings = BoardSettings
+
+    @classmethod
+    def detect(cls, read):
+        model = (read('/proc/device-tree/model') or '').strip('\x00\n ')
+        return model if 'Raspberry Pi' in model else None
 
     def __init__(self):
         self._ctx: Any = None

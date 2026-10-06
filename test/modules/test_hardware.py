@@ -1,5 +1,6 @@
 import pytest
 
+import lauschkiste.contract.plugins as plugins
 from lauschkiste.cfghandler import ConfigHandler
 from lauschkiste.contract import OperationError, Plugin
 from lauschkiste.contract.manager import ModuleManager
@@ -111,10 +112,12 @@ def test_gpio_line_and_power_go_to_the_board():
     assert error.value.status == 404
 
 
-def test_without_a_board():
+def test_without_a_board(monkeypatch):
+    monkeypatch.setattr(plugins, 'detected_boards', lambda: [{'name': 'board_x', 'model': 'X 1'}])
     hardware = manager_with(None, [[Claim(resource='GPIO5', owner='x')]])
     state = hardware.invoke('get_state')
     assert state.board is None and state.pins == [] and len(state.unknown) == 1
+    assert [(board.name, board.model) for board in state.detected] == [('board_x', 'X 1')]
     with pytest.raises(OperationError) as error:
         hardware.invoke('shutdown')
     assert error.value.status == 501

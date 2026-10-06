@@ -564,7 +564,19 @@
       },
       "install": "Installieren",
       "installing": "Pakete werden installiert, das kann einige Minuten dauern …",
-      "install-error": "Installation fehlgeschlagen: {{error}}"
+      "install-error": "Installation fehlgeschlagen: {{error}}",
+      "detected": "Erkannt: {{model}}",
+      "blocked-board": "Es kann nur ein Board-Support aktiv sein. Schalte zuerst „{{name}}“ aus.",
+      "blocked-needs": "Braucht {{needs}}. Schalte zuerst den Board-Support deiner Platine ein.",
+      "capabilities": {
+        "board": "Board-Support",
+        "gpio": "GPIO-Pins",
+        "i2c": "I²C",
+        "spi": "SPI",
+        "i2s": "I²S",
+        "uart": "UART",
+        "poweroff": "Abschalt-Pin"
+      }
     },
     "modules": {
       "volume": "Lautstärke",
@@ -922,7 +934,10 @@
       "nothing-used": "Noch keine Pins belegt.",
       "show-free_one": "{{count}} freien Pin zeigen",
       "show-free_other": "{{count}} freie Pins zeigen",
-      "hide-free": "Freie Pins ausblenden"
+      "hide-free": "Freie Pins ausblenden",
+      "detected": "Erkannt: {{model}}. Der passende Board-Support ist „{{name}}“.",
+      "enable-board": "Einschalten",
+      "board-enabled": "Board-Support eingeschaltet. Starte Lauschkiste neu, damit er geladen wird."
     }
   },
   "help": {

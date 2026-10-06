@@ -2,6 +2,7 @@
 
 from typing import List
 
+import lauschkiste.contract.plugins as plugins
 import lauschkiste.paths
 from lauschkiste_cli import plugin
 from lauschkiste_cli.environment import checkout, executable
@@ -12,9 +13,7 @@ SERVICE = 'lauschkiste.service'
 
 
 def wanted_plugins(ctx: Context) -> List[str]:
-    names = []
-    if ctx.system.is_raspberry_pi():
-        names.append('board_raspberry_pi')
+    names = [board['name'] for board in plugins.detected_boards(ctx.system.read)[:1]]
     if ctx.answer('mpd'):
         names.append('mpd')
     if ctx.answer('samba'):

@@ -4,6 +4,9 @@
   "interface_version": "1.0",
   "kind": "plugin",
   "name": "gpio_controls",
+  "needs": [
+    "gpio"
+  ],
   "operations": {},
   "requires": {
     "hardware": ">=1.0,<2"

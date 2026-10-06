@@ -4,6 +4,10 @@
   "interface_version": "1.0",
   "kind": "plugin",
   "name": "power_button",
+  "needs": [
+    "gpio",
+    "poweroff"
+  ],
   "operations": {},
   "requires": {
     "hardware": ">=1.0,<2"

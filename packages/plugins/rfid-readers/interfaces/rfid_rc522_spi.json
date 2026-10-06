@@ -4,6 +4,10 @@
   "interface_version": "1.0",
   "kind": "plugin",
   "name": "rfid_rc522_spi",
+  "needs": [
+    "gpio",
+    "spi"
+  ],
   "operations": {},
   "requires": {
     "rfid": ">=1.0,<2"

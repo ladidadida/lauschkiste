@@ -183,6 +183,18 @@ def add_settings_routes(router: APIRouter, manager: ModuleManager, executor) -> 
     add_plugin_routes(router, manager, blocking)
 
 
+def check_installed(name: str) -> None:
+    if name not in plugins.installed():
+        raise OperationError(404, 'unknown_plugin', f"Plugin '{name}' is not installed")
+
+
+def check_enable(cfg, name: str) -> None:
+    check_installed(name)
+    reason = plugins.why_not_enable(cfg, name)
+    if reason:
+        raise OperationError(409, 'plugin_blocked', reason)
+
+
 def add_plugin_routes(router: APIRouter, manager: ModuleManager, blocking) -> None:
     """Installed plugins: list, enable or disable, install missing extras."""
     store = manager.settings
@@ -190,9 +202,6 @@ def add_plugin_routes(router: APIRouter, manager: ModuleManager, blocking) -> No
     def describe(name: str):
         return next(entry for entry in plugins.describe(store.cfg, manager, store.installer) if entry['name'] == name)
 
-    def check_installed(name: str):
-        if name not in plugins.installed():
-            raise OperationError(404, 'unknown_plugin', f"Plugin '{name}' is not installed")
 
     @router.get('/api/v1/plugins', tags=['settings'])
     async def list_plugins():
@@ -204,7 +213,7 @@ def add_plugin_routes(router: APIRouter, manager: ModuleManager, blocking) -> No
         """Enable or disable an installed plugin; takes effect after a restart."""
         def change():
             if body.enabled:
-                check_installed(name)
+                check_enable(store.cfg, name)
             if plugins.set_enabled(store.cfg, name, body.enabled):
                 store.save()
                 store.restart_required.add(name)

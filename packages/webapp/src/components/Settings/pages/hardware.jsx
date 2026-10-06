@@ -23,6 +23,7 @@ import {
 
 import request from '../../../utils/request';
 import CliHint from '../cli-hint';
+import { useRestart } from '../restart';
 import SettingsPage from './page';
 
 const usage = (users) => users.map(({ owner, purpose }) => (purpose ? `${owner}: ${purpose}` : owner)).join(', ');
@@ -56,6 +57,14 @@ const HardwareSettings = () => {
   const { t } = useTranslation();
   const [state, setState] = useState(undefined);
   const [showAll, setShowAll] = useState(false);
+  const [enabled, setEnabled] = useState(null);
+  const { refresh } = useRestart();
+
+  const enable = async (name) => {
+    const { error } = await request('setPluginEnabled', { name, enabled: true });
+    if (!error) setEnabled(name);
+    refresh();
+  };
 
   useEffect(() => {
     request('hardwareState').then(({ result }) => setState(result || null));
@@ -68,6 +77,19 @@ const HardwareSettings = () => {
         <Card>
           <CardContent>
             <Typography sx={{ marginBottom: 2 }}>{t('settings.hardware.no-board')}</Typography>
+            {(state?.detected || []).map(({ name, model }) => (
+              <Alert
+                action={enabled !== name &&
+                  <Button color="inherit" onClick={() => enable(name)} size="small">{t('settings.hardware.enable-board')}</Button>
+                }
+                key={name}
+                severity={enabled === name ? 'success' : 'info'}
+                sx={{ marginBottom: 2 }}
+              >
+                {enabled === name ? t('settings.hardware.board-enabled')
+                  : t('settings.hardware.detected', { model, name: t(`settings.plugins.names.${name}`, { defaultValue: name }) })}
+              </Alert>
+            ))}
             <Button component={RouterLink} to="/settings/plugins" variant="outlined">
               {t('settings.sections.plugins.title')}
             </Button>

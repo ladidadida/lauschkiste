@@ -4,6 +4,9 @@
   "interface_version": "1.0",
   "kind": "plugin",
   "name": "rfid_pn532_i2c_py532",
+  "needs": [
+    "i2c"
+  ],
   "operations": {},
   "requires": {
     "rfid": ">=1.0,<2"

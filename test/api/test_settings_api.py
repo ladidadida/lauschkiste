@@ -5,7 +5,7 @@ import pytest
 from pydantic import BaseModel, Field
 
 import lauschkiste.contract.plugins as plugins
-from lauschkiste.contract import ActionEntry, CoreModule, query
+from lauschkiste.contract import ActionEntry, CoreModule, Plugin, query
 
 
 class DemoSettings(BaseModel):
@@ -83,7 +83,8 @@ def test_unknown_module(client):
 
 
 def test_plugins_list_and_enable(client, monkeypatch):
-    ep = Mock(dist=Mock(version='1.2'), load=Mock(return_value=type('P', (), {'__doc__': 'Does things.'})))
+    gadget = type('P', (Plugin,), {'__doc__': 'Does things.', 'name': 'gadget'})
+    ep = Mock(dist=Mock(version='1.2'), load=Mock(return_value=gadget))
     ep.name = 'gadget'
     ep.dist.name = 'lauschkiste-plugin-gadget'
     monkeypatch.setattr(plugins, 'installed', lambda: {'gadget': ep})
@@ -91,12 +92,43 @@ def test_plugins_list_and_enable(client, monkeypatch):
     listed = client.get('/api/v1/plugins').json()
     assert listed == [{'name': 'gadget', 'enabled': False, 'running': False, 'package': 'lauschkiste-plugin-gadget',
                        'version': '1.2', 'summary': 'Does things.', 'problem': None, 'missing_extras': [],
+                       'provides': [], 'needs': [], 'blocked': None, 'detected': None,
                        'installing': False, 'install_error': None}]
     assert client.put('/api/v1/plugins/gadget', json={'enabled': True}).json()['enabled'] is True
     assert client.modules.settings.cfg.getn('plugins') == {'gadget': {}}
     assert 'gadget' in client.get('/api/v1/settings/restart').json()['modules']
     assert client.put('/api/v1/plugins/gadget', json={'enabled': False}).json()['enabled'] is False
     assert client.put('/api/v1/plugins/missing', json={'enabled': True}).status_code == 404
+
+
+def _entry_point(cls):
+    ep = Mock(dist=Mock(version='1.0'), load=Mock(return_value=cls))
+    ep.name = cls.name
+    ep.dist.name = f'lauschkiste-plugin-{cls.name}'
+    return ep
+
+
+def test_plugins_need_a_board_and_only_one_board(client, monkeypatch):
+    def board(name, model):
+        return type(name, (Plugin,), {'name': name, 'provides': ('board', 'i2c'),
+                                      'detect': classmethod(lambda cls, read: model)})
+    sensor = type('Sensor', (Plugin,), {'name': 'sensor', 'needs': ('i2c',)})
+    found = {cls.name: _entry_point(cls) for cls in (board('board_a', 'Board A'), board('board_b', None), sensor)}
+    monkeypatch.setattr(plugins, 'installed', lambda: found)
+    monkeypatch.setattr(plugins, 'missing_extras', lambda name: [])
+
+    listed = {entry['name']: entry for entry in client.get('/api/v1/plugins').json()}
+    assert listed['sensor']['blocked'] == {'missing': ['i2c']}
+    assert listed['board_a']['detected'] == 'Board A' and listed['board_b']['detected'] is None
+    response = client.put('/api/v1/plugins/sensor', json={'enabled': True})
+    assert response.status_code == 409 and 'i2c' in response.json()['error']['message']
+
+    assert client.put('/api/v1/plugins/board_a', json={'enabled': True}).status_code == 200
+    listed = {entry['name']: entry for entry in client.get('/api/v1/plugins').json()}
+    assert listed['sensor']['blocked'] is None
+    assert listed['board_b']['blocked'] == {'taken_by': 'board_a'}
+    assert client.put('/api/v1/plugins/board_b', json={'enabled': True}).status_code == 409
+    assert client.put('/api/v1/plugins/sensor', json={'enabled': True}).status_code == 200
 
 
 class Elsewhere(CoreModule):

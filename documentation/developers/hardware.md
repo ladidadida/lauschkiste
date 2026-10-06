@@ -27,6 +27,25 @@ resource claimed twice is a conflict. Pin fields in settings use
 `json_schema_extra={'options': '/api/v1/hardware/pin-options'}`, which offers the board's GPIO pins
 and names their current users.
 
+## Capabilities
+
+Plugins declare what they offer and need as class attributes, so this is checked before a plugin is
+started:
+
+```python
+class BoardRaspberryPi(Plugin):
+    provides = ('board', 'gpio', 'i2c', 'spi', 'i2s', 'uart', 'poweroff')
+
+class Battery(Plugin):
+    needs = ('i2c',)
+```
+
+A device plugin can only be enabled while a board plugin provides what it needs, and only one
+plugin may provide `board`. The web app greys out the switch and says what is missing; the API
+answers 409 and `lauschctl plugin enable` refuses. If the config enables it anyway, it is skipped at
+startup and listed with a problem. Whether a specific pin or bus really exists on the board model
+and is free is checked through the claims at runtime.
+
 ## Boards
 
 Exactly one board plugin registers at `hardware.boards`. It describes the board (`describe()`:
@@ -35,6 +54,11 @@ model, pins with header position and functions, interfaces), maps a pin to a GPI
 board off or reboots it, and claims what its own settings use (e.g. the I²S pins of a sound card).
 Without a board plugin (e.g. on a desktop) there are no pins, and shutdown/reboot are not
 available.
+
+A board plugin recognises its board with `detect(read)` (the Raspberry Pi plugin reads
+`/proc/device-tree/model`). Detection only suggests: the installer enables the detected board's
+plugin, and the web app offers to switch it on (Settings → Hardware, "Detected" on the plugins
+page). A board plugin is never enabled silently at runtime.
 
 Switching interfaces and overlays on needs root and a reboot: the board's settings say what is
 wanted (sound card, I²C, SPI, power-off pin), `lauschctl setup` writes the boot configuration, and
