@@ -96,6 +96,13 @@ def wait(predicate, timeout=2.0):
     return predicate()
 
 
+def test_bars_start_at_the_other_end_than_pimoronis_unless_reversed():
+    one = [(1, 1, 1)] + [OFF] * (BAR - 1)
+    picture = one + one
+    assert phat_beat.physical(picture) == [OFF] * (BAR - 1) + [(1, 1, 1)] * 2 + [OFF] * (BAR - 1)
+    assert phat_beat.physical(picture, reverse=True) == [(1, 1, 1)] + [OFF] * (2 * BAR - 2) + [(1, 1, 1)]
+
+
 def test_frame_has_start_pixels_in_bgr_and_end():
     data = frame([(1, 2, 3), (4, 5, 6)], brightness=3)
     assert data == b'\x00' * 4 + bytes((0xE3, 3, 2, 1, 0xE3, 6, 5, 4)) + b'\x00' * 4
@@ -112,8 +119,7 @@ def test_volume_overlay_shows_on_both_bars_and_runs_out():
     state = LedState(vu=False, clock=clock)
     state.volume(50)
     pixels = state.pixels()
-    assert pixels[:BAR] == [VOLUME_COLOR] * 4 + [OFF] * 4
-    assert pixels[BAR:] == [OFF] * 4 + [VOLUME_COLOR] * 4
+    assert pixels[:BAR] == pixels[BAR:] == [VOLUME_COLOR] * 4 + [OFF] * 4
     clock.now += 3
     assert state.pixels() == [OFF] * 2 * BAR and not state.busy()
 
@@ -152,7 +158,7 @@ def test_startup_animation_rises_and_fades_out():
     state = LedState(vu=False, clock=clock)
     state.animate(startup_frames())
     first = state.pixels()
-    assert first[0] == RAINBOW[0] and first[1:BAR] == [OFF] * (BAR - 1) and first[-1] == RAINBOW[0]
+    assert first[0] == first[BAR] == RAINBOW[0] and first[1:BAR] == [OFF] * (BAR - 1)
     clock.now += 0.07 * BAR
     assert state.pixels()[:BAR] == RAINBOW
     clock.now += 2
@@ -193,7 +199,7 @@ def test_buttons_run_actions_leds_show_volume_and_pins_are_claimed(mock_pins, mo
     assert manager.handle('hardware').invoke('get_state').conflicts == []
     manager.stop()
     assert wait(lambda: Writer.frames[-1] == frame([OFF] * 2 * BAR, 3))
-    assert frame(shutdown_frames(phat_beat.PALETTES['classic'])[0][0], 3) in Writer.frames
+    assert frame(phat_beat.physical(shutdown_frames(phat_beat.PALETTES['classic'])[0][0]), 3) in Writer.frames
 
 
 def test_power_button_needs_holding(mock_pins, monkeypatch):

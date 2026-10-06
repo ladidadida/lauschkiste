@@ -23,7 +23,8 @@ With `leds: vu` they also show the level of each channel while playing (only wit
 player), with volume and cards shown over it; `leds: off` leaves them dark and their pins free. The
 bars fill up when the box is ready and sink when it shuts down (`animations: false` turns
 that off). `colors` picks the colors of the meter and the animations: `classic` (green, yellow,
-red), `rainbow`, `ocean`, `sunset`, `unicorn`, `forest` or `fire`.
+red), `rainbow`, `ocean`, `sunset`, `unicorn`, `forest` or `fire`. The bars fill as in the Pirate
+Radio; `reverse: true` turns them round for a pHAT BEAT mounted the other way.
 
 The on/off button only shuts the system down; the Pirate Radio has no circuit that cuts the power
 afterwards.

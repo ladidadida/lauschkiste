@@ -931,6 +931,10 @@
           "label": "LEDs",
           "help": "Lautstärke und Karten werden kurz angezeigt, bei Pegelanzeige über dem Pegel"
         },
+        "reverse": {
+          "label": "Laufrichtung umkehren",
+          "help": "Die Balken füllen sich vom anderen Ende her (je nachdem, wie der pHAT BEAT eingebaut ist)"
+        },
         "colors": {
           "label": "Farben",
           "help": "Farben der Pegelanzeige und der Animationen, von unten nach oben"

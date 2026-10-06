@@ -88,6 +88,8 @@ class PhatBeatSettings(BaseModel):
     power_hold_time: float = Field(2.0, ge=0.5, le=10, title='Hold the on/off button for (seconds)')
     leds: Literal['vu', 'status', 'off'] = Field('status', title='LEDs', description=(
         'vu: level meter while playing, volume and cards shown over it; status: only volume and cards'))
+    reverse: bool = Field(False, title='Reverse direction', description=(
+        'The bars fill from the other end (depends on how the pHAT BEAT is mounted)'))
     colors: Palette = Field('classic', title='Colors', description=(
         'Colors of the level meter and the animations, bottom to top'))
     animations: bool = Field(True, title='Start and shutdown animation')
@@ -99,8 +101,15 @@ def _bar(count: float, colors: List[Color]) -> List[Color]:
 
 
 def _pixels(left: List[Color], right: List[Color]) -> List[Color]:
-    """Channel 0 runs from pixel 0 upwards, channel 1 from pixel 15 downwards."""
-    return left + list(reversed(right))
+    """A picture: both bars from bottom to top (see ``physical``)."""
+    return left + right
+
+
+def physical(pixels: List[Color], reverse: bool = False) -> List[Color]:
+    """The LED order of a picture. The LEDs run 0-7 along one bar and 8-15 back along the other; in the
+    Pirate Radio both bars start at pixels 7 and 8. ``reverse``: they start at pixels 0 and 15."""
+    left, right = pixels[:BAR], pixels[BAR:]
+    return left + list(reversed(right)) if reverse else list(reversed(left)) + right
 
 
 def _scaled(colors: List[Color], factor: float) -> List[Color]:
@@ -203,8 +212,10 @@ class LedState:
 class Leds:
     """Draws the LED state about ten times a second while it changes; writes only changed frames."""
 
-    def __init__(self, state: LedState, write: Callable[[bytes], None], brightness: int, animations: bool = True):
+    def __init__(self, state: LedState, write: Callable[[bytes], None], brightness: int, animations: bool = True,
+                 reverse: bool = False):
         self._state = state
+        self._reverse = reverse
         self._animations = animations
         self._write = write
         self._brightness = brightness
@@ -233,7 +244,7 @@ class Leds:
             pixels = self._state.pixels()
             if pixels != last:
                 try:
-                    self._write(frame(pixels, self._brightness))
+                    self._write(frame(physical(pixels, self._reverse), self._brightness))
                 except Exception as error:
                     logger.error(f"LEDs: {error.__class__.__name__}: {error}")
                     return
@@ -410,7 +421,7 @@ class PhatBeat(Plugin):
                 logger.error(f"LEDs not available: {error.__class__.__name__}: {error}")
                 return
             logger.info(f"LEDs through {type(leds).__name__}")
-            self._leds = Leds(self._state, leds.write, config['brightness'], config['animations'])
+            self._leds = Leds(self._state, leds.write, config['brightness'], config['animations'], config['reverse'])
             self._leds.start()
 
     def stop(self):
