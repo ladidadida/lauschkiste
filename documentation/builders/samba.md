@@ -32,4 +32,10 @@ Open your network environment and select your Lauschkiste, or enter the address 
   see also [Apple's guide](https://support.apple.com/guide/mac-help/mchlp1140/mac)
 * Linux: `smb://<ip-address-of-your-lauschkiste>/lauschkiste`
 
-Log in with your user name on the Pi and the Samba password.
+## User and password
+
+* The user name is the user Lauschkiste runs as on the box, the one you log in with over SSH (for
+  example `pi`). There is no separate Samba user; the web app shows the name.
+* The password is a Samba password of its own, separate from the login password of the box. Set
+  or change it in the web app (Settings → Library → New Samba password, at least 8 characters) or
+  on the box with `sudo smbpasswd -a <user>`.

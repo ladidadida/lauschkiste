@@ -617,14 +617,18 @@
       "plugin-off": "The share is managed by the \"Samba\" plugin. Switch it on under Plugins and restart Lauschkiste.",
       "not-installed": "Samba is not installed on the box yet. Run once on the box:",
       "share": "Share the library on the network",
-      "address": "Reachable at {{address}}, log in as \"{{user}}\".",
       "outdated": "The share is outdated. Switch it off and on again.",
       "password-set": "A Samba password is set for \"{{user}}\".",
       "password-missing": "No Samba password is set for \"{{user}}\" yet.",
       "password": "New Samba password",
-      "password-help": "At least {{count}} characters",
+      "password-help": "At least {{count}} characters. Replaces the previous Samba password.",
       "password-saved": "Password saved.",
-      "error": "That did not work."
+      "error": "That did not work.",
+      "login": "Logging in to the network drive",
+      "login-user": "User name: {{user}} (the user Lauschkiste runs as on the box)",
+      "login-password": "Password: the Samba password you set below. It is separate from the login password of the box.",
+      "login-windows": "Windows Explorer: {{address}}",
+      "login-mac": "macOS Finder (Go → Connect to Server) and Linux: {{address}}"
     },
     "cli": {
       "more": "More in the help",

@@ -21,9 +21,24 @@ Unter Musik → Ordner bzw. Hörbücher → Ordner auf „Hochladen“ tippen un
 
 Neue Dateien erscheinen nach ein paar Sekunden von selbst; der Aktualisieren-Knopf startet das Einlesen sofort.
 
-## Netzlaufwerk (Samba)
+## Netzlaufwerk (Samba) {#samba}
 
-Für große Sammlungen lässt sich die Bibliothek als Netzlaufwerk im Windows-Explorer oder macOS-Finder öffnen. Samba wird einmalig auf der Box installiert ([Befehle auf der Box](/help/lauschctl?section=samba)), danach schaltest du die Freigabe und das Passwort unter Einstellungen → Bibliothek.
+Für große Sammlungen lässt sich die Bibliothek als Netzlaufwerk im Windows-Explorer oder macOS-Finder öffnen. Samba wird einmalig auf der Box installiert ([Befehle auf der Box](/help/lauschctl?section=samba)), danach schaltest du die Freigabe unter Einstellungen → Bibliothek ein.
+
+### Benutzer und Passwort
+
+- **Benutzername** ist der Benutzer, unter dem Lauschkiste auf der Box läuft, also der, mit dem du dich auch per SSH anmeldest (z. B. `pi`). Einen anderen Benutzer gibt es nicht; die Einstellungsseite zeigt den Namen an.
+- **Passwort** ist ein eigenes Samba-Passwort, unabhängig vom Login-Passwort der Box. Du setzt oder änderst es unter Einstellungen → Bibliothek → „Neues Samba-Passwort“ (mindestens 8 Zeichen). Das neue Passwort ersetzt das alte sofort.
+
+### Verbinden
+
+| Rechner | So geht's |
+| --- | --- |
+| Windows | Im Explorer in die Adresszeile `\\<name-der-box>\lauschkiste` eingeben |
+| macOS | Finder → Gehe zu → Mit Server verbinden → `smb://<name-der-box>/lauschkiste` |
+| Linux | Im Dateimanager `smb://<name-der-box>/lauschkiste` öffnen |
+
+Beim ersten Verbinden fragt der Rechner nach Benutzername und Passwort; „Kennwort speichern“ erspart die Eingabe beim nächsten Mal. Statt des Namens geht auch die IP-Adresse (Einstellungen → Status).
 
 ## Radio
 

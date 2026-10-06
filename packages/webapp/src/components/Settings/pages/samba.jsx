@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -11,6 +11,7 @@ import {
   CircularProgress,
   Divider,
   FormControlLabel,
+  Link,
   Stack,
   Switch,
   TextField,
@@ -53,7 +54,7 @@ const SambaSettings = () => {
       return (
         <Stack spacing={2}>
           <Typography variant="body2">{t('settings.samba.plugin-off')}</Typography>
-          <Button component={Link} sx={{ alignSelf: 'flex-start' }} to="/settings/plugins" variant="outlined">
+          <Button component={RouterLink} sx={{ alignSelf: 'flex-start' }} to="/settings/plugins" variant="outlined">
             {t('settings.sections.plugins.title')}
           </Button>
         </Stack>
@@ -70,9 +71,16 @@ const SambaSettings = () => {
           label={t('settings.samba.share')}
         />
         {status.shared && status.address &&
-          <Typography variant="body2">
-            {t('settings.samba.address', { address: status.address, user: status.user })}
-          </Typography>
+          <Alert icon={false} severity="success">
+            <Typography sx={{ fontWeight: 600 }} variant="body2">{t('settings.samba.login')}</Typography>
+            <Typography variant="body2">{t('settings.samba.login-user', { user: status.user })}</Typography>
+            <Typography variant="body2">{t('settings.samba.login-password')}</Typography>
+            <Typography variant="body2">
+              {t('settings.samba.login-windows', { address: status.address.replace(/^smb:/, '').replaceAll('/', '\\') })}
+            </Typography>
+            <Typography variant="body2">{t('settings.samba.login-mac', { address: status.address })}</Typography>
+            <Link component={RouterLink} to="/help/library?section=samba">{t('settings.cli.more')}</Link>
+          </Alert>
         }
         {status.outdated && <Alert severity="info">{t('settings.samba.outdated')}</Alert>}
         <Typography variant="body2">

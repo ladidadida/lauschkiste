@@ -845,14 +845,18 @@
       "plugin-off": "Die Freigabe verwaltet das Plugin „Samba“. Schalte es unter Plugins ein und starte Lauschkiste neu.",
       "not-installed": "Samba ist auf der Box noch nicht installiert. Einmalig auf der Box ausführen:",
       "share": "Bibliothek im Netzwerk freigeben",
-      "address": "Erreichbar unter {{address}}, Anmeldung als „{{user}}“.",
       "outdated": "Die Freigabe ist veraltet. Einmal aus- und wieder einschalten.",
       "password-set": "Für „{{user}}“ ist ein Samba-Passwort gesetzt.",
       "password-missing": "Für „{{user}}“ ist noch kein Samba-Passwort gesetzt.",
       "password": "Neues Samba-Passwort",
-      "password-help": "Mindestens {{count}} Zeichen",
+      "password-help": "Mindestens {{count}} Zeichen. Ersetzt das bisherige Samba-Passwort.",
       "password-saved": "Passwort gespeichert.",
-      "error": "Das hat nicht geklappt."
+      "error": "Das hat nicht geklappt.",
+      "login": "Anmelden am Netzlaufwerk",
+      "login-user": "Benutzername: {{user}} (der Benutzer, unter dem Lauschkiste auf der Box läuft)",
+      "login-password": "Passwort: das Samba-Passwort, das du hier unten setzt. Es ist unabhängig vom Login-Passwort der Box.",
+      "login-windows": "Windows-Explorer: {{address}}",
+      "login-mac": "macOS-Finder (Gehe zu → Mit Server verbinden) und Linux: {{address}}"
     },
     "cli": {
       "more": "Mehr dazu in der Hilfe",
