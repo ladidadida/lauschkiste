@@ -236,12 +236,10 @@ def test_repeat_cycles_off_repeat_single():
 # -- PortAudioSink falls back silently without a real device --------------------------------------
 
 def test_portaudio_sink_falls_back_when_no_device(monkeypatch):
-    import lauschkiste.audio_output as audio_output_module
-
     def raise_error(*args, **kwargs):
         raise RuntimeError("no output device")
 
-    monkeypatch.setattr(audio_output_module.sd, 'RawOutputStream', raise_error)
+    monkeypatch.setattr('sounddevice.RawOutputStream', raise_error)
     sink = PortAudioSink()
 
     sink.open(44100, 2)  # must not raise
@@ -270,9 +268,8 @@ class FakeStream:
 
 
 def test_portaudio_sink_starts_after_prefill(monkeypatch):
-    import lauschkiste.audio_output as audio_output_module
     streams = []
-    monkeypatch.setattr(audio_output_module.sd, 'RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
+    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
     sink = PortAudioSink()
     sink.open(1000, 2)  # prefill: 300 frames = 1200 bytes
 
@@ -286,9 +283,8 @@ def test_portaudio_sink_starts_after_prefill(monkeypatch):
 
 
 def test_portaudio_sink_plays_short_sounds_on_close(monkeypatch):
-    import lauschkiste.audio_output as audio_output_module
     streams = []
-    monkeypatch.setattr(audio_output_module.sd, 'RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
+    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
     sink = PortAudioSink()
     sink.open(1000, 2)
     sink.write(b'\x00' * 100)

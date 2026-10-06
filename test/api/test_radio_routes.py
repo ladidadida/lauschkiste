@@ -77,7 +77,7 @@ def test_play_resolves_playlists(radio, monkeypatch):
     response.raw.read.return_value = b'[playlist]\nFile1=https://example.org/real.aac\nTitle1=Live\n'
     response.__enter__ = Mock(return_value=response)
     response.__exit__ = Mock(return_value=False)
-    monkeypatch.setattr(lauschkiste.radio.requests, 'get', Mock(return_value=response))
+    monkeypatch.setattr('requests.get', Mock(return_value=response))
     station = add(client, name='Playlist', url='https://example.org/station.pls').json()['id']
     client.post('/api/v1/radio/play', json={'station': station})
     ctrl.play_files.assert_called_once_with(['https://example.org/real.aac'], 0, 0.0, False)

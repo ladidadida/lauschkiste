@@ -135,7 +135,7 @@ install_package() {
         [[ "$wheel" == "$cli" ]] || with+=(--with "$wheel")
     done
     log "Installing the Lauschkiste package"
-    uv tool install --force --python python3 "$cli" "${with[@]}"
+    uv tool install --force --compile-bytecode --python python3 "$cli" "${with[@]}"
     CTL="$(uv tool dir --bin)/lauschctl"
 }
 

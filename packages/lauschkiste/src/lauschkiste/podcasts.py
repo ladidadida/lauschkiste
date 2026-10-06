@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
-import requests
 from pydantic import BaseModel, Field
 
 import lauschkiste.paths
@@ -180,6 +179,7 @@ def parse_feed(content: bytes) -> Dict[str, Any]:
 
 
 def fetch_feed(url: str) -> Dict[str, Any]:
+    import requests
     try:
         with requests.get(url, timeout=FEED_TIMEOUT_SEC, stream=True) as response:
             response.raise_for_status()

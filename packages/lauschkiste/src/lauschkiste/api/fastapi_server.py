@@ -14,6 +14,7 @@ import asyncio
 import json
 import logging
 import threading
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -26,7 +27,7 @@ import lauschkiste.paths
 import lauschkiste.publishing
 from lauschkiste.api.events import EventBroker, MAX_MESSAGE_SIZE, parse_subscription_command
 from lauschkiste.api.webapp_static import register_webapp_routes
-from lauschkiste.contract.routes import build_router
+from lauschkiste.contract.routes import add_response_schemas, build_router
 
 logger = logging.getLogger('lauschkiste.api.fastapi_server')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
@@ -172,7 +173,14 @@ def create_app(broker, executor, modules=None, webapp_build_dir=None, logs_dir=N
         await _handle_events_websocket(websocket, broker)
 
     if modules is not None:
-        app.include_router(build_router(modules, executor))
+        router = build_router(modules, executor)
+        app.include_router(router)
+
+        def openapi():
+            if app.openapi_schema is None:
+                app.openapi_schema = add_response_schemas(FastAPI.openapi(app), router.operations)
+            return app.openapi_schema
+        app.openapi = openapi
 
     # Registered last so it never shadows the /api/v1/* routes above: FastAPI/Starlette tries
     # routes in registration order, and this includes a catch-all.
@@ -223,7 +231,9 @@ class FastApiServer(threading.Thread):
 
     async def _run_async(self):
         self._executor = ThreadPoolExecutor(max_workers=API_EXECUTOR_WORKERS, thread_name_prefix='FastApi')
+        started = time.perf_counter()
         app = create_app(self.broker, self._executor, modules=self.modules)
+        logger.debug(f"API routes built in {(time.perf_counter() - started) * 1000:.0f} ms")
 
         config = uvicorn.Config(app, host=self.bind_address, port=self.port, loop='none', log_config=None)
         self._server = uvicorn.Server(config)

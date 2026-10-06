@@ -6,9 +6,8 @@ import logging
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Body, HTTPException, Path, Query
-from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse, Response
-from pydantic import BaseModel, ConfigDict, create_model
+from pydantic import BaseModel, ConfigDict, TypeAdapter, create_model
 
 import lauschkiste.contract.plugins as plugins
 from lauschkiste.contract.declarations import Operation
@@ -24,6 +23,17 @@ class SettingsUpdate(BaseModel):
 
 class PluginState(BaseModel):
     enabled: bool
+
+
+_adapters: Dict[int, TypeAdapter] = {}
+
+
+def response_adapter(op: Operation) -> TypeAdapter:
+    """Validates and serializes the return value; built on first use, which keeps start-up fast on small boards."""
+    adapter = _adapters.get(id(op))
+    if adapter is None:
+        adapter = _adapters[id(op)] = TypeAdapter(op.return_type)
+    return adapter
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:
@@ -42,9 +52,9 @@ async def _run(executor, handle: ModuleHandle, op: Operation, kwargs: Dict[str, 
         return _error(422, 'invalid_action', str(error))
     if result is None and op.returns_nothing:
         return Response(status_code=op.spec.status_code or 204)
-    if op.spec.status_code is not None:
-        return JSONResponse(status_code=op.spec.status_code, content=jsonable_encoder(result))
-    return result
+    adapter = response_adapter(op)
+    content = adapter.dump_python(adapter.validate_python(result), mode='json')
+    return JSONResponse(status_code=op.spec.status_code or 200, content=content)
 
 
 def _endpoint(executor, handle: ModuleHandle, op: Operation):
@@ -128,16 +138,17 @@ def build_router(manager: ModuleManager, executor) -> APIRouter:
 
     add_settings_routes(router, manager, executor)
 
+    router.operations = []
     for handle in manager.handles():
         for op in sorted(handle.cls.operations().values(), key=lambda o: o.name):
             path = op.path(handle.is_core)
-            response_model = None if op.returns_nothing else op.return_type
+            router.operations.append((path, op))
             router.add_api_route(
                 path,
                 _endpoint(executor, handle, op),
                 methods=[op.spec.method],
                 status_code=op.spec.status_code or (204 if op.returns_nothing else 200),
-                response_model=response_model,
+                response_model=None,
                 response_class=Response if op.returns_nothing else JSONResponse,
                 tags=[handle.name],
                 summary=(op.func.__doc__ or '').strip().split('\n', 1)[0] or None,
@@ -145,6 +156,26 @@ def build_router(manager: ModuleManager, executor) -> APIRouter:
             )
         handle.instance.extra_routes(router)
     return router
+
+
+def add_response_schemas(schema: Dict[str, Any], operations) -> Dict[str, Any]:
+    """Add the operations' return types to an OpenAPI ``schema`` (FastAPI doesn't know them)."""
+    components = schema.setdefault('components', {}).setdefault('schemas', {})
+    for path, op in operations:
+        if op.returns_nothing:
+            continue
+        entry = schema.get('paths', {}).get(path, {}).get(op.spec.method.lower())
+        if entry is None:
+            continue
+        json_schema = response_adapter(op).json_schema(ref_template='#/components/schemas/{model}')
+        components.update(json_schema.pop('$defs', {}))
+        if isinstance(op.return_type, type) and issubclass(op.return_type, BaseModel):
+            components[op.return_type.__name__] = json_schema
+            json_schema = {'$ref': f'#/components/schemas/{op.return_type.__name__}'}
+        status = str(op.spec.status_code or 200)
+        entry.setdefault('responses', {}).setdefault(status, {'description': 'Successful Response'})
+        entry['responses'][status]['content'] = {'application/json': {'schema': json_schema}}
+    return schema
 
 
 def _blocking(executor):

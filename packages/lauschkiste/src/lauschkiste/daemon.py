@@ -146,13 +146,18 @@ class Daemon:
         from lauschkiste.contract.manager import ModuleManager
         from lauschkiste.core_modules import CORE_MODULES
 
+        def phase(name, func):
+            started = time.perf_counter()
+            func()
+            logger.debug(f"Start-up phase '{name}': {(time.perf_counter() - started) * 1000:.0f} ms")
+
         self.modules = ModuleManager(CORE_MODULES, cfg, publishing.get_bus())
-        self.modules.load()
-        self.modules.start()
-        self.modules.ready()
+        phase('load modules', self.modules.load)
+        phase('start modules', self.modules.start)
 
         self.api_server = FastApiServer(modules=self.modules)
-        self.api_server.start_and_wait()
+        phase('start API server', self.api_server.start_and_wait)
+        phase('ready modules', self.modules.ready)
 
         logger.info(f"Start-up time: {((time.time_ns() - time_start) / 1000000.0):.3f} ms")
 

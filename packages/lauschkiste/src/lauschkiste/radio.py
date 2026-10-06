@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
-import requests
 from pydantic import BaseModel
 
 import lauschkiste.paths
@@ -125,6 +124,7 @@ class Radio(CoreModule):
     def _stream_url(self, url: str) -> str:
         if not urlparse(url).path.lower().endswith(PLAYLIST_SUFFIXES):
             return url
+        import requests
         try:
             with requests.get(url, timeout=PLAYLIST_TIMEOUT_SEC, stream=True) as response:
                 response.raise_for_status()

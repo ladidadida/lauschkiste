@@ -27,9 +27,6 @@ from typing import Optional  # noqa: E402
 import typer  # noqa: E402
 
 import lauschkiste.paths  # noqa: E402
-from lauschkiste_cli import debug, plugin  # noqa: E402
-from lauschkiste_cli.setup import setup  # noqa: E402
-from lauschkiste_cli.update import update  # noqa: E402
 from lauschkiste_cli.run import run  # noqa: E402
 
 HOME_HELP = ("Directory with all data (settings, music, logs). "
@@ -48,6 +45,10 @@ def show_home() -> None:
 
 
 def _management_app(name: str, help_text: str) -> typer.Typer:
+    from lauschkiste_cli import debug, plugin
+    from lauschkiste_cli.setup import setup
+    from lauschkiste_cli.update import update
+
     app = typer.Typer(name=name, help=help_text, no_args_is_help=True)
     app.callback()(main)
     app.command(name="home")(show_home)
@@ -62,5 +63,10 @@ def _management_app(name: str, help_text: str) -> typer.Typer:
 server = typer.Typer(name="lauschkiste", add_completion=False)
 server.command()(run)
 
-#: `lauschctl`: everything else
-ctl = _management_app("lauschctl", "Manage Lauschkiste: setup, plugins, updates.")
+def __getattr__(name: str):
+    """`ctl` (`lauschctl`: everything else) is built on first use, so the server doesn't import it."""
+    if name == 'ctl':
+        app = _management_app("lauschctl", "Manage Lauschkiste: setup, plugins, updates.")
+        globals()['ctl'] = app
+        return app
+    raise AttributeError(name)

@@ -4,7 +4,8 @@ requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.13'",
     "python_full_version == '3.12.*'",
-    "python_full_version < '3.12'",
+    "(python_full_version < '3.12' and platform_machine == 'armv6l') or (python_full_version < '3.12' and platform_machine == 'armv7l')",
+    "python_full_version < '3.12' and platform_machine != 'armv6l' and platform_machine != 'armv7l'",
 ]
 
 [manifest]
@@ -149,8 +150,22 @@ wheels = [
 
 [[package]]
 name = "av"
+version = "13.0.0"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "(python_full_version < '3.12' and platform_machine == 'armv6l') or (python_full_version < '3.12' and platform_machine == 'armv7l')",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e1/df/4f77aa98b998e1a19622b7a45da07884a053826e9038138d8023208e31e5/av-13.0.0.tar.gz", hash = "sha256:7fb1a5588cd8ce4d0564ddf82221f886541ea2d5152f15e63ab890430dcd3c31", size = 3884902, upload-time = "2024-09-04T08:30:48.971Z" }
+
+[[package]]
+name = "av"
 version = "18.1.0"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "python_full_version >= '3.13'",
+    "python_full_version == '3.12.*'",
+    "python_full_version < '3.12' and platform_machine != 'armv6l' and platform_machine != 'armv7l'",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/8d/f4/f22114d30d3435e38c6af2b4870f37b864403dca6ae7af747a289ce0a18e/av-18.1.0.tar.gz", hash = "sha256:47bfc286e1bc9de7ab4681fc2b575cd2460a66919d31ffe1bd5aa54fae531a28", size = 4451061, upload-time = "2026-08-12T22:28:18.761Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/05/d4/d7cdc8bff143c17a6d35924375ae28dd692cacde38700a7d419fde54f44a/av-18.1.0-cp311-abi3-macosx_11_0_x86_64.whl", hash = "sha256:ae75d8bb6467895ed1f8572ededf7ffa49eac07f6e483222f5d7d62a41d12f04", size = 22546147, upload-time = "2026-08-12T22:27:11.851Z" },
@@ -889,7 +904,8 @@ version = "0.1.0a3"
 source = { editable = "packages/lauschkiste" }
 dependencies = [
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
-    { name = "av" },
+    { name = "av", version = "13.0.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and platform_machine == 'armv6l') or (python_full_version < '3.12' and platform_machine == 'armv7l')" },
+    { name = "av", version = "18.1.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and platform_machine == 'armv6l') or (python_full_version >= '3.12' and platform_machine == 'armv7l') or (platform_machine != 'armv6l' and platform_machine != 'armv7l')" },
     { name = "evdev" },
     { name = "fastapi" },
     { name = "mutagen" },
@@ -906,6 +922,7 @@ dependencies = [
 requires-dist = [
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
     { name = "av" },
+    { name = "av", marker = "(python_full_version < '3.12' and platform_machine == 'armv6l') or (python_full_version < '3.12' and platform_machine == 'armv7l')", specifier = "<13.1" },
     { name = "evdev" },
     { name = "fastapi" },
     { name = "mutagen" },
@@ -1221,7 +1238,8 @@ name = "networkx"
 version = "3.6.1"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
-    "python_full_version < '3.12'",
+    "(python_full_version < '3.12' and platform_machine == 'armv6l') or (python_full_version < '3.12' and platform_machine == 'armv7l')",
+    "python_full_version < '3.12' and platform_machine != 'armv6l' and platform_machine != 'armv7l'",
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6a/51/63fe664f3908c97be9d2e4f1158eb633317598cfa6e1fc14af5383f17512/networkx-3.6.1.tar.gz", hash = "sha256:26b7c357accc0c8cde558ad486283728b65b6a95d85ee1cd66bafab4c8168509", size = 2517025, upload-time = "2025-12-08T17:02:39.908Z" }
 wheels = [

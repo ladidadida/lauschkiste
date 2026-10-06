@@ -3,9 +3,6 @@
 import audioop
 import logging
 
-import av
-import sounddevice as sd
-from av.audio.resampler import AudioResampler
 
 logger = logging.getLogger('lauschkiste.audio_output')
 
@@ -52,6 +49,7 @@ class PortAudioSink(AudioSink):
         self._pending = bytearray()
         self._prefill_bytes = int(samplerate * self.PREFILL_SECONDS) * channels * 2
         try:
+            import sounddevice as sd
             self._stream = sd.RawOutputStream(samplerate=samplerate, channels=channels, dtype='int16')
         except Exception as e:
             logger.warning(f"No audio output device available ({e.__class__.__name__}: {e}); playing silently")
@@ -91,6 +89,9 @@ class PortAudioSink(AudioSink):
 
 def play_file(path: str, volume: int = 100, sink=None, should_stop=lambda: False) -> None:
     """Decode ``path`` and play it to the end (or until ``should_stop()``), blocking."""
+    import av
+    from av.audio.resampler import AudioResampler
+
     sink = sink or PortAudioSink()
     with av.open(path) as container:
         stream = container.streams.audio[0]

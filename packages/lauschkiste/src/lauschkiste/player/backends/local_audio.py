@@ -19,10 +19,7 @@ import os
 import random
 import threading
 
-import av
 from fractions import Fraction
-import sounddevice as sd
-from av.audio.resampler import AudioResampler
 
 import lauschkiste.paths
 import lauschkiste.library
@@ -151,6 +148,7 @@ class PlayerLocalAudio:
         logger.info(f"Playing '{path}' from {start_position:.3f}s")
         self._stream_metadata = {}
         try:
+            import av
             if '://' in path:
                 container = av.open(path, timeout=STREAM_TIMEOUT, options=STREAM_OPTIONS)
                 self._stream_metadata = dict(container.metadata)
@@ -175,6 +173,7 @@ class PlayerLocalAudio:
         return self._speed if self._ordered else 1.0
 
     def _tempo_filter(self, speed: float):
+        import av
         graph = av.filter.Graph()
         source = graph.add_abuffer(format='s16', sample_rate=SAMPLE_RATE, layout='stereo',
                                    time_base=Fraction(1, SAMPLE_RATE))
@@ -187,6 +186,7 @@ class PlayerLocalAudio:
 
     def _output(self, frames, speed: float, graph):
         """Write resampled frames (through the tempo filter unless at normal speed); False if aborted."""
+        import av
         for rframe in frames:
             if self._abort.is_set():
                 return False
@@ -207,6 +207,7 @@ class PlayerLocalAudio:
         return True
 
     def _decode_loop(self, container, start_position: float) -> bool:
+        from av.audio.resampler import AudioResampler
         stream = container.streams.audio[0]
         resampler = AudioResampler(format='s16', layout='stereo', rate=SAMPLE_RATE)
         speed = self._effective_speed()
@@ -301,6 +302,8 @@ class PlayerLocalAudio:
         return status
 
     def get_player_type_and_version(self):
+        import av
+        import sounddevice as sd
         return f"lauschkiste-local-audio (pyav {av.__version__}, sounddevice {sd.__version__})"
 
     def play(self):

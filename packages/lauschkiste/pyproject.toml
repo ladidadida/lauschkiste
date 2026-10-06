@@ -18,6 +18,8 @@ dependencies = [
   # Default player backend (player.backend: local_audio): decode via ffmpeg-bundled wheels (no
   # system ffmpeg needed, wheels exist for x86_64/aarch64/armv7l), output via PortAudio.
   "av",
+  # piwheels: newer av for Python 3.11 on 32-bit ARM is built against Trixie's ffmpeg 7, Bookworm has 5
+  "av<13.1; python_version < '3.12' and (platform_machine == 'armv6l' or platform_machine == 'armv7l')",
   "sounddevice",
   # audioop (fast PCM volume scaling) left the standard library in Python 3.13
   "audioop-lts; python_version >= '3.13'",

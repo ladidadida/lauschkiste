@@ -129,3 +129,6 @@ def test_player_routes_appear_in_openapi_schema(client):
     schema = client.get('/openapi.json').json()
     assert '/api/v1/player/play' in schema['paths']
     assert '/api/v1/player/volume' in schema['paths']
+    status = schema['paths']['/api/v1/player/status']['get']['responses']['200']
+    assert status['content']['application/json']['schema'] == {'$ref': '#/components/schemas/PlayerStatus'}
+    assert 'PlayerStatus' in schema['components']['schemas']
