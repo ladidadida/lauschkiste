@@ -2,7 +2,7 @@
 
 Einige Einstellungen ändern das Betriebssystem und brauchen Administratorrechte. Die erledigt `lauschctl` direkt auf der Box. Dazu meldest du dich per SSH an, z. B. am Computer im Terminal:
 
-```
+```bash
 ssh <benutzer>@<name-oder-ip-der-box>
 ```
 
@@ -20,7 +20,7 @@ Jeder Einrichtungsschritt prüft zuerst und ändert nur, was fehlt; erneutes Aus
 
 ## Samba {#samba}
 
-```
+```bash
 lauschctl setup samba
 ```
 
@@ -28,7 +28,7 @@ Installiert Samba, gibt die Bibliothek als `lauschkiste` frei und fragt nach ein
 
 ## Lesegerät {#reader}
 
-```
+```bash
 lauschctl setup rfid
 ```
 
@@ -36,7 +36,7 @@ Fragt, welches Lesegerät angeschlossen ist (z. B. RC522, USB-Leser) und wie es 
 
 ## Audio {#audio}
 
-```
+```bash
 lauschctl setup raspi
 lauschctl setup audio
 ```
@@ -45,7 +45,7 @@ lauschctl setup audio
 
 ## Update {#update}
 
-```
+```bash
 lauschctl update
 ```
 
@@ -53,7 +53,7 @@ Holt die neueste Version, installiert sie und startet Lauschkiste neu. Einstellu
 
 ## Hotspot {#hotspot}
 
-```
+```bash
 lauschctl setup autohotspot
 ```
 

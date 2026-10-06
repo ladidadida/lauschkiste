@@ -2,7 +2,7 @@
 
 Some settings change the operating system and need administrator rights. `lauschctl` does them right on the box. Log in with SSH, e.g. in a terminal on your computer:
 
-```
+```bash
 ssh <user>@<name-or-ip-of-the-box>
 ```
 
@@ -20,7 +20,7 @@ Every setup step checks first and only changes what is missing; running it again
 
 ## Samba {#samba}
 
-```
+```bash
 lauschctl setup samba
 ```
 
@@ -28,7 +28,7 @@ Installs Samba, shares the library as `lauschkiste` and asks for a Samba passwor
 
 ## Reader {#reader}
 
-```
+```bash
 lauschctl setup rfid
 ```
 
@@ -36,7 +36,7 @@ Asks which reader is connected (e.g. RC522, USB reader) and how it is wired, ena
 
 ## Audio {#audio}
 
-```
+```bash
 lauschctl setup raspi
 lauschctl setup audio
 ```
@@ -45,7 +45,7 @@ lauschctl setup audio
 
 ## Update {#update}
 
-```
+```bash
 lauschctl update
 ```
 
@@ -53,7 +53,7 @@ Fetches the newest version, installs it and restarts Lauschkiste. Settings, card
 
 ## Hotspot {#hotspot}
 
-```
+```bash
 lauschctl setup autohotspot
 ```
 

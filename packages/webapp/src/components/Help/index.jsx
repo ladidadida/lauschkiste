@@ -90,7 +90,7 @@ const HelpTopic = () => {
 
   return (
     <>
-      <Header backLink="/help" title={known ? t(`help.topics.${topic}.title`) : t('navigation.help')} />
+      <Header backLink="/help" title={known && source ? '' : t('navigation.help')} />
       <Stack sx={{ padding: '0 16px 16px', width: '100%' }}>
         {!known || failed ? <Typography>{t('help.not-found')}</Typography> : null}
         {known && !failed && !source && <CircularProgress />}
