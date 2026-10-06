@@ -31,8 +31,11 @@ const Volume = () => {
     request('toggleMuteVolume', { mute: !volumeMute });
   };
 
-  const updateVolume = () => {
-    request('setVolume', { volume: _volume });
+  const updateVolume = (event, newVolume) => {
+    const volume = Math.min(newVolume, maxVolume);
+    setVolume(volume);
+    setVolumeMute(false);
+    request('setVolume', { volume });
     // Delay the next command to avoid jumping slide control
     setTimeout(() => setIsChangingVolume(false), 500);
   }
@@ -94,7 +97,6 @@ const Volume = () => {
           aria-labelledby={t('player.volume.slider')}
           onChange={handleVolumeChange}
           onChangeCommitted={updateVolume}
-          disabled={!!volumeMute}
           marks={[ { value: maxVolume } ]}
           step={volumeStep}
           value={_volume}

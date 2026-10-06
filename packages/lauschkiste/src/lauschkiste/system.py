@@ -115,6 +115,20 @@ def _read_log(handler_name: str) -> str:
     return content
 
 
+def own_unit(cgroup: str = '/proc/self/cgroup') -> Optional[str]:
+    """The systemd service this process runs in (e.g. ``lauschkiste.service``), None outside one."""
+    try:
+        with open(cgroup) as stream:
+            lines = stream.read().splitlines()
+    except OSError:
+        return None
+    for line in lines:
+        for part in reversed(line.rsplit(':', 1)[-1].split('/')):
+            if part.endswith('.service') and not part.startswith('user@'):
+                return part
+    return None
+
+
 class System(CoreModule):
     """Version information, log files and web app settings."""
 
@@ -190,9 +204,12 @@ class System(CoreModule):
 
     @action()
     def restart_service(self) -> None:
-        """Restart the Lauschkiste systemd user service."""
+        """Restart the systemd user service Lauschkiste runs in."""
+        unit = own_unit()
+        if unit is None:
+            raise OperationError(501, 'no_systemd', 'Lauschkiste does not run as a systemd user service')
         try:
-            subprocess.Popen(['systemctl', '--user', 'restart', 'lauschkiste'])
+            subprocess.Popen(['systemctl', '--user', 'restart', unit])
         except OSError as error:
             raise OperationError(501, 'no_systemd', f'systemctl is not available: {error}') from None
 
