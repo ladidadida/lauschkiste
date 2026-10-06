@@ -270,6 +270,10 @@ class PlayerLocalAudio:
     def set_status_callback(self, callback):
         self._status_callback = callback
 
+    def set_level_callback(self, callback):
+        """``callback(left, right, delay)`` for the level of the output, or None."""
+        self._sink.level_callback = callback
+
     def set_active(self, active):
         self._active = active
         if active:

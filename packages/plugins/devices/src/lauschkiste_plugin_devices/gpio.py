@@ -27,6 +27,10 @@ class Pins:
             self._chip = chip
         return line
 
+    @property
+    def chip(self) -> int:
+        return self._chip or 0
+
     def factory(self):
         if self._factory is None:
             from gpiozero.pins.lgpio import LGPIOFactory

@@ -59,3 +59,9 @@ class PlayerBackend(Protocol):
     def set_volume(self, volume: int) -> int: ...
 
     def exit(self) -> Any: ...
+
+
+class LevelMeter(Protocol):
+    def level(self, left: float, right: float, delay: float) -> None:
+        """RMS level (0..1) of each channel of the output, audible in ``delay`` seconds; about ten times a second
+        while playing (only with backends that can measure it, e.g. local_audio)."""

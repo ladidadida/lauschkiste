@@ -236,9 +236,12 @@
       "stop": "(self) -> None",
       "stop_after_current": "(self, enabled: bool = True) -> None",
       "toggle": "(self) -> None"
+    },
+    "level_meters": {
+      "level": "(self, left: float, right: float, delay: float) -> None"
     }
   },
-  "interface_version": "5.0",
+  "interface_version": "5.1",
   "kind": "core",
   "name": "player",
   "operations": {

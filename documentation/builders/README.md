@@ -29,6 +29,7 @@
   * [Battery Monitor](./components/power/batterymonitor.md)
 * [Soundcards](./components/soundcards/)
   * [HiFiBerry Boards](./components/soundcards/hifiberry.md)
+  * [Pimoroni pHAT BEAT (Pirate Radio)](./components/soundcards/phat-beat.md)
 * [RFID Readers](./../developers/rfid/README.md)
 * [Event devices (USB and other buttons)](./event-devices.md)
 

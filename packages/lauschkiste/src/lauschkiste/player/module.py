@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Literal, Mapping, Optional
 from pydantic import BaseModel, Field
 
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
-from lauschkiste.player.backend import PlayerBackend
+from lauschkiste.player.backend import LevelMeter, PlayerBackend
 from lauschkiste.player.coordinator import PlayerCoordinator
 from lauschkiste.player.status import ContentKind, PlaybackContext, PlayerStatus, status_from_backend
 
@@ -54,13 +54,14 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '5.0'
+    interface_version = '5.1'
     concurrency = 'threadsafe'
     requires = ('library',)
 
     settings = PlayerSettings
     status = event('status', PlayerStatus)
     backends = extension_point('backends', PlayerBackend)
+    level_meters = extension_point('level_meters', LevelMeter)
 
     def __init__(self):
         self._ctx = None
@@ -77,16 +78,32 @@ class Player(CoreModule):
         self._ctx = ctx
         self._configured_backend = ctx.config.get('backend', default=DEFAULT_BACKEND)
         self.backends.on_register(self._add_backend)
+        self.level_meters.on_register(lambda name, meter: self._connect_levels())
 
         from lauschkiste.player.backends.local_audio import PlayerLocalAudio
         self.backends.register('local_audio', PlayerLocalAudio())
 
     def _add_backend(self, name: str, backend: Any) -> None:
         backend.set_status_callback(partial(self._publish_status, name))
+        self._connect_levels()
         is_configured = name == self._configured_backend
         self._coordinator.register_backend(name, backend, make_active=is_configured)
         if is_configured:
             self._coordinator.set_default_backend(name)
+
+    def _connect_levels(self) -> None:
+        """Backends that can measure their output level report it once a level meter is registered."""
+        callback = self._dispatch_level if self.level_meters.names() else None
+        for _, backend in self.backends.items():
+            if hasattr(backend, 'set_level_callback'):
+                backend.set_level_callback(callback)
+
+    def _dispatch_level(self, left: float, right: float, delay: float) -> None:
+        for name, meter in self.level_meters.items():
+            try:
+                meter.level(left, right, delay)
+            except Exception as error:
+                logger.debug(f"Level meter '{name}' failed: {error}")
 
     def _publish_status(self, provider: str, raw: Mapping[str, Any]) -> None:
         self._ctx.publish(self.status, self._with_metadata(status_from_backend(raw, provider)))

@@ -309,6 +309,18 @@ def test_portaudio_sink_collects_small_writes(monkeypatch):
     assert streams[0].events == ['start', 1200, 600]
 
 
+def test_portaudio_sink_reports_the_level_of_each_channel(monkeypatch):
+    import struct
+    streams, levels = [], []
+    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream(**kw)) or streams[-1])
+    sink = PortAudioSink()
+    sink.level_callback = lambda left, right, delay: levels.append((round(left, 2), right, delay))
+    sink.open(1000, 2)
+    sink.write(b'\x00' * 1200)
+    sink.write(struct.pack('<200h', *([16384, 0] * 100)))
+    assert levels == [(0.5, 0.0, streams[0].latency)]
+
+
 def test_portaudio_sink_drops_buffered_audio_when_interrupted(monkeypatch):
     streams = []
     monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream(**kw)) or streams[-1])

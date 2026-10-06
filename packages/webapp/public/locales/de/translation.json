@@ -560,7 +560,8 @@
         "board_raspberry_pi": "Raspberry Pi",
         "gpio_controls": "Tasten, Drehregler, LED (GPIO)",
         "battery": "Akku",
-        "power_button": "Ein/Aus-Taster"
+        "power_button": "Ein/Aus-Taster",
+        "phat_beat": "Pimoroni pHAT BEAT"
       },
       "install": "Installieren",
       "installing": "Pakete werden installiert, das kann einige Minuten dauern …",
@@ -608,7 +609,10 @@
       "onoff_shim": "Pimoroni OnOff SHIM",
       "custom": "Eigene Pins",
       "max17048": "MAX17048",
-      "max98357a": "MAX98357A"
+      "max98357a": "MAX98357A",
+      "vu": "Pegelanzeige (VU-Meter)",
+      "status": "Lautstärke und Karten",
+      "off": "Aus"
     },
     "fields": {
       "volume": {
@@ -890,6 +894,38 @@
         "hold_time": {
           "label": "Drücken für (Sekunden)",
           "help": "So lange muss der Taster gedrückt werden"
+        }
+      },
+      "phat_beat": {
+        "play_pause": {
+          "label": "Taste Play/Pause"
+        },
+        "next": {
+          "label": "Taste Vor"
+        },
+        "previous": {
+          "label": "Taste Zurück"
+        },
+        "volume_up": {
+          "label": "Taste Lauter",
+          "help": "Wiederholt sich, solange sie gedrückt ist"
+        },
+        "volume_down": {
+          "label": "Taste Leiser",
+          "help": "Wiederholt sich, solange sie gedrückt ist"
+        },
+        "power": {
+          "label": "Ein/Aus-Taste (gedrückt halten)"
+        },
+        "power_hold_time": {
+          "label": "Ein/Aus-Taste halten für (Sekunden)"
+        },
+        "leds": {
+          "label": "LEDs",
+          "help": "Pegelanzeige beim Abspielen; Lautstärke und Karten werden immer kurz angezeigt"
+        },
+        "brightness": {
+          "label": "LED-Helligkeit"
         }
       }
     },

@@ -562,7 +562,8 @@
         "board_raspberry_pi": "Raspberry Pi",
         "gpio_controls": "Buttons, encoders, LED (GPIO)",
         "battery": "Battery",
-        "power_button": "Power button"
+        "power_button": "Power button",
+        "phat_beat": "Pimoroni pHAT BEAT"
       },
       "install": "Install",
       "installing": "Installing packages, this can take a few minutes …",
@@ -610,7 +611,10 @@
       "onoff_shim": "Pimoroni OnOff SHIM",
       "custom": "Own pins",
       "max17048": "MAX17048",
-      "max98357a": "MAX98357A"
+      "max98357a": "MAX98357A",
+      "vu": "Level meter (VU)",
+      "status": "Volume and cards",
+      "off": "Off"
     },
     "fields": {
       "player": {

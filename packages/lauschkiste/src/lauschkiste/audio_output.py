@@ -51,6 +51,8 @@ class PortAudioSink(AudioSink):
         self._prefill_bytes = 0
         self._bytes_per_second = 1
         self._chunk = bytearray()
+        #: ``callback(left, right, delay)``: RMS level (0..1) of each written chunk, audible in ``delay`` seconds
+        self.level_callback = None
 
     def open(self, samplerate, channels):
         self._pending = bytearray()
@@ -88,6 +90,18 @@ class PortAudioSink(AudioSink):
         if len(self._chunk) >= self._bytes_per_second * self.CHUNK_SECONDS:
             data, self._chunk = bytes(self._chunk), bytearray()
             self._write(data)
+            self._report_level(data)
+
+    def _report_level(self, data):
+        callback = self.level_callback
+        if callback is None or self._stream is None:
+            return
+        try:
+            left = audioop.rms(audioop.tomono(data, 2, 1, 0), 2) / 32768
+            right = audioop.rms(audioop.tomono(data, 2, 0, 1), 2) / 32768
+            callback(left, right, self._stream.latency)
+        except Exception as error:
+            logger.debug(f"Level meter failed: {error}")
 
     def close(self, discard=False):
         dropped = 0.0

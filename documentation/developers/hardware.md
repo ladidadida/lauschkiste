@@ -74,5 +74,11 @@ button two GPIO pins. Through the core they get the GPIO line of a pin and regis
 | `gpio_controls` | buttons, rotary encoders, status LED |
 | `battery` | battery monitor with drivers INA219, MAX17048, simulator |
 | `power_button` | button that shuts down cleanly, pin that cuts the power afterwards (OnOff SHIM preset) |
+| `phat_beat` | Pimoroni pHAT BEAT: six buttons, two LED bars (volume, cards, level meter); its DAC is a sound card of the board |
+
+A device plugin that shows the output level registers at the player's extension point
+`level_meters` (`level(left, right, delay)`, RMS 0..1 per channel about ten times a second, audible
+in `delay` seconds). Backends that can measure it (`local_audio`) only do so while a meter is
+registered.
 
 Sound cards are only boot configuration, so they are a setting of the board plugin.

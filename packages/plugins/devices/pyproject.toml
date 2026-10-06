@@ -20,6 +20,7 @@ battery = ["pi-ina219", "smbus2"]
 gpio_controls = "lauschkiste_plugin_devices.gpio_controls:GpioControls"
 battery = "lauschkiste_plugin_devices.battery:Battery"
 power_button = "lauschkiste_plugin_devices.power_button:PowerButton"
+phat_beat = "lauschkiste_plugin_devices.phat_beat:PhatBeat"
 
 [tool.uv.sources]
 lauschkiste = { workspace = true }

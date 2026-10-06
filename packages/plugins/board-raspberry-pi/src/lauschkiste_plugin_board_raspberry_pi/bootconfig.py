@@ -26,6 +26,8 @@ POWEROFF = re.compile(r'^dtoverlay=gpio-poweroff[^\n]*$', re.MULTILINE)
 
 I2C_BATTERY_DRIVERS = ('ina219', 'max17048')
 SPI_READERS = ('rc522_spi',)
+#: Device plugins of HATs with a DAC: the sound card they need
+HAT_SOUND_CARDS = {'phat_beat': 'hifiberry-dac'}
 
 
 @dataclass
@@ -55,6 +57,8 @@ def wanted(config: Mapping[str, Any], rfid: Optional[Mapping[str, Any]] = None) 
     power = plugins.get('power_button') or {}
     readers = ((rfid or {}).get('rfid') or {}).get('readers') or {}
     card = str(board.get('sound_card') or 'none')
+    if card == 'none':
+        card = next((sound for hat, sound in HAT_SOUND_CARDS.items() if hat in plugins), 'none')
     return Wanted(
         sound_card=card if card in SOUND_CARDS else 'none',
         onboard_audio=card not in SOUND_CARDS and board.get('onboard_audio', True) is not False,
