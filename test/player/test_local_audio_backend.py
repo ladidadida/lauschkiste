@@ -24,8 +24,9 @@ class RecordingSink:
     def write(self, data):
         self.chunks.append(data)
 
-    def close(self):
+    def close(self, discard=False):
         self.closed = True
+        return 0.0
 
 
 class _FakeStatusStore(dict):
@@ -251,6 +252,7 @@ class FakeStream:
     def __init__(self, **kwargs):
         self.active = False
         self.events = []
+        self.latency = kwargs.get('latency', 0.0)
 
     def start(self):
         self.active = True
@@ -262,6 +264,9 @@ class FakeStream:
 
     def stop(self):
         self.events.append('stop')
+
+    def abort(self):
+        self.events.append('abort')
 
     def close(self):
         self.events.append('close')
@@ -290,6 +295,34 @@ def test_portaudio_sink_plays_short_sounds_on_close(monkeypatch):
     sink.write(b'\x00' * 100)
     sink.close()
     assert streams[0].events == ['start', 100, 'stop', 'close']
+
+
+def test_portaudio_sink_collects_small_writes(monkeypatch):
+    streams = []
+    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream(**kw)) or streams[-1])
+    sink = PortAudioSink()
+    sink.open(1000, 2)  # 4000 bytes/s: prefill 1200 bytes, chunks of 400 bytes
+    sink.write(b'\x00' * 1200)
+    sink.write(b'\x00' * 300)
+    assert streams[0].events == ['start', 1200]
+    sink.write(b'\x00' * 300)
+    assert streams[0].events == ['start', 1200, 600]
+
+
+def test_portaudio_sink_drops_buffered_audio_when_interrupted(monkeypatch):
+    streams = []
+    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream(**kw)) or streams[-1])
+    sink = PortAudioSink()
+    sink.open(1000, 2)
+    sink.write(b'\x00' * 1600)
+    sink.write(b'\x00' * 400)
+    assert sink.close(discard=True) == streams[0].latency
+    assert streams[0].events == ['start', 1600, 400, 'abort', 'close']
+
+    sink.open(1000, 2)
+    sink.write(b'\x00' * 400)
+    assert sink.close(discard=True) == 0.1
+    assert streams[1].events == ['stop', 'close']
 
 
 def test_play_files_starts_at_entry_and_position(tmp_path, monkeypatch):

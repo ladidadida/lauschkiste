@@ -18,6 +18,7 @@ import logging
 import os
 import random
 import threading
+import time
 
 from fractions import Fraction
 
@@ -48,6 +49,8 @@ class PlayerLocalAudio:
             self._status_store['last_played_folder'] = ''
 
         self._status_callback = lambda status: None
+        self._last_published: dict = {}
+        self._published_at = 0.0
         self._cv = threading.Condition(threading.RLock())
         self._abort = threading.Event()
         self._closing = False
@@ -229,7 +232,11 @@ class PlayerLocalAudio:
                     return False
             return True
         finally:
-            self._sink.close()
+            dropped = self._sink.close(discard=self._abort.is_set())
+            if dropped:
+                with self._cv:
+                    if self._state == 'pause':
+                        self._position = max(0.0, self._position - dropped * speed)
 
     def _jump_to(self, index: int, position: float = 0.0):
         with self._cv:
@@ -269,8 +276,16 @@ class PlayerLocalAudio:
             self._status_callback(self._status_dict())
 
     def _publish_status(self):
-        if self._active:
-            self._status_callback(self._status_dict())
+        if not self._active:
+            return
+        status = self._status_dict()
+        last = self._last_published
+        moved = {k: v for k, v in status.items() if k != 'elapsed'} != {k: v for k, v in last.items() if k != 'elapsed'}
+        due = status['state'] == 'play' and time.monotonic() - self._published_at >= 1.0
+        if moved or due or (status != last and status['state'] != 'play'):
+            self._last_published = status
+            self._published_at = time.monotonic()
+            self._status_callback(status)
 
     def _status_dict(self):
         with self._cv:

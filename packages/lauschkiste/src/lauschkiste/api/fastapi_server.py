@@ -193,6 +193,18 @@ def create_app(broker, executor, modules=None, webapp_build_dir=None, logs_dir=N
     return app
 
 
+class _Server(uvicorn.Server):
+    """uvicorn wakes up ten times a second to check for shutdown; once a second saves CPU on small boards."""
+
+    async def main_loop(self) -> None:
+        counter = 0
+        should_exit = await self.on_tick(counter)
+        while not should_exit:
+            counter = (counter + 10) % 864000
+            await asyncio.sleep(1.0)
+            should_exit = await self.on_tick(counter)
+
+
 class FastApiServer(threading.Thread):
     """Run the browser API on an isolated asyncio event loop."""
 
@@ -236,7 +248,7 @@ class FastApiServer(threading.Thread):
         logger.debug(f"API routes built in {(time.perf_counter() - started) * 1000:.0f} ms")
 
         config = uvicorn.Config(app, host=self.bind_address, port=self.port, loop='none', log_config=None)
-        self._server = uvicorn.Server(config)
+        self._server = _Server(config)
 
         # broker.publish is called synchronously from whatever thread published (see
         # lauschkiste.publishing.bus.EventBus); it hands off to this server's event loop itself via
