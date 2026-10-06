@@ -47,14 +47,21 @@ def clean(monkeypatch):
     lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
 
 
+class FakeButtons:
+    pressed_lines = set()
+
+    def __init__(self, chip, lines):
+        FakeButtons.lines = lines
+
+    def pressed(self):
+        return [line in FakeButtons.pressed_lines for line in FakeButtons.lines]
+
+
 @pytest.fixture
 def mock_pins(monkeypatch):
-    gpiozero = pytest.importorskip('gpiozero')
-    from gpiozero.pins.mock import MockFactory
-    factory = MockFactory()
-    monkeypatch.setattr(phat_beat.PhatBeat, 'pin_factory', factory)
-    yield factory
-    gpiozero.Device.pin_factory = None
+    FakeButtons.pressed_lines = set()
+    monkeypatch.setattr(phat_beat.PhatBeat, 'button_reader', FakeButtons)
+    return FakeButtons.pressed_lines
 
 
 class Writer:
@@ -161,8 +168,7 @@ def test_status_mode_ignores_levels():
 
 def test_buttons_run_actions_leds_show_volume_and_pins_are_claimed(mock_pins, monkeypatch):
     manager, bus = start({'leds': 'vu'}, monkeypatch)
-    time.sleep(0.1)
-    mock_pins.pin(6).drive_low()
+    mock_pins.add(6)
     assert wait(lambda: Player.calls == ['toggle'])
     assert 'phat_beat' in manager.handle('player').instance.level_meters.names()
 
@@ -182,12 +188,37 @@ def test_power_button_needs_holding(mock_pins, monkeypatch):
     manager, _ = start({'leds': 'off', 'power_hold_time': 0.5}, monkeypatch)
     shutdown = Mock()
     monkeypatch.setattr(board_plugin.RaspberryPiBoard, 'shutdown', lambda self: shutdown())
-    mock_pins.pin(12).drive_low()
+    mock_pins.add(12)
     time.sleep(0.2)
     assert not shutdown.called
     assert wait(lambda: shutdown.called)
     assert Writer.frames == []
     manager.stop()
+
+
+def test_buttons_press_hold_and_repeat():
+    clock = Clock()
+    calls = []
+    state = [False, False, False]
+    buttons = phat_beat.Buttons(lambda: state, [
+        phat_beat.Button(press=lambda: calls.append('press')),
+        phat_beat.Button(hold=lambda: calls.append('hold'), hold_time=2),
+        phat_beat.Button(press=lambda: calls.append('up'), hold=lambda: calls.append('up'), hold_time=0.5, repeat=0.25),
+    ], clock=clock)
+    state[:] = [True, True, True]
+    for _ in range(10):
+        buttons.poll()
+        clock.now += 0.1
+    assert calls.count('press') == 1 and 'hold' not in calls and calls.count('up') == 3
+    for _ in range(15):
+        buttons.poll()
+        clock.now += 0.1
+    assert calls.count('hold') == 1
+    state[:] = [False, False, False]
+    buttons.poll()
+    state[0] = True
+    buttons.poll()
+    assert calls.count('press') == 2
 
 
 def test_boot_configuration_switches_its_dac_on():

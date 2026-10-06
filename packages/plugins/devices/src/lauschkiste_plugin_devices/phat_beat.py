@@ -24,7 +24,7 @@ from pydantic import BaseModel, Field
 from lauschkiste.contract import ActionEntry, Plugin
 from lauschkiste.hardware import Claim
 
-from lauschkiste_plugin_devices.apa102 import Color, LgpioWriter, frame
+from lauschkiste_plugin_devices.apa102 import Color, frame, writer
 from lauschkiste_plugin_devices.gpio import Pins
 
 logger = logging.getLogger('lauschkiste.phat_beat')
@@ -219,44 +219,94 @@ class Leds:
             pass
 
 
-class Buttons:
-    def __init__(self, config: Dict[str, Any], bind: Callable[[Dict[str, Any]], Optional[Callable[[], None]]], pins: Pins):
-        import gpiozero
-        self._devices: List[Any] = []
-        for name, pin in BUTTONS.items():
-            entry = config.get(name)
-            run = bind(entry) if entry else None
-            if run is None:
-                continue
-            try:
-                self._devices.append(self._button(gpiozero, name, pin, run, config, pins))
-            except Exception as error:
-                logger.error(f"Button '{name}' on {pin}: {error.__class__.__name__}: {error}")
+class LgpioButtons:
+    """Reads the levels of all button lines with one call (pull-ups on, pressed = low)."""
 
-    @staticmethod
-    def _button(gpiozero, name: str, pin: str, run, config: Dict[str, Any], pins: Pins):
-        line = pins.line(pin)
-        if name == 'power':
-            button = gpiozero.Button(line, pull_up=True, bounce_time=0.05,
-                                     hold_time=config['power_hold_time'], **pins.kwargs())
-            button.when_held = run
-        elif name in REPEATING:
-            button = gpiozero.Button(line, pull_up=True, bounce_time=0.05, hold_time=0.5, hold_repeat=True,
-                                     **pins.kwargs())
-            button.when_pressed = run
-            button.when_held = run
-        else:
-            button = gpiozero.Button(line, pull_up=True, bounce_time=0.05, **pins.kwargs())
-            button.when_pressed = run
-        return button
+    def __init__(self, chip: int, lines: List[int]):
+        import lgpio
+        self._lgpio = lgpio
+        self._handle = lgpio.gpiochip_open(chip)
+        self._leader = lines[0]
+        self._count = len(lines)
+        try:
+            lgpio.group_claim_input(self._handle, lines, lgpio.SET_PULL_UP)
+        except Exception:
+            lgpio.gpiochip_close(self._handle)
+            raise
+
+    def pressed(self) -> List[bool]:
+        _, levels = self._lgpio.group_read(self._handle, self._leader)
+        return [not (levels >> i) & 1 for i in range(self._count)]
 
     def close(self) -> None:
-        for device in self._devices:
+        self._lgpio.gpiochip_close(self._handle)
+
+
+class Button:
+    def __init__(self, press: Optional[Callable[[], None]] = None, hold: Optional[Callable[[], None]] = None,
+                 hold_time: float = 1.0, repeat: Optional[float] = None):
+        self.press, self.hold, self.hold_time, self.repeat = press, hold, hold_time, repeat
+        self.down: Optional[float] = None
+        self.fired: Optional[float] = None
+
+
+class Buttons:
+    """Polls the buttons 20 times a second. gpiozero's edge detection (through lgpio) keeps 13 % of a
+    Pi Zero's CPU busy; this needs a fraction of one percent."""
+
+    INTERVAL = 0.05
+
+    def __init__(self, read: Callable[[], List[bool]], buttons: List[Button], clock: Callable[[], float] = time.monotonic):
+        self._read = read
+        self._buttons = buttons
+        self._clock = clock
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._run, name='phat_beat.buttons', daemon=True)
+
+    def start(self) -> None:
+        self._thread.start()
+
+    def stop(self) -> threading.Thread:
+        self._stop.set()
+        return self._thread
+
+    def _run(self) -> None:
+        while not self._stop.wait(self.INTERVAL):
             try:
-                device.close()
+                self.poll()
             except Exception as error:
-                logger.debug(f"Closing a button failed: {error}")
-        self._devices = []
+                logger.error(f"Buttons: {error.__class__.__name__}: {error}")
+                return
+
+    def poll(self) -> None:
+        now = self._clock()
+        for button, pressed in zip(self._buttons, self._read()):
+            if not pressed:
+                button.down = button.fired = None
+                continue
+            if button.down is None:
+                button.down = now
+                if button.press is not None:
+                    button.press()
+            elif button.hold is not None and now - button.down >= button.hold_time:
+                if button.fired is None or (button.repeat is not None and now - button.fired >= button.repeat):
+                    button.fired = now
+                    button.hold()
+
+
+def buttons_from(config: Dict[str, Any], bind: Callable[[Dict[str, Any]], Optional[Callable[[], None]]]) -> Dict[str, Button]:
+    result = {}
+    for name in BUTTONS:
+        run = bind(config[name]) if config.get(name) else None
+        if run is None:
+            continue
+        if name == 'power':
+            result[name] = Button(hold=run, hold_time=config['power_hold_time'])
+        elif name in REPEATING:
+            result[name] = Button(press=run, hold=run, hold_time=0.5, repeat=0.25)
+        else:
+            result[name] = Button(press=run)
+    return result
 
 
 def settings_of(ctx) -> Dict[str, Any]:
@@ -291,12 +341,13 @@ class PhatBeat(Plugin):
     requires = {'hardware': '>=1.0,<2', 'player': '>=5.1,<6'}
     extras = ('gpio',)
     settings = PhatBeatSettings
-    pin_factory = None
+    button_reader: Optional[Callable[[int, List[int]], Any]] = None
     led_writer: Optional[Callable[[int, int, int], Any]] = None
 
     def __init__(self):
         self._ctx: Any = None
         self._buttons: Optional[Buttons] = None
+        self._button_lines: Any = None
         self._state: Optional[LedState] = None
         self._leds: Optional[Leds] = None
 
@@ -313,22 +364,31 @@ class PhatBeat(Plugin):
 
     def ready(self) -> None:
         config = settings_of(self._ctx)
-        pins = Pins(self._ctx.modules.hardware, self.pin_factory)
-        self._buttons = Buttons(config, self._bind, pins)
+        pins = Pins(self._ctx.modules.hardware)
+        buttons = buttons_from(config, self._bind)
+        if buttons:
+            try:
+                lines = [pins.line(BUTTONS[name]) for name in buttons]
+                self._button_lines = (self.button_reader or LgpioButtons)(pins.chip, lines)
+                self._buttons = Buttons(self._button_lines.pressed, list(buttons.values()))
+                self._buttons.start()
+            except Exception as error:
+                logger.error(f"Buttons not available: {error.__class__.__name__}: {error}")
         if self._state is not None:
             try:
                 data, clock = pins.line(LED_DATA), pins.line(LED_CLOCK)
-                writer = (self.led_writer or LgpioWriter)(pins.chip, data, clock)
+                leds = (self.led_writer or writer)(pins.chip, data, clock)
             except Exception as error:
                 logger.error(f"LEDs not available: {error.__class__.__name__}: {error}")
                 return
-            self._leds = Leds(self._state, writer.write, config['brightness'], config['animations'])
+            logger.info(f"LEDs through {type(leds).__name__}")
+            self._leds = Leds(self._state, leds.write, config['brightness'], config['animations'])
             self._leds.start()
 
     def stop(self):
         threads = []
         if self._buttons is not None:
-            self._buttons.close()
+            threads.append(self._buttons.stop())
         if self._leds is not None:
             threads.append(self._leds.stop())
         return threads
