@@ -15,7 +15,8 @@ from lauschkiste.publishing.bus import EventBus
 from lauschkiste_plugin_board_raspberry_pi import bootconfig
 from lauschkiste_plugin_devices import phat_beat
 from lauschkiste_plugin_devices.apa102 import frame
-from lauschkiste_plugin_devices.phat_beat import BAR, OFF, VOLUME_COLOR, LedState, level_to_leds
+from lauschkiste_plugin_devices.phat_beat import (BAR, OFF, RAINBOW, RED, VOLUME_COLOR, LedState, level_to_leds,
+                                                  shutdown_frames, startup_frames)
 
 
 class Player(CoreModule):
@@ -124,6 +125,34 @@ def test_level_meter_follows_the_audible_level_and_decays():
     assert state.pixels() == [OFF] * 2 * BAR
 
 
+def test_volume_and_cards_show_over_the_level_meter():
+    clock = Clock()
+    state = LedState(vu=True, clock=clock)
+    state.level(1.0, 1.0, delay=0)
+    state.card(registered=False)
+    assert state.pixels() == [RED] * 2 * BAR
+    clock.now += 0.3
+    assert state.pixels() == [OFF] * 2 * BAR
+    clock.now += 0.2
+    assert state.pixels() == [RED] * 2 * BAR
+    clock.now += 0.5
+    state.level(1.0, 1.0, delay=0)
+    assert all(color != OFF for color in state.pixels())
+
+
+def test_startup_animation_rises_and_fades_out():
+    clock = Clock()
+    state = LedState(vu=False, clock=clock)
+    state.animate(startup_frames())
+    first = state.pixels()
+    assert first[0] == RAINBOW[0] and first[1:BAR] == [OFF] * (BAR - 1) and first[-1] == RAINBOW[0]
+    clock.now += 0.07 * BAR
+    assert state.pixels()[:BAR] == RAINBOW
+    clock.now += 2
+    assert state.pixels() == [OFF] * 2 * BAR and not state.animating()
+    assert shutdown_frames()[-1][0] == [OFF] * 2 * BAR
+
+
 def test_status_mode_ignores_levels():
     state = LedState(vu=False, clock=Clock())
     state.level(1.0, 1.0, delay=0)
@@ -146,6 +175,7 @@ def test_buttons_run_actions_leds_show_volume_and_pins_are_claimed(mock_pins, mo
     assert manager.handle('hardware').invoke('get_state').conflicts == []
     manager.stop()
     assert wait(lambda: Writer.frames[-1] == frame([OFF] * 2 * BAR, 3))
+    assert frame(shutdown_frames()[0][0], 3) in Writer.frames
 
 
 def test_power_button_needs_holding(mock_pins, monkeypatch):

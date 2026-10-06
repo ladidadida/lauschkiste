@@ -612,8 +612,8 @@
       "custom": "Own pins",
       "max17048": "MAX17048",
       "max98357a": "MAX98357A",
-      "vu": "Level meter (VU)",
-      "status": "Volume and cards",
+      "vu": "Level meter, plus volume and cards",
+      "status": "Volume and cards only",
       "off": "Off"
     },
     "fields": {

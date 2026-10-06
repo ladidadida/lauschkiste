@@ -11,6 +11,7 @@ The DAC is a sound card of the board (Raspberry Pi: hifiberry-dac); the board pl
 configuration switches it on when this plugin is enabled.
 """
 
+import colorsys
 import logging
 import math
 import threading
@@ -36,7 +37,13 @@ BAR = 8
 OFF: Color = (0, 0, 0)
 VU_COLORS: List[Color] = [(0, 255, 0)] * 5 + [(255, 160, 0)] * 2 + [(255, 0, 0)]
 VOLUME_COLOR: Color = (0, 80, 255)
-OVERLAY_SECONDS = {'volume': 2.0, 'card': 0.6, 'unknown_card': 1.2}
+GREEN: Color = (0, 255, 0)
+RED: Color = (255, 0, 0)
+RAINBOW: List[Color] = [tuple(round(255 * c) for c in colorsys.hsv_to_rgb(0.75 * i / (BAR - 1), 1, 1))
+                        for i in range(BAR)]
+VOLUME_SECONDS = 2.0
+#: A picture and how long it stays
+Frames = List[Tuple[List[Color], float]]
 #: Level in dB shown by an empty and a full bar
 VU_RANGE_DB = (-45.0, 0.0)
 
@@ -55,8 +62,9 @@ class PhatBeatSettings(BaseModel):
                                                description='Repeats while held')
     power: Optional[ActionEntry] = Field(_action('hardware.shutdown'), title='On/off button (held)')
     power_hold_time: float = Field(2.0, ge=0.5, le=10, title='Hold the on/off button for (seconds)')
-    leds: Literal['vu', 'status', 'off'] = Field('status', title='LEDs',
-                                                 description='vu: level meter while playing; status: volume and cards')
+    leds: Literal['vu', 'status', 'off'] = Field('status', title='LEDs', description=(
+        'vu: level meter while playing, volume and cards shown over it; status: only volume and cards'))
+    animations: bool = Field(True, title='Start and shutdown animation')
     brightness: int = Field(3, ge=1, le=31, title='LED brightness')
 
 
@@ -69,6 +77,29 @@ def _pixels(left: List[Color], right: List[Color]) -> List[Color]:
     return left + list(reversed(right))
 
 
+def _scaled(colors: List[Color], factor: float) -> List[Color]:
+    return [(round(r * factor), round(g * factor), round(b * factor)) for r, g, b in colors]
+
+
+def startup_frames() -> Frames:
+    """A rainbow rises in both bars, stays a moment and fades out."""
+    frames: Frames = [(_pixels(_bar(n, RAINBOW), _bar(n, RAINBOW)), 0.07) for n in range(1, BAR + 1)]
+    frames.append((_pixels(RAINBOW, RAINBOW), 0.4))
+    frames += [(_pixels(_scaled(RAINBOW, f), _scaled(RAINBOW, f)), 0.08) for f in (0.6, 0.35, 0.15, 0.05)]
+    return frames
+
+
+def shutdown_frames() -> Frames:
+    """The bars sink down, top first."""
+    return [(_pixels(_bar(n, RAINBOW), _bar(n, RAINBOW)), 0.06) for n in range(BAR, -1, -1)]
+
+
+def card_frames(registered: bool) -> Frames:
+    if registered:
+        return [([GREEN] * 2 * BAR, 0.6)]
+    return [([RED] * 2 * BAR, 0.25), ([OFF] * 2 * BAR, 0.15)] * 2
+
+
 def level_to_leds(rms: float) -> float:
     if rms <= 0:
         return 0.0
@@ -77,7 +108,7 @@ def level_to_leds(rms: float) -> float:
 
 
 class LedState:
-    """What the LEDs show: a short overlay (volume, card) over the level meter or darkness."""
+    """What the LEDs show: short animations (start, volume, cards) over the level meter or darkness."""
 
     DECAY = 0.75
 
@@ -85,31 +116,46 @@ class LedState:
         self._vu = vu
         self._clock = clock
         self._lock = threading.Lock()
-        self._overlay: Optional[Tuple[List[Color], float]] = None
+        self._overlay: Optional[Tuple[float, Frames]] = None
         self._levels: Deque[Tuple[float, float, float]] = deque(maxlen=50)
         self._left = self._right = 0.0
 
     def volume(self, volume: int) -> None:
         bar = _bar(BAR * max(0, min(100, volume)) / 100, [VOLUME_COLOR] * BAR)
-        self._show(_pixels(bar, bar), OVERLAY_SECONDS['volume'])
+        self.animate([(_pixels(bar, bar), VOLUME_SECONDS)])
 
     def card(self, registered: bool) -> None:
-        color = (0, 255, 0) if registered else (255, 0, 0)
-        self._show([color] * 2 * BAR, OVERLAY_SECONDS['card' if registered else 'unknown_card'])
+        self.animate(card_frames(registered))
 
     def level(self, left: float, right: float, delay: float) -> None:
         if self._vu:
             with self._lock:
                 self._levels.append((self._clock() + delay, level_to_leds(left), level_to_leds(right)))
 
-    def _show(self, pixels: List[Color], seconds: float) -> None:
+    def animate(self, frames: Frames) -> None:
+        """Show ``frames`` now, replacing what is shown over the meter."""
         with self._lock:
-            self._overlay = (pixels, self._clock() + seconds)
+            self._overlay = (self._clock(), frames)
+
+    def animating(self) -> bool:
+        with self._lock:
+            return self._overlay is not None
 
     def busy(self) -> bool:
-        """True while the picture changes by itself (an overlay runs out, the meter moves)."""
+        """True while the picture changes by itself (an animation runs, the meter moves)."""
         with self._lock:
             return self._overlay is not None or bool(self._levels) or self._left > 0.05 or self._right > 0.05
+
+    def _overlay_pixels(self, now: float) -> Optional[List[Color]]:
+        if self._overlay is None:
+            return None
+        start, frames = self._overlay
+        for pixels, seconds in frames:
+            start += seconds
+            if now < start:
+                return list(pixels)
+        self._overlay = None
+        return None
 
     def pixels(self) -> List[Color]:
         now = self._clock()
@@ -119,10 +165,9 @@ class LedState:
                 _, target_left, target_right = self._levels.popleft()
             self._left = max(target_left, self._left * self.DECAY)
             self._right = max(target_right, self._right * self.DECAY)
-            if self._overlay is not None:
-                if now < self._overlay[1]:
-                    return list(self._overlay[0])
-                self._overlay = None
+            overlay = self._overlay_pixels(now)
+            if overlay is not None:
+                return overlay
             if not self._vu:
                 return [OFF] * 2 * BAR
             return _pixels(_bar(self._left, VU_COLORS), _bar(self._right, VU_COLORS))
@@ -131,8 +176,9 @@ class LedState:
 class Leds:
     """Draws the LED state about ten times a second while it changes; writes only changed frames."""
 
-    def __init__(self, state: LedState, write: Callable[[bytes], None], brightness: int):
+    def __init__(self, state: LedState, write: Callable[[bytes], None], brightness: int, animations: bool = True):
         self._state = state
+        self._animations = animations
         self._write = write
         self._brightness = brightness
         self._wake = threading.Event()
@@ -140,19 +186,23 @@ class Leds:
         self._thread = threading.Thread(target=self._run, name='phat_beat.leds', daemon=True)
 
     def start(self) -> None:
+        if self._animations:
+            self._state.animate(startup_frames())
         self._thread.start()
 
     def wake(self) -> None:
         self._wake.set()
 
     def stop(self) -> threading.Thread:
+        if self._animations:
+            self._state.animate(shutdown_frames())
         self._stop.set()
         self._wake.set()
         return self._thread
 
     def _run(self) -> None:
         last: Optional[List[Color]] = None
-        while not self._stop.is_set():
+        while not self._stop.is_set() or self._state.animating():
             pixels = self._state.pixels()
             if pixels != last:
                 try:
@@ -272,7 +322,7 @@ class PhatBeat(Plugin):
             except Exception as error:
                 logger.error(f"LEDs not available: {error.__class__.__name__}: {error}")
                 return
-            self._leds = Leds(self._state, writer.write, config['brightness'])
+            self._leds = Leds(self._state, writer.write, config['brightness'], config['animations'])
             self._leds.start()
 
     def stop(self):

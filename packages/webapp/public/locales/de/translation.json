@@ -610,8 +610,8 @@
       "custom": "Eigene Pins",
       "max17048": "MAX17048",
       "max98357a": "MAX98357A",
-      "vu": "Pegelanzeige (VU-Meter)",
-      "status": "Lautstärke und Karten",
+      "vu": "Pegelanzeige, dazu Lautstärke und Karten",
+      "status": "Nur Lautstärke und Karten",
       "off": "Aus"
     },
     "fields": {
@@ -922,7 +922,10 @@
         },
         "leds": {
           "label": "LEDs",
-          "help": "Pegelanzeige beim Abspielen; Lautstärke und Karten werden immer kurz angezeigt"
+          "help": "Lautstärke und Karten werden kurz angezeigt, bei Pegelanzeige über dem Pegel"
+        },
+        "animations": {
+          "label": "Animation beim Starten und Herunterfahren"
         },
         "brightness": {
           "label": "LED-Helligkeit"

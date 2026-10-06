@@ -19,8 +19,10 @@ two bars of eight RGB LEDs. In Lauschkiste it is the `phat_beat` plugin.
 
 Every button can run any [action](../../actions.md) instead. The LEDs (GPIO23 data, GPIO24 clock)
 show the volume after a change and light up green for a known card and red for an unknown one.
-With `leds: vu` they show the level of each channel while playing (only with the `local_audio`
-player); `leds: off` leaves them dark and their pins free.
+With `leds: vu` they also show the level of each channel while playing (only with the `local_audio`
+player), with volume and cards shown over it; `leds: off` leaves them dark and their pins free. A
+rainbow rises when the box is ready and the bars sink when it shuts down (`animations: false` turns
+that off).
 
 The on/off button only shuts the system down; the Pirate Radio has no circuit that cuts the power
 afterwards.
