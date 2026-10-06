@@ -55,6 +55,7 @@ export default function Navigation() {
         position: 'fixed',
         bottom: '0px',
         height: '65px',
+        zIndex: (theme) => theme.zIndex.appBar,
       }}
     >
       {navigationItems.map(({
