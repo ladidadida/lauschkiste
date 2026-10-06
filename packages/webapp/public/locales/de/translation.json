@@ -612,7 +612,14 @@
       "max98357a": "MAX98357A",
       "vu": "Pegelanzeige, dazu Lautstärke und Karten",
       "status": "Nur Lautstärke und Karten",
-      "off": "Aus"
+      "off": "Aus",
+      "classic": "Klassisch (grün, gelb, rot)",
+      "rainbow": "Regenbogen",
+      "ocean": "Ozean",
+      "sunset": "Sonnenuntergang",
+      "unicorn": "Einhorn",
+      "forest": "Wald",
+      "fire": "Feuer"
     },
     "fields": {
       "volume": {
@@ -923,6 +930,10 @@
         "leds": {
           "label": "LEDs",
           "help": "Lautstärke und Karten werden kurz angezeigt, bei Pegelanzeige über dem Pegel"
+        },
+        "colors": {
+          "label": "Farben",
+          "help": "Farben der Pegelanzeige und der Animationen, von unten nach oben"
         },
         "animations": {
           "label": "Animation beim Starten und Herunterfahren"

@@ -160,6 +160,18 @@ def test_startup_animation_rises_and_fades_out():
     assert shutdown_frames()[-1][0] == [OFF] * 2 * BAR
 
 
+def test_palettes_have_eight_colors_and_color_the_meter():
+    for name, colors in phat_beat.PALETTES.items():
+        assert len(colors) == BAR and all(len(c) == 3 and all(0 <= v <= 255 for v in c) for c in colors), name
+    assert phat_beat.PALETTES['ocean'][0] == (0, 255, 160) and phat_beat.PALETTES['ocean'][-1] == (120, 0, 255)
+    assert set(phat_beat.PALETTES) == set(phat_beat.PhatBeatSettings.model_json_schema()['properties']['colors']['enum'])
+    clock = Clock()
+    state = LedState(vu=True, colors=phat_beat.PALETTES['fire'], clock=clock)
+    state.level(1.0, 1.0, delay=0)
+    assert state.pixels()[:BAR] == phat_beat.PALETTES['fire']
+    assert startup_frames(phat_beat.PALETTES['fire'])[BAR][0][:BAR] == phat_beat.PALETTES['fire']
+
+
 def test_status_mode_ignores_levels():
     state = LedState(vu=False, clock=Clock())
     state.level(1.0, 1.0, delay=0)
@@ -181,7 +193,7 @@ def test_buttons_run_actions_leds_show_volume_and_pins_are_claimed(mock_pins, mo
     assert manager.handle('hardware').invoke('get_state').conflicts == []
     manager.stop()
     assert wait(lambda: Writer.frames[-1] == frame([OFF] * 2 * BAR, 3))
-    assert frame(shutdown_frames()[0][0], 3) in Writer.frames
+    assert frame(shutdown_frames(phat_beat.PALETTES['classic'])[0][0], 3) in Writer.frames
 
 
 def test_power_button_needs_holding(mock_pins, monkeypatch):

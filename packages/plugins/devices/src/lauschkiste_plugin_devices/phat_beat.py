@@ -35,12 +35,36 @@ REPEATING = ('volume_up', 'volume_down')
 LED_DATA, LED_CLOCK = 'GPIO23', 'GPIO24'
 BAR = 8
 OFF: Color = (0, 0, 0)
-VU_COLORS: List[Color] = [(0, 255, 0)] * 5 + [(255, 160, 0)] * 2 + [(255, 0, 0)]
 VOLUME_COLOR: Color = (0, 80, 255)
 GREEN: Color = (0, 255, 0)
 RED: Color = (255, 0, 0)
 RAINBOW: List[Color] = [tuple(round(255 * c) for c in colorsys.hsv_to_rgb(0.75 * i / (BAR - 1), 1, 1))
                         for i in range(BAR)]
+
+
+def gradient(*stops: Color) -> List[Color]:
+    """Eight colors from the first stop (bottom) to the last (top)."""
+    colors = []
+    for i in range(BAR):
+        position = i / (BAR - 1) * (len(stops) - 1)
+        index = min(int(position), len(stops) - 2)
+        f = position - index
+        low, high = stops[index], stops[index + 1]
+        colors.append(tuple(round(a + (b - a) * f) for a, b in zip(low, high)))
+    return colors
+
+
+#: Colors of the bars from bottom to top
+PALETTES: Dict[str, List[Color]] = {
+    'classic': [(0, 255, 0)] * 5 + [(255, 160, 0)] * 2 + [(255, 0, 0)],
+    'rainbow': RAINBOW,
+    'ocean': gradient((0, 255, 160), (0, 120, 255), (120, 0, 255)),
+    'sunset': gradient((255, 200, 0), (255, 70, 0), (255, 0, 120)),
+    'unicorn': gradient((255, 90, 200), (170, 70, 255), (60, 200, 255)),
+    'forest': gradient((200, 255, 0), (0, 210, 50), (0, 140, 130)),
+    'fire': gradient((255, 20, 0), (255, 120, 0), (255, 230, 90)),
+}
+Palette = Literal['classic', 'rainbow', 'ocean', 'sunset', 'unicorn', 'forest', 'fire']
 VOLUME_SECONDS = 2.0
 #: A picture and how long it stays
 Frames = List[Tuple[List[Color], float]]
@@ -64,6 +88,8 @@ class PhatBeatSettings(BaseModel):
     power_hold_time: float = Field(2.0, ge=0.5, le=10, title='Hold the on/off button for (seconds)')
     leds: Literal['vu', 'status', 'off'] = Field('status', title='LEDs', description=(
         'vu: level meter while playing, volume and cards shown over it; status: only volume and cards'))
+    colors: Palette = Field('classic', title='Colors', description=(
+        'Colors of the level meter and the animations, bottom to top'))
     animations: bool = Field(True, title='Start and shutdown animation')
     brightness: int = Field(3, ge=1, le=31, title='LED brightness')
 
@@ -81,17 +107,17 @@ def _scaled(colors: List[Color], factor: float) -> List[Color]:
     return [(round(r * factor), round(g * factor), round(b * factor)) for r, g, b in colors]
 
 
-def startup_frames() -> Frames:
-    """A rainbow rises in both bars, stays a moment and fades out."""
-    frames: Frames = [(_pixels(_bar(n, RAINBOW), _bar(n, RAINBOW)), 0.07) for n in range(1, BAR + 1)]
-    frames.append((_pixels(RAINBOW, RAINBOW), 0.4))
-    frames += [(_pixels(_scaled(RAINBOW, f), _scaled(RAINBOW, f)), 0.08) for f in (0.6, 0.35, 0.15, 0.05)]
+def startup_frames(colors: List[Color] = RAINBOW) -> Frames:
+    """The bars fill up in ``colors``, stay a moment and fade out."""
+    frames: Frames = [(_pixels(_bar(n, colors), _bar(n, colors)), 0.07) for n in range(1, BAR + 1)]
+    frames.append((_pixels(colors, colors), 0.4))
+    frames += [(_pixels(_scaled(colors, f), _scaled(colors, f)), 0.08) for f in (0.6, 0.35, 0.15, 0.05)]
     return frames
 
 
-def shutdown_frames() -> Frames:
+def shutdown_frames(colors: List[Color] = RAINBOW) -> Frames:
     """The bars sink down, top first."""
-    return [(_pixels(_bar(n, RAINBOW), _bar(n, RAINBOW)), 0.06) for n in range(BAR, -1, -1)]
+    return [(_pixels(_bar(n, colors), _bar(n, colors)), 0.06) for n in range(BAR, -1, -1)]
 
 
 def card_frames(registered: bool) -> Frames:
@@ -112,8 +138,9 @@ class LedState:
 
     DECAY = 0.75
 
-    def __init__(self, vu: bool, clock: Callable[[], float] = time.monotonic):
+    def __init__(self, vu: bool, colors: Optional[List[Color]] = None, clock: Callable[[], float] = time.monotonic):
         self._vu = vu
+        self.colors = colors or PALETTES['classic']
         self._clock = clock
         self._lock = threading.Lock()
         self._overlay: Optional[Tuple[float, Frames]] = None
@@ -170,7 +197,7 @@ class LedState:
                 return overlay
             if not self._vu:
                 return [OFF] * 2 * BAR
-            return _pixels(_bar(self._left, VU_COLORS), _bar(self._right, VU_COLORS))
+            return _pixels(_bar(self._left, self.colors), _bar(self._right, self.colors))
 
 
 class Leds:
@@ -187,7 +214,7 @@ class Leds:
 
     def start(self) -> None:
         if self._animations:
-            self._state.animate(startup_frames())
+            self._state.animate(startup_frames(self._state.colors))
         self._thread.start()
 
     def wake(self) -> None:
@@ -195,7 +222,7 @@ class Leds:
 
     def stop(self) -> threading.Thread:
         if self._animations:
-            self._state.animate(shutdown_frames())
+            self._state.animate(shutdown_frames(self._state.colors))
         self._stop.set()
         self._wake.set()
         return self._thread
@@ -354,9 +381,10 @@ class PhatBeat(Plugin):
     def start(self, ctx) -> None:
         self._ctx = ctx
         ctx.modules.hardware.claims.register('phat_beat', PhatBeatClaims(ctx))
-        mode = settings_of(ctx)['leds']
+        config = settings_of(ctx)
+        mode = config['leds']
         if mode != 'off':
-            self._state = LedState(vu=mode == 'vu')
+            self._state = LedState(vu=mode == 'vu', colors=PALETTES[config['colors']])
             if mode == 'vu':
                 ctx.modules.player.level_meters.register('phat_beat', self)
             ctx.subscribe('volume.level', self._on_volume)

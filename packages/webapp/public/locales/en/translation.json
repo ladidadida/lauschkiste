@@ -614,7 +614,14 @@
       "max98357a": "MAX98357A",
       "vu": "Level meter, plus volume and cards",
       "status": "Volume and cards only",
-      "off": "Off"
+      "off": "Off",
+      "classic": "Classic (green, yellow, red)",
+      "rainbow": "Rainbow",
+      "ocean": "Ocean",
+      "sunset": "Sunset",
+      "unicorn": "Unicorn",
+      "forest": "Forest",
+      "fire": "Fire"
     },
     "fields": {
       "player": {
