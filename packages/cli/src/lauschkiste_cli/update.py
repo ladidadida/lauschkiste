@@ -119,7 +119,7 @@ def enabled_extras(config_path: Path) -> Dict[str, List[str]]:
 
 def update_package(repo: str, tag: str, config_path: Path, check_only: bool = False) -> bool:
     try:
-        current = Version(installed_version('lauschkiste'))
+        current = Version(installed_version('lauschkiste-core'))
     except PackageNotFoundError:
         current = Version('0')
     release = fetch_release(repo, tag)

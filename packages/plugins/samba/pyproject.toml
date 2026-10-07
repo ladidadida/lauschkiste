@@ -4,17 +4,42 @@ version = "0.1.0a3"
 description = "Lauschkiste plugin: share the library on the network with Samba, managed from the web app"
 license = "MIT"
 requires-python = ">=3.11"
-dependencies = [
+readme = "README.md"
+authors = [{ name = "the Lauschkiste contributors" }]
+keywords = [
   "lauschkiste",
-  "lauschkiste-cli",
+  "plugin",
+  "samba",
 ]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: System :: Filesystems",
+]
+license-files = ["LICENSE"]
+dependencies = [
+  "lauschkiste-core==0.1.0a3",
+  "lauschkiste==0.1.0a3",
+]
+
+[project.urls]
+Homepage = "https://github.com/ladidadida/lauschkiste"
+Documentation = "https://github.com/ladidadida/lauschkiste/tree/main/documentation"
+Issues = "https://github.com/ladidadida/lauschkiste/issues"
+Changelog = "https://github.com/ladidadida/lauschkiste/releases"
 
 [project.entry-points."lauschkiste.plugins"]
 samba = "lauschkiste_plugin_samba:Samba"
 
 [tool.uv.sources]
+lauschkiste-core = { workspace = true }
 lauschkiste = { workspace = true }
-lauschkiste-cli = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

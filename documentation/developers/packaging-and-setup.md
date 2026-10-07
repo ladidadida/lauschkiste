@@ -14,8 +14,8 @@
   `lauschctl setup <step>` commands. An install script only bootstraps: base packages, `uv`, the
   Lauschkiste itself (package or source), then `lauschctl setup`.
 - **Plugins from the CLI:** `lauschctl plugin list|enable|disable|install`.
-- **Distribution:** wheels attached to GitHub releases first, PyPI later (after the renaming
-  question is settled).
+- **Distribution:** wheels attached to GitHub releases and the packages on PyPI; see
+  "Packages and releases".
 
 ## Where things live: `LAUSCHKISTE_HOME`
 
@@ -81,6 +81,25 @@ Steps port the former Bash installer routines: system packages, Raspberry Pi
 settings, the systemd user service, mpd (only when the `mpd` plugin is chosen), Samba, autohotspot,
 kiosk mode, RFID readers (the existing reader configuration tool), audio output, boot-time
 optimisation. Steps needing root run their commands through `sudo`.
+
+## Packages and releases
+
+| Distribution | Directory | Import package | Contents |
+| --- | --- | --- | --- |
+| `lauschkiste` | `packages/cli` | `lauschkiste_cli` | what users install: `lauschkiste`, `lauschctl` |
+| `lauschkiste-core` | `packages/lauschkiste` | `lauschkiste` | player, library, cards, API, web app |
+| `lauschkiste-plugin-board-raspberry-pi`, `-devices`, `-mpd`, `-rfid-readers`, `-samba` | `packages/plugins/*` | `lauschkiste_plugin_*` | bundled plugins |
+
+- **One version for all.** The packages are released together and depend on each other with exact
+  pins (`lauschkiste-core==0.1.0a4`), so a plugin never meets a different core. Change the version with
+  `ci/set_version.py 0.1.0-alpha.4` (all `pyproject.toml` files, the pins and `version.py`);
+  `test/test_packaging.py` fails when they drift apart.
+- **PyPI page.** Each package has a `README.md` (shown as the project description, links absolute), a copy
+  of the `LICENSE`, authors, keywords, classifiers and URLs; the test checks them too.
+- **Build.** `ci/build_wheels.sh` builds the web app, then a source distribution and a wheel of every package
+  (the wheel from the source distribution, which carries the web app, so what is published works). The
+  GitHub release gets the wheels, PyPI the wheels and source distributions.
+- **Check before publishing:** `uvx twine check dist/*`.
 
 ## Install script
 

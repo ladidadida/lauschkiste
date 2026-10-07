@@ -30,7 +30,7 @@ Architektur. Es existiert parallel weiter die stabile Version 2 im `main`-Zweig 
 │   │                           frühere Komponenten (gpio, mqtt, volume, timers, battery_monitor,
 │   │                           controls, jingle, hostif, synchronisation) wurden entfernt, kommen
 │   │                           später neu gestaltet zurück. Kein ZeroMQ mehr im ganzen Projekt.
-│   ├── cli/                    Lauschkiste-CLI (lauschkiste-cli): `lauschkiste` (Core starten), `home`,
+│   ├── cli/                    Lauschkiste-CLI (Distribution `lauschkiste`): `lauschkiste` (Core starten), `home`,
 │   │                           `plugin ...`, `setup ...` (Maschinen-Setup), `update`,
 │   │                           `debug sniff` (Publishing-Bus-Sniffer).
 │   └── webapp/                 React-Frontend (Touch-/Web-UI), kommuniziert per HTTP/WebSocket mit

@@ -1,10 +1,33 @@
 [project]
-name = "lauschkiste"
+name = "lauschkiste-core"
 # Keep in sync with src/lauschkiste/version.py
 version = "0.1.0a3"
-description = "Lauschkiste: an RFID audio player for kids on the Raspberry Pi"
+description = "Lauschkiste core: player, library, cards, volume, timers and the web API of the RFID audio player"
 license = "MIT"
 requires-python = ">=3.11"
+readme = "README.md"
+authors = [{ name = "the Lauschkiste contributors" }]
+keywords = [
+  "rfid",
+  "music player",
+  "audiobooks",
+  "kids",
+  "raspberry pi",
+  "home automation",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Multimedia :: Sound/Audio :: Players",
+  "Topic :: Home Automation",
+]
+license-files = ["LICENSE"]
 dependencies = [
   "evdev",
   "mutagen",
@@ -25,6 +48,12 @@ dependencies = [
   "audioop-lts; python_version >= '3.13'",
 ]
 
+[project.urls]
+Homepage = "https://github.com/ladidadida/lauschkiste"
+Documentation = "https://github.com/ladidadida/lauschkiste/tree/main/documentation"
+Issues = "https://github.com/ladidadida/lauschkiste/issues"
+Changelog = "https://github.com/ladidadida/lauschkiste/releases"
+
 [tool.uv]
 package = true
 
@@ -35,5 +64,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/lauschkiste"]
 # The web app build, copied in by ci/build_wheels.sh (ignored by git, so listed explicitly)
+artifacts = ["src/lauschkiste/webapp/**"]
+
+[tool.hatch.build.targets.sdist]
+# A wheel built from the sdist has the web app too
 artifacts = ["src/lauschkiste/webapp/**"]
 

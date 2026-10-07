@@ -27,7 +27,8 @@ packages/          uv workspace members
                    documentation/developers/core-and-plugins.md.
     interfaces/    Interface snapshots of the framework contract and every core module, checked
                    by test/contract/test_snapshots.py (see "Core and plugins" below)
-  cli/             Lauschkiste CLI (lauschkiste-cli): `lauschkiste` (start the daemon), `home`,
+  cli/             Distribution `lauschkiste` (the package users install; import package lauschkiste_cli,
+                   the core is the distribution `lauschkiste-core`, import package lauschkiste): `lauschkiste` (start the daemon), `home`,
                    `plugin list|enable|disable|install`, `update`, `setup` (machine setup steps in
                    lauschkiste_cli/setup/, see documentation/developers/packaging-and-setup.md),
                    `debug sniff` (publishing-bus WebSocket sniffer).

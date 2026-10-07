@@ -1,21 +1,50 @@
 [project]
-name = "lauschkiste-cli"
+name = "lauschkiste"
 version = "0.1.0a3"
-description = "Lauschkiste command line: the lauschkiste server and lauschctl"
+description = "Lauschkiste: an RFID audio player for kids (the lauschkiste server and the lauschctl commands)"
 license = "MIT"
 requires-python = ">=3.11"
+readme = "README.md"
+authors = [{ name = "the Lauschkiste contributors" }]
+keywords = [
+  "rfid",
+  "music player",
+  "audiobooks",
+  "kids",
+  "raspberry pi",
+  "home automation",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Multimedia :: Sound/Audio :: Players",
+  "Topic :: Home Automation",
+]
+license-files = ["LICENSE"]
 dependencies = [
   "typer",
   "websockets",
   "python-dotenv",
-  "lauschkiste",
+  "lauschkiste-core==0.1.0a3",
 ]
+
+[project.urls]
+Homepage = "https://github.com/ladidadida/lauschkiste"
+Documentation = "https://github.com/ladidadida/lauschkiste/tree/main/documentation"
+Issues = "https://github.com/ladidadida/lauschkiste/issues"
+Changelog = "https://github.com/ladidadida/lauschkiste/releases"
 
 [tool.uv]
 package = true
 
 [tool.uv.sources]
-lauschkiste = { workspace = true }
+lauschkiste-core = { workspace = true }
 
 [project.scripts]
 lauschkiste = "lauschkiste_cli.cli:server"

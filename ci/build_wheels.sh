@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Build the wheels of the core, the CLI and the bundled plugins, with the web app inside the core wheel.
+# Build the source distributions and wheels of the core, the CLI and the bundled plugins, with the web
+# app inside the core's. The wheels are built from the source distributions, so what is published works.
 #   ci/build_wheels.sh [output-dir]     (default: dist/)
 # Set SKIP_WEBAPP_BUILD=1 to package an existing packages/webapp/build.
 set -euo pipefail
@@ -27,6 +28,6 @@ cp -r "${ROOT}/packages/webapp/build" "${WEBAPP_TARGET}"
 rm -rf "${WEBAPP_TARGET:?}/cover-cache"
 
 cd "${ROOT}"
-uv build --all-packages --wheel -o "${OUT}"
+uv build --all-packages -o "${OUT}"
 rm -rf "${WEBAPP_TARGET:?}"
 ls -1 "${OUT}"

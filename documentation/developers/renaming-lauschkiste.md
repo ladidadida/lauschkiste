@@ -17,8 +17,8 @@
 
 | What | Now | New |
 | --- | --- | --- |
-| Core distribution / import package | `jukebox` / `jukebox` | `lauschkiste` / `lauschkiste` |
-| CLI distribution / import package | `jukebox-cli` / `jukebox_cli` | `lauschkiste-cli` / `lauschkiste_cli` |
+| Core distribution / import package | `jukebox` / `jukebox` | `lauschkiste-core` / `lauschkiste` |
+| CLI distribution / import package | `jukebox-cli` / `jukebox_cli` | `lauschkiste` / `lauschkiste_cli` (what users install) |
 | Bundled plugins | `jukebox-plugin-<name>`, `jukebox_rfid_readers`, `jukebox_plugin_*` | `lauschkiste-plugin-<name>`, `lauschkiste_plugin_<name>` |
 | Plugin entry-point group | `jukebox.plugins` | `lauschkiste.plugins` |
 | Commands | `jukebox run`; `jukebox setup`, `plugin`, `update`, `home`, `debug` | server: `lauschkiste` (what `jukebox run` is now, started by the service); management: `lauschctl setup`, `lauschctl plugin ...`, `lauschctl update`, `lauschctl home`, `lauschctl debug ...` |

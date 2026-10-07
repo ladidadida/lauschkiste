@@ -4,15 +4,41 @@ version = "0.1.0a3"
 description = "Lauschkiste board support: Raspberry Pi (pins, interfaces, sound cards, power, firmware health)"
 license = "MIT"
 requires-python = ">=3.11"
-dependencies = [
+readme = "README.md"
+authors = [{ name = "the Lauschkiste contributors" }]
+keywords = [
   "lauschkiste",
+  "plugin",
+  "raspberry pi",
 ]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: System :: Hardware",
+  "Topic :: Home Automation",
+]
+license-files = ["LICENSE"]
+dependencies = [
+  "lauschkiste-core==0.1.0a3",
+]
+
+[project.urls]
+Homepage = "https://github.com/ladidadida/lauschkiste"
+Documentation = "https://github.com/ladidadida/lauschkiste/tree/main/documentation"
+Issues = "https://github.com/ladidadida/lauschkiste/issues"
+Changelog = "https://github.com/ladidadida/lauschkiste/releases"
 
 [project.entry-points."lauschkiste.plugins"]
 board_raspberry_pi = "lauschkiste_plugin_board_raspberry_pi:BoardRaspberryPi"
 
 [tool.uv.sources]
-lauschkiste = { workspace = true }
+lauschkiste-core = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

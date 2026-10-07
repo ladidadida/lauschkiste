@@ -11,7 +11,7 @@ resolution-markers = [
 [manifest]
 members = [
     "lauschkiste",
-    "lauschkiste-cli",
+    "lauschkiste-core",
     "lauschkiste-plugin-board-raspberry-pi",
     "lauschkiste-plugin-devices",
     "lauschkiste-plugin-mpd",
@@ -901,6 +901,25 @@ wheels = [
 [[package]]
 name = "lauschkiste"
 version = "0.1.0a3"
+source = { editable = "packages/cli" }
+dependencies = [
+    { name = "lauschkiste-core" },
+    { name = "python-dotenv" },
+    { name = "typer" },
+    { name = "websockets" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
+    { name = "python-dotenv" },
+    { name = "typer" },
+    { name = "websockets" },
+]
+
+[[package]]
+name = "lauschkiste-core"
+version = "0.1.0a3"
 source = { editable = "packages/lauschkiste" }
 dependencies = [
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
@@ -936,41 +955,22 @@ requires-dist = [
 ]
 
 [[package]]
-name = "lauschkiste-cli"
-version = "0.1.0a3"
-source = { editable = "packages/cli" }
-dependencies = [
-    { name = "lauschkiste" },
-    { name = "python-dotenv" },
-    { name = "typer" },
-    { name = "websockets" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "lauschkiste", editable = "packages/lauschkiste" },
-    { name = "python-dotenv" },
-    { name = "typer" },
-    { name = "websockets" },
-]
-
-[[package]]
 name = "lauschkiste-plugin-board-raspberry-pi"
 version = "0.1.0a3"
 source = { editable = "packages/plugins/board-raspberry-pi" }
 dependencies = [
-    { name = "lauschkiste" },
+    { name = "lauschkiste-core" },
 ]
 
 [package.metadata]
-requires-dist = [{ name = "lauschkiste", editable = "packages/lauschkiste" }]
+requires-dist = [{ name = "lauschkiste-core", editable = "packages/lauschkiste" }]
 
 [[package]]
 name = "lauschkiste-plugin-devices"
 version = "0.1.0a3"
 source = { editable = "packages/plugins/devices" }
 dependencies = [
-    { name = "lauschkiste" },
+    { name = "lauschkiste-core" },
 ]
 
 [package.optional-dependencies]
@@ -986,7 +986,7 @@ gpio = [
 [package.metadata]
 requires-dist = [
     { name = "gpiozero", marker = "extra == 'gpio'" },
-    { name = "lauschkiste", editable = "packages/lauschkiste" },
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
     { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv6l' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
     { name = "pi-ina219", marker = "extra == 'battery'" },
     { name = "smbus2", marker = "extra == 'battery'" },
@@ -998,13 +998,13 @@ name = "lauschkiste-plugin-mpd"
 version = "0.1.0a3"
 source = { editable = "packages/plugins/mpd" }
 dependencies = [
-    { name = "lauschkiste" },
+    { name = "lauschkiste-core" },
     { name = "python-mpd2" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "lauschkiste", editable = "packages/lauschkiste" },
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
     { name = "python-mpd2" },
 ]
 
@@ -1013,7 +1013,7 @@ name = "lauschkiste-plugin-rfid-readers"
 version = "0.1.0a3"
 source = { editable = "packages/plugins/rfid-readers" }
 dependencies = [
-    { name = "lauschkiste" },
+    { name = "lauschkiste-core" },
 ]
 
 [package.optional-dependencies]
@@ -1041,7 +1041,7 @@ rdm6300-serial = [
 [package.metadata]
 requires-dist = [
     { name = "gpiozero", marker = "extra == 'rc522-spi'" },
-    { name = "lauschkiste", editable = "packages/lauschkiste" },
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
     { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'rc522-spi') or (platform_machine == 'armv6l' and extra == 'rc522-spi') or (platform_machine == 'armv7l' and extra == 'rc522-spi')" },
     { name = "mfrc522-i2c", marker = "extra == 'mfrc522-i2c'" },
     { name = "nfcpy", marker = "extra == 'generic-nfcpy'" },
@@ -1058,13 +1058,13 @@ version = "0.1.0a3"
 source = { editable = "packages/plugins/samba" }
 dependencies = [
     { name = "lauschkiste" },
-    { name = "lauschkiste-cli" },
+    { name = "lauschkiste-core" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "lauschkiste", editable = "packages/lauschkiste" },
-    { name = "lauschkiste-cli", editable = "packages/cli" },
+    { name = "lauschkiste", editable = "packages/cli" },
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
 ]
 
 [[package]]
