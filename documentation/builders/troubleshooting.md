@@ -26,7 +26,7 @@ shutdown of the service.
 The logs are also available via the Web Server:
 
 ```text
-http://ip.of.your.box:5556/logs
+http://ip.of.your.box/logs
 ```
 
 > [!IMPORTANT]

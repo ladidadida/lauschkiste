@@ -3,6 +3,7 @@
 from typing import List
 
 import lauschkiste.contract.plugins as plugins
+import lauschkiste.cfghandler
 import lauschkiste.paths
 from lauschkiste_cli import plugin
 from lauschkiste_cli.environment import checkout, executable
@@ -104,6 +105,47 @@ class ServiceStep(Step):
             system.run('systemctl', '--user', 'restart', SERVICE)
         if ctx.answer('start_at_boot') and not self._lingering(ctx):
             system.run('loginctl', 'enable-linger', system.user, root=True)
+
+
+DEFAULT_PORT = 5556
+
+
+def web_port(ctx: Context) -> int:
+    return int(ctx.load_config().getn('api', 'port', default=DEFAULT_PORT))
+
+
+class WebPortStep(Step):
+    name = 'port'
+    title = 'Web app on port 80'
+    questions = (
+        Question('port80', 'Serve the web app on port 80, so its address needs no ":5556"?',
+                 default=lambda ctx: ctx.system.is_raspberry_pi(),
+                 help='Lets programs without root rights use ports from 80 up (net.ipv4.ip_unprivileged_port_start)'),
+    )
+    SYSCTL = '/etc/sysctl.d/60-lauschkiste-port.conf'
+    CONTENT = '# Lauschkiste serves its web app on port 80 without root rights\nnet.ipv4.ip_unprivileged_port_start = 80\n'
+
+    def wanted(self, ctx):
+        return bool(ctx.answer('port80'))
+
+    def check(self, ctx):
+        problems = []
+        if ctx.system.read(self.SYSCTL) != self.CONTENT:
+            problems.append('programs without root rights may not use port 80')
+        if web_port(ctx) != 80:
+            problems.append('the web app does not use port 80')
+        return problems
+
+    def apply(self, ctx):
+        system = ctx.system
+        system.write(self.SYSCTL, self.CONTENT, root=True)
+        system.run('sysctl', '-p', self.SYSCTL, root=True, quiet=True)
+        if web_port(ctx) != 80:
+            cfg = ctx.load_config()
+            cfg.setn('api', 'port', value=80)
+            lauschkiste.cfghandler.write_yaml(cfg, str(ctx.config_path))
+            if system.unit_active(SERVICE, user=True):
+                system.run('systemctl', '--user', 'restart', SERVICE)
 
 
 class RfidStep(Step):

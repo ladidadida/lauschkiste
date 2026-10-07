@@ -2,13 +2,15 @@
 # Login message (installed by `lauschctl setup welcome`)
 
 address="$(hostname -I 2>/dev/null | awk '{print $1}')"
+port=":@PORT@"
+[ "$port" = ":80" ] && port=""
 
 cat <<MESSAGE
 
   ╭──────────────────────────────────────────────╮
   │   L A U S C H K I S T E                      │
   ╰──────────────────────────────────────────────╯
-  Web app:   http://${address:-$(hostname)}:5556
+  Web app:   http://${address:-$(hostname)}${port}
   Status:    systemctl --user status lauschkiste
   Settings:  lauschctl setup --check
 

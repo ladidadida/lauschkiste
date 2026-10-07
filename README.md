@@ -25,7 +25,7 @@ On a Raspberry Pi with Raspberry Pi OS (Lite):
 curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash
 ```
 
-Then open `http://<your-pi>:5556`. Details: [Installation](documentation/builders/installation.md).
+Then open `http://<your-pi>` (on other machines `http://<host>:5556`). Details: [Installation](documentation/builders/installation.md).
 
 ```bash
 lauschctl setup --check    # what is set up on this machine

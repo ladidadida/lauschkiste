@@ -147,6 +147,7 @@ class KioskStep(Step):
 
     def apply(self, ctx):
         system = ctx.system
+        port = ctx.load_config().getn('api', 'port', default=5556)
         system.append_block(self.BASHRC, self.MARKER,
                             '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor')
         system.append_block(self.AUTOSTART, self.MARKER, (
@@ -156,7 +157,7 @@ class KioskStep(Step):
             "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'\n"
             "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; "
             "s/\"exit_type\":\"[^\"]\\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences\n"
-            f'{self._chromium(ctx)} http://localhost:5556 --disable-infobars --disable-pinch --disable-translate '
+            f'{self._chromium(ctx)} http://localhost:{port} --disable-infobars --disable-pinch --disable-translate '
             '--kiosk --noerrdialogs --no-first-run'), root=True)
         system.write(self._update_check_file(ctx),
                      f'{self.MARKER}\nCHROMIUM_FLAGS="${{CHROMIUM_FLAGS}} --check-for-update-interval=31536000"\n',

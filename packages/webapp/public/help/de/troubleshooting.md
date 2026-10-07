@@ -19,7 +19,7 @@ In der Bibliothek auf Aktualisieren tippen. Musik gehört nach `library/music`, 
 ## Die Web-App ist nicht erreichbar
 
 - Die Box braucht ein paar Sekunden nach dem Einschalten.
-- Adresse: `http://<name-der-box>:5556` oder die IP-Adresse (Einstellungen → Status, oder per Karte „IP-Adresse ansagen“).
+- Adresse: `http://<name-der-box>` (mit `lauschctl setup port`, auf dem Raspberry Pi Standard), sonst `http://<name-der-box>:5556`, oder die IP-Adresse (Einstellungen → Status, oder per Karte „IP-Adresse ansagen“).
 
 ## Lauschkiste neu starten
 

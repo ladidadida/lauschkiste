@@ -66,4 +66,5 @@ Opens its own WiFi when no known one is in range, e.g. when travelling.
 | `boot` | faster start (Bluetooth, IPv6, boot messages off) |
 | `kiosk` | the web app on an attached screen |
 | `mpd` | mpd for playback instead of the built-in player |
+| `port` | the web app on port 80, so its address needs no `:5556` |
 | `service` | Lauschkiste as a service at boot |

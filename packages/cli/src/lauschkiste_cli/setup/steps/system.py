@@ -192,11 +192,12 @@ class WelcomeStep(Step):
     def relevant(self, ctx):
         return ctx.system.is_raspberry_pi()
 
-    def _content(self) -> str:
-        return lauschkiste.paths.resource('system', '99-lauschkiste-welcome').read_text()
+    def _content(self, ctx) -> str:
+        port = ctx.load_config().getn('api', 'port', default=5556)
+        return lauschkiste.paths.resource('system', '99-lauschkiste-welcome').read_text().replace('@PORT@', str(port))
 
     def check(self, ctx) -> List[str]:
-        return [] if ctx.system.read(self.TARGET) == self._content() else ['login message not installed']
+        return [] if ctx.system.read(self.TARGET) == self._content(ctx) else ['login message not installed or outdated']
 
     def apply(self, ctx):
-        ctx.system.write(self.TARGET, self._content(), root=True, mode=0o755)
+        ctx.system.write(self.TARGET, self._content(ctx), root=True, mode=0o755)

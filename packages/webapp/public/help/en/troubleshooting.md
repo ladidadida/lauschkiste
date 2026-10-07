@@ -19,7 +19,7 @@ Tap refresh in the library. Music belongs in `library/music`, audiobooks in `lib
 ## The web app can't be reached
 
 - The box needs a few seconds after switching on.
-- Address: `http://<name-of-the-box>:5556` or the IP address (Settings → Status, or a card that reads out the IP address).
+- Address: `http://<name-of-the-box>` (with `lauschctl setup port`, the default on a Raspberry Pi), otherwise `http://<name-of-the-box>:5556`, or the IP address (Settings → Status, or a card that reads out the IP address).
 
 ## Restarting Lauschkiste
 

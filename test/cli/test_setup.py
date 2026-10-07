@@ -105,6 +105,7 @@ def test_pc_setup_installs_packages_and_service(tmp_path, home, extras):
     assert not system.exists('/var/lib/systemd/linger/pi')
     assert ctx.enabled_plugins() == {}
     assert extras == []
+    assert not system.exists('/etc/sysctl.d/60-lauschkiste-port.conf')
 
 
 def test_network_stays_on_dhcp_by_default(tmp_path, home, extras):
@@ -134,6 +135,10 @@ def test_pi_setup(tmp_path, home, extras):
     assert cmdline.startswith('console=tty1 root=PARTUUID=1234 rootwait ')
     assert 'ipv6.disable=1' in cmdline and cmdline.count('quiet') == 1
     assert 'bluetooth.service' not in system.enabled
+    assert 'ip_unprivileged_port_start = 80' in system.read('/etc/sysctl.d/60-lauschkiste-port.conf')
+    assert ctx.load_config().getn('api', 'port') == 80
+    welcome = system.read('/etc/update-motd.d/99-lauschkiste-welcome')
+    assert 'port=":80"' in welcome and '5556' not in welcome
     assert 'static ip_address=192.168.1.50/24' in system.read('/etc/dhcpcd.conf')
     smb = system.read('/etc/samba/smb.conf')
     assert f'path={home / "library"}\n' in smb and smb.count('## Lauschkiste Samba Config') == 1

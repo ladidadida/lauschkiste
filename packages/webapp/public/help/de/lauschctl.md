@@ -66,4 +66,5 @@ lauschctl setup autohotspot
 | `boot` | schnellerer Start (Bluetooth, IPv6, Startmeldungen aus) |
 | `kiosk` | Web-App auf einem angeschlossenen Bildschirm |
 | `mpd` | mpd als Wiedergabe statt der eingebauten |
+| `port` | Web-App auf Port 80, also ohne `:5556` in der Adresse |
 | `service` | Lauschkiste als Dienst beim Start |
