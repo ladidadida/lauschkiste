@@ -163,6 +163,28 @@ Works well with the design, because a downloaded book is just a set of audio fil
 - **Automatic downloads** ("keep the books in progress and the next one of a series on the box
   while on WiFi") are a later step on top; the first version is manual.
 
+### Handover to other rooms (Music Assistant)
+
+At home, [Music Assistant](https://www.music-assistant.io) (MA) can be the central player. Its
+Audiobookshelf provider syncs the position **in both directions** with ABS (it reads it just before
+playing, per its documentation), so box and MA share the position through ABS and Lauschkiste does
+not need to know about MA: a book heard on the box continues at the same place on the speakers in
+the living room, and the other way round. Requirements on this plugin:
+
+- MA and the box use **the same ABS user**, because progress is per user. This is a decision for the
+  household (for example one user for the child's books).
+- The position is written **immediately** on pause and stop, not at the next interval.
+- An action `audiobooks.pause_and_sync` pauses and returns only after the server accepted the
+  position, so whatever starts the book elsewhere (MA, Home Assistant, a card) never reads a stale
+  position.
+- "Continue in the living room" is triggered outside Lauschkiste at first (MA or Home Assistant). A
+  small optional action that calls MA's API for a named player can follow, if a card or button on the
+  box should do it.
+
+Not planned: Lauschkiste as an MA player (Sendspin) or as a browser of the MA library; see the
+decision in the Music Assistant notes of the maintainer. Phase 0 checks the round trip with a real MA
+(positions in both directions, when MA writes).
+
 ### Chapters inside one file
 
 Many ABS books are a single m4b with chapters. Lauschkiste treats files as chapters, so **next /
@@ -283,3 +305,5 @@ commit, as usual; nothing is installed on a box without asking.
 4. Offline use is wanted (portable box): how much space should downloads use at most on the box's
    card (default 8 GB), and should finished books be removed automatically when it is full?
 5. Several ABS libraries or servers? The plan has one server, any number of its libraries.
+6. Which ABS user do MA and the box share, so that the position follows the child from the box to the
+   living room?
