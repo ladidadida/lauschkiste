@@ -1,6 +1,8 @@
 # Lauschkiste Configuration
 
-Lauschkiste configuration is managed by a set of files located in `shared/settings`.
+Lauschkiste configuration is managed by a set of files in the `settings` folder of its home directory
+(`$LAUSCHKISTE_HOME`; `lauschctl home` prints it and the configuration file in use. It is `~/lauschkiste` on a
+Raspberry Pi and `shared/` in a source checkout).
 Some configuration changes can be made through the Web App and take immediate effect.
 
 The majority of configuration options are only available by editing the config files -
@@ -18,7 +20,7 @@ Even after using the tools, certain aspects can only be changed by directly modi
 $ systemctl --user stop lauschkiste
 
 # Edit the file(s)
-$ nano ./shared/settings/lauschkiste.yaml
+$ nano "$LAUSCHKISTE_HOME/settings/lauschkiste.yaml"
 
 # Start Lauschkiste in console and check the log output (optional)
 $ uv run lauschkiste

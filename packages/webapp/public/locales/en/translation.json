@@ -463,9 +463,7 @@
     "audio": {
       "title": "Audio",
       "outputs": {
-        "title": "Outputs",
-        "settings.audio.outputs.radio-primary": "Speaker (Primary)",
-        "settings.audio.outputs.radio-secondary": "Bluetooth (Secondary)"
+        "title": "Outputs"
       },
       "volume": {
         "max-volume": "Maximum Volume"

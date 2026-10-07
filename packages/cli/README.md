@@ -61,4 +61,5 @@ Plugins are installed next to this package and switched on in the web app or wit
 ## Origin and license
 
 Lauschkiste grew out of [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID), the RFID
-jukebox started by Micz Flor, and keeps its history. MIT license.
+jukebox started by Micz Flor, and keeps its history. It is not a drop-in replacement: settings and card files of
+Phoniebox are not compatible. MIT license.

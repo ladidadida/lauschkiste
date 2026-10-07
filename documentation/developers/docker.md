@@ -24,10 +24,10 @@ need to adapt some of those commands to your needs.
     ```
 
 3. Create a lauschkiste.yaml file
-    * Copy the `./resources/default-settings/lauschkiste.default.yaml` to `./shared/settings` and rename the file to `lauschkiste.yaml`.
+    * Copy `packages/lauschkiste/src/lauschkiste/resources/default-settings/lauschkiste.default.yaml` to `./shared/settings` and rename the file to `lauschkiste.yaml`.
 
     ```bash
-    cp ./resources/default-settings/lauschkiste.default.yaml ./shared/settings/lauschkiste.yaml
+    cp packages/lauschkiste/src/lauschkiste/resources/default-settings/lauschkiste.default.yaml ./shared/settings/lauschkiste.yaml
     ```
 
     * Override/Merge the values from the following [Override file](../../docker/config/lauschkiste.overrides.yaml) in your `lauschkiste.yaml`.

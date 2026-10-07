@@ -20,7 +20,7 @@ action: player.toggle
 
 The running Lauschkiste lists all actions with their arguments at `GET /api/v1/actions`, e.g. in the
 browser at `http://<lauschkiste>/api/v1/actions` (`:5556` without `lauschctl setup port`). `lauschkiste --artifacts` also writes the list to
-`shared/artifacts/card_actions.json`. Actions of a plugin only exist while the plugin is enabled.
+`$LAUSCHKISTE_HOME/artifacts/card_actions.json`. Actions of a plugin only exist while the plugin is enabled.
 
 Frequently used actions of the core:
 

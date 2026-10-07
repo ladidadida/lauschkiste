@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <title>Lauschkiste</title>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8656d9"/>
+      <stop offset="1" stop-color="#4a2a8c"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#background)"/>
+  <g transform="rotate(-12 96 62)">
+    <rect x="56" y="22" width="80" height="56" rx="10" fill="#ffd166"/>
+    <circle cx="82" cy="58" r="4.5" fill="#4a2a8c"/>
+    <g fill="none" stroke="#4a2a8c" stroke-width="5" stroke-linecap="round">
+      <path d="M92 58a10 10 0 0 0-10-10" transform="rotate(180 82 58)"/>
+      <path d="M102 58a20 20 0 0 0-20-20" transform="rotate(180 82 58)"/>
+    </g>
+  </g>
+  <rect x="32" y="76" width="128" height="92" rx="17" fill="#ffffff"/>
+  <g fill="#4a2a8c">
+    <circle cx="72" cy="124" r="21"/>
+    <circle cx="120" cy="124" r="21"/>
+  </g>
+  <g fill="#ffffff">
+    <circle cx="72" cy="124" r="8.5"/>
+    <circle cx="120" cy="124" r="8.5"/>
+  </g>
+</svg>

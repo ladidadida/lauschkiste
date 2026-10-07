@@ -9,6 +9,10 @@ starts. Runs on a Raspberry Pi, managed from any browser.
 *Lauschkiste* is German: *lauschen* means to listen closely, *die Kiste* is the box.
 Say it like "LOWSH-kiss-tuh".
 
+> [!NOTE]
+> Lauschkiste is **alpha software**: it runs on real boxes, but settings, card formats and interfaces
+> may still change between versions.
+
 ## Features
 
 - RFID/NFC cards start albums, playlists or actions (volume, timers, shutdown, ...)
@@ -44,7 +48,12 @@ Lauschkiste grew out of [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID
 ([phoniebox.de](https://phoniebox.de/)), the RFID jukebox started by Micz Flor, and keeps its
 history. Thanks to the Phoniebox community for many years of work and ideas. Lauschkiste
 reworked the core (REST API, plugin system, packaging) and goes its own way since; see
-[the roadmap](documentation/developers/roadmap-core-architecture.md).
+[the roadmap](documentation/developers/roadmap-core-architecture.md). It is not a drop-in replacement:
+settings and card files of Phoniebox are not compatible.
+
+The start and shutdown sounds come from the Phoniebox project (added there by Micz Flor and arne123); the
+RC522 driver in the RFID reader plugin is [pi-rc522-gpiozero](https://github.com/hoffie/pi-rc522-gpiozero), a
+port of [pi-rc522](https://github.com/ondryaso/pi-rc522) by Ondřej Ondryáš (MIT, its license is included).
 
 ## License
 

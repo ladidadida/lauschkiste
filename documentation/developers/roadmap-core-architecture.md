@@ -1,5 +1,8 @@
 # Roadmap: Core Architecture (Fork)
 
+> Historical design record. It was written while the code still carried its old names: `jukebox` in this
+> document is today's `lauschkiste`. What is implemented is described in [Feature status](status.md).
+>
 > Fork context: diverging from upstream because the direction they're pursuing isn't the direction we
 > want. Building on `future3/develop` as a base — swap pieces incrementally, keep something runnable
 > after every step, ditch what turns out to be dead weight along the way rather than carrying it forward.

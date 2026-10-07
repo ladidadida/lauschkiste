@@ -4,7 +4,7 @@ In the card database, an [action](actions.md) is assigned to every card. It runs
 card is swiped (or placed) on the reader.
 
 Cards are usually registered through the web app. The database is stored in
-`shared/settings/cards.yaml` (config key `cards.database`):
+`$LAUSCHKISTE_HOME/settings/cards.yaml` (config key `cards.database`):
 
 > [!IMPORTANT]
 > Card IDs **must** be strings! So, be sure to quote numbers!

@@ -20,5 +20,4 @@
 ## RPC
 
 * [Web App API](./webapp.md#backend-api)
-* [CLI Client for RPC](../builders/cli-client.md)
 * [Actions](../builders/actions.md)

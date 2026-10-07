@@ -14,7 +14,7 @@ driver, and thus cannot be used with the [genericusb](genericusb.md) module. Als
 ## Configuration
 
 The installation script will scan for compatible devices and will assist in configuration.
-By setting `rfid > readers > generic_nfcpy > config > device_path` in `shared/settings/rfid.yaml` you can override the
+By setting `rfid > readers > generic_nfcpy > config > device_path` in `$LAUSCHKISTE_HOME/settings/rfid.yaml` you can override the
 device location. By specifying an explicit device location it is possible to use multiple readers compatible with NFCpy.
 
 Example configuration for a usb-device with vendor ID 072f and product ID 2200:

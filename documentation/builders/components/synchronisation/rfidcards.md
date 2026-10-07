@@ -52,7 +52,7 @@ modules:
 ...
 sync_rfidcards:
     enable: false
-    config_file: shared/settings/sync_rfidcards.yaml
+    config_file: settings/sync_rfidcards.yaml
 ```
 
 The settings file (`shared\settings\sync_rfidcards.yaml`) contains the

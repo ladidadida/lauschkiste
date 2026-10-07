@@ -10,7 +10,7 @@ labels: bug, needs triage
 ### What I did
 
 <!--
-i.e. `I installed the raspberry pi with above mentioned buster image and ran the installer script`
+i.e. `I flashed Raspberry Pi OS Lite (Trixie) and ran the installer script`
 -->
 
 ### What happened
@@ -85,4 +85,11 @@ Can be found in the output of `sudo lsusb -v` when it is connected via USB.
 
 <!--
 i.e. post the relevant part of `settings/lauschkiste.yaml` (see `lauschctl home`):
+-->
+
+### Version and hardware
+
+<!--
+Lauschkiste version (Settings → Status in the web app), Raspberry Pi model, RFID reader, sound card, how it was installed.
+`lauschctl setup --check` shows what is set up on the machine.
 -->

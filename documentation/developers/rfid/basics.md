@@ -38,7 +38,7 @@ During the installation process, you can already configure a RFID
 reader. To manually configure RFID reader(s) run the [RFID reader configuration tool](../coreapps.md#RFID-Reader).
 
 It will generate a reader configuration file at
-`shared/settings/rfid.yaml`. You can re-run the tool to change the
+`$LAUSCHKISTE_HOME/settings/rfid.yaml`. You can re-run the tool to change the
 settings any time.
 
 Some options are not covered by the tool. You may change the file

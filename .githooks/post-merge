@@ -48,7 +48,7 @@ warn_python_requirements() {
   echo ""
   echo "Update the environment with"
   echo " uv sync --no-dev --frozen"
-  echo "('jukebox update' pulls and does this for you)"
+  echo "('lauschctl update' pulls and does this for you)"
   echo "************************************************************"
   echo -e "\n"
 }
@@ -70,8 +70,8 @@ warn_setup() {
   echo "ATTENTION: Setup steps have changed since last pull!"
   echo ""
   echo "Check and re-apply them with"
-  echo " jukebox setup --check"
-  echo " jukebox setup --yes"
+  echo " lauschctl setup --check"
+  echo " lauschctl setup --yes"
   echo "************************************************************"
   echo -e "\n"
 }

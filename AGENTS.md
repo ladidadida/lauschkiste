@@ -187,4 +187,4 @@ mpd/RFID hardware.
 - `documentation/developers/python.md` — Python dev environment notes
 - `documentation/developers/webapp.md` — webapp dev notes
 - `documentation/developers/docker.md` — Docker-based dev environment
-- `documentation/developers/status.md` — feature parity status vs. v2
+- `documentation/developers/status.md` — what works and what is planned

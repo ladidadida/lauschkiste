@@ -92,7 +92,7 @@ Today every piece of functionality is wired up by hand in several places:
 - `lauschkiste.daemon.run()` calls each module's `register()`/`start()`/`stop()` explicitly, and start
   order is encoded only in comments.
 - Every REST route in `lauschkiste.api.fastapi_server` is hand-written per method and reaches the object
-  via `jukebox.registry.get()`.
+  via the former `jukebox.registry.get()`.
 - RFID card actions, `card_removal_action` and `second_swipe_action` are stored as
   `(package, plugin, method)` plus untyped `args`/`kwargs`; arguments are only checked when a card is
   swiped. Aliases live separately in `command_aliases.py`.
@@ -398,7 +398,7 @@ in `lauschkiste.yaml`):
 
 ## What goes away
 
-- `jukebox.registry` (`register`, `call`, `tag`/`callable_method`), replaced by the module manager.
+- The former `jukebox.registry` (`register`, `call`, `tag`/`callable_method`), replaced by the module manager.
 - `command_aliases.py` and `lauschkiste.utils.{decode_rpc_command,bind_rpc_command,decode_and_call_rpc_command}`.
 - The hand-written `register_player_routes`/`register_settings_routes`/`register_cards_routes` in
   `fastapi_server.py`.

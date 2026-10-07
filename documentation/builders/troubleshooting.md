@@ -15,8 +15,8 @@ Debugging your setup runs in several steps
 ## The short answer
 
 ```bash
-shared/logs/app.log   : Complete Debug Messages
-shared/logs/errors.log: Only Errors and Warnings
+$LAUSCHKISTE_HOME/logs/app.log   : Complete Debug Messages
+$LAUSCHKISTE_HOME/logs/errors.log: Only Errors and Warnings
 ```
 
 These files always contain the messages of the current run only.
@@ -34,7 +34,7 @@ http://ip.of.your.box/logs
 
 ## The long answer: A few more details
 
-If started without parameters, Lauschkiste checks for the existence of `shared/settings/logger.yaml`
+If started without parameters, Lauschkiste checks for the existence of `$LAUSCHKISTE_HOME/settings/logger.yaml`
 and if present, uses that configuration for logging. This file is created by the installation process.
 The default configuration file is also provided in `resources/default-settings/logger.default.yaml`.
 We use Python's logging module to provide the debug messages which is configured through this file.
@@ -48,8 +48,8 @@ The default logging config does 2 things:
 1. It writes 2 log files:
 
     ```bash
-    shared/logs/app.log    : Complete Debug Messages
-    shared/logs/errors.log : Only Errors and Warnings
+    $LAUSCHKISTE_HOME/logs/app.log    : Complete Debug Messages
+    $LAUSCHKISTE_HOME/logs/errors.log : Only Errors and Warnings
     ```
 
 2. Prints logging messages to the console. If run as a service, only error messages are emitted to console to avoid spamming the system log files.
