@@ -61,4 +61,4 @@ port of [pi-rc522](https://github.com/ondryaso/pi-rc522) by Ondřej Ondryáš (M
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). The logo has its own [usage note](documentation/assets/logo/README.md#use).

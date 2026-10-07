@@ -5,6 +5,18 @@ All packages are released together under one version (see
 the workflow `wheels.yml` builds, tests, creates the GitHub release with the wheels and publishes to
 PyPI after a manual approval.
 
+## Before the first release
+
+- [ ] Clarified with the Phoniebox project: that Lauschkiste is named as its origin, and the origin of the
+  start and shutdown sounds.
+- [ ] Searched for conflicts with the name "Lauschkiste" (trademark registers of the DPMA and EUIPO) and for
+  similar logos.
+- [ ] Private vulnerability reporting is switched on (repository Settings → Code security): the Code of
+  Conduct and `SECURITY.md` send reports there.
+- [ ] Repository description, topics and social preview image are set.
+- [ ] The accounts, pending publishers and environments below exist.
+- [ ] A test upload to TestPyPI and a fresh installation from it on a box worked.
+
 ## One-time setup
 
 PyPI needs no token in the repository: the workflow proves its identity to PyPI ("trusted

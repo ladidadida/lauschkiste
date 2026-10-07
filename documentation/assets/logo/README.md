@@ -14,3 +14,12 @@ white/lauschkiste-logo[-text]-<color>-white.svg
 
 The web app has its own copies in `packages/webapp/public`: `logo.svg` is the default bear, `logo192.png` and
 `favicon.ico` are made from it on a square white tile (the app icon of phones and the browser tab).
+
+## Use
+
+The MIT license of the repository covers the code. For the logo this note applies.
+
+The logo may be used to refer to Lauschkiste: links, articles, talks, "works with Lauschkiste" notes, and in forks
+that clearly say that they are forks. Please do not alter it, and do not use it (or a confusingly similar one) as
+the logo of another project, of a modified version of Lauschkiste or of a product, or in a way that suggests the
+project endorses it. Modified versions and other projects should use their own name and logo.
