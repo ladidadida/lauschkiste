@@ -17,14 +17,16 @@ Goals:
 
 - Books of one ABS server show up in the **Audiobooks** tab next to the local ones, with cover,
   progress and "continue".
-- Playback streams from the server, nothing is copied to the box.
+- Playback streams from the server by default.
+- **Offline use:** a book can be downloaded to the box and then plays without the server (for a
+  portable box), with the position synchronised once the server is reachable again.
 - Progress is shared with ABS (the server is the source of truth).
 - Cards can start an ABS book, like a local one.
 - Setup is done in the web app: server address, API key, libraries.
 - Later, the same for ABS podcasts.
 
-Non-goals (for now): downloading books for offline use, managing the ABS library (upload, metadata),
-ABS series and collections as their own views, multiple ABS servers, the ABS listening statistics.
+Non-goals (for now): managing the ABS library (upload, metadata), ABS series and collections as
+their own views, multiple ABS servers, the ABS listening statistics.
 
 ## What ABS offers
 
@@ -125,6 +127,42 @@ This extension point is also what Music Assistant and other authenticated stream
 - Start with the stateless progress endpoint. ABS "playback sessions" (listening statistics in the
   ABS UI) can be added later without changing the design.
 
+### Offline use
+
+Works well with the design, because a downloaded book is just a set of audio files:
+
+- **What is downloaded:** the same files the server streams (`/s/item/<id>/<file>`; or the whole book
+  as one archive, `GET /api/items/:id/download`, if the server allows downloads for the user). They
+  go to the plugin's own cache folder (`cache/audiobookshelf/<id>/`), not into `library/`, so the
+  book stays one entry (not a local duplicate) and keeps its link to the server.
+- **Playing:** a complete download plays as plain local files through the normal player. No network,
+  no TLS and no resolver involved, which also makes it cheaper for the CPU of a Pi Zero and works with
+  every player backend. Incomplete downloads are never played; the book streams instead.
+- **Managing it:** per book "download" / "remove download" in the web app, with progress, pause and
+  cancel. One download at a time, with low priority and no downloading while something plays on a
+  Zero (SD card and WLAN are shared). Partial files are kept and continued with range requests;
+  files are renamed into place only when complete and their size matches.
+- **Space:** the cache limit above; the web app shows used and free space and the size of each
+  book before downloading. A book whose download would not fit is refused with the numbers. Books in
+  progress and ones you marked "keep" are never removed automatically; the oldest finished ones may be,
+  if the limit is reached and you allowed it.
+- **Updates on the server:** the cache stores the item's `updatedAt` and the file sizes. If the
+  server's copy changed, the book shows "update available"; the old copy keeps playing meanwhile.
+- **Progress while offline:** the position is stored on the box (like local audiobooks) and
+  marked as "not yet sent". When the server is reachable again it is pushed. If the book was also
+  listened to elsewhere in between (the server's progress changed since the box last saw it), the
+  furthest position wins and a finished book stays finished. The decision does not use the
+  clock, because a Pi has no battery-backed clock and can be days off while offline.
+- **Browsing offline:** the book list is cached on disk (so the box also starts without the
+  server), downloaded books are marked and listed first when the server is not reachable.
+- **Portable use:** the existing `autohotspot` step opens a WiFi of the box when no known one is in
+  range, so the web app stays reachable from a phone on the road.
+- **Alternatives that already work:** audiobook files copied to `library/audiobooks` (Samba or upload)
+  play as local books; they just do not share their position with ABS. The cache is the
+  "keeps everything connected" version of that.
+- **Automatic downloads** ("keep the books in progress and the next one of a series on the box
+  while on WiFi") are a later step on top; the first version is manual.
+
 ### Chapters inside one file
 
 Many ABS books are a single m4b with chapters. Lauschkiste treats files as chapters, so **next /
@@ -152,6 +190,8 @@ A settings model (`audiobookshelf` section, or a file of its own, `settings_stor
 | `verify_tls` | off for self-signed certificates |
 | `refresh_minutes` | how often the book list is fetched again (default 10), plus a "refresh" button |
 | `sync_interval_sec` | progress write interval (default 15) |
+| `cache_limit_gb` | space downloaded books may use (default 8, never more than the free space minus a reserve) |
+| `prefer_downloaded` | play the downloaded copy even when the server is reachable (default on) |
 
 - **Secrets:** the settings system has no secret fields yet. Add them: the form shows a password
   field, `GET` never returns the value (only whether one is set), an empty value on save keeps the
@@ -193,11 +233,13 @@ feeds; the ABS ones appear next to them.
 | 1 | Core groundwork: secret settings, `player.resolvers`, `audiobooks.sources`, delegated progress in the `ResumeTracker`; tests with a fake source | local audiobooks unchanged, tests green |
 | 2 | Plugin MVP: connect, list, cover proxy, play, progress sync, finished/restart, settings with test button; tests with a fake ABS server | a book plays from ABS and the position is shared |
 | 3 | Web app: merged tab, source chip, continue, card dialog, settings page, help | usable without the command line |
-| 4 | Chapters inside one file | next/previous chapter for m4b books |
-| 5 | Podcasts from ABS | |
-| later | download for offline use, series/collections, listening sessions, live updates (socket.io) | |
+| 4 | **Offline use:** download manager, cache and space limit, local playback of downloaded books, progress queue and merge, web app buttons and status | books play without the server; positions catch up later |
+| 5 | Chapters inside one file | next/previous chapter for m4b books |
+| 6 | Podcasts from ABS (episodes can be downloaded the same way) | |
+| later | automatic downloads, series/collections, listening sessions, live updates (socket.io) | |
 
-Phase 0 and 1 are small, 2 and 3 are the bulk, 4 is medium. Each phase ends with tests, docs and a
+Phase 0 and 1 are small, 2 and 3 are the bulk, 4 is medium to large (the progress merge is the
+delicate part), 5 is medium. Each phase ends with tests, docs and a
 commit, as usual; nothing is installed on a box without asking.
 
 ## Tests
@@ -215,7 +257,7 @@ commit, as usual; nothing is installed on a box without asking.
 
 - **m4b over HTTP on a Pi Zero:** AAC decoding costs more than mp3, a file with the index at the end
   makes opening slow, and TLS has its own cost. Phase 0 measures this; fallbacks are plain http in
-  the home network and, later, downloading the book to the box.
+  the home network and downloading the book to the box (phase 4).
 - **ffmpeg of the `av` build:** on 32-bit Raspberry Pi OS the `av` wheel uses the system ffmpeg; it
   must support https and the `headers` option. Checked in phase 0.
 - **API differences between ABS versions:** API keys need 2.26 or newer. Older servers use user name
@@ -223,8 +265,12 @@ commit, as usual; nothing is installed on a box without asking.
   again.
 - **Two players, one position:** if the phone and the radio play the same book at the same time,
   the last write wins. That is how ABS itself behaves, so no extra handling.
-- **No network, no book:** an ABS book cannot be played without the server. The Audiobooks tab shows
-  the cached list (greyed out) and says why.
+- **No network, no book:** an ABS book that is not downloaded cannot be played without the server.
+  The Audiobooks tab shows the cached list (greyed out) and says why; downloaded books are marked.
+- **SD card:** several books can fill a small card, and many writes wear it. Hence the limit, one
+  download at a time and no automatic downloads in the first version.
+- **Download permission:** an ABS user may be forbidden to download; then the plugin says so instead
+  of failing half way (the user's permissions are part of the "test connection" result).
 - **Secrets on the box:** the API key lies in a file readable only by the service user; anyone with
   access to the box (or its backup) can use it, so a key restricted to one user is the right choice.
 
@@ -234,5 +280,6 @@ commit, as usual; nothing is installed on a box without asking.
    certificate the box can verify?
 2. Which version, and are API keys available (2.26+)?
 3. Audiobooks only first (as planned), or are ABS podcasts equally important?
-4. Is playing without the server needed (offline cache) soon, or is "the server is always on" fine?
+4. Offline use is wanted (portable box): how much space should downloads use at most on the box's
+   card (default 8 GB), and should finished books be removed automatically when it is full?
 5. Several ABS libraries or servers? The plan has one server, any number of its libraries.
