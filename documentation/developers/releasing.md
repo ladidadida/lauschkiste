@@ -55,6 +55,9 @@ TestPyPI only has the Lauschkiste packages; the installer takes everything else 
    the GitHub release (a pre-release while the tag has a suffix) and then waits for your approval of the
    `pypi` environment. After the approval the packages are on PyPI.
 4. Check: `uv tool install lauschkiste` on a machine, `lauschctl plugin list`.
+5. After the **first** release on PyPI: make `pypi` the default of `install.sh` (`FROM=pypi`) and in
+   [Installation](../builders/installation.md) and [Update](../builders/update.md) (the table of `--from`, the
+   curl line without `--from`), and say so in the README.
 
 While there are only pre-releases, `pip install lauschkiste` needs `--pre` (uv and the installer do not).
 

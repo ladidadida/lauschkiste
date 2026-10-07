@@ -2,16 +2,20 @@
 # Installs Lauschkiste and runs `lauschctl setup`.
 #
 #   curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash
-#   curl -fsSL .../install.sh | bash -s -- --source
+#   curl -fsSL .../install.sh | bash -s -- --from source
+#
+# Where Lauschkiste comes from (--from):
+#   github   the wheels attached to a release (default); --version TAG picks a release
+#   pypi     the packages on PyPI; --version 0.1.0a4 picks a version
+#   source   a git checkout (default ~/lauschkiste, --source DIR for another one) that runs from its
+#            own folder; --branch NAME picks the branch
+#   testpypi, or the URL of a package index, for testing; --wheels DIR installs wheels from a folder
 #
 # Options:
-#   --source [DIR]     install from a git checkout (default DIR: ~/lauschkiste) instead of
-#                      the release wheels
-#   --branch NAME      branch to check out with --source (default: main)
-#   --version V        release to install: a tag (default: the latest release), with --from a version
-#                      such as 0.1.0a4
-#   --from SOURCE      where the packages come from: github (default, the wheels of a release),
-#                      pypi, testpypi, or the URL of a package index (e.g. a local one)
+#   --from SOURCE      see above
+#   --source [DIR]     the same as --from source
+#   --branch NAME      branch to check out with --from source (default: main)
+#   --version V        release to install (default: the latest)
 #   --wheels DIR       install the wheels in DIR instead of downloading a release
 #   --repo OWNER/NAME  GitHub repository (default: ladidadida/lauschkiste)
 #   --home DIR         LAUSCHKISTE_HOME (default: ~/lauschkiste on a Raspberry Pi,
@@ -43,7 +47,9 @@ parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --source)
+                [[ "$FROM" == github || "$FROM" == source ]] || die "--source and --from ${FROM} exclude each other"
                 MODE=source
+                FROM=source
                 if [[ $# -gt 1 && "$2" != --* ]]; then SOURCE_DIR="$2"; shift; fi ;;
             --branch) BRANCH="$2"; shift ;;
             --version) VERSION="$2"; shift ;;
@@ -58,6 +64,12 @@ parse_args() {
         esac
         shift
     done
+}
+
+check_args() {
+    [[ "$FROM" != source ]] || MODE=source
+    if [[ "$MODE" == source && "$FROM" != source ]]; then die "--source and --from ${FROM} exclude each other"; fi
+    if [[ -n "$WHEELS" && "$FROM" != github ]]; then die "--wheels and --from ${FROM} exclude each other"; fi
 }
 
 is_debian() { [[ -r /etc/os-release ]] && grep -qiE '^(ID|ID_LIKE)=.*(debian|raspbian)' /etc/os-release; }
@@ -148,7 +160,6 @@ install_from_index() {
 
 install_package() {
     if [[ "$FROM" != github ]]; then
-        [[ -z "$WHEELS" ]] || die "--from and --wheels exclude each other"
         install_from_index
         return
     fi
@@ -225,6 +236,7 @@ choose_home() {
 # Everything runs from main, so a partially downloaded script does nothing
 main() {
     parse_args "$@"
+    check_args
     SUDO=""
     if [[ "$(id -u)" -ne 0 ]]; then
         SUDO=sudo

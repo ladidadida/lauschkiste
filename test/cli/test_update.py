@@ -122,3 +122,77 @@ def test_latest_falls_back_to_the_newest_pre_release(monkeypatch):
     assert update.fetch_release('o/r')['tag_name'] == 'v0.1.0-alpha.1'
     assert calls == ['https://api.github.com/repos/o/r/releases/latest', 'https://api.github.com/repos/o/r/releases']
     assert update.release_version({'tag_name': 'v0.1.0-alpha.1'}) > update.Version('0.1.0a0')
+
+
+class FakeDist:
+    def __init__(self, name):
+        self.metadata = {'Name': name}
+
+
+def pypi(releases):
+    return FakeResponse({'releases': {version: [{'yanked': yanked}] if yanked is not None else []
+                                      for version, yanked in releases.items()}})
+
+
+def test_wheel_files_tell_a_package_from_an_index_install(monkeypatch):
+    class Dist:
+        def __init__(self, text):
+            self.text = text
+
+        def read_text(self, name):
+            return self.text
+
+    monkeypatch.setattr(update, 'distribution', lambda name: Dist('{"url": "file:///x.whl"}'))
+    assert update.installed_from_wheel_files() is True
+    monkeypatch.setattr(update, 'distribution', lambda name: Dist(None))
+    assert update.installed_from_wheel_files() is False
+
+
+def test_latest_index_version_is_the_newest_stable_else_the_newest_pre_release(monkeypatch):
+    monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0a3': False, '0.1.0a4': False, '0.0.9': False}))
+    assert str(update.latest_index_version()) == '0.0.9'
+    monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0a3': False, '0.1.0a4': False}))
+    assert str(update.latest_index_version()) == '0.1.0a4'
+    monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0': False, '0.2.0a1': False, '0.1.1': True}))
+    assert str(update.latest_index_version()) == '0.1.0'
+    monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0a5': None}))
+    with pytest.raises(update.UpdateError):
+        update.latest_index_version()
+
+
+def test_index_update_pins_all_installed_packages_and_keeps_extras(tmp_path, monkeypatch):
+    monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0a3': False, '99.0.0': False}))
+    monkeypatch.setattr(update, 'installed_version', lambda name: '0.1.0a3')
+    monkeypatch.setattr(update, 'distributions', lambda: [FakeDist('lauschkiste'), FakeDist('lauschkiste_core'),
+                                                          FakeDist('lauschkiste-plugin-devices'), FakeDist('typer')])
+    monkeypatch.setattr(update, 'enabled_extras', lambda path: {'lauschkiste-plugin-devices': ['gpio']})
+    installed = []
+    monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
+    assert update.update_from_index('latest', tmp_path / 'x.yaml', check_only=True) is True
+    assert installed == []
+    assert update.update_from_index('latest', tmp_path / 'x.yaml') is True
+    assert installed == ['lauschkiste==99.0.0', 'lauschkiste-core==99.0.0', 'lauschkiste-plugin-devices[gpio]==99.0.0']
+    installed.clear()
+    update.update_from_index('v0.1.0-alpha.4', tmp_path / 'x.yaml')
+    assert installed[0] == 'lauschkiste==0.1.0a4'
+
+
+def test_index_update_when_up_to_date(tmp_path, monkeypatch):
+    monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0a3': False}))
+    monkeypatch.setattr(update, 'installed_version', lambda name: '0.1.0a3')
+    assert update.update_from_index('latest', tmp_path / 'x.yaml') is False
+
+
+def test_update_command_picks_the_source_of_the_installation(tmp_path, monkeypatch):
+    called = []
+    monkeypatch.setattr(update, 'checkout', lambda: None)
+    monkeypatch.setattr(update, 'update_package', lambda *args: called.append('github') or False)
+    monkeypatch.setattr(update, 'update_from_index', lambda *args: called.append('index') or False)
+    monkeypatch.setattr(update, 'installed_from_wheel_files', lambda: True)
+    update.update('latest', 'o/r', True, False, tmp_path / 'x.yaml')
+    monkeypatch.setattr(update, 'installed_from_wheel_files', lambda: False)
+    update.update('latest', 'o/r', True, False, tmp_path / 'x.yaml')
+    monkeypatch.setattr(update, 'checkout', lambda: tmp_path)
+    monkeypatch.setattr(update, 'update_source', lambda *args: called.append('source') or False)
+    update.update('latest', 'o/r', True, False, tmp_path / 'x.yaml')
+    assert called == ['github', 'index', 'source']

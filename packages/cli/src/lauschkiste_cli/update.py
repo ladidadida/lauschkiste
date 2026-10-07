@@ -1,14 +1,21 @@
-"""`lauschctl update`: newer release (package install) or `git pull` (source checkout)."""
+"""`lauschctl update`: `git pull` (source checkout), the newest release from PyPI, or the wheels of a GitHub release.
+
+How Lauschkiste was installed decides where the update comes from: a source checkout pulls its branch;
+packages installed from an index (PyPI) are upgraded from PyPI; packages installed from wheel files
+(the install script's default until the first PyPI release, ``--wheels``) get the wheels of the newest
+GitHub release.
+"""
 
 import re
 import shutil
 import subprocess
 import tempfile
-from importlib.metadata import PackageNotFoundError, version as installed_version
+from importlib.metadata import PackageNotFoundError, distribution, distributions, version as installed_version
 from pathlib import Path
 from typing import Dict, List, Optional
 
 import typer
+from packaging.utils import canonicalize_name
 from packaging.version import Version
 
 import lauschkiste.paths
@@ -146,6 +153,59 @@ def update_package(repo: str, tag: str, config_path: Path, check_only: bool = Fa
     return True
 
 
+# --- packages from an index (PyPI) -----------------------------------------------------------------
+
+PYPI_PROJECT = 'https://pypi.org/pypi/{name}/json'
+
+
+def installed_from_wheel_files() -> bool:
+    """True if the packages were installed from wheel files (``direct_url.json``), not from an index."""
+    try:
+        return bool(distribution('lauschkiste-core').read_text('direct_url.json'))
+    except PackageNotFoundError:
+        return False
+
+
+def latest_index_version(name: str = 'lauschkiste') -> Version:
+    """The newest stable version on PyPI, else (only pre-releases yet) the newest pre-release."""
+    import requests
+    response = requests.get(PYPI_PROJECT.format(name=name), timeout=30)
+    if response.status_code == 404:
+        raise UpdateError(f"'{name}' is not on PyPI")
+    response.raise_for_status()
+    versions = [Version(version) for version, files in response.json().get('releases', {}).items()
+                if files and not all(file.get('yanked') for file in files)]
+    if not versions:
+        raise UpdateError(f"'{name}' has no releases on PyPI")
+    stable = [version for version in versions if not version.is_prerelease]
+    return max(stable or versions)
+
+
+def index_requirements(config_path: Path, version: Version) -> List[str]:
+    """Every installed Lauschkiste package pinned to ``version``, with the extras enabled plugins need."""
+    extras = enabled_extras(config_path)
+    names = sorted({canonicalize_name(dist.metadata['Name']) for dist in distributions()
+                    if canonicalize_name(dist.metadata['Name']).startswith('lauschkiste')})
+    return [f"{name}{f'[{chr(44).join(sorted(extras[name]))}]' if extras.get(name) else ''}=={version}"
+            for name in names]
+
+
+def update_from_index(release: str, config_path: Path, check_only: bool = False) -> bool:
+    try:
+        current = Version(installed_version('lauschkiste-core'))
+    except PackageNotFoundError:
+        current = Version('0')
+    target = latest_index_version() if release == 'latest' else Version(release.lstrip('v'))
+    if release == 'latest' and target <= current:
+        typer.echo(f"Lauschkiste {current} is up to date (latest on PyPI: {target}).")
+        return False
+    typer.echo(f"Updating Lauschkiste {current} -> {target}")
+    if check_only:
+        return True
+    plugin.install_requirements(index_requirements(config_path, target))
+    return True
+
+
 # --- command -----------------------------------------------------------------------------------
 
 def restart_service() -> None:
@@ -153,7 +213,7 @@ def restart_service() -> None:
         run('systemctl', '--user', 'restart', SERVICE)
 
 
-def update(release: str = typer.Option('latest', "--version", help="Release tag to install (package installs)"),
+def update(release: str = typer.Option('latest', "--version", help="Version or release tag to install (package installs)"),
            repo: str = typer.Option(DEFAULT_REPO, "--repo", envvar=lauschkiste.paths.env_name("REPO"),
                                     help="GitHub repository"),
            check: bool = typer.Option(False, "--check", help="Only report whether an update is available"),
@@ -165,7 +225,12 @@ def update(release: str = typer.Option('latest', "--version", help="Release tag 
     config_path = conf or lauschkiste.paths.config_file()
     root = checkout()
     try:
-        changed = update_source(root, check) if root else update_package(repo, release, config_path, check)
+        if root:
+            changed = update_source(root, check)
+        elif installed_from_wheel_files():
+            changed = update_package(repo, release, config_path, check)
+        else:
+            changed = update_from_index(release, config_path, check)
     except (UpdateError, OSError) as error:
         typer.echo(f"Update failed: {error}", err=True)
         raise typer.Exit(1)

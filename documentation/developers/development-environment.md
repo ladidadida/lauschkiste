@@ -21,8 +21,8 @@ The full setup is running on the RPi and you access files via SSH.
 
 We recommend to use at least a Pi 3 or Pi Zero 2 for development. While this hardware won\'t be needed in production, it comes in helpful while developing.
 
-1. Follow the [installation preperation](../builders/installation.md#install-raspberry-pi-os-lite) steps
-1. [Install](../builders/installation.md#development) your feature/fork branch of Lauschkiste (`install.sh --source --repo <you>/lauschkiste --branch <branch>`).
+1. Follow the [installation preperation](../builders/installation.md#1-prepare-the-raspberry-pi) steps
+1. [Install](../builders/installation.md#where-lauschkiste-comes-from) your feature/fork branch of Lauschkiste (`install.sh --from source --repo <you>/lauschkiste --branch <branch>`).
 
 ## Develop on local machine
 

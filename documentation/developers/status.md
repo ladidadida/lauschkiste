@@ -24,6 +24,8 @@ the [roadmap](roadmap-core-architecture.md).
 - [Audiobookshelf](audiobookshelf.md) as an audiobook source, with offline use and a handover to other
   rooms through Music Assistant.
 - Release on PyPI ([Releasing](releasing.md)).
+- Installing straight from a git branch or tag without a release (the web app would have to be built on the
+  box or taken from a CI build).
 - A switch for Bluetooth on the Raspberry Pi, more board support plugins, general LED strip control.
 - An MQTT plugin (the [old documentation](../builders/components/mqtt/mqtt-integration.md) still describes
   the earlier implementation).
