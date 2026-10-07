@@ -5,6 +5,9 @@ const apiTarget = process.env.API_PROXY_TARGET || 'http://localhost:5556';
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    'import.meta.env.VITE_BUILD_ID': JSON.stringify(Date.now().toString(36)),
+  },
   build: {
     outDir: 'build',
     sourcemap: false,

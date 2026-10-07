@@ -17,6 +17,9 @@ const i18nReady = i18n
   // init i18next
   // for all options read: https://www.i18next.com/overview/configuration-options
   .init({
+    // A browser may still hold translations of whatever else was served from this address before
+    // (an older version, another program); a new build id makes it fetch them again.
+    backend: { queryStringParams: { v: import.meta.env.VITE_BUILD_ID } },
     debug: import.meta.env.DEV,
     // lng: 'en',
     fallbackLng: 'en',
