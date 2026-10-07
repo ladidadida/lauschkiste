@@ -108,10 +108,19 @@ class ServiceStep(Step):
 
 
 DEFAULT_PORT = 5556
+PUBLIC_PORT = 80
+HTTP_SOCKET = '/etc/systemd/system/lauschkiste-http.socket'
+HTTP_SERVICE = '/etc/systemd/system/lauschkiste-http.service'
+SOCKET_PROXY = '/usr/lib/systemd/systemd-socket-proxyd'
 
 
 def web_port(ctx: Context) -> int:
     return int(ctx.load_config().getn('api', 'port', default=DEFAULT_PORT))
+
+
+def public_port(ctx: Context) -> int:
+    """The port the web app is reached at: 80 when the forwarding is set up, else its own."""
+    return PUBLIC_PORT if ctx.system.exists(HTTP_SOCKET) else web_port(ctx)
 
 
 class WebPortStep(Step):
@@ -120,32 +129,89 @@ class WebPortStep(Step):
     questions = (
         Question('port80', 'Serve the web app on port 80, so its address needs no ":5556"?',
                  default=lambda ctx: ctx.system.is_raspberry_pi(),
-                 help='Lets programs without root rights use ports from 80 up (net.ipv4.ip_unprivileged_port_start)'),
+                 help='A systemd socket on port 80 forwards to the web app; Lauschkiste itself needs no extra rights'),
     )
-    SYSCTL = '/etc/sysctl.d/60-lauschkiste-port.conf'
-    CONTENT = '# Lauschkiste serves its web app on port 80 without root rights\nnet.ipv4.ip_unprivileged_port_start = 80\n'
+    OLD_SYSCTL = '/etc/sysctl.d/60-lauschkiste-port.conf'
+    SOCKET_UNIT = (
+        '[Unit]\n'
+        'Description=Lauschkiste web app on port 80\n'
+        '\n'
+        '[Socket]\n'
+        f'ListenStream={PUBLIC_PORT}\n'
+        '\n'
+        '[Install]\n'
+        'WantedBy=sockets.target\n'
+    )
+
+    def relevant(self, ctx):
+        return ctx.system.which('systemctl') is not None
 
     def wanted(self, ctx):
         return bool(ctx.answer('port80'))
 
+    def target(self, ctx) -> str:
+        config = ctx.load_config()
+        address = str(config.getn('api', 'bind_address', default='0.0.0.0'))
+        host = '127.0.0.1' if address in ('', '0.0.0.0', '::') else address
+        return f'{host}:{web_port(ctx)}'
+
+    def service_unit(self, ctx) -> str:
+        return (
+            '[Unit]\n'
+            'Description=Forwards port 80 to the Lauschkiste web app\n'
+            'Requires=lauschkiste-http.socket\n'
+            'After=lauschkiste-http.socket\n'
+            '\n'
+            '[Service]\n'
+            f'ExecStart={SOCKET_PROXY} --exit-idle-time=10min {self.target(ctx)}\n'
+            'DynamicUser=yes\n'
+            'PrivateTmp=yes\n'
+            'PrivateDevices=yes\n'
+            'ProtectSystem=strict\n'
+            'ProtectHome=yes\n'
+            'NoNewPrivileges=yes\n'
+            'RestrictAddressFamilies=AF_INET AF_INET6\n'
+        )
+
     def check(self, ctx):
+        system = ctx.system
         problems = []
-        if ctx.system.read(self.SYSCTL) != self.CONTENT:
-            problems.append('programs without root rights may not use port 80')
-        if web_port(ctx) != 80:
-            problems.append('the web app does not use port 80')
+        if not system.exists(SOCKET_PROXY):
+            problems.append(f'{SOCKET_PROXY} is missing (part of systemd)')
+        if system.read(HTTP_SOCKET) != self.SOCKET_UNIT:
+            problems.append(f'{HTTP_SOCKET} is missing or outdated')
+        if system.read(HTTP_SERVICE) != self.service_unit(ctx):
+            problems.append(f'{HTTP_SERVICE} is missing or outdated')
+        if not system.unit_enabled('lauschkiste-http.socket'):
+            problems.append('lauschkiste-http.socket is not enabled')
+        if web_port(ctx) == PUBLIC_PORT:
+            problems.append(f'the web app itself uses port {PUBLIC_PORT}, which the forwarding needs')
+        if system.exists(self.OLD_SYSCTL):
+            problems.append('ports below 1024 are open to every program without root rights')
         return problems
 
     def apply(self, ctx):
         system = ctx.system
-        system.write(self.SYSCTL, self.CONTENT, root=True)
-        system.run('sysctl', '-p', self.SYSCTL, root=True, quiet=True)
-        if web_port(ctx) != 80:
+        if not system.exists(SOCKET_PROXY):
+            raise SetupError(f'{SOCKET_PROXY} is missing; it belongs to systemd')
+        if web_port(ctx) == PUBLIC_PORT:
             cfg = ctx.load_config()
-            cfg.setn('api', 'port', value=80)
+            cfg.setn('api', 'port', value=DEFAULT_PORT)
             lauschkiste.cfghandler.write_yaml(cfg, str(ctx.config_path))
             if system.unit_active(SERVICE, user=True):
                 system.run('systemctl', '--user', 'restart', SERVICE)
+        if system.exists(self.OLD_SYSCTL):
+            system.remove(self.OLD_SYSCTL, root=True)
+            system.run('sysctl', '-w', 'net.ipv4.ip_unprivileged_port_start=1024', root=True, quiet=True)
+        changed = (system.read(HTTP_SOCKET) != self.SOCKET_UNIT
+                   or system.read(HTTP_SERVICE) != self.service_unit(ctx))
+        system.write(HTTP_SOCKET, self.SOCKET_UNIT, root=True)
+        system.write(HTTP_SERVICE, self.service_unit(ctx), root=True)
+        system.run('systemctl', 'daemon-reload', root=True)
+        system.run('systemctl', 'enable', '--now', 'lauschkiste-http.socket', root=True)
+        if changed:
+            system.run('systemctl', 'restart', 'lauschkiste-http.socket', root=True)
+            system.run('systemctl', 'try-restart', 'lauschkiste-http.service', root=True)
 
 
 class RfidStep(Step):

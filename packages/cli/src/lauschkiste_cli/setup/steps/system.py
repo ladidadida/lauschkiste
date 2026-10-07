@@ -6,6 +6,7 @@ import typer
 
 import lauschkiste.paths
 from lauschkiste_cli.setup.base import Context, Question, Step
+from lauschkiste_cli.setup.steps.lauschkiste import public_port
 from lauschkiste_cli.setup.system import SetupError
 
 BUILD_PACKAGES = ['build-essential', 'python3-dev', 'libffi-dev']
@@ -193,7 +194,7 @@ class WelcomeStep(Step):
         return ctx.system.is_raspberry_pi()
 
     def _content(self, ctx) -> str:
-        port = ctx.load_config().getn('api', 'port', default=5556)
+        port = public_port(ctx)
         return lauschkiste.paths.resource('system', '99-lauschkiste-welcome').read_text().replace('@PORT@', str(port))
 
     def check(self, ctx) -> List[str]:

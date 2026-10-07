@@ -22,6 +22,8 @@ class FakeSystem(System):
         }
         (self.root / 'usr/bin').mkdir(parents=True)
         (self.root / 'usr/bin/apt-get').touch()
+        (self.root / 'usr/lib/systemd').mkdir(parents=True)
+        (self.root / 'usr/lib/systemd/systemd-socket-proxyd').touch()
         if pi:
             (self.root / 'proc/device-tree').mkdir(parents=True)
             (self.root / 'proc/device-tree/model').write_text('Raspberry Pi 4 Model B Rev 1.4')
@@ -105,7 +107,7 @@ def test_pc_setup_installs_packages_and_service(tmp_path, home, extras):
     assert not system.exists('/var/lib/systemd/linger/pi')
     assert ctx.enabled_plugins() == {}
     assert extras == []
-    assert not system.exists('/etc/sysctl.d/60-lauschkiste-port.conf')
+    assert not system.exists('/etc/systemd/system/lauschkiste-http.socket')
 
 
 def test_network_stays_on_dhcp_by_default(tmp_path, home, extras):
@@ -135,8 +137,12 @@ def test_pi_setup(tmp_path, home, extras):
     assert cmdline.startswith('console=tty1 root=PARTUUID=1234 rootwait ')
     assert 'ipv6.disable=1' in cmdline and cmdline.count('quiet') == 1
     assert 'bluetooth.service' not in system.enabled
-    assert 'ip_unprivileged_port_start = 80' in system.read('/etc/sysctl.d/60-lauschkiste-port.conf')
-    assert ctx.load_config().getn('api', 'port') == 80
+    assert 'ListenStream=80' in system.read('/etc/systemd/system/lauschkiste-http.socket')
+    forwarding = system.read('/etc/systemd/system/lauschkiste-http.service')
+    assert 'systemd-socket-proxyd --exit-idle-time=10min 127.0.0.1:5556' in forwarding
+    assert 'lauschkiste-http.socket' in system.enabled
+    assert ctx.load_config().getn('api', 'port', default=5556) == 5556
+    assert not system.exists('/etc/sysctl.d/60-lauschkiste-port.conf')
     welcome = system.read('/etc/update-motd.d/99-lauschkiste-welcome')
     assert 'port=":80"' in welcome and '5556' not in welcome
     assert 'static ip_address=192.168.1.50/24' in system.read('/etc/dhcpcd.conf')
@@ -291,3 +297,24 @@ def test_replace_block_keeps_the_rest_of_the_file(tmp_path):
                                           '  path=/new\n\n[other]\n  b=2\n')
     assert system.read_block('/etc/x.conf', '## Lauschkiste Samba Config') == (
         '## Lauschkiste Samba Config\n[lauschkiste]\n  path=/new')
+
+
+def test_port_step_replaces_the_old_sysctl_setting_and_moves_the_web_app_off_port_80(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    system.write('/etc/sysctl.d/60-lauschkiste-port.conf', 'net.ipv4.ip_unprivileged_port_start = 80\n')
+    home.mkdir(parents=True, exist_ok=True)
+    (home / 'settings').mkdir(exist_ok=True)
+    (home / 'settings' / 'lauschkiste.yaml').write_text('api:\n  port: 80\n  bind_address: 192.168.1.50\n')
+    failed, ctx = setup_run(system, home, names=['port'])
+    assert failed == 0
+    assert not system.exists('/etc/sysctl.d/60-lauschkiste-port.conf')
+    assert ('sysctl', '-w', 'net.ipv4.ip_unprivileged_port_start=1024') in system.commands
+    assert ctx.load_config().getn('api', 'port') == 5556
+    assert '192.168.1.50:5556' in system.read('/etc/systemd/system/lauschkiste-http.service')
+    assert setup_run(system, home, names=['port'], check_only=True)[0] == 0
+
+
+def test_port_step_needs_the_socket_proxy(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    (system.root / 'usr/lib/systemd/systemd-socket-proxyd').unlink()
+    assert setup_run(system, home, names=['port'])[0] == 1
