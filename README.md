@@ -1,5 +1,9 @@
 # Lauschkiste
 
+<p align="center">
+  <img src="documentation/assets/logo/white/lauschkiste-logo-text-berry-white.svg" alt="Lauschkiste" width="380">
+</p>
+
 **An open-source RFID audio player for kids.** Put a card on the box and music or an audiobook
 starts. Runs on a Raspberry Pi, managed from any browser.
 

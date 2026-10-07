@@ -12,7 +12,7 @@ config:
     siblings_only: true
   # allow some tags we use for formatting
   no-inline-html:
-    allowed_elements: [ "details", "summary" ]
+    allowed_elements: [ "details", "summary", "p", "img" ]
 
 # Include a custom rule package
 #customRules:
