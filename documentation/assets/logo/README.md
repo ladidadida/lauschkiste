@@ -14,6 +14,3 @@ white/lauschkiste-logo[-text]-<color>-white.svg
 
 The web app has its own copies in `packages/webapp/public`: `logo.svg` is the default bear, `logo192.png` and
 `favicon.ico` are made from it on a square white tile (the app icon of phones and the browser tab).
-
-The files carry content credentials (a C2PA manifest in the `metadata` element) that state who created them;
-they do not change the picture.
