@@ -99,7 +99,8 @@ optimisation. Steps needing root run their commands through `sudo`.
 - **Build.** `ci/build_wheels.sh` builds the web app, then a source distribution and a wheel of every package
   (the wheel from the source distribution, which carries the web app, so what is published works). The
   GitHub release gets the wheels, PyPI the wheels and source distributions.
-- **Check before publishing:** `uvx twine check dist/*`.
+- **Check before publishing:** `uvx twine check dist/*`. How a release is made and the one-time PyPI setup:
+  [Releasing](releasing.md).
 
 ## Install script
 

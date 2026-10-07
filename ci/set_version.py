@@ -2,6 +2,7 @@
 """Set the version of all packages at once: ``ci/set_version.py 0.1.0-alpha.4`` (or ``0.1.0a4``).
 
 Changes the version of every package, the exact pins between them and ``lauschkiste/version.py``.
+A test upload to TestPyPI needs a new version each time: ``0.1.0a4.dev1``, ``0.1.0a4.dev2``, ...
 """
 
 import re
@@ -17,14 +18,16 @@ PINNED = ('lauschkiste-core', 'lauschkiste')
 
 
 def runtime_parts(version: Version):
-    """(major, minor, patch, extra) for version.py: 0.1.0a4 -> (0, 1, 0, 'alpha.4')."""
+    """(major, minor, patch, extra) for version.py: 0.1.0a4.dev1 -> (0, 1, 0, 'alpha.4.dev1')."""
     names = {'a': 'alpha', 'b': 'beta', 'rc': 'rc'}
-    extra = ''
+    parts = []
     if version.pre:
-        extra = f'{names[version.pre[0]]}.{version.pre[1]}'
-    elif version.dev is not None:
-        extra = f'dev.{version.dev}'
-    return version.major, version.minor, version.micro, extra
+        parts.append(f'{names[version.pre[0]]}.{version.pre[1]}')
+    if version.post is not None:
+        parts.append(f'post{version.post}')
+    if version.dev is not None:
+        parts.append(f'dev{version.dev}')
+    return version.major, version.minor, version.micro, '.'.join(parts)
 
 
 def main(argv):

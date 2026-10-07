@@ -24,7 +24,7 @@ def test_distribution_names():
 
 
 def test_all_packages_have_the_version_of_the_program():
-    expected = Version(lauschkiste.version().replace('-alpha.', 'a').replace('-beta.', 'b'))
+    expected = Version(lauschkiste.version())
     assert {project(directory)['version'] for directory in PACKAGES} == {str(expected)}
 
 

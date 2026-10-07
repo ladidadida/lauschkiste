@@ -8,7 +8,10 @@
 #   --source [DIR]     install from a git checkout (default DIR: ~/lauschkiste) instead of
 #                      the release wheels
 #   --branch NAME      branch to check out with --source (default: main)
-#   --version TAG      release to install (default: the latest release)
+#   --version V        release to install: a tag (default: the latest release), with --from a version
+#                      such as 0.1.0a4
+#   --from SOURCE      where the packages come from: github (default, the wheels of a release),
+#                      pypi, testpypi, or the URL of a package index (e.g. a local one)
 #   --wheels DIR       install the wheels in DIR instead of downloading a release
 #   --repo OWNER/NAME  GitHub repository (default: ladidadida/lauschkiste)
 #   --home DIR         LAUSCHKISTE_HOME (default: ~/lauschkiste on a Raspberry Pi,
@@ -23,7 +26,10 @@ MODE=package
 SOURCE_DIR="${HOME}/lauschkiste"
 BRANCH=main
 VERSION=latest
+FROM=github
 WHEELS=""
+BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-devices lauschkiste-plugin-mpd
+                 lauschkiste-plugin-rfid-readers lauschkiste-plugin-samba)
 HOME_DIR=""
 ASSUME_YES=false
 RUN_SETUP=true
@@ -41,6 +47,7 @@ parse_args() {
                 if [[ $# -gt 1 && "$2" != --* ]]; then SOURCE_DIR="$2"; shift; fi ;;
             --branch) BRANCH="$2"; shift ;;
             --version) VERSION="$2"; shift ;;
+            --from) FROM="$2"; shift ;;
             --wheels) WHEELS="$(cd "$2" && pwd)"; shift ;;
             --repo) REPO="$2"; shift ;;
             --home) HOME_DIR="$2"; shift ;;
@@ -122,7 +129,29 @@ for asset in json.load(sys.stdin).get("assets", []):
     (cd "$target" && xargs -n1 curl -fsSLO < urls)
 }
 
+install_from_index() {
+    local index="" requirement=lauschkiste args=()
+    case "$FROM" in
+        pypi) ;;
+        testpypi) index="https://test.pypi.org/simple/" ;;
+        *) index="$FROM" ;;
+    esac
+    [[ "$VERSION" == latest ]] || requirement="lauschkiste==${VERSION}"
+    # TestPyPI and local indexes only have the Lauschkiste packages; the rest comes from PyPI
+    [[ -z "$index" ]] || args+=(--index "$index" --index-strategy unsafe-best-match)
+    local with=()
+    for plugin in "${BUNDLED_PLUGINS[@]}"; do with+=(--with "$plugin"); done
+    log "Installing ${requirement} from ${FROM}"
+    uv tool install --force --compile-bytecode --python python3 "${args[@]}" "$requirement" "${with[@]}"
+    CTL="$(uv tool dir --bin)/lauschctl"
+}
+
 install_package() {
+    if [[ "$FROM" != github ]]; then
+        [[ -z "$WHEELS" ]] || die "--from and --wheels exclude each other"
+        install_from_index
+        return
+    fi
     local wheels="$WHEELS"
     if [[ -z "$wheels" ]]; then
         wheels="$(mktemp -d)"

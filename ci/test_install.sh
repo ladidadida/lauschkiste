@@ -4,6 +4,7 @@
 #
 #   ci/test_install.sh <debian codename> <install.sh options...>
 #   ci/test_install.sh trixie --wheels dist      (wheels built into ./dist)
+#   ci/test_install.sh trixie --index dist       (a package index made of ./dist, installed from like from PyPI)
 #   ci/test_install.sh trixie --source           (this checkout; web app built into packages/webapp/build)
 
 set -euo pipefail
@@ -18,6 +19,13 @@ useradd -m -s /bin/bash pi && echo "pi ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d
 mkdir /home/pi/checkout && tar -C /home/pi/checkout -xf - && chown -R pi:pi /home/pi/checkout
 args="${INSTALL_ARGS/--source/--source /home/pi/checkout}"
 args="${args/--wheels /--wheels /home/pi/checkout/}"
+if [[ "$INSTALL_ARGS" == --index\ * ]]; then
+    apt-get -qq install -y python3 >/dev/null
+    python3 /home/pi/checkout/ci/make_index.py "/home/pi/checkout/${INSTALL_ARGS#--index }" /home/pi/index
+    chown -R pi:pi /home/pi/index
+    su - pi -c "nohup python3 -m http.server 8099 -d /home/pi/index >/tmp/index.log 2>&1 &"
+    args="--from http://localhost:8099/simple/"
+fi
 su - pi -c "bash ~/checkout/install.sh --yes ${args}"
 su - pi -c "
     set -e
