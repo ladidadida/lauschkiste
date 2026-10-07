@@ -181,9 +181,9 @@ the living room, and the other way round. Requirements on this plugin:
   small optional action that calls MA's API for a named player can follow, if a card or button on the
   box should do it.
 
-Not planned: Lauschkiste as an MA player (Sendspin) or as a browser of the MA library; see the
-decision in the Music Assistant notes of the maintainer. Phase 0 checks the round trip with a real MA
-(positions in both directions, when MA writes).
+Not planned: Lauschkiste as an MA player (Sendspin) or as a browser of the MA library. The box is
+meant to work without a server, MA needs one, so the position in ABS is the shared state. Phase 0
+checks the round trip with a real MA (positions in both directions, when MA writes).
 
 ### Chapters inside one file
 
