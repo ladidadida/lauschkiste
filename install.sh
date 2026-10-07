@@ -188,13 +188,14 @@ install_source() {
             VERSION=latest download_release_wheels "$tmp"
             python3 - "$tmp" "${SOURCE_DIR}/packages/webapp/build" <<'PYTHON'
 import glob, pathlib, sys, zipfile
-wheel = glob.glob(f"{sys.argv[1]}/lauschkiste-*.whl")[0]
-with zipfile.ZipFile(wheel) as archive:
-    for name in archive.namelist():
-        if name.startswith("lauschkiste/webapp/") and not name.endswith("/"):
-            target = pathlib.Path(sys.argv[2], name[len("lauschkiste/webapp/"):])
-            target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_bytes(archive.read(name))
+prefix = "lauschkiste/webapp/"
+for wheel in glob.glob(f"{sys.argv[1]}/*.whl"):
+    with zipfile.ZipFile(wheel) as archive:
+        for name in archive.namelist():
+            if name.startswith(prefix) and not name.endswith("/"):
+                target = pathlib.Path(sys.argv[2], name[len(prefix):])
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(archive.read(name))
 PYTHON
         fi
     fi
