@@ -264,7 +264,14 @@
       "mark-finished": "Als fertig markieren",
       "mark-unfinished": "Als nicht gehört markieren",
       "menu": "Aktionen für {{title}}",
-      "progress-label": "Fortschritt von {{title}}"
+      "progress-label": "Fortschritt von {{title}}",
+      "download": "Auf die Box laden",
+      "remove-download": "Download entfernen",
+      "cancel-download": "Download abbrechen",
+      "downloading": "Lade {{progress}} %",
+      "queued": "Wartet auf den Download",
+      "downloaded": "Auf der Box",
+      "download-error": "Der Download ist fehlgeschlagen"
     },
     "radio": {
       "empty": "Noch keine Sender. Füge einen Sender mit seiner Stream-Adresse hinzu.",

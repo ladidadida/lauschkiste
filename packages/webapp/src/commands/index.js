@@ -128,6 +128,23 @@ const commands = {
     argKeys: ['book', 'finished'],
   },
 
+  // Audiobookshelf downloads (plugin)
+  audiobookshelfDownloads: {
+    rest: { method: 'GET', path: '/api/v1/audiobookshelf/downloads' },
+  },
+  audiobookshelfDownload: {
+    rest: { method: 'POST', path: '/api/v1/audiobookshelf/download' },
+    argKeys: ['book'],
+  },
+  audiobookshelfCancelDownload: {
+    rest: { method: 'POST', path: '/api/v1/audiobookshelf/cancel_download' },
+    argKeys: ['book'],
+  },
+  audiobookshelfRemoveDownload: {
+    rest: { method: 'POST', path: '/api/v1/audiobookshelf/remove_download' },
+    argKeys: ['book'],
+  },
+
   // Radio
   radioStations: {
     rest: { method: 'GET', path: '/api/v1/radio/stations' },

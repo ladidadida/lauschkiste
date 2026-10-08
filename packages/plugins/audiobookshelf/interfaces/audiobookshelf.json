@@ -1,10 +1,138 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "plugin",
   "name": "audiobookshelf",
-  "operations": {},
+  "operations": {
+    "cancel_download": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobookshelf/cancel_download",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "download": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobookshelf/download",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "downloads": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/audiobookshelf/downloads",
+      "returns": {
+        "properties": {
+          "free_bytes": {
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "book": {
+                  "type": "string"
+                },
+                "done": {
+                  "default": 0,
+                  "type": "integer"
+                },
+                "error": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "state": {
+                  "type": "string"
+                },
+                "total": {
+                  "default": 0,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "book",
+                "state"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "limit_bytes": {
+            "type": "integer"
+          },
+          "used_bytes": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "used_bytes",
+          "limit_bytes",
+          "free_bytes"
+        ],
+        "type": "object"
+      }
+    },
+    "remove_download": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobookshelf/remove_download",
+      "returns": {
+        "type": "null"
+      }
+    }
+  },
   "requires": {
     "audiobooks": ">=2.0,<3",
     "player": ">=5.2,<6"

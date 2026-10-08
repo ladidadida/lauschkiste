@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DownloadDoneIcon from '@mui/icons-material/DownloadDone';
 import MenuBookIcon from '@mui/icons-material/MenuBook';
 
 import AppSettingsContext from '../../../context/appsettings/context';
@@ -33,7 +34,7 @@ export const progressOf = ({ duration, finished, listened }) => {
 // Books of other sources (not the local library) name their source in every request.
 const sourceArg = (book) => (book.source && book.source !== 'local' ? { source: book.source } : {});
 
-export const AudiobookItem = ({ book, onChanged, showCovers }) => {
+export const AudiobookItem = ({ book, download, onChanged, showCovers }) => {
   const { t } = useTranslation();
   const progress = progressOf(book);
   const started = progress > 0 && !book.finished;
@@ -54,7 +55,30 @@ export const AudiobookItem = ({ book, onChanged, showCovers }) => {
     onChanged();
   };
 
+  const downloadState = download?.state;
+  const downloadPercent = download?.total ? Math.floor((100 * download.done) / download.total) : 0;
+  const downloadStatus = {
+    queued: t('library.audiobooks.queued'),
+    downloading: t('library.audiobooks.downloading', { progress: downloadPercent }),
+    error: t('library.audiobooks.download-error'),
+  }[downloadState];
+  const downloadRequest = async (command) => {
+    await request(command, { book: book.book });
+    onChanged();
+  };
+  const downloadItem = (() => {
+    if (book.source === undefined || book.source === 'local') return [];
+    if (downloadState === 'done') {
+      return [{ label: t('library.audiobooks.remove-download'), onClick: () => downloadRequest('audiobookshelfRemoveDownload') }];
+    }
+    if (downloadState === 'downloading' || downloadState === 'queued') {
+      return [{ label: t('library.audiobooks.cancel-download'), onClick: () => downloadRequest('audiobookshelfCancelDownload') }];
+    }
+    return [{ label: t('library.audiobooks.download'), onClick: () => downloadRequest('audiobookshelfDownload') }];
+  })();
+
   const menuItems = [
+    ...downloadItem,
     {
       label: t('library.audiobooks.restart'),
       onClick: () => request('audiobook_restart', { book: book.book, ...sourceArg(book) }).then(onChanged),
@@ -82,11 +106,14 @@ export const AudiobookItem = ({ book, onChanged, showCovers }) => {
             <Box component="span" sx={{ alignItems: 'center', display: 'flex', gap: 0.5 }}>
               {book.title}
               {book.finished && <CheckCircleIcon color="success" fontSize="small" titleAccess={status} />}
+              {downloadState === 'done' &&
+                <DownloadDoneIcon fontSize="small" titleAccess={t('library.audiobooks.downloaded')} />}
             </Box>
           }
           secondary={
             <Box component="span" sx={{ display: 'block' }}>
               <Box component="span" sx={{ display: 'block' }}>{`${status}${duration}`}</Box>
+              {downloadStatus && <Box component="span" sx={{ display: 'block' }}>{downloadStatus}</Box>}
               {started &&
                 <LinearProgress
                   aria-label={t('library.audiobooks.progress-label', { title: book.title })}
@@ -123,6 +150,26 @@ const Audiobooks = ({ musicFilter }) => {
     load();
   }, [load, lastScan]);
 
+  const [downloads, setDownloads] = useState({});
+  const loadDownloads = useCallback(async () => {
+    const { result } = await request('audiobookshelfDownloads');
+    setDownloads(result ? Object.fromEntries(result.items.map((entry) => [entry.book, entry])) : {});
+  }, []);
+  const hasRemoteBooks = books.some(({ source }) => source && source !== 'local');
+  useEffect(() => {
+    if (hasRemoteBooks) loadDownloads();
+  }, [hasRemoteBooks, loadDownloads]);
+  const downloading = Object.values(downloads).some(({ state }) => state === 'downloading' || state === 'queued');
+  useEffect(() => {
+    if (!downloading) return undefined;
+    const timer = setInterval(loadDownloads, 3000);
+    return () => clearInterval(timer);
+  }, [downloading, loadDownloads]);
+  const changed = useCallback(() => {
+    load();
+    loadDownloads();
+  }, [load, loadDownloads]);
+
   const visible = useMemo(() => {
     const query = musicFilter.toLowerCase();
     return query ? books.filter(({ title }) => title.toLowerCase().includes(query)) : books;
@@ -136,7 +183,13 @@ const Audiobooks = ({ musicFilter }) => {
   return (
     <List sx={{ width: '100%' }}>
       {visible.map((book) => (
-        <AudiobookItem book={book} key={`${book.source}/${book.book}`} onChanged={load} showCovers={showCovers} />
+        <AudiobookItem
+          book={book}
+          download={downloads[book.book]}
+          key={`${book.source}/${book.book}`}
+          onChanged={changed}
+          showCovers={showCovers}
+        />
       ))}
     </List>
   );

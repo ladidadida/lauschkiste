@@ -1,5 +1,6 @@
 import json
 import threading
+import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
@@ -7,20 +8,30 @@ import pytest
 pytest.importorskip('lauschkiste_plugin_audiobookshelf', reason="the audiobookshelf plugin package is not installed")
 
 from lauschkiste.contract import OperationError
+from lauschkiste_plugin_audiobookshelf.downloader import Download, DownloadError
+from lauschkiste_plugin_audiobookshelf.downloads import DownloadCache, DownloadManager
 from lauschkiste_plugin_audiobookshelf.source import AudiobookshelfSource
 
 KEY = 'secret-key'
+CONTENT = {'10': bytes(range(256)) * 4, '20': b'B' * 3000, '30': b'C' * 500}
+
+
+def audio(ino, index, duration):
+    return {'ino': ino, 'index': index, 'duration': duration,
+            'metadata': {'ext': '.mp3', 'size': len(CONTENT[ino]), 'filename': f'{index}.mp3'}}
+
+
 BOOK = {
-    'id': 'book1', 'mediaType': 'book',
+    'id': 'book1', 'mediaType': 'book', 'updatedAt': 1000,
     'media': {'metadata': {'title': 'Bullerbü'}, 'duration': 300.0, 'numAudioFiles': 3,
-              'audioFiles': [{'ino': '30', 'index': 3, 'duration': 100.0}, {'ino': '10', 'index': 1, 'duration': 70.0},
-                             {'ino': '20', 'index': 2, 'duration': 130.0}]},
+              'audioFiles': [audio('30', 3, 100.0), audio('10', 1, 70.0), audio('20', 2, 130.0)]},
 }
 
 
 class FakeServer(BaseHTTPRequestHandler):
     progress = {}
     requests = []
+    ranges = []
 
     def log_message(self, *args):
         pass
@@ -33,6 +44,18 @@ class FakeServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def send_file(self, content):
+        start = 0
+        header = self.headers.get('Range')
+        if header:
+            start = int(header.split('=')[1].rstrip('-'))
+        type(self).ranges.append(header)
+        body = content[start:]
+        self.send_response(206 if header else 200)
+        self.send_header('Content-Length', str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def handle_any(self):
         length = int(self.headers.get('Content-Length') or 0)
         body = json.loads(self.rfile.read(length)) if length else None
@@ -40,6 +63,9 @@ class FakeServer(BaseHTTPRequestHandler):
         if self.headers.get('Authorization') != f'Bearer {KEY}':
             return self.reply(401, {})
         path = self.path.split('?')[0]
+        parts = path.split('/')
+        if len(parts) == 7 and parts[1:4] == ['api', 'items', 'book1'] and parts[4] == 'file':
+            return self.send_file(CONTENT[parts[5]])
         if path == '/api/libraries':
             return self.reply(200, {'libraries': [{'id': 'lib1', 'mediaType': 'book'},
                                                   {'id': 'pod', 'mediaType': 'podcast'}]})
@@ -63,7 +89,7 @@ class FakeServer(BaseHTTPRequestHandler):
 
 @pytest.fixture
 def server():
-    FakeServer.progress, FakeServer.requests = {}, []
+    FakeServer.progress, FakeServer.requests, FakeServer.ranges = {}, [], []
     httpd = ThreadingHTTPServer(('127.0.0.1', 0), FakeServer)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     yield f'http://127.0.0.1:{httpd.server_port}'
@@ -136,3 +162,68 @@ def test_wrong_key_is_reported(server):
     source.configure(server, 'wrong', 10)
     with pytest.raises(Exception, match='refused the API key'):
         source.list_books()
+
+
+# -- downloads --------------------------------------------------------------------------------
+
+def fetch(server, directory, key=KEY):
+    Download(server, key, 'book1', directory, directory.parent / 'rate').run()
+
+
+def test_download_writes_all_files_and_marks_the_book_complete(server, tmp_path):
+    cache = DownloadCache(tmp_path)
+    fetch(server, cache.directory('book1'))
+    meta = cache.complete('book1')
+    assert [f['name'] for f in meta['files']] == ['001_10.mp3', '002_20.mp3', '003_30.mp3']
+    assert (cache.directory('book1') / '001_10.mp3').read_bytes() == CONTENT['10']
+    assert cache.status_of('book1')['state'] == 'done'
+    assert cache.used_bytes() == sum(len(c) for c in CONTENT.values())
+    assert not list(cache.directory('book1').glob('*.part'))
+
+
+def test_a_partial_file_is_continued_with_a_range_request(server, tmp_path):
+    cache = DownloadCache(tmp_path)
+    directory = cache.directory('book1')
+    directory.mkdir(parents=True)
+    (directory / '002_20.mp3.part').write_bytes(CONTENT['20'][:1000])
+    fetch(server, directory)
+    assert (directory / '002_20.mp3').read_bytes() == CONTENT['20']
+    assert 'bytes=1000-' in FakeServer.ranges
+
+
+def test_download_with_a_wrong_key_reports_an_error(server, tmp_path):
+    with pytest.raises(DownloadError, match='refused'):
+        fetch(server, tmp_path / 'b', key='wrong')
+
+
+def test_the_rate_file_slows_the_download_down(server, tmp_path):
+    cache = DownloadCache(tmp_path)
+    cache.set_rate(100)
+    directory = cache.directory('book1')
+    directory.parent.mkdir(exist_ok=True)
+    Download(server, KEY, 'book1', directory, cache.rate_file).run()
+    assert cache.complete('book1')
+
+
+def test_manager_downloads_in_a_process_and_the_source_then_plays_the_files(server, tmp_path):
+    source = AudiobookshelfSource()
+    source.configure(server, KEY, 10)
+    source.cache = DownloadCache(tmp_path)
+    manager = DownloadManager(source.cache, source.credentials)
+    manager.start('book1')
+    deadline = time.monotonic() + 30
+    while time.monotonic() < deadline and not source.cache.complete('book1'):
+        time.sleep(0.1)
+    assert source.cache.complete('book1')
+    assert [s['state'] for s in manager.states()] == ['done']
+
+    files = source.files('book1')
+    assert files == [str(tmp_path / 'book1' / name) for name in ('001_10.mp3', '002_20.mp3', '003_30.mp3')]
+    FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 90.0, 'isFinished': False}
+    assert source.position('book1').load() == {'file': files[1], 'elapsed': 20.0, 'finished': False}
+
+    source.prefer_downloaded = False
+    assert source.files('book1')[0].startswith('abs://')
+    manager.remove('book1')
+    assert source.cache.books() == []
+    manager.close()

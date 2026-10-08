@@ -53,5 +53,17 @@ a book started in the Audiobookshelf app continues on the box and the other way 
 3. The books appear in the Audiobooks tab. On a card the book is `{book: <id>, source: audiobookshelf}`;
    the card dialog offers them like the local ones.
 
-Needs the `local_audio` player and a reachable server: a book that is not on the box cannot play without it.
-Downloading books for offline use is planned, see [Audiobookshelf](../developers/audiobookshelf.md).
+Needs the `local_audio` player. A book that is not downloaded needs the server to play.
+
+### Downloading books
+
+In the Audiobooks tab, the menu of an Audiobookshelf book has **Download to the box**. The files go to
+`cache/audiobookshelf/` in the Lauschkiste home (not into the library, so the book stays one entry and keeps
+sharing its position with the server). A downloaded book plays from the box even when the server is
+reachable (`prefer_downloaded`). The download runs in a process of its own with the lowest priority; while
+something plays it is slowed to `download_rate_kbps_playing` (1000 kB/s, `0` waits until the playback
+stops). `cache_limit_gb` (8) caps the space; a book that would not fit is refused with the numbers.
+A stopped download keeps what it loaded and continues next time. Remove a download in the same menu.
+
+Not yet: automatic removal of old downloads, and playing a downloaded book without the server (the position
+is still read from and written to the server).

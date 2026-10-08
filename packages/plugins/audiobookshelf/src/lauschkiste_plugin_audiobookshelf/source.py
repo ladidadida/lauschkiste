@@ -7,6 +7,7 @@ from typing import Any, Dict, List, NamedTuple, Optional
 
 from lauschkiste.contract import OperationError
 from lauschkiste_plugin_audiobookshelf.client import AudiobookshelfError, Client
+from lauschkiste_plugin_audiobookshelf.downloads import DownloadCache
 
 logger = logging.getLogger('lauschkiste.audiobookshelf')
 
@@ -64,6 +65,30 @@ class AudiobookshelfSource:
         self._items: Optional[List[Dict[str, Any]]] = None
         self._items_at = 0.0
         self._tracks: Dict[str, tuple] = {}
+        self.cache: Optional[DownloadCache] = None
+        self.prefer_downloaded = True
+
+    def credentials(self):
+        client = self._client
+        return (client.base, client.key) if client else ('', '')
+
+    def book_size(self, book: str) -> int:
+        """Bytes of the audio files of a book on the server."""
+        item = self.client().item(book)
+        if item is None:
+            raise OperationError(404, 'unknown_audiobook', f"No audiobook '{book}' on the Audiobookshelf server")
+        return sum(int(f['metadata'].get('size') or 0) for f in (item.get('media') or {}).get('audioFiles') or [])
+
+    def _downloaded(self, book: str) -> Optional[List[Track]]:
+        meta = self.cache.complete(book) if self.cache is not None and self.prefer_downloaded else None
+        if not meta:
+            return None
+        tracks, start = [], 0.0
+        for entry in meta['files']:
+            duration = float(entry.get('duration') or 0)
+            tracks.append(Track(str(self.cache.directory(book) / entry['name']), start, duration))
+            start += duration
+        return tracks or None
 
     def configure(self, server_url: str, api_key: str, refresh_minutes: float) -> None:
         with self._lock:
@@ -130,6 +155,9 @@ class AudiobookshelfSource:
         return index, position - tracks[index].start
 
     def tracks(self, book: str) -> List[Track]:
+        downloaded = self._downloaded(book)
+        if downloaded:
+            return downloaded
         with self._lock:
             cached = self._tracks.get(book)
         if cached and time.monotonic() - cached[0] < TRACKS_TTL_SEC:

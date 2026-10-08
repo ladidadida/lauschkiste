@@ -264,7 +264,14 @@
       "mark-finished": "Mark as finished",
       "mark-unfinished": "Mark as not finished",
       "menu": "Actions for {{title}}",
-      "progress-label": "Progress of {{title}}"
+      "progress-label": "Progress of {{title}}",
+      "download": "Download to the box",
+      "remove-download": "Remove the download",
+      "cancel-download": "Stop the download",
+      "downloading": "Downloading {{progress}} %",
+      "queued": "Waiting to download",
+      "downloaded": "On the box",
+      "download-error": "The download failed"
     },
     "radio": {
       "empty": "No stations yet. Add a station with its stream address.",

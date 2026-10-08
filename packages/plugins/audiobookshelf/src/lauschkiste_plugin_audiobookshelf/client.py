@@ -14,6 +14,7 @@ class AudiobookshelfError(Exception):
 class Client:
     def __init__(self, server_url: str, api_key: str):
         self.base = server_url.rstrip('/')
+        self.key = api_key
         self._headers = {'Authorization': f'Bearer {api_key}'}
         self._session = requests.Session()
 
