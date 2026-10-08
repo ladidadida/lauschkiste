@@ -11,9 +11,9 @@ PyPI after a manual approval.
   start and shutdown sounds.
 - [x] Searched for conflicts with the name "Lauschkiste" (trademark registers of the DPMA and EUIPO) and for
   similar logos (October 2026: no problems expected).
-- [ ] Private vulnerability reporting is switched on (repository Settings → Code security): the Code of
+- [x] Private vulnerability reporting is switched on (repository Settings → Code security): the Code of
   Conduct and `SECURITY.md` send reports there.
-- [ ] Repository description, topics and social preview image are set.
+- [x] Repository description, topics and social preview image are set.
 - [ ] The accounts, pending publishers and environments below exist.
 - [ ] A test upload to TestPyPI and a fresh installation from it on a box worked.
 
