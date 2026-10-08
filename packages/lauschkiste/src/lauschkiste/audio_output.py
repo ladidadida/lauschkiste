@@ -55,6 +55,12 @@ class PortAudioSink(AudioSink):
     LATENCY = 0.3
     #: Writes are collected to this length: fewer calls through PortAudio and ALSA
     CHUNK_SECONDS = 0.1
+    #: Amplifiers like the MAX98357A thump when the clock starts or stops with the signal. So the stream
+    #: starts with silence, the first audio fades in, and it ends with silence.
+    LEAD_IN_SECONDS = 0.15
+    FADE_IN_SECONDS = 0.03
+    TAIL_SECONDS = 0.1
+    FADE_STEPS = 8
 
     def __init__(self):
         self._stream = None
@@ -62,11 +68,17 @@ class PortAudioSink(AudioSink):
         self._prefill_bytes = 0
         self._bytes_per_second = 1
         self._chunk = bytearray()
+        self._underflows = 0
+        self._rate = 1
+        self._started = False
         #: ``callback(left, right, delay)``: RMS level (0..1) of each written chunk, audible in ``delay`` seconds
         self.level_callback = None
 
     def open(self, samplerate, channels):
         self._pending = bytearray()
+        self._rate = samplerate
+        self._underflows = 0
+        self._started = False
         self._prefill_bytes = int(samplerate * self.PREFILL_SECONDS) * channels * 2
         self._bytes_per_second = samplerate * channels * 2
         self._chunk = bytearray()
@@ -78,11 +90,34 @@ class PortAudioSink(AudioSink):
             logger.warning(f"No audio output device available ({e.__class__.__name__}: {e}); playing silently")
             self._stream = None
 
+    def _silence(self, seconds):
+        frame = self._bytes_per_second // self._rate
+        return bytes(int(self._rate * seconds) * frame)
+
+    def _fade_in(self, data):
+        """``data`` with its first FADE_IN_SECONDS rising from silence to full level."""
+        fade = min(len(data), int(self._rate * self.FADE_IN_SECONDS) * (self._bytes_per_second // self._rate))
+        if fade <= 0:
+            return data
+        step = max(2, fade // self.FADE_STEPS // 4 * 4)
+        parts = []
+        for index, start in enumerate(range(0, fade, step)):
+            parts.append(audioop.mul(data[start:min(start + step, fade)], 2, index / self.FADE_STEPS))
+        return b''.join(parts) + data[fade:]
+
     def _write(self, data):
         try:
             if not self._stream.active:
                 self._stream.start()
-            self._stream.write(data)
+            if not self._started:
+                self._started = True
+                if self.LEAD_IN_SECONDS:
+                    self._stream.write(self._silence(self.LEAD_IN_SECONDS))
+                data = self._fade_in(data)
+            if self._stream.write(data):
+                self._underflows += 1
+                if self._underflows <= 3:
+                    logger.warning("The audio output ran empty (underflow); the CPU or the source is too slow")
         except Exception as e:
             logger.warning(f"Audio output error, playing silently for the rest of this track: {e}")
             self._stream = None
@@ -120,8 +155,12 @@ class PortAudioSink(AudioSink):
             dropped = (len(self._pending or b'') + len(self._chunk)) / self._bytes_per_second
         elif self._stream is not None and (self._pending or self._chunk):
             self._write(bytes(self._pending or b'') + bytes(self._chunk))
+        if not discard and self._stream is not None and self._started and self.TAIL_SECONDS:
+            self._write(self._silence(self.TAIL_SECONDS))
         self._pending = None
         self._chunk = bytearray()
+        if self._underflows:
+            logger.warning(f"The audio output ran empty {self._underflows} times during this track")
         if self._stream is not None:
             try:
                 if discard and self._stream.active:

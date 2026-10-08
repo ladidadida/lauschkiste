@@ -29,6 +29,14 @@ class RecordingSink:
         return 0.0
 
 
+@pytest.fixture(autouse=True)
+def plain_sink(monkeypatch):
+    """The soft start and end of the sink are tested on their own."""
+    monkeypatch.setattr(PortAudioSink, 'LEAD_IN_SECONDS', 0)
+    monkeypatch.setattr(PortAudioSink, 'FADE_IN_SECONDS', 0)
+    monkeypatch.setattr(PortAudioSink, 'TAIL_SECONDS', 0)
+
+
 class _FakeStatusStore(dict):
     def save_to_json(self):
         pass
@@ -432,3 +440,31 @@ def test_decode_track_at_higher_speed_writes_less_audio(tmp_path):
     fast_bytes = sum(len(c) for c in fast._sink.chunks)
     assert fast_bytes == pytest.approx(normal_bytes / 1.5, rel=0.1)
     assert fast._position == pytest.approx(normal._position, rel=0.1)
+
+
+def test_portaudio_sink_starts_and_ends_softly(monkeypatch):
+    import struct
+    monkeypatch.setattr(PortAudioSink, 'LEAD_IN_SECONDS', 0.1)
+    monkeypatch.setattr(PortAudioSink, 'FADE_IN_SECONDS', 0.1)
+    monkeypatch.setattr(PortAudioSink, 'TAIL_SECONDS', 0.05)
+    written = []
+
+    class Stream(FakeStream):
+        def write(self, data):
+            super().write(data)
+            written.append(bytes(data))
+
+    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: Stream(**kw))
+    sink = PortAudioSink()
+    sink.open(1000, 2)  # 4 bytes per frame
+    loud = struct.pack('<h', 20000) * 2 * 1200
+    sink.write(loud)
+    sink.close()
+
+    lead, music, tail = written
+    assert lead == bytes(400) and tail == bytes(200)
+    samples = struct.unpack(f'<{len(music) // 2}h', music)
+    assert len(music) == len(loud)
+    assert samples[0] == 0
+    assert samples[0] < samples[50] < samples[100] < samples[150] < 20000
+    assert all(sample == 20000 for sample in samples[200:])

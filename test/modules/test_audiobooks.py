@@ -313,3 +313,19 @@ def test_a_track_that_cannot_be_opened_does_not_overwrite_the_source_position(se
     status(file='fake://b/2', state='play', elapsed='0')
     time.sleep(0.3)
     assert source.saved == []
+
+
+def test_an_unchanged_position_is_not_reported_again(setup):
+    start, _, status, _ = setup
+    audiobooks = start()
+    source = FakeSource()
+    start.managers[-1].handle('audiobooks').instance.sources.register('fake', source)
+    audiobooks.invoke('play', 'b', 'fake')
+    status(file='fake://b/2', state='pause', elapsed='55.0', duration='100')
+    assert wait_for(lambda: len(source.saved) == 1)
+    for _ in range(5):
+        status(file='fake://b/2', state='pause', elapsed='55.0', duration='100')
+    time.sleep(0.3)
+    assert len(source.saved) == 1
+    status(file='fake://b/2', state='pause', elapsed='56.0', duration='100')
+    assert wait_for(lambda: len(source.saved) == 2)

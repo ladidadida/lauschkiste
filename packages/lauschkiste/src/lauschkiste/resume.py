@@ -64,6 +64,7 @@ class ResumeTracker:
         self._worker = ctx.executor('resume')
         self._store: Optional[PositionStore] = None
         self._store_entry: Optional[Dict[str, Any]] = None
+        self._store_sent: Optional[Dict[str, Any]] = None
         self._store_saved_at = 0.0
 
     def configure(self, rewind_sec: float) -> None:
@@ -77,6 +78,8 @@ class ResumeTracker:
     def stop(self) -> None:
         with self._lock:
             store, entry, self._store_entry = self._store, self._store_entry, None
+            if entry == self._store_sent:
+                entry = None
         if store is not None and entry is not None:
             self._send(store, entry)
         self.save()
@@ -146,6 +149,7 @@ class ResumeTracker:
             self._flush_store()
             self._key, self._files, self._last = key, list(files), None
             self._store, self._store_entry, self._store_saved_at = store, None, 0.0
+            self._store_sent = None
             self._activated_at = time.monotonic()
 
     def _flush_store(self) -> None:
@@ -153,6 +157,9 @@ class ResumeTracker:
         if self._store is not None and self._store_entry is not None:
             store, entry = self._store, self._store_entry
             self._store_entry = None
+            if entry == self._store_sent:
+                return
+            self._store_sent = entry
             self._store_saved_at = time.monotonic()
             self._worker.submit(self._send, store, entry)
 
