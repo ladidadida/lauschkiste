@@ -2,6 +2,7 @@ import pytest
 
 from lauschkiste.contract.settings import current_values
 from lauschkiste.core_modules import CORE_MODULES
+from lauschkiste_plugin_audiobookshelf import Audiobookshelf
 from lauschkiste_plugin_mpd import Mpd
 from lauschkiste_plugin_board_raspberry_pi import BoardRaspberryPi
 from lauschkiste_plugin_devices.battery import Battery
@@ -9,7 +10,7 @@ from lauschkiste_plugin_devices.gpio_controls import GpioControls
 from lauschkiste_plugin_devices.phat_beat import PhatBeat
 from lauschkiste_plugin_devices.power_button import PowerButton
 
-MODULES = [m for m in CORE_MODULES if m.settings is not None] + [Mpd, BoardRaspberryPi, Battery, GpioControls,
+MODULES = [m for m in CORE_MODULES if m.settings is not None] + [Audiobookshelf, Mpd, BoardRaspberryPi, Battery, GpioControls,
                                                                     PowerButton, PhatBeat]
 
 

@@ -214,3 +214,102 @@ def test_unknown_or_invalid_books(setup, book, status):
     with pytest.raises(OperationError) as error:
         start().invoke('play', book)
     assert error.value.status == status
+
+
+class FakeSource:
+    def __init__(self):
+        self.saved = []
+        self.stored = {'file': 'fake://b/2', 'elapsed': 40.0, 'finished': False}
+        self.finished = []
+
+    def list_books(self):
+        return [{'book': 'b', 'title': 'Remote', 'chapters': 2, 'duration': 200.0, 'listened': 40.0}]
+
+    def files(self, book):
+        return ['fake://b/1', 'fake://b/2']
+
+    def title(self, book):
+        return 'Remote book'
+
+    def position(self, book):
+        source = self
+
+        class Store:
+            def load(self):
+                return dict(source.stored)
+
+            def save(self, entry):
+                source.saved.append(entry)
+
+        return Store()
+
+    def set_finished(self, book, finished):
+        self.finished.append((book, finished))
+
+
+def test_books_of_a_source_are_listed_and_play_from_the_source_position(setup):
+    start, ctrl, status, state_file = setup
+    audiobooks = start()
+    source = FakeSource()
+    start.managers[-1].handle('audiobooks').instance.sources.register('fake', source)
+
+    books = audiobooks.invoke('list_books')
+    assert [(b.source, b.book, b.title) for b in books] == [
+        ('local', 'Emil', 'Emil'), ('local', 'Pippi', 'Pippi Langstrumpf'), ('fake', 'b', 'Remote')]
+
+    audiobooks.invoke('play', 'b', 'fake')
+    ctrl.play_files.assert_called_once_with(['fake://b/1', 'fake://b/2'], 1, 30.0, True)
+    context = start.managers[-1].handle('player').invoke('playerstatus').context
+    assert (context.title, context.args) == ('Remote book', {'book': 'b', 'source': 'fake'})
+
+    status(file='fake://b/2', elapsed='50.0', duration='100')
+    status(file='fake://b/2', state='pause', elapsed='55.0', duration='100')
+    assert wait_for(lambda: source.saved and source.saved[-1]['elapsed'] == 55.0)
+    assert not state_file.exists() or 'b' not in json.loads(state_file.read_text())
+
+
+def test_finishing_the_last_file_of_a_source_book_is_reported(setup):
+    start, ctrl, status, _ = setup
+    audiobooks = start()
+    source = FakeSource()
+    start.managers[-1].handle('audiobooks').instance.sources.register('fake', source)
+    audiobooks.invoke('play', 'b', 'fake')
+    status(file='fake://b/2', elapsed='95.0', duration='100')
+    status(file='fake://b/2', state='stop', elapsed='0', duration='100')
+    assert wait_for(lambda: {'finished': True} in source.saved)
+
+
+def test_a_failing_source_leaves_the_others(setup):
+    start, _, _, _ = setup
+    audiobooks = start()
+
+    class Broken(FakeSource):
+        def list_books(self):
+            raise RuntimeError('down')
+
+    start.managers[-1].handle('audiobooks').instance.sources.register('broken', Broken())
+    assert [b.source for b in audiobooks.invoke('list_books')] == ['local', 'local']
+
+
+def test_unknown_source_and_set_finished_on_a_source(setup):
+    start, _, _, _ = setup
+    audiobooks = start()
+    with pytest.raises(OperationError) as error:
+        audiobooks.invoke('play', 'b', 'nowhere')
+    assert error.value.status == 404
+    source = FakeSource()
+    start.managers[-1].handle('audiobooks').instance.sources.register('fake', source)
+    audiobooks.invoke('set_finished', 'b', True, 'fake')
+    assert source.finished == [('b', True)]
+
+
+def test_a_track_that_cannot_be_opened_does_not_overwrite_the_source_position(setup):
+    start, _, status, _ = setup
+    audiobooks = start()
+    source = FakeSource()
+    start.managers[-1].handle('audiobooks').instance.sources.register('fake', source)
+    audiobooks.invoke('play', 'b', 'fake')
+    status(file='fake://b/2', state='stop', elapsed='0')
+    status(file='fake://b/2', state='play', elapsed='0')
+    time.sleep(0.3)
+    assert source.saved == []

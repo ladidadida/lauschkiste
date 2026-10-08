@@ -102,7 +102,9 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `documentation/developers/hardware.md`), `mpd` (player backend) and `rfid-readers`
   (one plugin per reader driver, `rfid_<driver>`; each driver's dependencies are an extra of that
   package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`) and `samba` (the
-  library's network share and Samba password from the web app; `lauschctl setup samba` enables it).
+  library's network share and Samba password from the web app; `lauschctl setup samba` enables it) and
+  `audiobookshelf` (books of an Audiobookshelf server at `audiobooks.sources`, resolver at
+  `player.resolvers`; `documentation/developers/audiobookshelf.md`).
 - **Settings:** modules and plugins describe their config section as a pydantic model
   (`settings = ...`); the web app renders forms from its schema
   (`/api/v1/settings/modules/<name>`), see "Settings" in `documentation/developers/core-and-plugins.md`.

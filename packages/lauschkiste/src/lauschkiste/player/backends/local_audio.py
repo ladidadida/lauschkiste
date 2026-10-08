@@ -17,6 +17,7 @@ to signal a live decode loop with finer-grained commands.
 import logging
 import os
 import random
+import ssl
 import threading
 import time
 
@@ -36,6 +37,17 @@ logger = logging.getLogger('lauschkiste.PlayerLocalAudio')
 cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
 
 STREAM_TIMEOUT = (10.0, 30.0)
+
+
+def ca_file():
+    """The CA bundle for https streams: the ffmpeg of the av wheels does not know the system's."""
+    path = ssl.get_default_verify_paths().cafile
+    if path and os.path.exists(path):
+        return path
+    import certifi
+    return certifi.where()
+
+
 STREAM_OPTIONS = {'icy': '1', 'reconnect': '1', 'reconnect_streamed': '1', 'reconnect_delay_max': '30'}
 
 class PlayerLocalAudio:
@@ -49,6 +61,7 @@ class PlayerLocalAudio:
             self._status_store['last_played_folder'] = ''
 
         self._status_callback = lambda status: None
+        self._resolve = lambda url: (url, {})
         self._last_published: dict = {}
         self._published_at = 0.0
         self._cv = threading.Condition(threading.RLock())
@@ -153,7 +166,13 @@ class PlayerLocalAudio:
         try:
             import av
             if '://' in path:
-                container = av.open(path, timeout=STREAM_TIMEOUT, options=STREAM_OPTIONS)
+                url, headers = self._resolve(path)
+                options = dict(STREAM_OPTIONS)
+                if url.startswith('https://'):
+                    options['ca_file'] = ca_file()
+                if headers:
+                    options['headers'] = ''.join(f'{name}: {value}\r\n' for name, value in headers.items())
+                container = av.open(url, timeout=STREAM_TIMEOUT, options=options)
                 self._stream_metadata = dict(container.metadata)
             else:
                 container = av.open(path)
@@ -266,6 +285,9 @@ class PlayerLocalAudio:
         self.second_swipe_action = self._second_swipe_action_dict.get(action)
 
     # -- coordinator-facing surface -----------------------------------------------------------
+
+    def set_resolver(self, resolve):
+        self._resolve = resolve
 
     def set_status_callback(self, callback):
         self._status_callback = callback

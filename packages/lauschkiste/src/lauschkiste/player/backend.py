@@ -4,7 +4,7 @@ Optional capabilities (library browsing, cover art, rewind, ...) are looked up b
 time; a backend without them makes the corresponding operation answer 501.
 """
 
-from typing import Any, Callable, Dict, List, Mapping, Protocol
+from typing import Any, Callable, Dict, List, Mapping, Protocol, Tuple
 
 
 class PlayerBackend(Protocol):
@@ -65,3 +65,9 @@ class LevelMeter(Protocol):
     def level(self, left: float, right: float, delay: float) -> None:
         """RMS level (0..1) of each channel of the output, audible in ``delay`` seconds; about ten times a second
         while playing (only with backends that can measure it, e.g. local_audio)."""
+
+
+class Resolver(Protocol):
+    def resolve(self, url: str) -> Tuple[str, Dict[str, str]]:
+        """The URL to open and the HTTP headers to send for a track URL with the scheme this resolver is
+        registered for (``player.resolvers``), so that credentials never appear in queues, status or logs."""

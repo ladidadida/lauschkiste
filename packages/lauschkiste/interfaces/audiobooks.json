@@ -1,7 +1,15 @@
 {
   "events": {},
-  "extension_points": {},
-  "interface_version": "1.0",
+  "extension_points": {
+    "sources": {
+      "files": "(self, book: str) -> List[str]",
+      "list_books": "(self) -> List[Dict[str, Any]]",
+      "position": "(self, book: str) -> Any",
+      "set_finished": "(self, book: str, finished: bool) -> None",
+      "title": "(self, book: str) -> str"
+    }
+  },
+  "interface_version": "2.0",
   "kind": "core",
   "name": "audiobooks",
   "operations": {
@@ -61,6 +69,10 @@
               "default": 0.0,
               "type": "number"
             },
+            "source": {
+              "default": "local",
+              "type": "string"
+            },
             "title": {
               "type": "string"
             }
@@ -81,6 +93,10 @@
         "properties": {
           "book": {
             "type": "string"
+          },
+          "source": {
+            "default": "local",
+            "type": "string"
           }
         },
         "required": [
@@ -100,6 +116,10 @@
         "additionalProperties": false,
         "properties": {
           "book": {
+            "type": "string"
+          },
+          "source": {
+            "default": "local",
             "type": "string"
           }
         },
@@ -125,6 +145,10 @@
           "finished": {
             "default": true,
             "type": "boolean"
+          },
+          "source": {
+            "default": "local",
+            "type": "string"
           }
         },
         "required": [

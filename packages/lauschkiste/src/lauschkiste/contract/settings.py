@@ -1,6 +1,7 @@
 """Module settings: read, validate and store a module's config section through its ``settings`` model."""
 
 import logging
+import os
 from typing import Any, Dict, List, Set
 
 from pydantic import BaseModel, ConfigDict, ValidationError
@@ -25,6 +26,12 @@ def storage(handle, cfg) -> tuple:
     if callable(custom):
         return custom()
     return cfg, ((handle.name,) if handle.is_core else ('plugins', handle.name))
+
+
+def secret_fields(model: type) -> Set[str]:
+    """Fields marked ``json_schema_extra={'secret': True}``: shown as password fields, never sent to the client."""
+    return {name for name, field in model.model_fields.items()
+            if isinstance(field.json_schema_extra, dict) and field.json_schema_extra.get('secret')}
 
 
 def current_values(model: type, section: Any) -> Dict[str, Any]:
@@ -69,12 +76,18 @@ class SettingsStore:
         model = handle.cls.settings
         cfg, prefix = storage(handle, self.cfg)
         section = cfg.getn(*prefix, default=None)
+        values = current_values(model, section)
+        secrets = sorted(secret_fields(model))
+        is_set = [key for key in secrets if values.get(key)]
+        for key in secrets:
+            values[key] = ''
         return {
             'name': name,
             'kind': 'core' if handle.is_core else 'plugin',
             'title': (handle.cls.__doc__ or '').strip().split('\n', 1)[0] or name,
             'schema': model.model_json_schema(),
-            'values': current_values(model, section),
+            'values': values,
+            'secrets_set': is_set,
             'restart_required': name in self.restart_required,
         }
 
@@ -84,6 +97,8 @@ class SettingsStore:
     def update(self, name: str, values: Dict[str, Any]) -> Dict[str, Any]:
         handle = self._handle(name)
         model = handle.cls.settings
+        values = {key: value for key, value in values.items()
+                  if not (key in secret_fields(model) and value in ('', None))}
         unknown = sorted(set(values) - set(model.model_fields))
         if unknown:
             raise OperationError(422, 'unknown_setting', f"Unknown settings for '{name}': {', '.join(unknown)}")
@@ -103,6 +118,8 @@ class SettingsStore:
                 else:
                     cfg.setn(*prefix, key, value=value)
         self.save(cfg)
+        if secret_fields(model) & set(changed):
+            self._restrict(cfg)
         try:
             applied = bool(handle.instance.settings_changed(changed))
         except Exception:
@@ -111,6 +128,15 @@ class SettingsStore:
         if not applied:
             self.restart_required.add(name)
         return self.describe(name)
+
+    @staticmethod
+    def _restrict(cfg) -> None:
+        path = getattr(cfg, 'loaded_from', None)
+        if path:
+            try:
+                os.chmod(path, 0o600)
+            except OSError as error:
+                logger.warning(f"Could not restrict the permissions of '{path}': {error}")
 
     def save(self, cfg=None) -> None:
         cfg = cfg if cfg is not None else self.cfg

@@ -22,9 +22,11 @@ removal action, removing the card pauses and placing it again continues.
 
 | Action | Arguments | |
 | --- | --- | --- |
-| `audiobooks.play` | `book` | play from the saved position |
-| `audiobooks.restart` | `book` | play from the beginning |
-| `audiobooks.set_finished` | `book`, `finished` (default true) | mark as finished or not; both start from the beginning next time |
+| `audiobooks.play` | `book`, `source` | play from the saved position |
+| `audiobooks.restart` | `book`, `source` | play from the beginning |
+| `audiobooks.set_finished` | `book`, `finished` (default true), `source` | mark as finished or not; both start from the beginning next time |
+
+`source` is `local` (the library, the default) or the id of a plugin that adds audiobooks, see below.
 
 `GET /api/v1/audiobooks` lists all audiobooks with chapter, position and progress.
 
@@ -35,3 +37,20 @@ audiobooks:
   rewind_sec: 10                          # go back this far when continuing
   state_file: settings/audiobooks.json    # positions
 ```
+
+## Audiobookshelf
+
+The plugin `audiobookshelf` shows the books of an [Audiobookshelf](https://www.audiobookshelf.org)
+server next to the local ones and streams them from the server. The position is kept on the server, so
+a book started in the Audiobookshelf app continues on the box and the other way round.
+
+1. In Audiobookshelf create an API key (Settings → API Keys) for the user the box should use.
+2. In the web app open Settings → Plugins, switch on `audiobookshelf` and enter the server address and the
+   key (or `lauschctl plugin enable audiobookshelf`, then `lauschctl config set
+   plugins.audiobookshelf.server_url https://...` and `...api_key`). The key is stored in the
+   configuration file, which is then readable for the box's user only, and is never shown again.
+3. The books appear in the Audiobooks tab. On a card the book is `{book: <id>, source: audiobookshelf}`;
+   the card dialog offers them like the local ones.
+
+Needs the `local_audio` player and a reachable server: a book that is not on the box cannot play without it.
+Downloading books for offline use is planned, see [Audiobookshelf](../developers/audiobookshelf.md).

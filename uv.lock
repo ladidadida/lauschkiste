@@ -12,6 +12,7 @@ resolution-markers = [
 members = [
     "lauschkiste",
     "lauschkiste-core",
+    "lauschkiste-plugin-audiobookshelf",
     "lauschkiste-plugin-board-raspberry-pi",
     "lauschkiste-plugin-devices",
     "lauschkiste-plugin-mpd",
@@ -950,6 +951,21 @@ requires-dist = [
     { name = "ruamel-yaml" },
     { name = "sounddevice" },
     { name = "uvicorn" },
+]
+
+[[package]]
+name = "lauschkiste-plugin-audiobookshelf"
+version = "0.1.0a3"
+source = { editable = "packages/plugins/audiobookshelf" }
+dependencies = [
+    { name = "lauschkiste-core" },
+    { name = "requests" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
+    { name = "requests" },
 ]
 
 [[package]]

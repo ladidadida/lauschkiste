@@ -8,7 +8,7 @@ from typing import Any, Dict, List, Literal, Mapping, Optional
 from pydantic import BaseModel, Field
 
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
-from lauschkiste.player.backend import LevelMeter, PlayerBackend
+from lauschkiste.player.backend import LevelMeter, PlayerBackend, Resolver
 from lauschkiste.player.coordinator import PlayerCoordinator
 from lauschkiste.player.status import ContentKind, PlaybackContext, PlayerStatus, status_from_backend
 
@@ -54,7 +54,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '5.1'
+    interface_version = '5.2'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -62,6 +62,7 @@ class Player(CoreModule):
     status = event('status', PlayerStatus)
     backends = extension_point('backends', PlayerBackend)
     level_meters = extension_point('level_meters', LevelMeter)
+    resolvers = extension_point('resolvers', Resolver)
 
     def __init__(self):
         self._ctx = None
@@ -83,7 +84,16 @@ class Player(CoreModule):
         from lauschkiste.player.backends.local_audio import PlayerLocalAudio
         self.backends.register('local_audio', PlayerLocalAudio())
 
+    def _resolve(self, url: str):
+        """(url, headers) to open for a track URL; the resolver registered for its scheme decides."""
+        scheme = url.split('://', 1)[0]
+        if scheme in self.resolvers:
+            return self.resolvers.get(scheme).resolve(url)
+        return url, {}
+
     def _add_backend(self, name: str, backend: Any) -> None:
+        if hasattr(backend, 'set_resolver'):
+            backend.set_resolver(self._resolve)
         backend.set_status_callback(partial(self._publish_status, name))
         self._connect_levels()
         is_configured = name == self._configured_backend

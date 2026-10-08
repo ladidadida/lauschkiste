@@ -82,7 +82,7 @@ const Continue = ({ musicFilter }) => {
         <Section title={t('library.header.audiobooks')}>
           <List>
             {visibleBooks.map((book) => (
-              <AudiobookItem book={book} key={book.book} onChanged={load} showCovers={showCovers} />
+              <AudiobookItem book={book} key={`${book.source}/${book.book}`} onChanged={load} showCovers={showCovers} />
             ))}
           </List>
         </Section>

@@ -239,9 +239,12 @@
     },
     "level_meters": {
       "level": "(self, left: float, right: float, delay: float) -> None"
+    },
+    "resolvers": {
+      "resolve": "(self, url: str) -> Tuple[str, Dict[str, str]]"
     }
   },
-  "interface_version": "5.1",
+  "interface_version": "5.2",
   "kind": "core",
   "name": "player",
   "operations": {

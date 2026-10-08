@@ -30,6 +30,9 @@ export const progressOf = ({ duration, finished, listened }) => {
   return Math.min(100, Math.round((listened / duration) * 100));
 };
 
+// Books of other sources (not the local library) name their source in every request.
+const sourceArg = (book) => (book.source && book.source !== 'local' ? { source: book.source } : {});
+
 export const AudiobookItem = ({ book, onChanged, showCovers }) => {
   const { t } = useTranslation();
   const progress = progressOf(book);
@@ -47,14 +50,14 @@ export const AudiobookItem = ({ book, onChanged, showCovers }) => {
   const duration = book.duration ? ` · ${toHHMMSS(book.duration)}` : '';
 
   const setFinished = async (finished) => {
-    await request('audiobookSetFinished', { book: book.book, finished });
+    await request('audiobookSetFinished', { book: book.book, finished, ...sourceArg(book) });
     onChanged();
   };
 
   const menuItems = [
     {
       label: t('library.audiobooks.restart'),
-      onClick: () => request('audiobook_restart', { book: book.book }).then(onChanged),
+      onClick: () => request('audiobook_restart', { book: book.book, ...sourceArg(book) }).then(onChanged),
     },
     book.finished
       ? { label: t('library.audiobooks.mark-unfinished'), onClick: () => setFinished(false) }
@@ -66,7 +69,7 @@ export const AudiobookItem = ({ book, onChanged, showCovers }) => {
       disablePadding
       secondaryAction={<ItemMenu items={menuItems} label={t('library.audiobooks.menu', { title: book.title })} />}
     >
-      <ListItemButton onClick={() => request('audiobook_play', { book: book.book })}>
+      <ListItemButton onClick={() => request('audiobook_play', { book: book.book, ...sourceArg(book) })}>
         {showCovers &&
           <ListItemAvatar>
             <Avatar alt="" src={book.cover_url ? coverSrc(book.cover_url) : undefined} variant="rounded">
@@ -133,7 +136,7 @@ const Audiobooks = ({ musicFilter }) => {
   return (
     <List sx={{ width: '100%' }}>
       {visible.map((book) => (
-        <AudiobookItem book={book} key={book.book} onChanged={load} showCovers={showCovers} />
+        <AudiobookItem book={book} key={`${book.source}/${book.book}`} onChanged={load} showCovers={showCovers} />
       ))}
     </List>
   );

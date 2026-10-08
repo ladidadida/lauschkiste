@@ -5,16 +5,41 @@ order. The position is kept per audiobook in ``audiobooks.state_file``; chapters
 regardless of shuffle and repeat.
 """
 
+import logging
 import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Protocol
 
 from pydantic import BaseModel, Field
 
 import lauschkiste.paths
-from lauschkiste.contract import CoreModule, OperationError, action, query
+from lauschkiste.contract import CoreModule, OperationError, action, extension_point, query
 from lauschkiste.resume import ResumeTracker
 
+logger = logging.getLogger('lauschkiste.audiobooks')
+
+LOCAL = 'local'
+
 DEFAULT_STATE_FILE = 'settings/audiobooks.json'
+
+
+class AudiobookSource(Protocol):
+    """Audiobooks from somewhere else (e.g. a server), registered at ``audiobooks.sources`` under the
+    source id. Their position is kept by the source, not in ``audiobooks.state_file``."""
+
+    def list_books(self) -> List[Dict[str, Any]]:
+        """The books as mappings with the fields of :class:`Audiobook` (``source`` is added)."""
+
+    def files(self, book: str) -> List[str]:
+        """The track URLs to play, in order; raises :class:`OperationError` if there is no such book."""
+
+    def title(self, book: str) -> str:
+        """The title shown while it plays."""
+
+    def position(self, book: str) -> Any:
+        """A ``lauschkiste.resume.PositionStore`` for the book."""
+
+    def set_finished(self, book: str, finished: bool) -> None:
+        """Mark the book finished or not (either way it starts from the beginning next time)."""
 
 
 class AudiobookSettings(BaseModel):
@@ -31,6 +56,7 @@ class Audiobook(BaseModel):
     listened: float = 0.0
     finished: bool = False
     cover_url: Optional[str] = None
+    source: str = LOCAL
 
 
 def natural_key(text: str):
@@ -48,10 +74,11 @@ class Audiobooks(CoreModule):
     """Audiobooks: play, continue, start over, mark as finished."""
 
     name = 'audiobooks'
-    interface_version = '1.0'
+    interface_version = '2.0'
     concurrency = 'threadsafe'
     requires = ('library', 'player')
     settings = AudiobookSettings
+    sources = extension_point('sources', AudiobookSource)
 
     def __init__(self):
         self._ctx: Any = None
@@ -118,25 +145,50 @@ class Audiobooks(CoreModule):
             result.append(Audiobook(book=book, title=songs[0].album or book, chapters=len(files), duration=total,
                                     chapter=chapter, elapsed=elapsed, listened=listened, finished=finished,
                                     cover_url=cover_url))
+        for source, implementation in self.sources.items():
+            try:
+                result.extend(Audiobook(**{**entry, 'source': source}) for entry in implementation.list_books())
+            except Exception as error:
+                logger.warning(f"Audiobooks of source '{source}' are not available: {error}")
         return result
 
-    def _context(self, book: str) -> Dict[str, Any]:
-        songs = self._songs(book)
-        title = next((song.album for song in songs if song.album), None) or book
-        return {'kind': 'audiobook', 'title': title, 'action': 'audiobooks.play', 'args': {'book': book}}
+    def _context(self, book: str, source: str = LOCAL) -> Dict[str, Any]:
+        args = {'book': book} if source == LOCAL else {'book': book, 'source': source}
+        if source != LOCAL:
+            title = self._source(source).title(book)
+        else:
+            songs = self._songs(book)
+            title = next((song.album for song in songs if song.album), None) or book
+        return {'kind': 'audiobook', 'title': title, 'action': 'audiobooks.play', 'args': args}
+
+    def _source(self, source: str):
+        if source not in self.sources:
+            raise OperationError(404, 'unknown_source', f"No audiobook source '{source}'")
+        return self.sources.get(source)
+
+    def _play(self, book: str, source: str, resume: bool) -> None:
+        if source == LOCAL:
+            self._resume.play(book, self._chapter_files(book), resume=resume, context=self._context(book))
+            return
+        implementation = self._source(source)
+        self._resume.play(f'{source}/{book}', implementation.files(book), resume=resume,
+                          context=self._context(book, source), store=implementation.position(book))
 
     @action()
-    def play(self, book: str) -> None:
+    def play(self, book: str, source: str = LOCAL) -> None:
         """Play an audiobook where it stopped (from the beginning when it is new or finished)."""
-        self._resume.play(book, self._chapter_files(book), context=self._context(book))
+        self._play(book, source, True)
 
     @action()
-    def restart(self, book: str) -> None:
+    def restart(self, book: str, source: str = LOCAL) -> None:
         """Play an audiobook from the beginning."""
-        self._resume.play(book, self._chapter_files(book), resume=False, context=self._context(book))
+        self._play(book, source, False)
 
     @action()
-    def set_finished(self, book: str, finished: bool = True) -> None:
+    def set_finished(self, book: str, finished: bool = True, source: str = LOCAL) -> None:
         """Mark an audiobook as finished (or not); either way it starts from the beginning next time."""
-        self._chapter_files(book)
-        self._resume.set_finished(book, finished)
+        if source == LOCAL:
+            self._chapter_files(book)
+            self._resume.set_finished(book, finished)
+        else:
+            self._source(source).set_finished(book, finished)

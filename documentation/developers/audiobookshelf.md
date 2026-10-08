@@ -1,6 +1,9 @@
 # Audiobookshelf
 
-Status: plan, nothing implemented yet.
+Status: phases 1 and 2 are implemented (streaming, shared position, covers, secret settings, card
+`source`); phase 3 is partly there (books in the Audiobooks tab and the card dialog, settings form), the
+rest and offline use (phase 4) are planned. Checked against a real server (2.36.0) with mp3 books; m4b
+books, a "test connection" button and the measurements on the Pi Zero are still open.
 
 [Audiobookshelf](https://www.audiobookshelf.org) (ABS) is a self-hosted server for audiobooks and
 podcasts with its own library, metadata, covers, per-user progress and apps. The goal: a Lauschkiste

@@ -12,6 +12,7 @@ class DemoSettings(BaseModel):
     level: int = Field(3, ge=0, le=10)
     name: str = 'box'
     action: Optional[ActionEntry] = None
+    token: str = Field('', json_schema_extra={'secret': True})
 
 
 class Demo(CoreModule):
@@ -41,7 +42,7 @@ def test_settings_are_listed_with_schema_and_values(client):
     entries = {entry['name']: entry for entry in client.get('/api/v1/settings/modules').json()}
     demo = entries['demo']
     assert demo['title'] == 'Demo module.'
-    assert demo['values'] == {'level': 3, 'name': 'box', 'action': None}
+    assert demo['values'] == {'level': 3, 'name': 'box', 'action': None, 'token': ''}
     assert demo['schema']['properties']['level']['maximum'] == 10
     assert demo['schema']['$defs']['ActionEntry']['widget'] == 'action'
 
@@ -195,3 +196,16 @@ def test_failed_installation_is_reported(client, monkeypatch):
     while time.monotonic() < deadline and client.get('/api/v1/plugins').json()[0]['installing']:
         time.sleep(0.05)
     assert client.get('/api/v1/plugins').json()[0]['install_error'] == 'no network'
+
+
+def test_secret_settings_are_never_sent_and_an_empty_value_keeps_them(client):
+    response = client.put('/api/v1/settings/modules/demo', json={'values': {'token': 's3cret'}})
+    assert response.status_code == 200
+    assert response.json()['values']['token'] == '' and response.json()['secrets_set'] == ['token']
+    assert client.modules.settings.cfg.getn('demo', 'token') == 's3cret'
+    assert 's3cret' not in client.get('/api/v1/settings/modules/demo').text
+
+    response = client.put('/api/v1/settings/modules/demo', json={'values': {'token': '', 'level': 5}})
+    assert response.json()['secrets_set'] == ['token']
+    assert client.modules.settings.cfg.getn('demo', 'token') == 's3cret'
+    assert Demo.applied[-1] == {'level': 5}

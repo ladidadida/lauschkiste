@@ -257,12 +257,14 @@ const Field = ({ i18nBase, onChange, path, root, schema: rawSchema, value, witho
   if (kind === 'string') {
     return (
       <TextField
+        autoComplete={schema.secret ? 'new-password' : undefined}
         disabled={Boolean(schema.readonly)}
         fullWidth
         helperText={help}
         label={label}
         onChange={(event) => onChange(event.target.value === '' && nullable ? null : event.target.value)}
         size="small"
+        type={schema.secret ? 'password' : 'text'}
         value={value ?? ''}
       />
     );
