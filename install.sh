@@ -234,9 +234,6 @@ choose_home() {
     fi
     HOME_DIR="$(mkdir -p "$HOME_DIR" && cd "$HOME_DIR" && pwd)"
     export LAUSCHKISTE_HOME="$HOME_DIR"
-    if [[ "$MODE" == source && ! -f "${SOURCE_DIR}/.env" ]]; then
-        echo "LAUSCHKISTE_HOME=${HOME_DIR}" > "${SOURCE_DIR}/.env"
-    fi
     add_to_shell_profile "export LAUSCHKISTE_HOME=\"${HOME_DIR}\""
 }
 

@@ -43,6 +43,6 @@ __pycache__/
 /.coverage
 /coverage.xml
 
-# Local settings and secrets (.env.example is the template)
+# Local secrets for tests and scripts (never committed)
 .env
 .env.local

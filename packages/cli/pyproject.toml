@@ -30,7 +30,6 @@ license-files = ["LICENSE"]
 dependencies = [
   "typer",
   "websockets",
-  "python-dotenv",
   "lauschkiste-core==0.1.0a3",
 ]
 

@@ -1,33 +1,10 @@
-import os
 from pathlib import Path
+from typing import Optional
 
-from dotenv import dotenv_values, find_dotenv
+import typer
 
-
-def load_env() -> None:
-    """``LAUSCHKISTE_*`` defaults from the nearest ``.env`` above this file (a source checkout's).
-
-    Relative paths in it are relative to the ``.env`` file. The environment wins over the file.
-    Runs at import: typer reads ``envvar`` options from os.environ.
-    """
-    path = find_dotenv()
-    if not path:
-        return
-    for key, value in dotenv_values(path).items():
-        if key.startswith('LAUSCHKISTE_') and key not in os.environ and value is not None:
-            if key.split('_', 1)[1] in ('HOME', 'WEBAPP_DIR', 'CONF', 'LOGGER_CONF'):
-                value = str(Path(path).parent / Path(value).expanduser())
-            os.environ[key] = value
-
-
-load_env()
-
-from typing import Optional  # noqa: E402
-
-import typer  # noqa: E402
-
-import lauschkiste.paths  # noqa: E402
-from lauschkiste_cli.run import run  # noqa: E402
+import lauschkiste.paths
+from lauschkiste_cli.run import run
 
 HOME_HELP = ("Directory with all data (settings, music, logs). "
              "Default: $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).")
