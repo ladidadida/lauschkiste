@@ -43,5 +43,6 @@ __pycache__/
 /.coverage
 /coverage.xml
 
-# Local secrets (not committed)
+# Local settings and secrets (.env.example is the template)
+.env
 .env.local

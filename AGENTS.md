@@ -38,7 +38,7 @@ packages/          uv workspace members
 docker/            Dockerfiles + compose files for a non-Pi development environment
 install.sh         Installer (curl | bash): base packages, uv, Lauschkiste (release wheels or --source),
                    then `lauschctl setup`
-shared/            LAUSCHKISTE_HOME when running from this checkout (see .env): settings, library,
+shared/            LAUSCHKISTE_HOME when running from this checkout (see .env.example): settings, library,
                    playlists, logs, cache
 documentation/     Project docs: builders/ (end users/installers) and developers/ (contributors)
 test/              Python unit tests (pytest)
@@ -88,7 +88,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `library.sources` extension point for further catalogs (mpd, streaming). Browsing routes are
   `/api/v1/library/*`; the local source id is `local`.
 - **Paths** (`lauschkiste.paths`): all runtime data lives in `LAUSCHKISTE_HOME` (`--home`, `$LAUSCHKISTE_HOME`,
-  default `$XDG_DATA_HOME/lauschkiste`; this checkout's `.env` sets it to `shared/`). Relative paths in
+  default `$XDG_DATA_HOME/lauschkiste`; this checkout's `.env` (copy of `.env.example`) sets it to `shared/`). Relative paths in
   the configuration resolve against it; never resolve paths
   against the working directory or the checkout. Packaged files (default settings, sounds, service
   templates) live in `lauschkiste/resources/`, read via `lauschkiste.paths.resource()`. The web app is
@@ -128,6 +128,7 @@ Package manager is **uv**; the dev/CI workflow is driven by **[bam](https://gitl
 The old `run_*.sh` wrapper scripts are gone.
 
 ```bash
+cp -n .env.example .env            # LAUSCHKISTE_HOME=shared (.env is not committed)
 uv sync --group dev             # install/update the .venv (runtime + dev dependencies, core and
                                  # bundled plugins); reader drivers with extra dependencies need
                                  # --extra <driver-extra> (see "Bundled plugins" above)

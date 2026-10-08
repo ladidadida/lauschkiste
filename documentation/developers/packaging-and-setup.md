@@ -32,9 +32,11 @@ $LAUSCHKISTE_HOME/
 
 - Default: `$XDG_DATA_HOME/lauschkiste` (usually `~/.local/share/lauschkiste`); override with the
   `LAUSCHKISTE_HOME` environment variable or `lauschctl --home`.
-- A source checkout's `.env` sets `LAUSCHKISTE_HOME=shared`, so development keeps using the repository's
-  `shared/` directory exactly as today. `lauschkiste` and `lauschctl` find that `.env` from their own location (not the
-  working directory) and resolves relative paths in it against the file's directory.
+- A source checkout's `.env` (not committed; `cp .env.example .env` gives `LAUSCHKISTE_HOME=shared`, the
+  repository's `shared/` directory) sets it for development. `install.sh --source` writes it with the
+  chosen `--home` (default `<checkout>/shared`) if it does not exist. `lauschkiste` and `lauschctl` find
+  that `.env` from their own location (not the working directory) and resolve relative paths in it
+  against the file's directory. Secrets go to `.env.local`, which is ignored too.
 - Relative paths in the configuration are resolved against `LAUSCHKISTE_HOME`, not against the working
   directory. Existing configurations (`shared/settings/cards.yaml` style values from a checkout
   install) keep working: a relative path starting with `shared/` is resolved against the home's
@@ -111,7 +113,7 @@ optimisation. Steps needing root run their commands through `sudo`.
 3. Installs Lauschkiste, either
    - **package** (default): `uv tool install <wheel URL of the latest GitHub release>`, or
    - **source** (`--source`): `git clone`, `uv sync` in the checkout, with `.env` pointing
-     `LAUSCHKISTE_HOME` wherever the user wants it.
+     `LAUSCHKISTE_HOME` wherever the user wants it (`--home`).
 4. Runs `lauschctl setup`.
 
 ## Implementation plan

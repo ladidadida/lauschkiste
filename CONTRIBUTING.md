@@ -15,6 +15,7 @@ Thank you for helping! Bug reports, ideas, documentation and code are all welcom
 [AGENTS.md](AGENTS.md) describes the repository, the tools and the common commands. In short:
 
 ```bash
+cp -n .env.example .env                 # data directory of this checkout (shared/), not committed
 uv sync --group dev                  # Python environment
 uv run pytest                        # tests
 uv run ruff check .                  # lint
