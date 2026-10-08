@@ -171,6 +171,8 @@ install_package() {
     local cli with=()
     cli="$(ls "$wheels"/lauschkiste-[0-9]*.whl 2>/dev/null | head -n1)"
     [[ -n "$cli" ]] || die "no lauschkiste wheel in ${wheels}"
+    ls "$wheels"/lauschkiste_core-*.whl >/dev/null 2>&1 \
+        || die "the wheels in ${wheels} are from before the packages were renamed (no lauschkiste_core wheel): use a newer release, --from source or --wheels"
     for wheel in "$wheels"/*.whl; do
         [[ "$wheel" == "$cli" ]] || with+=(--with "$wheel")
     done

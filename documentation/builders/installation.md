@@ -23,13 +23,19 @@ boot optimisation, ...). Run it in `screen` or `tmux` if your SSH connection is 
 
 ### Where Lauschkiste comes from
 
-Choose with `--from` (pass options with `bash -s --`, e.g. `curl ... | bash -s -- --from pypi`):
+Choose with `--from` (pass options with `bash -s --`, e.g. `curl ... | bash -s -- --from source`):
 
 | `--from` | What you get | Use it for |
 | --- | --- | --- |
-| `pypi` | the packages on PyPI; `--version 0.1.0a4` for a specific one | released versions (from the first PyPI release on) |
+| `pypi` | the packages on PyPI; `--version 0.1.0a4` for a specific one | released versions |
 | `github` (default) | the wheels attached to a GitHub release; `--version TAG` for a specific one | released versions, also bugfix releases that are not on PyPI |
 | `source` | a git checkout in `~/lauschkiste` (`--source DIR`, `--branch NAME`) that runs from its folder | development and trying branches; builds the web app with npm if installed, else takes it from the latest release |
+
+> [!NOTE]
+> The first release on PyPI is still pending, so `--from pypi` does not work yet. The newest GitHub release
+> (alpha.3) is from before the packages were renamed and the script refuses it; until the next release is
+> published, install with `--from source` (or `--wheels DIR` with wheels built by `ci/build_wheels.sh`).
+> `--from testpypi` installs test uploads.
 
 ### More options
 
@@ -37,6 +43,7 @@ Choose with `--from` (pass options with `bash -s --`, e.g. `curl ... | bash -s -
 | --- | --- |
 | `--home DIR` | where Lauschkiste keeps its data (default `~/lauschkiste` on a Raspberry Pi) |
 | `--repo OWNER/NAME` | install from a fork |
+| `--wheels DIR` | install the wheel files in `DIR` instead of downloading a release |
 | `--yes` | don't ask, use the defaults |
 | `--no-setup` | only install; run `lauschctl setup` later |
 

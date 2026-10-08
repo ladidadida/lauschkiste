@@ -9,8 +9,8 @@ PyPI after a manual approval.
 
 - [ ] Clarified with the Phoniebox project: that Lauschkiste is named as its origin, and the origin of the
   start and shutdown sounds.
-- [ ] Searched for conflicts with the name "Lauschkiste" (trademark registers of the DPMA and EUIPO) and for
-  similar logos.
+- [x] Searched for conflicts with the name "Lauschkiste" (trademark registers of the DPMA and EUIPO) and for
+  similar logos (October 2026: no problems expected).
 - [ ] Private vulnerability reporting is switched on (repository Settings → Code security): the Code of
   Conduct and `SECURITY.md` send reports there.
 - [ ] Repository description, topics and social preview image are set.
