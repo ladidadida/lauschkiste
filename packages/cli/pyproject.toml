@@ -1,6 +1,6 @@
 [project]
 name = "lauschkiste"
-version = "0.1.0a3"
+version = "0.1.0a4.dev1"
 description = "Lauschkiste: an RFID audio player for kids (the lauschkiste server and the lauschctl commands)"
 license = "MIT"
 requires-python = ">=3.11"
@@ -31,7 +31,7 @@ dependencies = [
   "typer",
   "websockets",
   "python-dotenv",
-  "lauschkiste-core==0.1.0a3",
+  "lauschkiste-core==0.1.0a4.dev1",
 ]
 
 [project.urls]

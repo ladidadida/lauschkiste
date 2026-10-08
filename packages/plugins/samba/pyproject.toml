@@ -1,6 +1,6 @@
 [project]
 name = "lauschkiste-plugin-samba"
-version = "0.1.0a3"
+version = "0.1.0a4.dev1"
 description = "Lauschkiste plugin: share the library on the network with Samba, managed from the web app"
 license = "MIT"
 requires-python = ">=3.11"
@@ -24,8 +24,8 @@ classifiers = [
 ]
 license-files = ["LICENSE"]
 dependencies = [
-  "lauschkiste-core==0.1.0a3",
-  "lauschkiste==0.1.0a3",
+  "lauschkiste-core==0.1.0a4.dev1",
+  "lauschkiste==0.1.0a4.dev1",
 ]
 
 [project.urls]
