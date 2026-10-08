@@ -139,9 +139,12 @@ Works well with the design, because a downloaded book is just a set of audio fil
   no TLS and no resolver involved, which also makes it cheaper for the CPU of a Pi Zero and works with
   every player backend. Incomplete downloads are never played; the book streams instead.
 - **Managing it:** per book "download" / "remove download" in the web app, with progress, pause and
-  cancel. One download at a time, with low priority and no downloading while something plays on a
-  Zero (SD card and WLAN are shared). Partial files are kept and continued with range requests;
-  files are renamed into place only when complete and their size matches.
+  cancel. A download starts at once. One at a time, in a process of its own with the lowest CPU and
+  disk priority (`nice 19`, `ionice` class idle), so playback keeps precedence. While something plays it
+  is throttled (`download_rate_kbps_playing`, default 1000) instead of paused; it pauses completely only
+  if the measurements on the Zero (below) show that playback stutters otherwise. Data is written in
+  small chunks. Partial files are kept and continued with range requests; files are renamed into
+  place only when complete and their size matches.
 - **Space:** the cache limit above; the web app shows used and free space and the size of each
   book before downloading. A book whose download would not fit is refused with the numbers. Books in
   progress and ones you marked "keep" are never removed automatically; the oldest finished ones may be,
@@ -213,6 +216,7 @@ A settings model (`audiobookshelf` section, or a file of its own, `settings_stor
 | `refresh_minutes` | how often the book list is fetched again (default 10), plus a "refresh" button |
 | `sync_interval_sec` | progress write interval (default 15) |
 | `cache_limit_gb` | space downloaded books may use (default 8, never more than the free space minus a reserve) |
+| `download_rate_kbps_playing` | download speed limit while something plays (default 1000, 0 = pause) |
 | `prefer_downloaded` | play the downloaded copy even when the server is reachable (default on) |
 
 - **Secrets:** the settings system has no secret fields yet. Add them: the form shows a password
@@ -274,6 +278,9 @@ commit, as usual; nothing is installed on a box without asking.
   tests; CI does not need it.
 - Measurements on the Pi Zero (radio) are part of phase 0 and 2: streaming CPU for mp3 and m4b,
   start time of a book, memory of the book list with a few hundred books.
+- Acceptance of phase 4 on a Pi Zero W: downloading a whole book while another one plays (streamed
+  and local) gives no audible dropouts, and the web app stays responsive. If it does, the limit
+  `download_rate_kbps_playing` is lowered or set to 0 and the default adjusted.
 
 ## Risks and open points
 
@@ -290,7 +297,7 @@ commit, as usual; nothing is installed on a box without asking.
 - **No network, no book:** an ABS book that is not downloaded cannot be played without the server.
   The Audiobooks tab shows the cached list (greyed out) and says why; downloaded books are marked.
 - **SD card:** several books can fill a small card, and many writes wear it. Hence the limit, one
-  download at a time and no automatic downloads in the first version.
+  download at a time, low priority and no automatic downloads in the first version.
 - **Download permission:** an ABS user may be forbidden to download; then the plugin says so instead
   of failing half way (the user's permissions are part of the "test connection" result).
 - **Secrets on the box:** the API key lies in a file readable only by the service user; anyone with
