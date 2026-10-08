@@ -3,7 +3,7 @@
 All packages are released together under one version (see
 [Packaging, Installation and Setup](packaging-and-setup.md#packages-and-releases)). A release is a tag;
 the workflow `wheels.yml` builds, tests, creates the GitHub release with the wheels and publishes to
-PyPI after a manual approval.
+PyPI after a manual approval (one job per package).
 
 ## Before the first release
 
@@ -25,19 +25,32 @@ publishing"). What has to be done once, by the owner of the PyPI account:
 1. Create accounts on [pypi.org](https://pypi.org) and [test.pypi.org](https://test.pypi.org) (two
    separate accounts, both with two-factor authentication).
 2. On each of them, for every package below, add a **pending publisher** (Account settings →
-   Publishing → "Add a new pending publisher"). The package is created by its first upload.
+   Publishing → "Add a new pending publisher", tab GitHub). The package is created by its first upload.
+   The same four values everywhere:
 
    | Field | Value |
    | --- | --- |
-   | PyPI project name | `lauschkiste`, `lauschkiste-core`, `lauschkiste-plugin-board-raspberry-pi`, `lauschkiste-plugin-devices`, `lauschkiste-plugin-mpd`, `lauschkiste-plugin-rfid-readers`, `lauschkiste-plugin-samba` |
    | Owner | `ladidadida` |
    | Repository name | `lauschkiste` |
    | Workflow name | `wheels.yml` |
-   | Environment name | `pypi` on pypi.org, `testpypi` on test.pypi.org |
 
-3. In the GitHub repository (Settings → Environments) create the environments `testpypi` and `pypi`.
-   Give `pypi` **required reviewers** (yourself): a PyPI upload cannot be undone, so the workflow waits
-   for an approval before it publishes.
+   PyPI accepts one configuration as pending for **one** new project only, so every package has its own
+   environment name: `testpypi-<project>` on test.pypi.org and `pypi-<project>` on pypi.org.
+
+   | PyPI project name | Environment name on test.pypi.org | on pypi.org |
+   | --- | --- | --- |
+   | `lauschkiste` | `testpypi-lauschkiste` | `pypi-lauschkiste` |
+   | `lauschkiste-core` | `testpypi-lauschkiste-core` | `pypi-lauschkiste-core` |
+   | `lauschkiste-plugin-board-raspberry-pi` | `testpypi-lauschkiste-plugin-board-raspberry-pi` | `pypi-lauschkiste-plugin-board-raspberry-pi` |
+   | `lauschkiste-plugin-devices` | `testpypi-lauschkiste-plugin-devices` | `pypi-lauschkiste-plugin-devices` |
+   | `lauschkiste-plugin-mpd` | `testpypi-lauschkiste-plugin-mpd` | `pypi-lauschkiste-plugin-mpd` |
+   | `lauschkiste-plugin-rfid-readers` | `testpypi-lauschkiste-plugin-rfid-readers` | `pypi-lauschkiste-plugin-rfid-readers` |
+   | `lauschkiste-plugin-samba` | `testpypi-lauschkiste-plugin-samba` | `pypi-lauschkiste-plugin-samba` |
+
+3. In the GitHub repository (Settings → Environments) create the environment `pypi` and give it **required
+   reviewers** (yourself): it is the gate before the upload to PyPI, which cannot be undone. The other
+   environments (`testpypi-...`, `pypi-...`) are created by GitHub when the workflow first uses them; they
+   need no settings.
 
 ## Test on TestPyPI
 
