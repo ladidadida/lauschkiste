@@ -55,7 +55,8 @@ player:
   stopped_prev_action: prev
   # Must be one of: 'none', 'next', 'rewind':
   stopped_next_action: next
-  # Playback volume in percent (0-100) of the local_audio backend, on top of the system volume.
+  # Playback volume in percent (0-100) of the local_audio backend, on top of the system volume;
+  # cubic like PulseAudio's (50 % is -18 dB).
   # Keep it at 100 when PulseAudio/PipeWire controls the volume (volume.mixer). mpd keeps its own
   # volume (see mpd_client.setvol), unrelated to this.
   volume: 100

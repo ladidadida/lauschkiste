@@ -29,7 +29,7 @@ import lauschkiste.utils as utils
 import lauschkiste.multitimer as multitimer
 import lauschkiste.playlistgenerator as playlistgenerator
 
-from lauschkiste.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_volume
+from lauschkiste.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_gain, volume_gain
 from lauschkiste.nv_manager import nv_manager
 
 logger = logging.getLogger('lauschkiste.PlayerLocalAudio')
@@ -205,7 +205,7 @@ class PlayerLocalAudio:
                         break
             for oframe in out:
                 n = oframe.samples * CHANNELS * 2
-                self._sink.write(scale_volume(bytes(oframe.planes[0])[:n], self._volume))
+                self._sink.write(scale_gain(bytes(oframe.planes[0])[:n], volume_gain(self._volume)))
                 self._position += oframe.samples / SAMPLE_RATE * speed
         return True
 

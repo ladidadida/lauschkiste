@@ -27,7 +27,7 @@ class PlayerSettings(BaseModel):
     backend: str = Field(DEFAULT_BACKEND, title='Player backend',
                          description="'local_audio' plays directly; 'mpd' needs the mpd plugin")
     volume: int = Field(100, ge=0, le=100, title='Player volume',
-                        description='Of the local_audio backend, on top of the system volume')
+                        description='Of the local_audio backend, on top of the system volume; cubic like PulseAudio')
     second_swipe_action: SecondSwipe = Field(default_factory=SecondSwipe, title='Second swipe')
     end_of_playlist_next_action: Literal['none', 'stop', 'rewind'] = Field(
         'none', title='At the end of the playlist')

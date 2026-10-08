@@ -10,11 +10,22 @@ SAMPLE_RATE = 44100
 CHANNELS = 2
 
 
-def scale_volume(data: bytes, volume: int) -> bytes:
-    """Scale packed s16 PCM by volume (0-100). No-op at full volume (the common case)."""
-    if volume >= 100:
+def volume_gain(volume: int) -> float:
+    """Gain of a 0-100 volume setting. Cubic like PulseAudio's, so equal steps of the slider sound about
+    equally loud: 50 % is -18 dB, not -6 dB as a linear gain would be."""
+    return (max(0, min(100, volume)) / 100.0) ** 3
+
+
+def scale_gain(data: bytes, gain: float) -> bytes:
+    """Scale packed s16 PCM by ``gain``. No-op at full gain (the common case)."""
+    if gain >= 1.0:
         return data
-    return audioop.mul(data, 2, max(0, volume) / 100.0)
+    return audioop.mul(data, 2, max(0.0, gain))
+
+
+def scale_volume(data: bytes, volume: int) -> bytes:
+    """Scale packed s16 PCM linearly by volume (0-100), e.g. a sound relative to the current output volume."""
+    return scale_gain(data, volume / 100.0)
 
 
 class AudioSink:

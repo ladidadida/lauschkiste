@@ -6,7 +6,7 @@ from unittest.mock import Mock
 import pytest
 
 import lauschkiste.library
-from lauschkiste.audio_output import PortAudioSink, scale_volume
+from lauschkiste.audio_output import PortAudioSink, scale_gain, scale_volume, volume_gain
 from lauschkiste.player.backends.local_audio import PlayerLocalAudio
 
 
@@ -75,6 +75,21 @@ def write_wav(path, duration_s=0.2, rate=44100, channels=2, freq=440):
 
 
 # -- scale_volume ------------------------------------------------------------------------------
+
+def test_volume_gain_is_cubic_like_pulseaudio():
+    assert volume_gain(100) == 1.0 and volume_gain(0) == 0.0
+    assert volume_gain(50) == pytest.approx(0.125)
+    assert volume_gain(150) == 1.0 and volume_gain(-5) == 0.0
+    assert all(volume_gain(v) < volume_gain(v + 1) for v in range(100))
+
+
+def test_scale_gain_scales_the_samples():
+    data = array.array('h', [1000, -1000]).tobytes()
+    assert scale_gain(data, 1.0) is data
+    scaled = array.array('h')
+    scaled.frombytes(scale_gain(data, 0.125))
+    assert list(scaled) == [125, -125]
+
 
 def test_scale_volume_is_noop_at_full_volume():
     data = array.array('h', [1000, -1000]).tobytes()
