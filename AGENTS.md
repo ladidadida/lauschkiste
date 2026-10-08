@@ -137,6 +137,7 @@ uv run lauschkiste              # start the Lauschkiste core -- creates $LAUSCHK
                                  # first run if missing (here: shared/settings/).
 uv run lauschctl home             # show LAUSCHKISTE_HOME and the config file in use
 uv run lauschctl plugin list      # installed plugins, enabled or not; also enable/disable <name>
+uv run lauschctl config set library.path DIR  # change one setting in the configuration file (`config get KEY` reads it)
                                  # [--with-extras], install <spec> [--enable]
 uv run lauschctl setup --check    # what `lauschctl setup [<step>...]` would change on this machine
                                  # (steps: `lauschctl setup --list`; answers in settings/setup.yaml)

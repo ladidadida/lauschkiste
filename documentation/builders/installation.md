@@ -42,6 +42,7 @@ Choose with `--from` (pass options with `bash -s --`, e.g. `curl ... | bash -s -
 | Option | Meaning |
 | --- | --- |
 | `--home DIR` | where Lauschkiste keeps its data (default `~/lauschkiste` on a Raspberry Pi) |
+| `--library DIR` | where music and audiobooks live (default `<home>/library`); can be changed later with `lauschctl config set library.path DIR` |
 | `--repo OWNER/NAME` | install from a fork |
 | `--wheels DIR` | install the wheel files in `DIR` instead of downloading a release |
 | `--yes` | don't ask, use the defaults |
@@ -59,6 +60,7 @@ Put music on the box through the web app or an optional Samba share ([Copying mu
 ```bash
 lauschctl setup --check      # what is set up, what is missing
 lauschctl setup rfid         # run a single step (lauschctl setup --list shows them)
+lauschctl config get library.path   # read and change single settings (`config set KEY VALUE`)
 lauschctl plugin list        # installed plugins; enable and disable them
 lauschctl update --check     # is there a newer version?
 lauschctl update             # install it, re-apply the setup, restart Lauschkiste

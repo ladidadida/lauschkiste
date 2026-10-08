@@ -20,6 +20,7 @@
 #   --repo OWNER/NAME  GitHub repository (default: ladidadida/lauschkiste)
 #   --home DIR         LAUSCHKISTE_HOME (default: ~/lauschkiste on a Raspberry Pi,
 #                      ~/.local/share/lauschkiste elsewhere, DIR/shared with --source)
+#   --library DIR      the library (music, audiobooks) in DIR instead of <home>/library
 #   --yes              don't ask, use defaults (also passed to `lauschctl setup`)
 #   --no-setup         only install, don't run `lauschctl setup`
 
@@ -35,6 +36,7 @@ WHEELS=""
 BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-devices lauschkiste-plugin-mpd
                  lauschkiste-plugin-rfid-readers lauschkiste-plugin-samba)
 HOME_DIR=""
+LIBRARY_DIR=""
 ASSUME_YES=false
 RUN_SETUP=true
 MARKER="# lauschkiste (added by install.sh)"
@@ -57,6 +59,7 @@ parse_args() {
             --wheels) WHEELS="$(cd "$2" && pwd)"; shift ;;
             --repo) REPO="$2"; shift ;;
             --home) HOME_DIR="$2"; shift ;;
+            --library) LIBRARY_DIR="$2"; shift ;;
             --yes|-y) ASSUME_YES=true ;;
             --no-setup) RUN_SETUP=false ;;
             -h|--help) echo "See the comment at the top of install.sh for the options."; exit 0 ;;
@@ -256,6 +259,10 @@ main() {
     choose_home
 
     "$CTL" home
+    if [[ -n "$LIBRARY_DIR" ]]; then
+        LIBRARY_DIR="$(mkdir -p "$LIBRARY_DIR" && cd "$LIBRARY_DIR" && pwd)"
+        "$CTL" config set library.path "$LIBRARY_DIR"
+    fi
 
     if [[ "$RUN_SETUP" == true ]]; then
         log "Setting up this machine"

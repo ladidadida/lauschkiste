@@ -28,15 +28,19 @@ class MpdStep(Step):
     def packages(self, ctx):
         return ['mpd', 'mpc']
 
-    def conf(self) -> str:
+    @staticmethod
+    def library(ctx):
+        return lauschkiste.paths.library_dir(ctx.load_config().getn('library', 'path', default=None))
+
+    def conf(self, ctx) -> str:
         template = lauschkiste.paths.resource('default-settings', 'mpd.default.conf').read_text()
-        return (template.replace('%%LAUSCHKISTE_LIBRARY_PATH%%', str(lauschkiste.paths.library_dir()))
+        return (template.replace('%%LAUSCHKISTE_LIBRARY_PATH%%', str(self.library(ctx)))
                 .replace('%%LAUSCHKISTE_PLAYLISTS_PATH%%', str(lauschkiste.paths.resolve('playlists'))))
 
     def check(self, ctx):
         system = ctx.system
         problems = []
-        if system.read(self.CONF) != self.conf():
+        if system.read(self.CONF) != self.conf(ctx):
             problems.append(f'{self.CONF} is missing or differs from the Lauschkiste template')
         problems += [f'system-wide {unit} is enabled' for unit in ('mpd.socket', 'mpd.service')
                      if system.unit_enabled(unit)]
@@ -49,11 +53,11 @@ class MpdStep(Step):
         for unit in ('mpd.socket', 'mpd.service'):
             system.run('systemctl', 'disable', '--now', unit, root=True, check=False)
         current = system.read(self.CONF)
-        if current is not None and current != self.conf():
+        if current is not None and current != self.conf(ctx):
             system.write(self.CONF + '.backup', current)
-        for folder in (lauschkiste.paths.library_dir(), lauschkiste.paths.resolve('playlists')):
+        for folder in (self.library(ctx), lauschkiste.paths.resolve('playlists')):
             folder.mkdir(parents=True, exist_ok=True)
-        system.write(self.CONF, self.conf())
+        system.write(self.CONF, self.conf(ctx))
         system.run('systemctl', '--user', 'daemon-reload')
         system.run('systemctl', '--user', 'enable', 'mpd.socket', 'mpd.service')
 
