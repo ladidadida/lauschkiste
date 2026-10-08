@@ -80,7 +80,8 @@ def source(server):
 def test_lists_the_books_of_book_libraries_with_progress(source):
     FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 90.0, 'isFinished': False}
     assert source.list_books() == [{
-        'book': 'book1', 'title': 'Bullerbü', 'chapters': 3, 'duration': 300.0, 'listened': 90.0, 'finished': False,
+        'book': 'book1', 'title': 'Bullerbü', 'chapters': 3, 'duration': 300.0, 'chapter': 1, 'elapsed': 20.0,
+        'listened': 90.0, 'finished': False,
         'cover_url': '/api/v1/audiobookshelf/covers/book1'}]
     assert not any('pod' in path for _, path, _ in FakeServer.requests)
 

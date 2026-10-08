@@ -105,15 +105,29 @@ class AudiobookshelfSource:
             duration = float(media.get('duration') or 0)
             entry = progress.get(item['id'], {})
             finished = bool(entry.get('isFinished'))
+            listened = duration if finished else float(entry.get('currentTime') or 0)
+            chapter, elapsed = self._place(client, item['id'], listened) if 0 < listened and not finished else (0, 0.0)
             books.append({
                 'book': item['id'],
                 'title': (media.get('metadata') or {}).get('title') or item['id'],
                 'chapters': int(media.get('numAudioFiles') or 0),
                 'duration': duration or None,
-                'listened': duration if finished else float(entry.get('currentTime') or 0),
+                'chapter': chapter,
+                'elapsed': elapsed,
+                'listened': listened,
                 'finished': finished,
                 'cover_url': f'{COVER_ROUTE}/{item["id"]}'})
         return sorted(books, key=lambda book: str(book['title']).casefold())
+
+    def _place(self, client: Client, book: str, position: float):
+        """(file index, seconds into it) of a position in the book; (0, position) if the files are unknown."""
+        try:
+            tracks = self.tracks(book)
+        except Exception as error:
+            logger.debug(f"No tracks for '{book}': {error}")
+            return 0, position
+        index = max((i for i, track in enumerate(tracks) if track.start <= position), default=0)
+        return index, position - tracks[index].start
 
     def tracks(self, book: str) -> List[Track]:
         with self._lock:
