@@ -222,10 +222,9 @@ A settings model (`audiobookshelf` section, or a file of its own, `settings_stor
 | `download_rate_kbps_playing` | download speed limit while something plays (default 1000, 0 = pause) |
 | `prefer_downloaded` | play the downloaded copy even when the server is reachable (default on) |
 
-- **Secrets:** the settings system has no secret fields yet. Add them: the form shows a password
-  field, `GET` never returns the value (only whether one is set), an empty value on save keeps the
-  old one. The file holding them is written with mode 0600. (The samba password has its own form
-  today; this unifies it.)
+- **Secrets:** the `api_key` is a secret field (see "Settings" in [Core and plugins](core-and-plugins.md)):
+  password field in the form, never sent back, kept in `settings/secrets.yaml` (mode 0600). (The samba
+  password has its own form today; this could unify it.)
 - A **"Test connection"** action button in the form (the `action` widget exists): checks address,
   key and libraries, and says what is wrong in plain words.
 - The plugin is set up in Settings → Plugins like the others; `lauschctl` is not needed.

@@ -29,8 +29,16 @@ class ModuleConfig:
     def __init__(self, cfg, prefix: Tuple[str, ...]):
         self._cfg = cfg
         self._prefix = prefix
+        self._secrets = None
+        self._secret_keys: frozenset = frozenset()
+
+    def _use_secrets(self, secrets, keys) -> 'ModuleConfig':
+        self._secrets, self._secret_keys = secrets, frozenset(keys)
+        return self
 
     def get(self, *keys, default=None):
+        if self._secrets is not None and keys and keys[0] in self._secret_keys:
+            return self._secrets.get(*self._prefix, *keys, default=default)
         return self._cfg.getn(*self._prefix, *keys, default=default)
 
     def setdefault(self, *keys, value):
@@ -50,7 +58,12 @@ class ModuleConfig:
 
     def as_dict(self) -> Dict[str, Any]:
         value = self._cfg.getn(*self._prefix, default=None)
-        return dict(value) if isinstance(value, dict) else {}
+        result = dict(value) if isinstance(value, dict) else {}
+        for key in self._secret_keys:
+            secret = self.get(key, default=None)
+            if secret is not None:
+                result[key] = secret
+        return result
 
 
 class ModuleProxy:

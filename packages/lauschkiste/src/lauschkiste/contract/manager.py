@@ -14,7 +14,8 @@ from lauschkiste.contract.errors import ContractError
 from lauschkiste.contract.module import CoreModule, Module, Plugin
 import lauschkiste.contract.plugins as plugins
 from lauschkiste.contract.plugins import ENTRY_POINT_GROUP
-from lauschkiste.contract.settings import SettingsStore
+from lauschkiste.contract.secrets import SecretStore, secrets_path
+from lauschkiste.contract.settings import SettingsStore, secret_fields
 from lauschkiste.contract.version import CONTRACT_VERSION
 
 logger = logging.getLogger('lauschkiste.contract')
@@ -67,6 +68,7 @@ class ModuleManager:
         self._handles: Dict[str, ModuleHandle] = {}
         self._order: List[str] = []
         self.failed: Dict[str, str] = {}
+        self.secrets = SecretStore(secrets_path(getattr(cfg, 'loaded_from', None)))
         self.settings = SettingsStore(self, cfg)
 
     # -- loading --------------------------------------------------------------------------------
@@ -200,7 +202,9 @@ class ModuleManager:
     def _context(self, handle: ModuleHandle) -> Context:
         prefix = (handle.name,) if handle.is_core else ('plugins', handle.name)
         allowed = {dep: self._handles[dep] for dep in handle.cls.required_modules() if dep in self._handles}
-        return Context(handle, bus=self._bus, config=ModuleConfig(self._cfg, prefix),
+        model = handle.cls.settings
+        config = ModuleConfig(self._cfg, prefix)._use_secrets(self.secrets, secret_fields(model) if model else ())
+        return Context(handle, bus=self._bus, config=config,
                        modules=ModulesView(handle.name, allowed), actions=self.catalog, strict=self._strict)
 
     def start(self) -> None:

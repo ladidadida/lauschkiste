@@ -8,6 +8,7 @@ import typer
 from ruamel.yaml import YAML, YAMLError
 
 import lauschkiste.cfghandler
+from lauschkiste.contract.secrets import SecretStore, secrets_path
 from lauschkiste_cli.plugin import ConfOption, _config
 
 app = typer.Typer(help="Read and change single settings.", no_args_is_help=True)
@@ -44,9 +45,14 @@ def _plain(value):
 
 @app.command('get')
 def get_setting(key: str = typer.Argument(..., help="e.g. library.path"),
+                reveal: bool = typer.Option(False, "--reveal", help="print a secret instead of hiding it"),
                 conf: Optional[Path] = ConfOption) -> None:
-    """Print a setting (a section is printed as YAML)."""
-    cfg, _ = _config(conf)
+    """Print a setting (a section is printed as YAML); secrets are hidden."""
+    cfg, path = _config(conf)
+    secret = SecretStore(secrets_path(str(path))).get(*_keys(key))
+    if secret is not None:
+        typer.echo(secret if reveal else '(secret, set)')
+        return
     value = cfg.getn(*_keys(key), default=_MISSING)
     if value is _MISSING:
         typer.echo(f"{key} is not set in the configuration file", err=True)
@@ -56,10 +62,20 @@ def get_setting(key: str = typer.Argument(..., help="e.g. library.path"),
 
 @app.command('set')
 def set_setting(key: str = typer.Argument(..., help="e.g. library.path"),
-                value: str = typer.Argument(..., help="a YAML value: text, number, true/false, [a, b]"),
+                value: Optional[str] = typer.Argument(None, help="a YAML value: text, number, true/false, [a, b]"),
+                secret: bool = typer.Option(False, "--secret", help="keep it in secrets.yaml (asks for the value)"),
                 conf: Optional[Path] = ConfOption) -> None:
     """Change a setting. Takes effect when Lauschkiste is restarted."""
     keys = _keys(key)
+    if secret:
+        path = _config(conf)[1]
+        if value is None:
+            value = typer.prompt(key, hide_input=True)
+        SecretStore(secrets_path(str(path))).set(*keys, value=value)
+        typer.echo(f"{key}: (secret)")
+        return
+    if value is None:
+        raise typer.BadParameter("a value is needed (or --secret to be asked for one)")
     try:
         parsed = YAML(typ='safe').load(value)
     except YAMLError:

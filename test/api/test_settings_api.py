@@ -202,10 +202,12 @@ def test_secret_settings_are_never_sent_and_an_empty_value_keeps_them(client):
     response = client.put('/api/v1/settings/modules/demo', json={'values': {'token': 's3cret'}})
     assert response.status_code == 200
     assert response.json()['values']['token'] == '' and response.json()['secrets_set'] == ['token']
-    assert client.modules.settings.cfg.getn('demo', 'token') == 's3cret'
+    secrets = client.modules.settings.secrets
+    assert secrets.get('demo', 'token') == 's3cret'
+    assert client.modules.settings.cfg.getn('demo', 'token') is None
     assert 's3cret' not in client.get('/api/v1/settings/modules/demo').text
 
     response = client.put('/api/v1/settings/modules/demo', json={'values': {'token': '', 'level': 5}})
     assert response.json()['secrets_set'] == ['token']
-    assert client.modules.settings.cfg.getn('demo', 'token') == 's3cret'
+    assert secrets.get('demo', 'token') == 's3cret'
     assert Demo.applied[-1] == {'level': 5}

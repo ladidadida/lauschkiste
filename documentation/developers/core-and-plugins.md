@@ -243,6 +243,13 @@ keep reading `ctx.config` with the same defaults.
 - After a change the module's `settings_changed(changed)` hook runs; it returns True if the change
   takes effect immediately. Otherwise `GET /api/v1/settings/restart` reports that a restart is
   needed (`system.restart_service`).
+- **Secrets** (API keys, passwords): mark a field `Field(..., json_schema_extra={'secret': True})`. The
+  web app shows a password field; `GET` never returns the value (`secrets_set` lists the fields that
+  have one) and an empty value on save keeps the old one. The values are not written to the main
+  config but to `secrets.yaml` next to it (mode 0600, same key path, `plugins.<name>.<key>`), which
+  people neither share nor back up by accident. The module still reads them with `ctx.config.get(...)`.
+  On the command line: `lauschctl config set plugins.<name>.<key> --secret` (asks for the value),
+  `lauschctl config get` hides them (`--reveal` shows them).
 - `GET /api/v1/plugins` lists installed plugins (enabled, running, problem, missing extras);
   `PUT /api/v1/plugins/<name>` with `{"enabled": true}` enables one (after a restart).
 

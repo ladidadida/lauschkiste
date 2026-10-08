@@ -39,3 +39,15 @@ def test_section_is_not_overwritten(home):
     result = runner.invoke(app, ['config', 'set', 'library', 'x'])
     assert result.exit_code == 1
     assert 'section' in result.output
+
+
+def test_secrets_go_to_their_own_file_and_are_hidden(home):
+    result = runner.invoke(app, ['config', 'set', 'plugins.demo.api_key', '--secret'], input='s3cret\n')
+    assert result.exit_code == 0, result.output
+    assert 's3cret' not in result.output
+    secrets = home / 'settings' / 'secrets.yaml'
+    assert 's3cret' in secrets.read_text() and oct(secrets.stat().st_mode & 0o777) == '0o600'
+    assert 's3cret' not in (home / 'settings' / 'lauschkiste.yaml').read_text()
+
+    assert runner.invoke(app, ['config', 'get', 'plugins.demo.api_key']).output.strip() == '(secret, set)'
+    assert runner.invoke(app, ['config', 'get', 'plugins.demo.api_key', '--reveal']).output.strip() == 's3cret'

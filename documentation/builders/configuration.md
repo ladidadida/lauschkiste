@@ -13,6 +13,10 @@ For several aspects, we have [configuration tools](../developers/coreapps.md#con
 
 Even after using the tools, certain aspects can only be changed by directly modifying the configuration files.
 
+API keys and passwords of plugins are not kept in `lauschkiste.yaml` but in `secrets.yaml` next to it
+(readable for the box's user only). Set them in the web app or with `lauschctl config set <key> --secret`;
+`lauschctl config get` hides them.
+
 ## Best practice procedure
 
 ```bash

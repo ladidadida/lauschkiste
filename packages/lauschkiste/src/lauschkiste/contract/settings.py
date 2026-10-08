@@ -1,7 +1,6 @@
 """Module settings: read, validate and store a module's config section through its ``settings`` model."""
 
 import logging
-import os
 from typing import Any, Dict, List, Set
 
 from pydantic import BaseModel, ConfigDict, ValidationError
@@ -59,6 +58,7 @@ class SettingsStore:
     def __init__(self, manager, cfg):
         self._manager = manager
         self.cfg = cfg
+        self.secrets = manager.secrets
         self.restart_required: Set[str] = set()
         from lauschkiste.contract.plugins import ExtrasInstaller
         self.installer = ExtrasInstaller(on_installed=self.restart_required.add)
@@ -78,7 +78,7 @@ class SettingsStore:
         section = cfg.getn(*prefix, default=None)
         values = current_values(model, section)
         secrets = sorted(secret_fields(model))
-        is_set = [key for key in secrets if values.get(key)]
+        is_set = [key for key in secrets if self.secrets.get(*self._secret_prefix(handle), key)]
         for key in secrets:
             values[key] = ''
         return {
@@ -109,8 +109,13 @@ class SettingsStore:
         except ValidationError as error:
             raise OperationError(422, 'invalid_setting', _message(error)) from None
         changed = {key: validated[key] for key in values}
+        secrets = secret_fields(model)
+        for key in secrets & set(changed):
+            self.secrets.set(*self._secret_prefix(handle), key, value=changed[key])
         with cfg:
             for key, value in changed.items():
+                if key in secrets:
+                    continue
                 if value is None:
                     section = cfg.getn(*prefix, default=None)
                     if isinstance(section, dict):
@@ -118,8 +123,6 @@ class SettingsStore:
                 else:
                     cfg.setn(*prefix, key, value=value)
         self.save(cfg)
-        if secret_fields(model) & set(changed):
-            self._restrict(cfg)
         try:
             applied = bool(handle.instance.settings_changed(changed))
         except Exception:
@@ -130,13 +133,8 @@ class SettingsStore:
         return self.describe(name)
 
     @staticmethod
-    def _restrict(cfg) -> None:
-        path = getattr(cfg, 'loaded_from', None)
-        if path:
-            try:
-                os.chmod(path, 0o600)
-            except OSError as error:
-                logger.warning(f"Could not restrict the permissions of '{path}': {error}")
+    def _secret_prefix(handle) -> tuple:
+        return (handle.name,) if handle.is_core else ('plugins', handle.name)
 
     def save(self, cfg=None) -> None:
         cfg = cfg if cfg is not None else self.cfg
