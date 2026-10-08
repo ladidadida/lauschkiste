@@ -42,3 +42,6 @@ __pycache__/
 /.reports/
 /.coverage
 /coverage.xml
+
+# Local secrets (not committed)
+.env.local
