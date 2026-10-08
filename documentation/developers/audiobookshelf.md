@@ -2,8 +2,9 @@
 
 Status: phases 1 and 2 are implemented (streaming, shared position, covers, secret settings, card
 `source`); phase 3 is partly there (books in the Audiobooks tab and the card dialog, settings form), the
-the rest is planned. Phase 4 is under way: downloads (own low-priority process, cache, limit, web app) work and
-are measured on a Pi Zero W; the offline position queue and automatic removal of old downloads are still open. Checked against a real server (2.36.0) with mp3 books; m4b
+the rest is planned. Phase 4 (offline use) is implemented: downloads (own low-priority process, cache, limit,
+web app), positions recorded without the server and merged later, the book list kept on disk, removal of old
+downloads, update hint. Measured on a Pi Zero W. Checked against a real server (2.36.0) with mp3 books; m4b
 books, a "test connection" button and the measurements on the Pi Zero are still open.
 
 [Audiobookshelf](https://www.audiobookshelf.org) (ABS) is a self-hosted server for audiobooks and
@@ -140,8 +141,8 @@ Works well with the design, because a downloaded book is just a set of audio fil
   go to the plugin's own cache folder (`cache/audiobookshelf/<id>/`), not into `library/`, so the
   book stays one entry (not a local duplicate) and keeps its link to the server.
 - **Playing:** a complete download plays as plain local files through the normal player. No network,
-  no TLS and no resolver involved, which also makes it cheaper for the CPU of a Pi Zero and works with
-  every player backend. Incomplete downloads are never played; the book streams instead.
+  no TLS and no resolver involved, so it also works without the server and with every player backend.
+  (It is not cheaper for the CPU: on a Pi Zero W decoding dominates, about 32 % either way.) Incomplete downloads are never played; the book streams instead.
 - **Managing it:** per book "download" / "remove download" in the web app, with progress, pause and
   cancel. A download starts at once. One at a time, in a process of its own with the lowest CPU and
   disk priority (`nice 19`, `ionice` class idle), so playback keeps precedence. While something plays it

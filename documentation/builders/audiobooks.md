@@ -65,5 +65,18 @@ something plays it is slowed to `download_rate_kbps_playing` (1000 kB/s, `0` wai
 stops). `cache_limit_gb` (8) caps the space; a book that would not fit is refused with the numbers.
 A stopped download keeps what it loaded and continues next time. Remove a download in the same menu.
 
-Not yet: automatic removal of old downloads, and playing a downloaded book without the server (the position
-is still read from and written to the server).
+Space: with `remove_old_downloads` switched on, the oldest *finished* downloads are removed when a new book
+does not fit; books in progress are never removed. If the server changed a book after the download, the
+list says so and "Download again" fetches the new version.
+
+### Without the server
+
+The box keeps working when the server is not reachable (portable box, WiFi gone, server off):
+
+- The book list is kept on the box and shows a notice; downloaded books come first and play as usual.
+- The position of what you listen to is saved on the box and sent as soon as the server answers again
+  (checked every minute). If the book was also listened to elsewhere in the meantime, the furthest position
+  wins and a book finished anywhere stays finished. The decision does not use the clock, because a Pi can be
+  days off while offline: the box's position wins only if the server's position did not move since the box
+  last saw it.
+- A book that is not downloaded needs the server to play.

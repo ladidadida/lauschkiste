@@ -271,7 +271,12 @@
       "downloading": "Lade {{progress}} %",
       "queued": "Wartet auf den Download",
       "downloaded": "Auf der Box",
-      "download-error": "Der Download ist fehlgeschlagen"
+      "download-error": "Der Download ist fehlgeschlagen",
+      "server-down": "Audiobookshelf ist nicht erreichbar ({{error}}). Heruntergeladene Bücher spielen weiter.",
+      "waiting": "{{count}} gemerkte Position wird gesendet, sobald der Server wieder da ist.",
+      "waiting_other": "{{count}} gemerkte Positionen werden gesendet, sobald der Server wieder da ist.",
+      "update-available": "Auf dem Server geändert",
+      "download-again": "Erneut laden"
     },
     "radio": {
       "empty": "Noch keine Sender. Füge einen Sender mit seiner Stream-Adresse hinzu.",

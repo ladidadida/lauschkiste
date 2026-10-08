@@ -9,6 +9,7 @@ Enable with::
 """
 
 import logging
+import threading
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -21,6 +22,8 @@ from lauschkiste_plugin_audiobookshelf.source import COVER_ROUTE, SCHEME, Audiob
 
 logger = logging.getLogger('lauschkiste.audiobookshelf')
 
+SYNC_EVERY_SEC = 60.0
+
 
 class AudiobookshelfSettings(BaseModel):
     server_url: str = Field('', title='Server address', description='e.g. https://audiobookshelf.example.org')
@@ -30,6 +33,8 @@ class AudiobookshelfSettings(BaseModel):
     prefer_downloaded: bool = Field(True, title='Play downloaded books from the box',
                                     description='Even when the server is reachable')
     cache_limit_gb: float = Field(8, ge=0.1, le=2000, title='Space for downloaded books (GB)')
+    remove_old_downloads: bool = Field(False, title='Make room by removing old downloads',
+                                       description='Removes the oldest finished books when the space is full')
     download_rate_kbps_playing: int = Field(1000, ge=0, le=100000, title='Download speed while playing (kB/s)',
                                             description='0 pauses downloads while something plays')
 
@@ -40,6 +45,14 @@ class DownloadState(BaseModel):
     done: int = 0
     total: int = 0
     error: Optional[str] = None
+    update_available: bool = False
+
+
+class ServerStatus(BaseModel):
+    configured: bool
+    reachable: bool
+    error: Optional[str] = None
+    waiting: int = 0
 
 
 class Downloads(BaseModel):
@@ -53,7 +66,7 @@ class Audiobookshelf(Plugin):
     """Audiobooks from an Audiobookshelf server, played by streaming; the position is shared with its apps."""
 
     name = 'audiobookshelf'
-    interface_version = '1.1'
+    interface_version = '1.0'
     requires = {'audiobooks': '>=2.0,<3', 'player': '>=5.2,<6'}
     settings = AudiobookshelfSettings
 
@@ -62,18 +75,31 @@ class Audiobookshelf(Plugin):
         self._cache = DownloadCache(lauschkiste.paths.resolve('cache/audiobookshelf'))
         self._downloads = DownloadManager(self._cache, self._source.credentials)
         self._playing: Optional[bool] = None
+        self._stopped = threading.Event()
+        self._sync: Optional[threading.Thread] = None
 
     def start(self, ctx) -> None:
         self._ctx = ctx
         self._configure()
         ctx.modules.audiobooks.sources.register('audiobookshelf', self._source)
         ctx.modules.player.resolvers.register(SCHEME, self._source)
-        self._source.cache = self._cache
+        self._source.attach(self._cache)
         ctx.subscribe('player.status', self._on_status)
+        self._sync = threading.Thread(target=self._sync_loop, name='abs-sync', daemon=True)
+        self._sync.start()
 
     def stop(self):
+        self._stopped.set()
         self._downloads.close()
         return []
+
+    def _sync_loop(self) -> None:
+        """Send the positions recorded without the server once it answers again."""
+        while not self._stopped.wait(SYNC_EVERY_SEC):
+            try:
+                self._source.sync_pending()
+            except Exception:
+                logger.exception("Could not send the recorded positions")
 
     def _limit_bytes(self) -> int:
         return int(float(self._ctx.config.get('cache_limit_gb', default=8)) * (1 << 30))
@@ -87,10 +113,16 @@ class Audiobookshelf(Plugin):
 
     # -- downloads --------------------------------------------------------------------------
 
+    @query(path='/status')
+    def status(self) -> ServerStatus:
+        """Whether the server is set up and answered the last request."""
+        return ServerStatus(**self._source.status())
+
     @query(path='/downloads')
     def downloads(self) -> Downloads:
         """Downloaded and downloading books and the space they use."""
-        return Downloads(items=[DownloadState(**entry) for entry in self._downloads.states()],
+        return Downloads(items=[DownloadState(**entry, update_available=self._source.update_available(entry['book']))
+                                for entry in self._downloads.states()],
                          used_bytes=self._cache.used_bytes(), limit_bytes=self._limit_bytes(),
                          free_bytes=self._cache.free_bytes())
 
@@ -104,6 +136,8 @@ class Audiobookshelf(Plugin):
                 path.stat().st_size for path in self._cache.directory(book).glob('*.part'))
         except AudiobookshelfError as error:
             raise OperationError(503, 'audiobookshelf_unavailable', str(error)) from None
+        if self._ctx.config.get('remove_old_downloads', default=False):
+            self._make_room(needed)
         used, limit, free = self._cache.used_bytes(), self._limit_bytes(), self._cache.free_bytes()
         mb = 1 << 20
         if used + needed > limit:
@@ -114,6 +148,17 @@ class Audiobookshelf(Plugin):
             raise OperationError(409, 'download_disk_full',
                                  f"The book needs {needed // mb} MB, only {free // mb} MB are free on the disk")
         self._downloads.start(book)
+
+    def _make_room(self, needed: int) -> None:
+        """Remove the oldest finished downloads until ``needed`` bytes fit under the limit."""
+        finished = [book for book in self._cache.books() if self._cache.complete(book)
+                    and (self._source.ledger.get(book) or {}).get('finished')]
+        finished.sort(key=lambda book: (self._cache.directory(book) / 'meta.json').stat().st_mtime)
+        for book in finished:
+            if self._cache.used_bytes() + needed <= self._limit_bytes():
+                return
+            logger.info(f"Removing the finished download '{book}' to make room")
+            self._downloads.remove(book)
 
     @action()
     def cancel_download(self, book: str) -> None:

@@ -2,6 +2,7 @@ import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
+  Alert,
   Avatar,
   Box,
   CircularProgress,
@@ -61,6 +62,7 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers }) => {
     queued: t('library.audiobooks.queued'),
     downloading: t('library.audiobooks.downloading', { progress: downloadPercent }),
     error: t('library.audiobooks.download-error'),
+    done: download?.update_available ? t('library.audiobooks.update-available') : undefined,
   }[downloadState];
   const downloadRequest = async (command) => {
     await request(command, { book: book.book });
@@ -69,7 +71,18 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers }) => {
   const downloadItem = (() => {
     if (book.source === undefined || book.source === 'local') return [];
     if (downloadState === 'done') {
-      return [{ label: t('library.audiobooks.remove-download'), onClick: () => downloadRequest('audiobookshelfRemoveDownload') }];
+      return [
+        ...(download.update_available
+          ? [{
+            label: t('library.audiobooks.download-again'),
+            onClick: async () => {
+              await request('audiobookshelfRemoveDownload', { book: book.book });
+              await downloadRequest('audiobookshelfDownload');
+            },
+          }]
+          : []),
+        { label: t('library.audiobooks.remove-download'), onClick: () => downloadRequest('audiobookshelfRemoveDownload') },
+      ];
     }
     if (downloadState === 'downloading' || downloadState === 'queued') {
       return [{ label: t('library.audiobooks.cancel-download'), onClick: () => downloadRequest('audiobookshelfCancelDownload') }];
@@ -165,10 +178,19 @@ const Audiobooks = ({ musicFilter }) => {
     const timer = setInterval(loadDownloads, 3000);
     return () => clearInterval(timer);
   }, [downloading, loadDownloads]);
+  const [serverStatus, setServerStatus] = useState(null);
+  const loadStatus = useCallback(async () => {
+    const { result } = await request('audiobookshelfStatus');
+    setServerStatus(result || null);
+  }, []);
+  useEffect(() => {
+    if (hasRemoteBooks || !books.length) loadStatus();
+  }, [hasRemoteBooks, books, loadStatus]);
   const changed = useCallback(() => {
     load();
     loadDownloads();
-  }, [load, loadDownloads]);
+    loadStatus();
+  }, [load, loadDownloads, loadStatus]);
 
   const visible = useMemo(() => {
     const query = musicFilter.toLowerCase();
@@ -181,17 +203,25 @@ const Audiobooks = ({ musicFilter }) => {
   if (!visible.length) return <Typography>{t('library.albums.no-music')}</Typography>;
 
   return (
-    <List sx={{ width: '100%' }}>
-      {visible.map((book) => (
-        <AudiobookItem
-          book={book}
-          download={downloads[book.book]}
-          key={`${book.source}/${book.book}`}
-          onChanged={changed}
-          showCovers={showCovers}
-        />
-      ))}
-    </List>
+    <>
+      {serverStatus?.configured && !serverStatus.reachable &&
+        <Alert severity="warning" sx={{ marginBottom: 1 }}>
+          {t('library.audiobooks.server-down', { error: serverStatus.error || '' })}
+          {serverStatus.waiting > 0 && ` ${t('library.audiobooks.waiting', { count: serverStatus.waiting })}`}
+        </Alert>
+      }
+      <List sx={{ width: '100%' }}>
+        {visible.map((book) => (
+          <AudiobookItem
+            book={book}
+            download={downloads[book.book]}
+            key={`${book.source}/${book.book}`}
+            onChanged={changed}
+            showCovers={showCovers}
+          />
+        ))}
+      </List>
+    </>
   );
 };
 

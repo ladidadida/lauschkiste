@@ -271,7 +271,12 @@
       "downloading": "Downloading {{progress}} %",
       "queued": "Waiting to download",
       "downloaded": "On the box",
-      "download-error": "The download failed"
+      "download-error": "The download failed",
+      "server-down": "Audiobookshelf is not reachable ({{error}}). Downloaded books still play.",
+      "waiting": "{{count}} saved position will be sent when the server is back.",
+      "waiting_other": "{{count}} saved positions will be sent when the server is back.",
+      "update-available": "Changed on the server",
+      "download-again": "Download again"
     },
     "radio": {
       "empty": "No stations yet. Add a station with its stream address.",

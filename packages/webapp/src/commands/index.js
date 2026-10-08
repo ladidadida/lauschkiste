@@ -129,6 +129,9 @@ const commands = {
   },
 
   // Audiobookshelf downloads (plugin)
+  audiobookshelfStatus: {
+    rest: { method: 'GET', path: '/api/v1/audiobookshelf/status' },
+  },
   audiobookshelfDownloads: {
     rest: { method: 'GET', path: '/api/v1/audiobookshelf/downloads' },
   },

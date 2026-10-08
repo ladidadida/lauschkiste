@@ -1,7 +1,7 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.1",
+  "interface_version": "1.0",
   "kind": "plugin",
   "name": "audiobookshelf",
   "operations": {
@@ -86,6 +86,10 @@
                 "total": {
                   "default": 0,
                   "type": "integer"
+                },
+                "update_available": {
+                  "default": false,
+                  "type": "boolean"
                 }
               },
               "required": [
@@ -130,6 +134,46 @@
       "path": "/api/v1/audiobookshelf/remove_download",
       "returns": {
         "type": "null"
+      }
+    },
+    "status": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/audiobookshelf/status",
+      "returns": {
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "reachable": {
+            "type": "boolean"
+          },
+          "waiting": {
+            "default": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "configured",
+          "reachable"
+        ],
+        "type": "object"
       }
     }
   },

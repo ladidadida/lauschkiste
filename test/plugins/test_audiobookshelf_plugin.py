@@ -32,6 +32,7 @@ class FakeServer(BaseHTTPRequestHandler):
     progress = {}
     requests = []
     ranges = []
+    down = False
 
     def log_message(self, *args):
         pass
@@ -60,6 +61,8 @@ class FakeServer(BaseHTTPRequestHandler):
         length = int(self.headers.get('Content-Length') or 0)
         body = json.loads(self.rfile.read(length)) if length else None
         type(self).requests.append((self.command, self.path, body))
+        if type(self).down:
+            return self.reply(503, {})
         if self.headers.get('Authorization') != f'Bearer {KEY}':
             return self.reply(401, {})
         path = self.path.split('?')[0]
@@ -89,7 +92,7 @@ class FakeServer(BaseHTTPRequestHandler):
 
 @pytest.fixture
 def server():
-    FakeServer.progress, FakeServer.requests, FakeServer.ranges = {}, [], []
+    FakeServer.progress, FakeServer.requests, FakeServer.ranges, FakeServer.down = {}, [], [], False
     httpd = ThreadingHTTPServer(('127.0.0.1', 0), FakeServer)
     threading.Thread(target=httpd.serve_forever, daemon=True).start()
     yield f'http://127.0.0.1:{httpd.server_port}'
@@ -107,7 +110,7 @@ def test_lists_the_books_of_book_libraries_with_progress(source):
     FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 90.0, 'isFinished': False}
     assert source.list_books() == [{
         'book': 'book1', 'title': 'Bullerbü', 'chapters': 3, 'duration': 300.0, 'chapter': 1, 'elapsed': 20.0,
-        'listened': 90.0, 'finished': False,
+        'listened': 90.0, 'finished': False, 'downloaded': False,
         'cover_url': '/api/v1/audiobookshelf/covers/book1'}]
     assert not any('pod' in path for _, path, _ in FakeServer.requests)
 
@@ -160,8 +163,8 @@ def test_unknown_book(source):
 def test_wrong_key_is_reported(server):
     source = AudiobookshelfSource()
     source.configure(server, 'wrong', 10)
-    with pytest.raises(Exception, match='refused the API key'):
-        source.list_books()
+    assert source.list_books() == []
+    assert 'refused the API key' in source.status()['error']
 
 
 # -- downloads --------------------------------------------------------------------------------
@@ -208,7 +211,7 @@ def test_the_rate_file_slows_the_download_down(server, tmp_path):
 def test_manager_downloads_in_a_process_and_the_source_then_plays_the_files(server, tmp_path):
     source = AudiobookshelfSource()
     source.configure(server, KEY, 10)
-    source.cache = DownloadCache(tmp_path)
+    source.attach(DownloadCache(tmp_path))
     manager = DownloadManager(source.cache, source.credentials)
     manager.start('book1')
     deadline = time.monotonic() + 30
@@ -227,3 +230,120 @@ def test_manager_downloads_in_a_process_and_the_source_then_plays_the_files(serv
     manager.remove('book1')
     assert source.cache.books() == []
     manager.close()
+
+
+# -- offline ----------------------------------------------------------------------------------
+
+def offline_source(server, tmp_path):
+    source = AudiobookshelfSource()
+    source.configure(server, KEY, 10)
+    source.attach(DownloadCache(tmp_path))
+    return source
+
+
+def server_back(source):
+    FakeServer.down = False
+    source._down_until = 0.0
+
+
+def test_a_position_recorded_offline_is_sent_when_the_server_is_back(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    assert source.position('book1').load() == {}
+    position = source.position('book1')
+    source.tracks('book1')  # known before the server went away
+    FakeServer.down = True
+    position.save({'file': 'abs://book1/20', 'elapsed': 30.0, 'finished': False})
+    assert 'book1' not in FakeServer.progress and source.ledger.pending() == ['book1']
+    assert not source.reachable()
+    assert source.sync_pending() == 1
+
+    server_back(source)
+    assert source.sync_pending() == 0
+    assert FakeServer.progress['book1']['currentTime'] == 100.0
+    assert source.ledger.get('book1')['pending'] is False
+
+
+def test_offline_the_box_continues_from_its_own_position(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    source.record('book1', 100.0, 300.0, False)
+    FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 100.0, 'isFinished': False}
+    FakeServer.down = True
+    source._down_until = 0.0
+    assert source.reconcile('book1') == {'position': 100.0, 'finished': False}
+
+
+def test_when_both_moved_the_furthest_position_wins_and_finished_stays_finished(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 50.0, 'isFinished': False}
+    source.reconcile('book1')
+    FakeServer.down = True
+    source.record('book1', 80.0, 300.0, False)
+    server_back(source)
+    FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 120.0, 'isFinished': False}
+    assert source.reconcile('book1') == {'position': 120.0, 'finished': False}
+    assert FakeServer.progress['book1']['currentTime'] == 120.0
+
+    FakeServer.down = True
+    source.record('book1', 130.0, 300.0, False)
+    server_back(source)
+    FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 10.0, 'isFinished': True}
+    assert source.reconcile('book1')['finished'] is True
+
+
+def test_if_the_server_did_not_move_the_box_position_wins_even_when_it_is_behind(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 200.0, 'isFinished': False}
+    source.reconcile('book1')
+    FakeServer.down = True
+    source.record('book1', 40.0, 300.0, False)  # went back
+    server_back(source)
+    assert source.reconcile('book1') == {'position': 40.0, 'finished': False}
+    assert FakeServer.progress['book1']['currentTime'] == 40.0
+
+
+def test_the_book_list_survives_a_server_that_is_gone(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    assert [b['book'] for b in source.list_books()] == ['book1']
+    FakeServer.down = True
+    fresh = offline_source(server, tmp_path)  # a restart of the box without the server
+    books = fresh.list_books()
+    assert [b['book'] for b in books] == ['book1'] and books[0]['title'] == 'Bullerbü'
+    assert fresh.status()['reachable'] is False
+
+
+def test_the_server_is_not_asked_again_right_after_a_failure(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    FakeServer.down = True
+    source.list_books()
+    seen = len(FakeServer.requests)
+    source.list_books()
+    source.reconcile('book1')
+    assert len(FakeServer.requests) == seen
+
+
+def test_downloaded_books_come_first_and_play_without_the_server(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    Download(server, KEY, 'book1', source.cache.directory('book1'), source.cache.rate_file).run()
+    FakeServer.down = True
+    fresh = offline_source(server, tmp_path)
+    books = fresh.list_books()
+    assert books[0]['book'] == 'book1' and books[0]['downloaded'] is True
+    files = fresh.files('book1')
+    assert files[0].endswith('001_10.mp3')
+    fresh.position('book1').save({'file': files[1], 'elapsed': 5.0, 'finished': False})
+    assert fresh.position('book1').load() == {'file': files[1], 'elapsed': 5.0, 'finished': False}
+
+
+def test_a_book_that_changed_on_the_server_is_reported(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    Download(server, KEY, 'book1', source.cache.directory('book1'), source.cache.rate_file).run()
+    source.list_books()
+    assert source.update_available('book1') is False
+    BOOK['updatedAt'] = 2000
+    try:
+        source._items = None
+        source._items_at = 0.0
+        source.list_books()
+        assert source.update_available('book1') is True
+    finally:
+        BOOK['updatedAt'] = 1000
