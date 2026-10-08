@@ -47,10 +47,25 @@ publishing"). What has to be done once, by the owner of the PyPI account:
    | `lauschkiste-plugin-rfid-readers` | `testpypi-lauschkiste-plugin-rfid-readers` | `pypi-lauschkiste-plugin-rfid-readers` |
    | `lauschkiste-plugin-samba` | `testpypi-lauschkiste-plugin-samba` | `pypi-lauschkiste-plugin-samba` |
 
+   PyPI allows **three pending publishers at a time** (an entry no longer counts once its first upload
+   has created the project). So register three, upload, register the next three and upload again; see
+   "Packages in rounds" below.
+
 3. In the GitHub repository (Settings → Environments) create the environment `pypi` and give it **required
    reviewers** (yourself): it is the gate before the upload to PyPI, which cannot be undone. The other
    environments (`testpypi-...`, `pypi-...`) are created by GitHub when the workflow first uses them; they
    need no settings.
+
+## Packages in rounds
+
+The workflow has one job per package. A job whose package has no trusted publisher yet fails with
+"invalid-publisher", the others succeed. After each upload that created projects:
+
+1. Register the next (up to three) pending publishers of the packages that failed.
+2. In the workflow run on GitHub choose **Re-run failed jobs**: only those uploads run again.
+
+Repeat until all seven jobs are green (three rounds: 3 + 3 + 1). This is needed once per registry (TestPyPI,
+PyPI); later uploads need no pending publishers any more.
 
 ## Test on TestPyPI
 
