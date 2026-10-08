@@ -84,7 +84,7 @@ curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install
   | bash -s -- --from testpypi --version 0.1.0a4.dev1
 ```
 
-TestPyPI only has the Lauschkiste packages; the installer takes everything else from PyPI.
+The installer takes everything from PyPI (and piwheels) first; TestPyPI only supplies the Lauschkiste packages, because it holds test copies of other projects that must not be used.
 
 ## Release
 

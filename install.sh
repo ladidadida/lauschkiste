@@ -142,15 +142,17 @@ for asset in json.load(sys.stdin).get("assets", []):
 }
 
 install_from_index() {
-    local index="" requirement=lauschkiste args=()
+    local requirement=lauschkiste args=()
+    [[ "$VERSION" == latest ]] || requirement="lauschkiste==${VERSION}"
     case "$FROM" in
         pypi) ;;
-        testpypi) index="https://test.pypi.org/simple/" ;;
-        *) index="$FROM" ;;
+        testpypi)
+            # TestPyPI holds test copies of many projects (a "fastapi" 1.0 that does not build): PyPI, and
+            # piwheels on 32-bit ARM, come first and TestPyPI only supplies what they lack, the Lauschkiste packages
+            case "$(uname -m)" in armv6l|armv7l) args+=(--index https://www.piwheels.org/simple) ;; esac
+            args+=(--index https://pypi.org/simple/ --default-index https://test.pypi.org/simple/) ;;
+        *) args+=(--index "$FROM" --index-strategy unsafe-best-match) ;;  # an index of the Lauschkiste packages only
     esac
-    [[ "$VERSION" == latest ]] || requirement="lauschkiste==${VERSION}"
-    # TestPyPI and local indexes only have the Lauschkiste packages; the rest comes from PyPI
-    [[ -z "$index" ]] || args+=(--index "$index" --index-strategy unsafe-best-match)
     local with=()
     for plugin in "${BUNDLED_PLUGINS[@]}"; do with+=(--with "$plugin"); done
     log "Installing ${requirement} from ${FROM}"
