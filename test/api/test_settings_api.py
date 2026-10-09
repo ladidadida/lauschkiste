@@ -262,7 +262,8 @@ def test_the_translations_of_every_plugin_cover_the_same_fields_in_each_language
         for language, bundle in bundles.items():
             assert bundle is not None and keys(bundle) == base, f"plugin '{name}': {language} differs from en.json"
         seen.add(name)
-    assert {'audiobookshelf', 'podcast_directories', 'mpd', 'samba', 'gpio_controls', 'rfid_rc522_spi'} <= seen
+    assert {'audiobookshelf', 'podcast_directories', 'radio_directories', 'mpd', 'samba', 'gpio_controls',
+            'rfid_rc522_spi'} <= seen
 
 
 def test_the_plugin_list_carries_what_the_package_says_about_itself(client):

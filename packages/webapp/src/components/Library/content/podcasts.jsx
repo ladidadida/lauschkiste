@@ -25,7 +25,8 @@ import request, { requestErrorMessage } from '../../../utils/request';
 import { PODCASTS_TOPIC } from '../../../config';
 import FormDialog from './form-dialog';
 import ItemMenu from './item-menu';
-import PodcastSearch from './podcast-search';
+import DirectorySearch from './directory-search';
+import { podcastKind } from './directory-kinds';
 
 const Podcasts = ({ musicFilter }) => {
   const { t } = useTranslation();
@@ -144,14 +145,15 @@ const Podcasts = ({ musicFilter }) => {
           </ListItem>
         ))}
       </List>
-      <PodcastSearch
+      <DirectorySearch
         directories={directories}
+        kind={podcastKind}
         onAddByAddress={() => {
           setIsSearching(false);
           setIsAdding(true);
         }}
+        onChanged={load}
         onClose={() => setIsSearching(false)}
-        onSubscribed={load}
         open={isSearching}
       />
       <FormDialog

@@ -15,12 +15,12 @@ import xml.etree.ElementTree as ElementTree
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Dict, List, Optional, Protocol
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, Field
 
+import lauschkiste.directories as directories
 import lauschkiste.paths
 import lauschkiste.statefile as statefile
 from lauschkiste.cache import CacheFile, CachePlan
@@ -502,39 +502,12 @@ class Podcasts(CoreModule):
 
     def _ask(self, directory: Optional[str], call) -> SearchResult:
         """Ask the directories (one, or all in parallel); one failing leaves the others."""
-        wanted = [(key, item) for key, item in self.directories.items() if directory in (None, key)]
-        if directory and not wanted:
-            raise OperationError(404, 'unknown_directory', f"No podcast directory '{directory}'")
-        errors: Dict[str, str] = {}
-
-        def run(entry):
-            key, item = entry
-            try:
-                return key, call(item), None
-            except Exception as error:
-                return key, [], f'{error.__class__.__name__}: {error}'
-
-        found: List[List[PodcastHit]] = []
-        if wanted:
-            with ThreadPoolExecutor(max_workers=len(wanted)) as pool:
-                for key, rows, error in pool.map(run, wanted):
-                    if error:
-                        errors[key] = error
-                        logger.warning(f"Podcast directory '{key}': {error}")
-                    found.append([PodcastHit(directory=key, **{k: v for k, v in row.items()
-                                                               if k in ('title', 'feed_url', 'author', 'image')})
-                                  for row in rows if row.get('title') and row.get('feed_url')])
-        subscribed, seen, hits = self._subscribed_urls(), set(), []
-        # the directories take turns, so that one does not fill the whole list
-        for rank in range(max((len(rows) for rows in found), default=0)):
-            for rows in found:
-                if rank < len(rows):
-                    hit = rows[rank]
-                    key = normalize_url(hit.feed_url)
-                    if key not in seen:
-                        seen.add(key)
-                        hit.subscribed = key in subscribed
-                        hits.append(hit)
+        answers, errors = directories.ask(self.directories.items(), directory, call, 'podcast')
+        subscribed = self._subscribed_urls()
+        rows = directories.interleave(answers, lambda row: normalize_url(row['feed_url']),
+                                      lambda row: bool(row.get('title') and row.get('feed_url')))
+        hits = [PodcastHit(**{k: v for k, v in row.items() if k in PodcastHit.model_fields},
+                           subscribed=normalize_url(row['feed_url']) in subscribed) for row in rows]
         return SearchResult(hits=hits, errors=errors)
 
     @query(path='/directories')

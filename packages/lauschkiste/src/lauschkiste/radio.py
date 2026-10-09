@@ -9,14 +9,17 @@ import re
 import threading
 import unicodedata
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Protocol
 from urllib.parse import urlparse
 
 from pydantic import BaseModel
 
+import lauschkiste.directories as directories
 import lauschkiste.paths
 import lauschkiste.statefile as statefile
-from lauschkiste.contract import CoreModule, OperationError, action, event, query
+from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
+from lauschkiste.podcast_opml import normalize_url
+from lauschkiste.radio_playlist import parse_stations, render_m3u
 
 logger = logging.getLogger('lauschkiste.radio')
 
@@ -31,6 +34,52 @@ class Station(BaseModel):
     name: str
     url: str
     logo: Optional[str] = None
+
+
+class StationHit(BaseModel):
+    """A station found in a directory."""
+    name: str
+    url: str
+    logo: Optional[str] = None
+    country: Optional[str] = None
+    tags: Optional[str] = None
+    codec: Optional[str] = None
+    bitrate: Optional[int] = None
+    directory: str = ''
+    #: already one of the stations
+    added: bool = False
+
+
+class SearchResult(BaseModel):
+    hits: List[StationHit]
+    #: directory id -> why it gave no answer
+    errors: Dict[str, str] = {}
+
+
+class DirectoryInfo(BaseModel):
+    id: str
+    label: str
+
+
+class ImportResult(BaseModel):
+    added: List[str]
+    already_there: int = 0
+    invalid: int = 0
+
+
+class Playlist(BaseModel):
+    content: str
+
+
+class RadioDirectory(Protocol):
+    """A place to find stations, registered at ``radio.directories`` by a plugin."""
+
+    def search(self, term: str, limit: int) -> List[Dict[str, Any]]:
+        """Stations matching ``term`` as mappings with ``name`` and ``url``, optionally ``logo``, ``country``, ``tags``,
+        ``codec`` and ``bitrate``."""
+
+    def top(self, limit: int) -> List[Dict[str, Any]]:
+        """Popular stations, same mappings."""
 
 
 class StationsChanged(BaseModel):
@@ -66,11 +115,12 @@ class Radio(CoreModule):
     """Internet radio stations."""
 
     name = 'radio'
-    interface_version = '1.0'
+    interface_version = '2.0'
     concurrency = 'threadsafe'
     requires = ('player',)
 
     changed = event('changed', StationsChanged)
+    directories = extension_point('directories', RadioDirectory)
 
     def __init__(self):
         self._ctx: Any = None
@@ -186,6 +236,73 @@ class Radio(CoreModule):
         with self._lock:
             self._stations.pop(station, None)
         self._store()
+
+    # -- finding, importing and exporting stations ------------------------------------------------
+
+    def _known_urls(self) -> set:
+        with self._lock:
+            return {normalize_url(value['url']) for value in self._stations.values()}
+
+    def _ask(self, directory: Optional[str], call) -> SearchResult:
+        answers, errors = directories.ask(self.directories.items(), directory, call, 'radio')
+        known = self._known_urls()
+        rows = directories.interleave(answers, lambda row: normalize_url(row['url']),
+                                      lambda row: bool(row.get('name') and row.get('url')))
+        hits = [StationHit(**{k: v for k, v in row.items() if k in StationHit.model_fields},
+                           added=normalize_url(row['url']) in known) for row in rows]
+        return SearchResult(hits=hits, errors=errors)
+
+    @query(path='/directories')
+    def list_directories(self) -> List[DirectoryInfo]:
+        """The places stations can be searched in (added by plugins)."""
+        return [DirectoryInfo(id=key, label=getattr(item, 'label', key)) for key, item in self.directories.items()]
+
+    @query(path='/search')
+    def search(self, term: str, directory: Optional[str] = None, limit: int = 20) -> SearchResult:
+        """Search the directories for stations."""
+        term = term.strip()
+        if not term:
+            return SearchResult(hits=[])
+        return self._ask(directory, lambda item: item.search(term, max(1, min(limit, 50))))
+
+    @query(path='/top')
+    def top(self, directory: Optional[str] = None, limit: int = 20) -> SearchResult:
+        """Popular stations of the directories."""
+        return self._ask(directory, lambda item: item.top(max(1, min(limit, 50))))
+
+    @action(path='/import_playlist')
+    def import_playlist(self, content: str) -> ImportResult:
+        """Add all streams of an M3U or PLS file as stations; known addresses are skipped."""
+        try:
+            entries = parse_stations(content)
+        except ValueError as error:
+            raise OperationError(422, 'invalid_playlist', str(error)) from None
+        added, known, skipped, invalid = [], self._known_urls(), 0, 0
+        with self._lock:
+            for entry in entries:
+                try:
+                    url = _check_url(entry['url'], 'The station URL')
+                except OperationError:
+                    invalid += 1
+                    continue
+                if normalize_url(url) in known:
+                    skipped += 1
+                    continue
+                known.add(normalize_url(url))
+                base = _slug(entry['name'])
+                key, number = base, 2
+                while key in self._stations:
+                    key, number = f'{base}-{number}', number + 1
+                self._stations[key] = {'name': entry['name'], 'url': url}
+                added.append(entry['name'])
+        if added:
+            self._store()
+        return ImportResult(added=added, already_there=skipped, invalid=invalid)
+
+    @query(path='/export_playlist')
+    def export_playlist(self) -> Playlist:
+        """The stations as an M3U file."""
+        return Playlist(content=render_m3u({'name': s.name, 'url': s.url} for s in self._list()))
 
     @action()
     def play(self, station: str) -> None:

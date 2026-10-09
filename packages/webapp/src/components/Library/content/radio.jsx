@@ -1,7 +1,8 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -18,9 +19,11 @@ import AddIcon from '@mui/icons-material/Add';
 import RadioIcon from '@mui/icons-material/Radio';
 
 import PubSubContext from '../../../context/pubsub/context';
-import request from '../../../utils/request';
+import request, { requestErrorMessage } from '../../../utils/request';
 import { RADIO_TOPIC } from '../../../config';
 import ConfirmDialog from './confirm-dialog';
+import DirectorySearch from './directory-search';
+import { radioKind } from './directory-kinds';
 import FormDialog from './form-dialog';
 import ItemMenu from './item-menu';
 
@@ -31,6 +34,10 @@ const Radio = ({ musicFilter }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [directories, setDirectories] = useState([]);
+  const [notice, setNotice] = useState(null);
+  const fileInput = useRef(null);
   const { state: { [RADIO_TOPIC]: changed } = {} } = useContext(PubSubContext);
 
   const load = useCallback(async () => {
@@ -49,6 +56,31 @@ const Radio = ({ musicFilter }) => {
       load();
     }
   }, [changed, load]);
+
+  useEffect(() => {
+    request('radioDirectories').then(({ result }) => setDirectories(result || []));
+  }, []);
+
+  const importFile = async (event) => {
+    const [file] = event.target.files;
+    event.target.value = '';
+    if (!file) return;
+    const { result, error: requestError } = await request('importRadioPlaylist', { content: await file.text() });
+    if (requestError) setNotice({ severity: 'error', text: requestErrorMessage(requestError) || t('library.radio.import-failed') });
+    else if (result.added.length) setNotice({ severity: 'success', text: t('library.radio.imported', { count: result.added.length }) });
+    else setNotice({ severity: 'info', text: t('library.radio.import-nothing') });
+    load();
+  };
+
+  const exportFile = async () => {
+    const { result } = await request('exportRadioPlaylist');
+    if (!result) return;
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([result.content], { type: 'audio/x-mpegurl' }));
+    link.download = 'lauschkiste-radio.m3u';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
 
   const visible = useMemo(() => {
     const query = musicFilter.toLowerCase();
@@ -78,11 +110,27 @@ const Radio = ({ musicFilter }) => {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', paddingX: 1 }}>
-        <Button onClick={() => setEditing({})} startIcon={<AddIcon />}>
+      <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'flex-end', paddingX: 1 }}>
+        <Button onClick={() => (directories.length ? setIsSearching(true) : setEditing({}))} startIcon={<AddIcon />}>
           {t('library.radio.add')}
         </Button>
+        <ItemMenu
+          items={[
+            { label: t('library.radio.by-address'), onClick: () => setEditing({}) },
+            { label: t('library.radio.import-playlist'), onClick: () => fileInput.current?.click() },
+            { label: t('library.radio.export-playlist'), onClick: exportFile },
+          ]}
+          label={t('library.content.more')}
+        />
+        <input accept=".m3u,.m3u8,.pls,audio/x-mpegurl,audio/x-scpls,text/plain" hidden onChange={importFile}
+          ref={fileInput} type="file" />
       </Box>
+      {notice && <Alert onClose={() => setNotice(null)} severity={notice.severity} sx={{ margin: 1 }}>{notice.text}</Alert>}
+      {!directories.length && !stations.length &&
+        <Typography color="text.secondary" sx={{ padding: 1 }} variant="body2">
+          {t('library.radio.directories-missing')}
+        </Typography>
+      }
       {!stations.length && <Typography sx={{ padding: 1 }}>{t('library.radio.empty')}</Typography>}
       {stations.length > 0 && !visible.length && <Typography>{t('library.albums.no-music')}</Typography>}
       <List sx={{ width: '100%' }}>
@@ -115,6 +163,17 @@ const Radio = ({ musicFilter }) => {
           </ListItem>
         ))}
       </List>
+      <DirectorySearch
+        directories={directories}
+        kind={radioKind}
+        onAddByAddress={() => {
+          setIsSearching(false);
+          setEditing({});
+        }}
+        onChanged={load}
+        onClose={() => setIsSearching(false)}
+        open={isSearching}
+      />
       <FormDialog
         fields={fields}
         initialValues={editing || {}}

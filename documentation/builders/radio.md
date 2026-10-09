@@ -37,3 +37,20 @@ stations:
     name: Deutschlandfunk
     url: https://st01.sslstream.dlf.de/dlf/01/128/mp3/stream.mp3
 ```
+
+## Find stations
+
+With the plugin `radio_directories` (Settings → Plugins, or `lauschctl plugin enable radio_directories`) the
+button "Add station" opens a search in [radio-browser.info](https://www.radio-browser.info), an open directory of
+internet radio stations (no sign-in). Type a name, or a topic such as "kinder": stations whose name or tags
+match are listed, with logo, country, codec and bitrate. Without a search term the popular stations of your
+country are shown. One tap adds a station; stations you already have show a check mark.
+
+The country for the popular stations and the switch for the directory are in the settings of the plugin. What
+you type is sent to radio-browser.info. "Add by address" in the menu is still there for any stream address.
+
+### Station lists (M3U and PLS)
+
+The menu next to the button imports an `.m3u` or `.pls` file, the list format radio apps and players use, and
+exports your stations as an `.m3u` file. Imported stations are named from the file; addresses you already have
+are skipped.

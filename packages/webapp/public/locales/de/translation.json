@@ -285,7 +285,23 @@
       "logo": "Logo-Adresse (optional)",
       "menu": "Aktionen für {{name}}",
       "delete-title": "{{name}} löschen?",
-      "delete-text": "Karten, die diesen Sender abspielen, funktionieren danach nicht mehr."
+      "delete-text": "Karten, die diesen Sender abspielen, funktionieren danach nicht mehr.",
+      "search": {
+        "title": "Radiosender finden",
+        "label": "Suchen",
+        "popular": "Beliebt",
+        "none": "Nichts gefunden",
+        "choose": "Hinzufügen",
+        "done": "Hinzugefügt",
+        "by-address": "Per Adresse hinzufügen"
+      },
+      "by-address": "Per Adresse hinzufügen",
+      "import-playlist": "Aus einer M3U- oder PLS-Datei importieren",
+      "export-playlist": "Als M3U-Datei exportieren",
+      "directories-missing": "Zum Suchen von Sendern das Plugin \"radio_directories\" unter Einstellungen → Plugins einschalten.",
+      "imported": "{{count}} Sender hinzugefügt.",
+      "import-nothing": "Nichts Neues in der Datei.",
+      "import-failed": "Die Datei konnte nicht gelesen werden."
     },
     "podcasts": {
       "empty": "Noch keine Podcasts. Abonniere einen Podcast mit der Adresse seines Feeds.",
@@ -315,8 +331,9 @@
         "label": "Suchen",
         "popular": "Beliebt",
         "none": "Nichts gefunden",
-        "subscribed": "Abonniert",
-        "by-address": "Per Adresse hinzufügen"
+        "by-address": "Per Adresse hinzufügen",
+        "choose": "Abonnieren",
+        "done": "Abonniert"
       },
       "directories-missing": "Zum Suchen von Podcasts das Plugin \"podcast_directories\" unter Einstellungen → Plugins einschalten.",
       "import-opml": "Aus einer OPML-Datei importieren",

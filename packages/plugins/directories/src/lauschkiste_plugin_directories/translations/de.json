@@ -89,6 +89,46 @@
           "help": "Gehört zum Schlüssel. Leer lassen, um das gespeicherte zu behalten."
         }
       }
+    },
+    "radio_directories": {
+      "name": "Radiosender finden (radio-browser.info)",
+      "description": "Radiosender in radio-browser.info suchen und mit einem Tipp hinzufügen.",
+      "fields": {
+        "radiobrowser": {
+          "label": "radio-browser.info",
+          "help": "Offenes Verzeichnis von Internetradios, ohne Anmeldung",
+          "enabled": {
+            "label": "In radio-browser.info suchen",
+            "help": "Was du eintippst, geht an radio-browser.info"
+          },
+          "country": {
+            "label": "Land",
+            "help": "Bestimmt, welche Sender beliebt sind",
+            "values": {
+              "de": "Deutschland",
+              "at": "Österreich",
+              "ch": "Schweiz",
+              "us": "USA",
+              "gb": "Großbritannien",
+              "fr": "Frankreich",
+              "it": "Italien",
+              "es": "Spanien",
+              "nl": "Niederlande",
+              "be": "Belgien",
+              "dk": "Dänemark",
+              "se": "Schweden",
+              "no": "Norwegen",
+              "fi": "Finnland",
+              "pl": "Polen",
+              "cz": "Tschechien",
+              "pt": "Portugal",
+              "ie": "Irland",
+              "ca": "Kanada",
+              "au": "Australien"
+            }
+          }
+        }
+      }
     }
   }
 }

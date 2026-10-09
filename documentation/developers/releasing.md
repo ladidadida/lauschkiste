@@ -47,7 +47,7 @@ publishing"). What has to be done once, by the owner of the PyPI account:
    | `lauschkiste-plugin-rfid-readers` | `testpypi-lauschkiste-plugin-rfid-readers` | `pypi-lauschkiste-plugin-rfid-readers` |
    | `lauschkiste-plugin-samba` | `testpypi-lauschkiste-plugin-samba` | `pypi-lauschkiste-plugin-samba` |
    | `lauschkiste-plugin-audiobookshelf` | `testpypi-lauschkiste-plugin-audiobookshelf` | `pypi-lauschkiste-plugin-audiobookshelf` |
-   | `lauschkiste-plugin-podcast-directories` | `testpypi-lauschkiste-plugin-podcast-directories` | `pypi-lauschkiste-plugin-podcast-directories` |
+   | `lauschkiste-plugin-directories` | `testpypi-lauschkiste-plugin-directories` | `pypi-lauschkiste-plugin-directories` |
 
    PyPI allows **three pending publishers at a time** (an entry no longer counts once its first upload
    has created the project). So register three, upload, register the next three and upload again; see

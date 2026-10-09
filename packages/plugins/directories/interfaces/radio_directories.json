@@ -1,0 +1,11 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "plugin",
+  "name": "radio_directories",
+  "operations": {},
+  "requires": {
+    "radio": ">=2.0,<3"
+  }
+}

@@ -285,7 +285,23 @@
       "logo": "Logo address (optional)",
       "menu": "Actions for {{name}}",
       "delete-title": "Delete {{name}}?",
-      "delete-text": "Cards playing this station stop working."
+      "delete-text": "Cards playing this station stop working.",
+      "search": {
+        "title": "Find a radio station",
+        "label": "Search",
+        "popular": "Popular",
+        "none": "Nothing found",
+        "choose": "Add",
+        "done": "Added",
+        "by-address": "Add by address"
+      },
+      "by-address": "Add by address",
+      "import-playlist": "Import from an M3U or PLS file",
+      "export-playlist": "Export as an M3U file",
+      "directories-missing": "To search for stations, switch on the plugin \"radio_directories\" in Settings → Plugins.",
+      "imported": "Added {{count}} stations.",
+      "import-nothing": "Nothing new in the file.",
+      "import-failed": "The file could not be read."
     },
     "podcasts": {
       "empty": "No podcasts yet. Subscribe to a podcast with the address of its feed.",
@@ -315,8 +331,9 @@
         "label": "Search",
         "popular": "Popular",
         "none": "Nothing found",
-        "subscribed": "Subscribed",
-        "by-address": "Add by address"
+        "by-address": "Add by address",
+        "choose": "Subscribe",
+        "done": "Subscribed"
       },
       "directories-missing": "To search for podcasts, switch on the plugin \"podcast_directories\" in Settings → Plugins.",
       "import-opml": "Import from an OPML file",

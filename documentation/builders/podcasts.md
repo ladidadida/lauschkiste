@@ -67,7 +67,7 @@ Each directory has a switch and the setting that fits it in the settings of the 
 | Podcast Index | needs a free key and secret from podcastindex.org (off until you enter them) | `podcastindex.enabled`, `podcastindex.language`, `podcastindex_key`, `podcastindex_secret` |
 
 Every directory has its own interface, so a further one needs code: see
-[Podcast directories](../developers/core-and-plugins.md#podcast-directories).
+[Podcast and radio directories](../developers/core-and-plugins.md#podcast-and-radio-directories).
 
 Every search goes to the directories that are switched on, so switch off those you do not want to ask.
 A directory that does not answer is named in the dialog and the others still show their results.

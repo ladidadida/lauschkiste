@@ -6,10 +6,10 @@ from urllib.parse import parse_qs, urlsplit
 
 import pytest
 
-pytest.importorskip('lauschkiste_plugin_podcast_directories', reason="the podcast-directories plugin is not installed")
+pytest.importorskip('lauschkiste_plugin_directories', reason="the directories plugin is not installed")
 
-from lauschkiste_plugin_podcast_directories import PodcastDirectories
-from lauschkiste_plugin_podcast_directories.directories import DirectoryError, Fyyd, ITunes, PodcastIndex
+from lauschkiste_plugin_directories import PodcastDirectories, RadioDirectories
+from lauschkiste_plugin_directories.directories import DirectoryError, Fyyd, ITunes, PodcastIndex, RadioBrowser
 
 ROUTES = {}
 SEEN = []
@@ -121,3 +121,69 @@ def test_directories_follow_the_settings(tmp_path):
     plugin.settings_changed({})
     assert sorted(registered) == ['fyyd', 'podcastindex']
     assert {call.args[0] for call in points.unregister.call_args_list} >= {'itunes', 'podcastindex'}
+
+
+STATION = {'stationuuid': 'u1', 'name': ' Die Maus ', 'url': 'http://x/old', 'url_resolved': 'https://x/maus.mp3',
+           'favicon': 'https://x/maus.png', 'countrycode': 'DE', 'tags': 'kids,kinder', 'codec': 'MP3', 'bitrate': 128}
+
+
+def test_radio_browser_search_by_name_then_tag_without_duplicates(server):
+    other = {**STATION, 'stationuuid': 'u2', 'name': 'TOGGO', 'url_resolved': 'https://x/toggo.mp3', 'favicon': ''}
+    video = {**STATION, 'stationuuid': 'u3', 'name': 'TV', 'bitrate': 1672}
+
+    class Both(Handler):
+        def do_GET(self):
+            query = parse_qs(urlsplit(self.path).query)
+            SEEN.append((urlsplit(self.path).path, query, dict(self.headers)))
+            rows = [STATION] if 'name' in query else [STATION, other, video]
+            data = json.dumps(rows).encode()
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(data)))
+            self.end_headers()
+            self.wfile.write(data)
+
+    httpd = ThreadingHTTPServer(('127.0.0.1', 0), Both)
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    try:
+        directory = RadioBrowser('rb', url=f'http://127.0.0.1:{httpd.server_port}', country='de')
+        rows = directory.search('kinder', 5)
+        assert [r['name'] for r in rows] == ['Die Maus', 'TOGGO']
+        assert rows[0] == {'name': 'Die Maus', 'url': 'https://x/maus.mp3', 'logo': 'https://x/maus.png',
+                           'country': 'DE', 'tags': 'kids,kinder', 'codec': 'MP3', 'bitrate': 128}
+        assert rows[1]['logo'] is None
+        assert 'name' in SEEN[0][1]
+        assert 'tag' in SEEN[1][1] and SEEN[0][1]['hidebroken'] == ['true']
+        directory.top(3)
+        assert SEEN[-1][1]['countrycode'] == ['DE'] and SEEN[-1][1]['limit'] == ['3']
+    finally:
+        httpd.shutdown()
+
+
+def test_radio_browser_tries_the_next_server(server):
+    ROUTES['/json/stations/search'] = [STATION]
+    directory = RadioBrowser('rb')
+    directory.servers = ('http://127.0.0.1:9', server)
+    assert [r['name'] for r in directory.top(2)] == ['Die Maus']
+    directory.servers = ('http://127.0.0.1:9',)
+    with pytest.raises(DirectoryError, match='not reachable'):
+        directory.top(2)
+
+
+def test_the_radio_plugin_registers_radio_browser_and_follows_its_switch():
+    from unittest.mock import MagicMock
+
+    values = {'enabled': True, 'country': 'at'}
+    registered = {}
+    points = MagicMock()
+    points.register.side_effect = lambda key, directory: registered.update({key: directory})
+    ctx = MagicMock()
+    ctx.modules.radio.directories = points
+    ctx.config.get.side_effect = lambda *keys, default=None: values.get(keys[1], default)
+    plugin = RadioDirectories()
+    plugin.start(ctx)
+    assert list(registered) == ['radiobrowser'] and registered['radiobrowser'].country == 'AT'
+    values['enabled'] = False
+    registered.clear()
+    plugin.settings_changed({})
+    assert registered == {} and points.unregister.call_args.args == ('radiobrowser',)

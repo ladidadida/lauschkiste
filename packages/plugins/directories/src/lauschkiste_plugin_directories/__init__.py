@@ -1,4 +1,4 @@
-"""Find podcasts in directories and subscribe to them.
+"""Find podcasts and radio stations in directories and add them.
 
 Each directory can be switched off and has the settings that matter for it::
 
@@ -17,7 +17,7 @@ from typing import List, Literal, get_args
 from pydantic import BaseModel, Field
 
 from lauschkiste.contract import Plugin
-from lauschkiste_plugin_podcast_directories.directories import Fyyd, ITunes, PodcastIndex
+from lauschkiste_plugin_directories.directories import Fyyd, ITunes, PodcastIndex, RadioBrowser
 
 logger = logging.getLogger('lauschkiste.podcast_directories')
 
@@ -97,3 +97,45 @@ class PodcastDirectories(Plugin):
                 key=lambda: config.get('podcastindex_key', default=''),
                 secret=lambda: config.get('podcastindex_secret', default='')))
             self._registered.append('podcastindex')
+
+
+class RadioBrowserSettings(BaseModel):
+    enabled: bool = Field(True, title='Search in radio-browser.info',
+                          description='What you type is sent to radio-browser.info')
+    country: Country = Field('de', title='Country', description='Decides which stations are popular')
+
+
+class RadioDirectoriesSettings(BaseModel):
+    radiobrowser: RadioBrowserSettings = Field(default_factory=RadioBrowserSettings, title='radio-browser.info')
+
+
+class RadioDirectories(Plugin):
+    """Search for radio stations in radio-browser.info."""
+
+    name = 'radio_directories'
+    title = 'Find radio stations'
+    interface_version = '1.0'
+    requires = {'radio': '>=2.0,<3'}
+    settings = RadioDirectoriesSettings
+
+    def __init__(self):
+        self._registered: List[str] = []
+
+    def start(self, ctx) -> None:
+        self._ctx = ctx
+        self._register()
+
+    def settings_changed(self, changed) -> bool:
+        self._register()
+        return True
+
+    def _register(self) -> None:
+        points = self._ctx.modules.radio.directories
+        for key in self._registered:
+            points.unregister(key)
+        self._registered = []
+        config = self._ctx.config
+        if config.get('radiobrowser', 'enabled', default=True):
+            points.register('radiobrowser', RadioBrowser('radio-browser.info',
+                                                         country=config.get('radiobrowser', 'country', default='de')))
+            self._registered.append('radiobrowser')

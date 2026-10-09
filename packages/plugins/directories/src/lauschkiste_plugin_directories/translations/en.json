@@ -89,6 +89,46 @@
           "help": "Belongs to the key. Leave empty to keep the current one."
         }
       }
+    },
+    "radio_directories": {
+      "name": "Find radio stations (radio-browser.info)",
+      "description": "Search for radio stations in radio-browser.info and add them with one tap.",
+      "fields": {
+        "radiobrowser": {
+          "label": "radio-browser.info",
+          "help": "Open directory of internet radio stations, no sign-in",
+          "enabled": {
+            "label": "Search in radio-browser.info",
+            "help": "What you type is sent to radio-browser.info"
+          },
+          "country": {
+            "label": "Country",
+            "help": "Decides which stations are popular",
+            "values": {
+              "de": "Germany",
+              "at": "Austria",
+              "ch": "Switzerland",
+              "us": "USA",
+              "gb": "United Kingdom",
+              "fr": "France",
+              "it": "Italy",
+              "es": "Spain",
+              "nl": "Netherlands",
+              "be": "Belgium",
+              "dk": "Denmark",
+              "se": "Sweden",
+              "no": "Norway",
+              "fi": "Finland",
+              "pl": "Poland",
+              "cz": "Czechia",
+              "pt": "Portugal",
+              "ie": "Ireland",
+              "ca": "Canada",
+              "au": "Australia"
+            }
+          }
+        }
+      }
     }
   }
 }

@@ -15,8 +15,8 @@ members = [
     "lauschkiste-plugin-audiobookshelf",
     "lauschkiste-plugin-board-raspberry-pi",
     "lauschkiste-plugin-devices",
+    "lauschkiste-plugin-directories",
     "lauschkiste-plugin-mpd",
-    "lauschkiste-plugin-podcast-directories",
     "lauschkiste-plugin-rfid-readers",
     "lauschkiste-plugin-samba",
 ]
@@ -1009,6 +1009,21 @@ requires-dist = [
 provides-extras = ["gpio", "battery"]
 
 [[package]]
+name = "lauschkiste-plugin-directories"
+version = "0.1.0a3"
+source = { editable = "packages/plugins/directories" }
+dependencies = [
+    { name = "lauschkiste-core" },
+    { name = "requests" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
+    { name = "requests" },
+]
+
+[[package]]
 name = "lauschkiste-plugin-mpd"
 version = "0.1.0a3"
 source = { editable = "packages/plugins/mpd" }
@@ -1021,21 +1036,6 @@ dependencies = [
 requires-dist = [
     { name = "lauschkiste-core", editable = "packages/lauschkiste" },
     { name = "python-mpd2" },
-]
-
-[[package]]
-name = "lauschkiste-plugin-podcast-directories"
-version = "0.1.0a3"
-source = { editable = "packages/plugins/podcast-directories" }
-dependencies = [
-    { name = "lauschkiste-core" },
-    { name = "requests" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
-    { name = "requests" },
 ]
 
 [[package]]

@@ -164,6 +164,24 @@ const commands = {
     rest: { method: 'DELETE', path: '/api/v1/radio/stations/{station}' },
     argKeys: ['station'],
   },
+  radioDirectories: {
+    rest: { method: 'GET', path: '/api/v1/radio/directories' },
+  },
+  radioSearch: {
+    rest: { method: 'GET', path: '/api/v1/radio/search' },
+    argKeys: ['term', 'directory'],
+  },
+  radioTop: {
+    rest: { method: 'GET', path: '/api/v1/radio/top' },
+    argKeys: ['directory'],
+  },
+  importRadioPlaylist: {
+    rest: { method: 'POST', path: '/api/v1/radio/import_playlist' },
+    argKeys: ['content'],
+  },
+  exportRadioPlaylist: {
+    rest: { method: 'GET', path: '/api/v1/radio/export_playlist' },
+  },
   radio_play: {
     rest: { method: 'POST', path: '/api/v1/radio/play' },
     cardAction: 'radio.play',
