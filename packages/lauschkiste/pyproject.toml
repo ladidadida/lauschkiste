@@ -1,7 +1,7 @@
 [project]
 name = "lauschkiste-core"
 # Keep in sync with src/lauschkiste/version.py
-version = "0.1.0a3"
+version = "0.1.0a4"
 description = "Lauschkiste core: player, library, cards, volume, timers and the web API of the RFID audio player"
 license = "MIT"
 requires-python = ">=3.11"
