@@ -150,7 +150,14 @@ install_from_index() {
     local requirement=lauschkiste args=()
     [[ "$VERSION" == latest ]] || requirement="lauschkiste==${VERSION}"
     case "$FROM" in
-        pypi) args+=(--index-strategy unsafe-best-match) ;;  # piwheels (32-bit ARM) lists projects without every version
+        pypi)
+            # piwheels (32-bit ARM) lists the Lauschkiste projects without their newest versions and would hide them
+            case "$(uname -m)" in
+                armv6l|armv7l)
+                    for name in lauschkiste lauschkiste-core "${BUNDLED_PLUGINS[@]}"; do
+                        args+=(--find-links "https://pypi.org/simple/${name}/")
+                    done ;;
+            esac ;;
         testpypi)
             # TestPyPI holds test copies of many projects (a "fastapi" 1.0 that does not build): PyPI, and
             # piwheels on 32-bit ARM, come first and TestPyPI only supplies what they lack, the Lauschkiste packages
