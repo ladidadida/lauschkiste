@@ -14,7 +14,6 @@ from typing import Any, Dict, List, NamedTuple, Optional
 
 from lauschkiste.contract import OperationError
 from lauschkiste_plugin_audiobookshelf.client import AudiobookshelfError, Client
-from lauschkiste_plugin_audiobookshelf.downloads import DownloadCache
 from lauschkiste_plugin_audiobookshelf.ledger import Ledger, winner
 
 logger = logging.getLogger('lauschkiste.audiobookshelf')
@@ -84,19 +83,19 @@ class AudiobookshelfSource:
         self._tracks: Dict[str, tuple] = {}
         self._down_until = 0.0
         self.last_error: Optional[str] = None
-        self.cache: Optional[DownloadCache] = None
         self.ledger: Optional[Ledger] = None
         self.prefer_downloaded = True
+        self._list_file: Optional[Path] = None
+        #: ``local_files(book)`` and ``cached_books()`` answer from the download cache of the core
+        self.local_files = lambda book: None
+        self.cached_books = lambda: []
 
-    def attach(self, cache: DownloadCache) -> None:
-        self.cache = cache
-        self.ledger = Ledger(cache.root / 'positions.json')
+    def attach(self, positions: Path, book_list: Path) -> None:
+        """Where the box keeps what it knows: the positions and the list of books."""
+        self.ledger = Ledger(positions)
+        self._list_file = book_list
 
     # -- the server -----------------------------------------------------------------------------
-
-    def credentials(self):
-        client = self._client
-        return (client.base, client.key) if client else ('', '')
 
     def configure(self, server_url: str, api_key: str, refresh_minutes: float) -> None:
         with self._lock:
@@ -122,13 +121,6 @@ class AudiobookshelfSource:
 
     def _ok(self) -> None:
         self._down_until, self.last_error = 0.0, None
-
-    def book_size(self, book: str) -> int:
-        """Bytes of the audio files of a book on the server."""
-        item = self.client().item(book)
-        if item is None:
-            raise OperationError(404, 'unknown_audiobook', f"No audiobook '{book}' on the Audiobookshelf server")
-        return sum(int(f['metadata'].get('size') or 0) for f in (item.get('media') or {}).get('audioFiles') or [])
 
     # -- positions ------------------------------------------------------------------------------
 
@@ -198,10 +190,6 @@ class AudiobookshelfSource:
 
     # -- the book list --------------------------------------------------------------------------
 
-    @property
-    def _list_file(self) -> Optional[Path]:
-        return self.cache.root / 'books.json' if self.cache is not None else None
-
     def _remember_items(self, items: List[Dict[str, Any]]) -> None:
         path = self._list_file
         if path is None:
@@ -214,7 +202,7 @@ class AudiobookshelfSource:
         except OSError as error:
             logger.warning(f"Could not save the book list: {error}")
 
-    def _known_items(self) -> List[Dict[str, Any]]:
+    def known_items(self) -> List[Dict[str, Any]]:
         with self._lock:
             if self._items is not None:
                 return self._items
@@ -240,14 +228,14 @@ class AudiobookshelfSource:
     def list_books(self) -> List[Dict[str, Any]]:
         if self._client is None:
             return []
-        items, progress = self._known_items(), None
+        items, progress = self.known_items(), None
         if self.reachable():
             try:
                 items, progress = self._all_items(self._client), self._client.progress()
                 self._ok()
             except AudiobookshelfError as error:
                 self._failed(error)
-                items = self._known_items()
+                items = self.known_items()
         books = [self._describe(item, progress) for item in items]
         books += self._only_downloaded({item['id'] for item in items})
         online = progress is not None
@@ -269,28 +257,20 @@ class AudiobookshelfSource:
                 'chapters': int(media.get('numAudioFiles') or 0), 'duration': duration or None,
                 'chapter': chapter, 'elapsed': elapsed, 'listened': listened, 'finished': finished,
                 'cover_url': f'{COVER_ROUTE}/{book}',
-                'downloaded': bool(self.cache and self.cache.complete(book))}
+                'downloaded': bool(self.local_files(book))}
 
     def _only_downloaded(self, known: set) -> List[Dict[str, Any]]:
         """Downloaded books the list does not know (yet): they play without the server."""
         books = []
-        for book in (self.cache.books() if self.cache else []):
-            meta = self.cache.complete(book)
-            if meta and book not in known:
-                local = self.ledger.get(book) if self.ledger else None
-                finished = bool(local and local.get('finished'))
-                books.append({'book': book, 'title': meta.get('title') or book, 'chapters': len(meta['files']),
-                              'duration': sum(float(f.get('duration') or 0) for f in meta['files']) or None,
-                              'chapter': 0, 'elapsed': 0.0, 'listened': float(local.get('position') or 0) if local else 0.0,
-                              'finished': finished, 'cover_url': None, 'downloaded': True})
+        for cached in self.cached_books():
+            if cached.item in known:
+                continue
+            local = self.ledger.get(cached.item) if self.ledger else None
+            books.append({'book': cached.item, 'title': cached.title or cached.item, 'chapters': len(cached.files),
+                          'duration': sum(float(f.duration or 0) for f in cached.files) or None,
+                          'chapter': 0, 'elapsed': 0.0, 'listened': float(local.get('position') or 0) if local else 0.0,
+                          'finished': bool(local and local.get('finished')), 'cover_url': None, 'downloaded': True})
         return books
-
-    def update_available(self, book: str) -> bool:
-        meta = self.cache.complete(book) if self.cache else None
-        if not meta or meta.get('updatedAt') is None:
-            return False
-        item = next((i for i in self._known_items() if i.get('id') == book), None)
-        return bool(item and item.get('updatedAt') and item['updatedAt'] != meta['updatedAt'])
 
     def status(self) -> Dict[str, Any]:
         """Whether the server is configured and answers (the answer to the last request, not a new one)."""
@@ -301,13 +281,13 @@ class AudiobookshelfSource:
     # -- the files ------------------------------------------------------------------------------
 
     def _downloaded(self, book: str) -> Optional[List[Track]]:
-        meta = self.cache.complete(book) if self.cache is not None and self.prefer_downloaded else None
-        if not meta:
+        cached = self.local_files(book) if self.prefer_downloaded else None
+        if not cached:
             return None
         tracks, start = [], 0.0
-        for entry in meta['files']:
-            duration = float(entry.get('duration') or 0)
-            tracks.append(Track(str(self.cache.directory(book) / entry['name']), start, duration))
+        for entry in cached.files:
+            duration = float(entry.duration or 0)
+            tracks.append(Track(entry.path, start, duration))
             start += duration
         return tracks or None
 
@@ -373,11 +353,11 @@ class AudiobookshelfSource:
         return [track.url for track in self.tracks(book)]
 
     def title(self, book: str) -> str:
-        for item in self._known_items():
+        for item in self.known_items():
             if item.get('id') == book:
                 return (item.get('media', {}).get('metadata') or {}).get('title') or book
-        meta = self.cache.meta(book) if self.cache else None
-        return (meta or {}).get('title') or book
+        cached = self.local_files(book)
+        return (cached.title if cached else '') or book
 
     # -- the resolver ---------------------------------------------------------------------------
 

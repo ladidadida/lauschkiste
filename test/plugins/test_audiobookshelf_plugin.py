@@ -1,6 +1,5 @@
 import json
 import threading
-import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
@@ -8,8 +7,8 @@ import pytest
 pytest.importorskip('lauschkiste_plugin_audiobookshelf', reason="the audiobookshelf plugin package is not installed")
 
 from lauschkiste.contract import OperationError
-from lauschkiste_plugin_audiobookshelf.downloader import Download, DownloadError
-from lauschkiste_plugin_audiobookshelf.downloads import DownloadCache, DownloadManager
+from lauschkiste.cache import CachedFile, CachedItem
+from lauschkiste_plugin_audiobookshelf.provider import AudiobookshelfProvider
 from lauschkiste_plugin_audiobookshelf.source import AudiobookshelfSource
 
 KEY = 'secret-key'
@@ -82,7 +81,13 @@ class FakeServer(BaseHTTPRequestHandler):
             if self.command == 'PATCH':
                 type(self).progress['book1'] = {'libraryItemId': 'book1', 'currentTime': body['currentTime'],
                                                 'isFinished': body['isFinished']}
-                return self.reply(200, {})
+                data = b'OK'  # the real server answers with plain text
+                self.send_response(200)
+                self.send_header('Content-Type', 'text/plain')
+                self.send_header('Content-Length', str(len(data)))
+                self.end_headers()
+                self.wfile.write(data)
+                return
             entry = type(self).progress.get('book1')
             return self.reply(200 if entry else 404, entry)
         self.reply(404, {})
@@ -167,77 +172,12 @@ def test_wrong_key_is_reported(server):
     assert 'refused the API key' in source.status()['error']
 
 
-# -- downloads --------------------------------------------------------------------------------
-
-def fetch(server, directory, key=KEY):
-    Download(server, key, 'book1', directory, directory.parent / 'rate').run()
-
-
-def test_download_writes_all_files_and_marks_the_book_complete(server, tmp_path):
-    cache = DownloadCache(tmp_path)
-    fetch(server, cache.directory('book1'))
-    meta = cache.complete('book1')
-    assert [f['name'] for f in meta['files']] == ['001_10.mp3', '002_20.mp3', '003_30.mp3']
-    assert (cache.directory('book1') / '001_10.mp3').read_bytes() == CONTENT['10']
-    assert cache.status_of('book1')['state'] == 'done'
-    assert cache.used_bytes() == sum(len(c) for c in CONTENT.values())
-    assert not list(cache.directory('book1').glob('*.part'))
-
-
-def test_a_partial_file_is_continued_with_a_range_request(server, tmp_path):
-    cache = DownloadCache(tmp_path)
-    directory = cache.directory('book1')
-    directory.mkdir(parents=True)
-    (directory / '002_20.mp3.part').write_bytes(CONTENT['20'][:1000])
-    fetch(server, directory)
-    assert (directory / '002_20.mp3').read_bytes() == CONTENT['20']
-    assert 'bytes=1000-' in FakeServer.ranges
-
-
-def test_download_with_a_wrong_key_reports_an_error(server, tmp_path):
-    with pytest.raises(DownloadError, match='refused'):
-        fetch(server, tmp_path / 'b', key='wrong')
-
-
-def test_the_rate_file_slows_the_download_down(server, tmp_path):
-    cache = DownloadCache(tmp_path)
-    cache.set_rate(100)
-    directory = cache.directory('book1')
-    directory.parent.mkdir(exist_ok=True)
-    Download(server, KEY, 'book1', directory, cache.rate_file).run()
-    assert cache.complete('book1')
-
-
-def test_manager_downloads_in_a_process_and_the_source_then_plays_the_files(server, tmp_path):
-    source = AudiobookshelfSource()
-    source.configure(server, KEY, 10)
-    source.attach(DownloadCache(tmp_path))
-    manager = DownloadManager(source.cache, source.credentials)
-    manager.start('book1')
-    deadline = time.monotonic() + 30
-    while time.monotonic() < deadline and not source.cache.complete('book1'):
-        time.sleep(0.1)
-    assert source.cache.complete('book1')
-    assert [s['state'] for s in manager.states()] == ['done']
-
-    files = source.files('book1')
-    assert files == [str(tmp_path / 'book1' / name) for name in ('001_10.mp3', '002_20.mp3', '003_30.mp3')]
-    FakeServer.progress['book1'] = {'libraryItemId': 'book1', 'currentTime': 90.0, 'isFinished': False}
-    assert source.position('book1').load() == {'file': files[1], 'elapsed': 20.0, 'finished': False}
-
-    source.prefer_downloaded = False
-    assert source.files('book1')[0].startswith('abs://')
-    manager.remove('book1')
-    assert source.cache.books() == []
-    manager.close()
-
-
 # -- offline ----------------------------------------------------------------------------------
 
 def offline_source(server, tmp_path):
     source = AudiobookshelfSource()
     source.configure(server, KEY, 10)
-    source.attach(DownloadCache(tmp_path))
+    source.attach(tmp_path / 'positions.json', tmp_path / 'books.json')
     return source
 
 
@@ -322,10 +262,13 @@ def test_the_server_is_not_asked_again_right_after_a_failure(server, tmp_path):
 
 
 def test_downloaded_books_come_first_and_play_without_the_server(server, tmp_path):
-    source = offline_source(server, tmp_path)
-    Download(server, KEY, 'book1', source.cache.directory('book1'), source.cache.rate_file).run()
+    names = ['001_10.mp3', '002_20.mp3', '003_30.mp3']
+    cached = CachedItem(item='book1', title='Bullerbü', files=[
+        CachedFile(path=str(tmp_path / name), duration=duration) for name, duration in zip(names, (70.0, 130.0, 100.0))])
     FakeServer.down = True
     fresh = offline_source(server, tmp_path)
+    fresh.local_files = lambda book: cached if book == 'book1' else None
+    fresh.cached_books = lambda: [cached]
     books = fresh.list_books()
     assert books[0]['book'] == 'book1' and books[0]['downloaded'] is True
     files = fresh.files('book1')
@@ -333,17 +276,33 @@ def test_downloaded_books_come_first_and_play_without_the_server(server, tmp_pat
     fresh.position('book1').save({'file': files[1], 'elapsed': 5.0, 'finished': False})
     assert fresh.position('book1').load() == {'file': files[1], 'elapsed': 5.0, 'finished': False}
 
+    fresh.prefer_downloaded = False
+    FakeServer.down = False
+    fresh._down_until = 0.0
+    assert fresh.files('book1')[0].startswith('abs://')
 
-def test_a_book_that_changed_on_the_server_is_reported(server, tmp_path):
+
+def test_the_provider_plans_the_files_in_order_with_the_key_as_header(server, tmp_path):
     source = offline_source(server, tmp_path)
-    Download(server, KEY, 'book1', source.cache.directory('book1'), source.cache.rate_file).run()
+    plan = AudiobookshelfProvider(source).plan('book1')
+    assert plan.title == 'Bullerbü' and plan.version == '1000'
+    assert [f.name for f in plan.files] == ['001_10.mp3', '002_20.mp3', '003_30.mp3']
+    assert [f.size for f in plan.files] == [1024, 3000, 500]
+    assert plan.files[0].url == f'{server}/api/items/book1/file/10/download'
+    assert plan.files[0].headers == {'Authorization': f'Bearer {KEY}'}
+    with pytest.raises(OperationError) as error:
+        AudiobookshelfProvider(source).plan('nope')
+    assert error.value.status == 404
+
+
+def test_the_provider_reports_the_version_and_what_may_be_removed(server, tmp_path):
+    source = offline_source(server, tmp_path)
+    provider = AudiobookshelfProvider(source)
+    assert provider.version('book1') is None  # nothing known yet
     source.list_books()
-    assert source.update_available('book1') is False
-    BOOK['updatedAt'] = 2000
-    try:
-        source._items = None
-        source._items_at = 0.0
-        source.list_books()
-        assert source.update_available('book1') is True
-    finally:
-        BOOK['updatedAt'] = 1000
+    assert provider.version('book1') == '1000'
+    assert provider.removable('book1') is False
+    source.record('book1', 100.0, 300.0, False)
+    assert provider.removable('book1') is False
+    source.record('book1', 300.0, 300.0, True)
+    assert provider.removable('book1') is True

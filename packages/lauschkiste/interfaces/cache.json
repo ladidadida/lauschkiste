@@ -1,0 +1,305 @@
+{
+  "events": {},
+  "extension_points": {
+    "providers": {
+      "plan": "(self, item: str) -> lauschkiste.cache.CachePlan",
+      "removable": "(self, item: str) -> bool",
+      "version": "(self, item: str) -> str | None"
+    }
+  },
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "cache",
+  "operations": {
+    "cached": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source"
+        ],
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/cache/cached",
+      "returns": {
+        "items": {
+          "properties": {
+            "files": {
+              "items": {
+                "properties": {
+                  "duration": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "path"
+                ],
+                "type": "object"
+              },
+              "type": "array"
+            },
+            "item": {
+              "type": "string"
+            },
+            "title": {
+              "default": "",
+              "type": "string"
+            }
+          },
+          "required": [
+            "item",
+            "files"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "cancel": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "item"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/cache/cancel",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "download": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "item"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/cache/download",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "downloads": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/cache/downloads",
+      "returns": {
+        "properties": {
+          "free_bytes": {
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "done": {
+                  "default": 0,
+                  "type": "integer"
+                },
+                "error": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "item": {
+                  "type": "string"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string"
+                },
+                "total": {
+                  "default": 0,
+                  "type": "integer"
+                },
+                "update_available": {
+                  "default": false,
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "source",
+                "item",
+                "state"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "limit_bytes": {
+            "type": "integer"
+          },
+          "used_bytes": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "used_bytes",
+          "limit_bytes",
+          "free_bytes"
+        ],
+        "type": "object"
+      }
+    },
+    "files": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "item"
+        ],
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/cache/files",
+      "returns": {
+        "anyOf": [
+          {
+            "properties": {
+              "files": {
+                "items": {
+                  "properties": {
+                    "duration": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null
+                    },
+                    "path": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "path"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "item": {
+                "type": "string"
+              },
+              "title": {
+                "default": "",
+                "type": "string"
+              }
+            },
+            "required": [
+              "item",
+              "files"
+            ],
+            "type": "object"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      }
+    },
+    "remove": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "item": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "item"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/cache/remove",
+      "returns": {
+        "type": "null"
+      }
+    }
+  },
+  "requires": {}
+}

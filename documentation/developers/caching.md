@@ -1,8 +1,9 @@
 # Caching content on the box
 
-Status: design. The Audiobookshelf plugin has its own download cache today
-([Audiobookshelf](audiobookshelf.md), "Offline use"); this moves the general part into the core so that
-other plugins (podcasts, Music Assistant, further sources) get it for free.
+Status: step 1 is implemented (the `cache` core module and the Audiobookshelf plugin as its first provider);
+the steps after it are still design. The download cache of the Audiobookshelf plugin
+([Audiobookshelf](audiobookshelf.md), "Offline use") became a core module so that other plugins (podcasts,
+Music Assistant, further sources) get it for free.
 
 ## Why in the core
 
@@ -80,8 +81,10 @@ The web app has one component for the download button and its state, used by eve
 
 ## Steps
 
-1. **Core module and worker**, with tests; the Audiobookshelf plugin becomes a provider (behaviour unchanged,
-   the cache folder keeps its layout and the plugin's download code goes away).
+1. **Core module and worker** (done), with tests; the Audiobookshelf plugin is a provider and its download
+   code is gone. Decisions: one global limit; automatic removal only of what the provider marks removable
+   (finished books, later heard episodes), never an item in progress; the offline ledger of positions stays in
+   the plugin. The name `cache` and the wording in the web app are still open (a symbol may be better than a word).
 2. **`source` and `availability`** on audiobook items and the web app line and chips; the same for podcasts
    and radio (and music where a second source exists).
 3. **Podcast episodes** as the second provider.

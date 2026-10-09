@@ -145,7 +145,7 @@ Works well with the design, because a downloaded book is just a set of audio fil
 - **Managing it:** per book "download" / "remove download" in the web app, with progress, pause and
   cancel. A download starts at once. One at a time, in a process of its own with the lowest CPU and
   disk priority (`nice 19`, `ionice` class idle), so playback keeps precedence. While something plays it
-  is throttled (`download_rate_kbps_playing`, default 1000) instead of paused; it pauses completely only
+  is throttled (`cache.rate_playing_kbps`, default 1000) instead of paused; it pauses completely only
   if the measurements on the Zero (below) show that playback stutters otherwise. Data is written in
   small chunks. Partial files are kept and continued with range requests; files are renamed into
   place only when complete and their size matches.
@@ -219,8 +219,6 @@ A settings model (`audiobookshelf` section, or a file of its own, `settings_stor
 | `verify_tls` | off for self-signed certificates |
 | `refresh_minutes` | how often the book list is fetched again (default 10), plus a "refresh" button |
 | `sync_interval_sec` | progress write interval (default 15) |
-| `cache_limit_gb` | space downloaded books may use (default 8, never more than the free space minus a reserve) |
-| `download_rate_kbps_playing` | download speed limit while something plays (default 1000, 0 = pause) |
 | `prefer_downloaded` | play the downloaded copy even when the server is reachable (default on) |
 
 - **Secrets:** the `api_key` is a secret field (see "Settings" in [Core and plugins](core-and-plugins.md)):
@@ -283,7 +281,7 @@ commit, as usual; nothing is installed on a box without asking.
   start time of a book, memory of the book list with a few hundred books.
 - Acceptance of phase 4 on a Pi Zero W: downloading a whole book while another one plays (streamed
   and local) gives no audible dropouts, and the web app stays responsive. If it does, the limit
-  `download_rate_kbps_playing` is lowered or set to 0 and the default adjusted.
+  `cache.rate_playing_kbps` is lowered or set to 0 and the default adjusted.
 
 ## Risks and open points
 

@@ -128,24 +128,24 @@ const commands = {
     argKeys: ['book', 'finished'],
   },
 
-  // Audiobookshelf downloads (plugin)
+  // Downloads to the box (core cache) and the state of the Audiobookshelf server
   audiobookshelfStatus: {
     rest: { method: 'GET', path: '/api/v1/audiobookshelf/status' },
   },
-  audiobookshelfDownloads: {
-    rest: { method: 'GET', path: '/api/v1/audiobookshelf/downloads' },
+  cacheDownloads: {
+    rest: { method: 'GET', path: '/api/v1/cache/downloads' },
   },
-  audiobookshelfDownload: {
-    rest: { method: 'POST', path: '/api/v1/audiobookshelf/download' },
-    argKeys: ['book'],
+  cacheDownload: {
+    rest: { method: 'POST', path: '/api/v1/cache/download' },
+    argKeys: ['source', 'item'],
   },
-  audiobookshelfCancelDownload: {
-    rest: { method: 'POST', path: '/api/v1/audiobookshelf/cancel_download' },
-    argKeys: ['book'],
+  cacheCancel: {
+    rest: { method: 'POST', path: '/api/v1/cache/cancel' },
+    argKeys: ['source', 'item'],
   },
-  audiobookshelfRemoveDownload: {
-    rest: { method: 'POST', path: '/api/v1/audiobookshelf/remove_download' },
-    argKeys: ['book'],
+  cacheRemove: {
+    rest: { method: 'POST', path: '/api/v1/cache/remove' },
+    argKeys: ['source', 'item'],
   },
 
   // Radio

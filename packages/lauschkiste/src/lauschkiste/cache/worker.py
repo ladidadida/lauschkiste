@@ -1,10 +1,11 @@
-"""Downloads the audio files of one book into a folder. Runs as a process of its own, with the lowest priority.
+"""Downloads the files of one item into its folder. Runs as a process of its own, with the lowest priority.
 
-    python -m lauschkiste_plugin_audiobookshelf.downloader SERVER BOOK DEST RATE_FILE
+    python -m lauschkiste.cache.worker DEST RATE_FILE
 
-The API key comes in the environment variable ``ABS_API_KEY``. ``RATE_FILE`` holds the speed limit in
-kB/s (empty or 0: none, -1: wait) and is read again while downloading. Progress is written to ``DEST/status.json``;
-files are renamed into place when complete, ``meta.json`` marks the book as complete.
+``DEST/plan.json`` (readable for the user only, removed when the worker ends) lists the files with their address,
+size and request headers. ``RATE_FILE`` holds the speed limit in kB/s (empty or 0: none, -1: wait) and is read
+again while downloading. Progress goes to ``DEST/status.json``; files are renamed into place when complete and
+``meta.json`` marks the item as complete.
 """
 
 import json
@@ -13,7 +14,7 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict
 
 import requests
 
@@ -51,11 +52,10 @@ def write_json(path: Path, data: Dict[str, Any]) -> None:
 
 
 class Download:
-    def __init__(self, server: str, key: str, book: str, dest: Path, rate_file: Path):
-        self.base = server.rstrip('/')
-        self.book, self.dest, self.rate_file = book, dest, rate_file
+    def __init__(self, dest: Path, rate_file: Path, source: str = '', item: str = ''):
+        self.dest, self.rate_file = dest, rate_file
+        self.source, self.item = source, item
         self.session = requests.Session()
-        self.session.headers['Authorization'] = f'Bearer {key}'
         self.done = 0
         self.total = 0
         self._status_at = 0.0
@@ -64,41 +64,27 @@ class Download:
         write_json(self.dest / 'status.json', {'state': state, 'done': self.done, 'total': self.total, **extra})
         self._status_at = time.monotonic()
 
-    def item(self) -> Dict[str, Any]:
-        response = self.session.get(f'{self.base}/api/items/{self.book}', timeout=TIMEOUT)
-        if response.status_code in (401, 403):
-            raise DownloadError('the server refused the API key')
-        if response.status_code == 404:
-            raise DownloadError('the book does not exist on the server')
-        response.raise_for_status()
-        return response.json()
-
     def run(self) -> None:
-        self.dest.mkdir(parents=True, exist_ok=True)
-        item = self.item()
-        files: List[Dict[str, Any]] = sorted((item.get('media') or {}).get('audioFiles') or [],
-                                             key=lambda f: f.get('index', 0))
+        plan: Dict[str, Any] = json.loads((self.dest / 'plan.json').read_text())
+        files = plan['files']
         if not files:
-            raise DownloadError('the book has no audio files')
-        names = [f"{number:03d}_{audio['ino']}{audio['metadata'].get('ext') or ''}"
-                 for number, audio in enumerate(files, 1)]
-        sizes = [int(audio['metadata']['size']) for audio in files]
-        self.total = sum(sizes)
+            raise DownloadError('there is nothing to download')
+        self.total = sum(int(entry['size']) for entry in files)
         self.status('downloading')
-        for audio, name, size in zip(files, names, sizes):
-            target = self.dest / name
+        for entry in files:
+            target = self.dest / entry['name']
+            size = int(entry['size'])
             if target.exists() and target.stat().st_size == size:
                 self.done += size
                 continue
-            self.fetch(audio['ino'], target, size)
+            self.fetch(entry['url'], entry.get('headers') or {}, target, size)
         write_json(self.dest / 'meta.json', {
-            'book': self.book, 'title': (item.get('media') or {}).get('metadata', {}).get('title'),
-            'updatedAt': item.get('updatedAt'), 'size': self.total,
-            'files': [{'name': name, 'ino': audio['ino'], 'size': size, 'duration': audio.get('duration')}
-                      for audio, name, size in zip(files, names, sizes)]})
+            'source': self.source, 'item': self.item, 'title': plan.get('title') or '', 'version': plan.get('version'),
+            'size': self.total, 'files': [{'name': entry['name'], 'size': int(entry['size']),
+                                          'duration': entry.get('duration')} for entry in files]})
         self.status('done')
 
-    def fetch(self, ino: str, target: Path, size: int) -> None:
+    def fetch(self, url: str, headers: Dict[str, str], target: Path, size: int) -> None:
         part = target.with_name(target.name + '.part')
         have = part.stat().st_size if part.exists() else 0
         if have > size:
@@ -106,9 +92,10 @@ class Download:
             have = 0
         self.done += have
         if have < size:
-            headers = {'Range': f'bytes={have}-'} if have else {}
-            url = f'{self.base}/api/items/{self.book}/file/{ino}/download'
-            with self.session.get(url, headers=headers, stream=True, timeout=TIMEOUT) as response:
+            request_headers = {**headers, **({'Range': f'bytes={have}-'} if have else {})}
+            with self.session.get(url, headers=request_headers, stream=True, timeout=TIMEOUT) as response:
+                if response.status_code in (401, 403):
+                    raise DownloadError('the server refused the access')
                 if response.status_code == 416:
                     part.unlink()
                     raise DownloadError('the partial file does not fit the server copy, try again')
@@ -145,17 +132,21 @@ class Download:
                 self.status('downloading')
 
 
-def main(argv: List[str]) -> int:
-    server, book, dest, rate_file = argv[1], argv[2], Path(argv[3]), Path(argv[4])
+def main(argv) -> int:
+    dest, rate_file = Path(argv[1]), Path(argv[2])
     lower_priority()
-    download = Download(server, os.environ.get('ABS_API_KEY', ''), book, dest, rate_file)
+    download = Download(dest, rate_file, source=dest.parent.name, item=dest.name)
     try:
         download.run()
-    except (DownloadError, requests.RequestException, OSError, KeyError) as error:
-        dest.mkdir(parents=True, exist_ok=True)
-        download.status('error', error=f'{error.__class__.__name__}: {error}' if not isinstance(error, DownloadError)
-                        else str(error))
+    except (DownloadError, requests.RequestException, OSError, KeyError, ValueError) as error:
+        message = str(error) if isinstance(error, DownloadError) else f'{error.__class__.__name__}: {error}'
+        download.status('error', error=message)
         return 1
+    finally:
+        try:
+            (dest / 'plan.json').unlink()
+        except OSError:
+            pass
     return 0
 
 

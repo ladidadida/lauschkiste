@@ -75,7 +75,7 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigi
     done: download?.update_available ? t('library.audiobooks.update-available') : undefined,
   }[downloadState];
   const downloadRequest = async (command) => {
-    await request(command, { book: book.book });
+    await request(command, { source: book.source, item: book.book });
     onChanged();
   };
   const downloadItem = (() => {
@@ -86,18 +86,18 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigi
           ? [{
             label: t('library.audiobooks.download-again'),
             onClick: async () => {
-              await request('audiobookshelfRemoveDownload', { book: book.book });
-              await downloadRequest('audiobookshelfDownload');
+              await request('cacheRemove', { source: book.source, item: book.book });
+              await downloadRequest('cacheDownload');
             },
           }]
           : []),
-        { label: t('library.audiobooks.remove-download'), onClick: () => downloadRequest('audiobookshelfRemoveDownload') },
+        { label: t('library.audiobooks.remove-download'), onClick: () => downloadRequest('cacheRemove') },
       ];
     }
     if (downloadState === 'downloading' || downloadState === 'queued') {
-      return [{ label: t('library.audiobooks.cancel-download'), onClick: () => downloadRequest('audiobookshelfCancelDownload') }];
+      return [{ label: t('library.audiobooks.cancel-download'), onClick: () => downloadRequest('cacheCancel') }];
     }
-    return [{ label: t('library.audiobooks.download'), onClick: () => downloadRequest('audiobookshelfDownload') }];
+    return [{ label: t('library.audiobooks.download'), onClick: () => downloadRequest('cacheDownload') }];
   })();
 
   const menuItems = [
@@ -176,8 +176,8 @@ const Audiobooks = ({ musicFilter }) => {
 
   const [downloads, setDownloads] = useState({});
   const loadDownloads = useCallback(async () => {
-    const { result } = await request('audiobookshelfDownloads');
-    setDownloads(result ? Object.fromEntries(result.items.map((entry) => [entry.book, entry])) : {});
+    const { result } = await request('cacheDownloads');
+    setDownloads(result ? Object.fromEntries(result.items.map((entry) => [`${entry.source}/${entry.item}`, entry])) : {});
   }, []);
   const hasRemoteBooks = books.some(({ source }) => source && source !== 'local');
   useEffect(() => {
@@ -246,7 +246,7 @@ const Audiobooks = ({ musicFilter }) => {
         {visible.map((book) => (
           <AudiobookItem
             book={book}
-            download={downloads[book.book] ?? null}
+            download={downloads[`${book.source}/${book.book}`] ?? null}
             key={`${book.source}/${book.book}`}
             onChanged={changed}
             showCovers={showCovers}

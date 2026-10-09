@@ -34,7 +34,10 @@ class Client:
             raise AudiobookshelfError("Audiobookshelf refused the API key")
         if not response.ok:
             raise AudiobookshelfError(f"Audiobookshelf answered {response.status_code} for {path}")
-        return response.json() if response.content else {}
+        try:
+            return response.json() if response.content else {}
+        except ValueError:
+            return {}  # answers like "OK" carry no data
 
     def libraries(self) -> List[Dict[str, Any]]:
         return [library for library in (self.request('GET', '/api/libraries') or {}).get('libraries', [])
