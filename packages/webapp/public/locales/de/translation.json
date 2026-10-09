@@ -173,7 +173,8 @@
     },
     "sources": {
       "mpd": "Lokal",
-      "local": "Lokal"
+      "local": "Lokal",
+      "audiobookshelf": "Audiobookshelf"
     },
     "selector-header": {
       "title": "Wähle ein Album, einen Ordner oder einen Song aus"
@@ -253,6 +254,11 @@
     "content": {
       "more": "Weitere Aktionen",
       "save-error": "Speichern fehlgeschlagen."
+    },
+    "origin": {
+      "local": "Auf der Box",
+      "stream": "Gestreamt",
+      "cached": "Auf die Box geladen"
     },
     "audiobooks": {
       "empty": "Noch keine Hörbücher. Lade sie unter „Ordner“ hoch, je Hörbuch ein Ordner.",

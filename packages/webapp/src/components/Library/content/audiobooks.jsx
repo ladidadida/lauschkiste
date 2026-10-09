@@ -5,6 +5,7 @@ import {
   Alert,
   Avatar,
   Box,
+  Chip,
   CircularProgress,
   LinearProgress,
   List,
@@ -12,6 +13,7 @@ import {
   ListItemAvatar,
   ListItemButton,
   ListItemText,
+  Stack,
   Typography,
 } from '@mui/material';
 
@@ -35,7 +37,7 @@ export const progressOf = ({ duration, finished, listened }) => {
 // Books of other sources (not the local library) name their source in every request.
 const sourceArg = (book) => (book.source && book.source !== 'local' ? { source: book.source } : {});
 
-export const AudiobookItem = ({ book, download, onChanged, showCovers }) => {
+export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigin = false }) => {
   const { t } = useTranslation();
   const progress = progressOf(book);
   const started = progress > 0 && !book.finished;
@@ -50,6 +52,14 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers }) => {
       })
       : t('library.audiobooks.chapters', { count: book.chapters });
   const duration = book.duration ? ` · ${toHHMMSS(book.duration)}` : '';
+  const isLocal = book.source === undefined || book.source === 'local';
+  const availability = isLocal
+    ? 'local'
+    : { done: 'cached' }[download?.state] || (download === undefined ? null : 'stream');
+  const origin = [
+    isLocal ? null : t(`library.sources.${book.source}`, { defaultValue: book.source }),
+    availability && (showOrigin || !isLocal) && t(`library.origin.${availability}`),
+  ].filter(Boolean).join(' · ');
 
   const setFinished = async (finished) => {
     await request('audiobookSetFinished', { book: book.book, finished, ...sourceArg(book) });
@@ -127,6 +137,7 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers }) => {
             <Box component="span" sx={{ display: 'block' }}>
               <Box component="span" sx={{ display: 'block' }}>{`${status}${duration}`}</Box>
               {downloadStatus && <Box component="span" sx={{ display: 'block' }}>{downloadStatus}</Box>}
+              {origin && <Box component="span" sx={{ color: 'text.disabled', display: 'block', fontSize: '0.8em' }}>{origin}</Box>}
               {started &&
                 <LinearProgress
                   aria-label={t('library.audiobooks.progress-label', { title: book.title })}
@@ -192,10 +203,14 @@ const Audiobooks = ({ musicFilter }) => {
     loadStatus();
   }, [load, loadDownloads, loadStatus]);
 
+  const [source, setSource] = useState(null);
+  const sources = useMemo(() => [...new Set(books.map((entry) => entry.source || 'local'))], [books]);
   const visible = useMemo(() => {
     const query = musicFilter.toLowerCase();
-    return query ? books.filter(({ title }) => title.toLowerCase().includes(query)) : books;
-  }, [books, musicFilter]);
+    return books
+      .filter((entry) => !source || (entry.source || 'local') === source)
+      .filter(({ title }) => !query || title.toLowerCase().includes(query));
+  }, [books, musicFilter, source]);
 
   if (isLoading) return <CircularProgress />;
   if (error) return <Typography>{t('library.loading-error')}</Typography>;
@@ -210,14 +225,32 @@ const Audiobooks = ({ musicFilter }) => {
           {serverStatus.waiting > 0 && ` ${t('library.audiobooks.waiting', { count: serverStatus.waiting })}`}
         </Alert>
       }
+      {sources.length > 1 &&
+        <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1, paddingX: 1, paddingBottom: 1 }}>
+          <Chip
+            color={source ? 'default' : 'primary'}
+            label={t('library.music.all-sources')}
+            onClick={() => setSource(null)}
+          />
+          {sources.map((id) => (
+            <Chip
+              color={source === id ? 'primary' : 'default'}
+              key={id}
+              label={t(`library.sources.${id}`, { defaultValue: id })}
+              onClick={() => setSource(id)}
+            />
+          ))}
+        </Stack>
+      }
       <List sx={{ width: '100%' }}>
         {visible.map((book) => (
           <AudiobookItem
             book={book}
-            download={downloads[book.book]}
+            download={downloads[book.book] ?? null}
             key={`${book.source}/${book.book}`}
             onChanged={changed}
             showCovers={showCovers}
+            showOrigin={sources.length > 1}
           />
         ))}
       </List>

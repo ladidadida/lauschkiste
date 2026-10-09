@@ -11,6 +11,8 @@
 * [Lauschkiste Apps](./coreapps.md)
 * [Web App](./webapp.md)
 * [Player Backends](./player-backends.md)
+* [Audiobookshelf](./audiobookshelf.md)
+* [Caching content on the box](./caching.md)
 * [RFID Readers](./rfid/README.md)
 * [Docstring API Docs (from py files)](./docstring/README.md)
 * [Plugin Reference](./docstring/README.md#jukebox.plugs)

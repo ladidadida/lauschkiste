@@ -173,7 +173,8 @@
     },
     "sources": {
       "mpd": "Local",
-      "local": "Local"
+      "local": "Local",
+      "audiobookshelf": "Audiobookshelf"
     },
     "selector-header": {
       "title": "Select an album, folder or song"
@@ -253,6 +254,11 @@
     "content": {
       "more": "More actions",
       "save-error": "Could not save."
+    },
+    "origin": {
+      "local": "On the box",
+      "stream": "Streamed",
+      "cached": "Downloaded to the box"
     },
     "audiobooks": {
       "empty": "No audiobooks yet. Upload them under \"Folders\", one folder per audiobook.",

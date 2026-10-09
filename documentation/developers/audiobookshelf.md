@@ -1,11 +1,10 @@
 # Audiobookshelf
 
-Status: phases 1 and 2 are implemented (streaming, shared position, covers, secret settings, card
-`source`); phase 3 is partly there (books in the Audiobooks tab and the card dialog, settings form), the
-the rest is planned. Phase 4 (offline use) is implemented: downloads (own low-priority process, cache, limit,
-web app), positions recorded without the server and merged later, the book list kept on disk, removal of old
-downloads, update hint. Measured on a Pi Zero W. Checked against a real server (2.36.0) with mp3 books; m4b
-books, a "test connection" button and the measurements on the Pi Zero are still open.
+Status: streaming, the shared position, covers, secret settings and cards with a `source` work, and so
+does offline use (downloads, positions recorded without the server and merged later, the book list kept on
+disk, removal of old downloads, update hint), measured on a Pi Zero W and checked against a real server
+(2.36.0) with mp3 books. Open: m4b books and chapters inside one file, a "test connection" button. The
+download cache is moving into the core, see [Caching](caching.md).
 
 [Audiobookshelf](https://www.audiobookshelf.org) (ABS) is a self-hosted server for audiobooks and
 podcasts with its own library, metadata, covers, per-user progress and apps. The goal: a Lauschkiste
