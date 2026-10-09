@@ -110,7 +110,7 @@ class TimeLimits(CoreModule):
         self._was_blocked = False
         self._settle_until = 0.0
         self._clock_ok = True
-        self._clock_checked = 0.0
+        self._clock_checked = float('-inf')
         self._saved_at = 0.0
         self._stopped = threading.Event()
         self._thread: Optional[threading.Thread] = None

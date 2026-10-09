@@ -117,6 +117,15 @@ def test_a_clock_that_is_not_synchronized_does_not_enforce_quiet_hours(tmp_path,
     s.ctx.modules.player.stop.assert_not_called()
 
 
+def test_the_clock_is_checked_at_once_even_shortly_after_boot(tmp_path, monkeypatch):
+    # right after boot the monotonic clock is small; the first check must not wait for the interval
+    monkeypatch.setattr(module.time, 'monotonic', lambda: 5.0)
+    s = Setup(tmp_path, {'enabled': True, 'quiet_hours': {'bedtime': {'start': '19:30', 'end': '07:00',
+                                                                   'days': 'every day'}}}, FRIDAY_EVENING,
+              clock=lambda: False)
+    assert s.plugin.status().clock_ok is False
+
+
 def test_allow_adds_time_and_lifts_quiet_hours_for_that_long(setup):
     s = setup(now=FRIDAY_EVENING)
     assert s.plugin.status().blocked
