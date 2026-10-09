@@ -5,8 +5,8 @@
 #   curl -fsSL .../install.sh | bash -s -- --from source
 #
 # Where Lauschkiste comes from (--from):
-#   github   the wheels attached to a release (default); --version TAG picks a release
-#   pypi     the packages on PyPI; --version 0.1.0a4 picks a version
+#   pypi     the packages on PyPI (default); --version 0.1.0a4 picks a version
+#   github   the wheels attached to a release; --version TAG picks a release
 #   source   a git checkout (default ~/lauschkiste, --source DIR for another one) that runs from its
 #            own folder; --branch NAME picks the branch
 #   testpypi, or the URL of a package index, for testing; --wheels DIR installs wheels from a folder
@@ -31,7 +31,7 @@ MODE=package
 SOURCE_DIR="${HOME}/lauschkiste"
 BRANCH=main
 VERSION=latest
-FROM=github
+FROM=
 WHEELS=""
 BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-devices lauschkiste-plugin-mpd
                  lauschkiste-plugin-rfid-readers lauschkiste-plugin-samba lauschkiste-plugin-audiobookshelf
@@ -50,7 +50,7 @@ parse_args() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --source)
-                [[ "$FROM" == github || "$FROM" == source ]] || die "--source and --from ${FROM} exclude each other"
+                [[ -z "$FROM" || "$FROM" == source ]] || die "--source and --from ${FROM} exclude each other"
                 MODE=source
                 FROM=source
                 if [[ $# -gt 1 && "$2" != --* ]]; then SOURCE_DIR="$2"; shift; fi ;;
@@ -71,6 +71,7 @@ parse_args() {
 }
 
 check_args() {
+    if [[ -z "$FROM" ]]; then if [[ -n "$WHEELS" ]]; then FROM=github; else FROM=pypi; fi; fi
     [[ "$FROM" != source ]] || MODE=source
     if [[ "$MODE" == source && "$FROM" != source ]]; then die "--source and --from ${FROM} exclude each other"; fi
     if [[ -n "$WHEELS" && "$FROM" != github ]]; then die "--wheels and --from ${FROM} exclude each other"; fi

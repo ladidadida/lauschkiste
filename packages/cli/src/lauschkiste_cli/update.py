@@ -1,9 +1,8 @@
 """`lauschctl update`: `git pull` (source checkout), the newest release from PyPI, or the wheels of a GitHub release.
 
 How Lauschkiste was installed decides where the update comes from: a source checkout pulls its branch;
-packages installed from an index (PyPI) are upgraded from PyPI; packages installed from wheel files
-(the install script's default until the first PyPI release, ``--wheels``) get the wheels of the newest
-GitHub release.
+packages installed from an index (PyPI, the install script's default) are upgraded from PyPI; packages installed
+from wheel files (``--from github``, ``--wheels``) get the wheels of the newest GitHub release.
 """
 
 import re

@@ -16,7 +16,7 @@ PyPI after a manual approval (one job per package).
 - [x] Private vulnerability reporting is switched on (repository Settings → Code security): the Code of
   Conduct and `SECURITY.md` send reports there.
 - [x] Repository description, topics and social preview image are set.
-- [ ] The accounts, pending publishers and environments below exist.
+- [x] The accounts, pending publishers and environments below exist.
 - [x] A test upload to TestPyPI and a fresh installation from it on a box worked.
 
 ## One-time setup
@@ -99,9 +99,7 @@ The installer takes everything from PyPI (and piwheels) first; TestPyPI only sup
    the GitHub release (a pre-release while the tag has a suffix) and then waits for your approval of the
    `pypi` environment. After the approval the packages are on PyPI.
 4. Check: `uv tool install lauschkiste` on a machine, `lauschctl plugin list`.
-5. After the **first** release on PyPI: make `pypi` the default of `install.sh` (`FROM=pypi`) and in
-   [Installation](../builders/installation.md) and [Update](../builders/update.md) (the table of `--from`, the
-   curl line without `--from`), and say so in the README.
+5. The installer installs from PyPI by default (`install.sh`, and `lauschctl update` follows the way a box was installed).
 
 While there are only pre-releases, `pip install lauschkiste` needs `--pre` (uv and the installer do not).
 

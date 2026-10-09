@@ -14,7 +14,7 @@ lauschctl update             # install it, re-apply the setup, restart Lauschkis
 
 - **From PyPI** (`--from pypi`): upgrades all Lauschkiste packages to the newest version on PyPI
   (`--version 0.1.0a4` for a specific one).
-- **From release wheels** (`--from github`, the default until the first PyPI release): installs the newest
+- **From release wheels** (`--from github`): installs the newest
   GitHub release (`--version vX.Y.Z` for a specific one).
 - **From a git checkout** (`--from source`): `git pull` of the current branch, then `uv sync`; the web app is
   rebuilt if it changed and `npm` is installed.
