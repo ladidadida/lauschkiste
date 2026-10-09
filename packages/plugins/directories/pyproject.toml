@@ -1,6 +1,6 @@
 [project]
 name = "lauschkiste-plugin-directories"
-version = "0.1.0a3"
+version = "0.1.0a4.dev2"
 description = "Lauschkiste plugin: find podcasts and radio stations in online directories"
 license = "MIT"
 requires-python = ">=3.11"
@@ -27,7 +27,7 @@ classifiers = [
 ]
 license-files = ["LICENSE"]
 dependencies = [
-  "lauschkiste-core==0.1.0a3",
+  "lauschkiste-core==0.1.0a4.dev2",
   "requests",
 ]
 
