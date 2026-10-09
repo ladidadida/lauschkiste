@@ -1,25 +1,32 @@
 {
   "plugins": {
     "rfid_fake_reader_gui": {
-      "name": "RFID: test reader"
+      "name": "RFID: test reader",
+      "description": "A test reader: a small window where you click cards. For development."
     },
     "rfid_generic_nfcpy": {
-      "name": "RFID: nfcpy"
+      "name": "RFID: nfcpy",
+      "description": "NFC readers that work with the nfcpy library (many USB NFC readers)."
     },
     "rfid_generic_usb": {
-      "name": "RFID: USB reader"
+      "name": "RFID: USB reader",
+      "description": "USB readers that behave like a keyboard and type the card number."
     },
     "rfid_mfrc522_i2c": {
-      "name": "RFID: MFRC522 (I²C)"
+      "name": "RFID: MFRC522 (I²C)",
+      "description": "The MFRC522 reader on the I²C bus."
     },
     "rfid_pn532_i2c_py532": {
-      "name": "RFID: PN532 (I²C)"
+      "name": "RFID: PN532 (I²C)",
+      "description": "The PN532 NFC reader on the I²C bus."
     },
     "rfid_rc522_spi": {
-      "name": "RFID: RC522 (SPI)"
+      "name": "RFID: RC522 (SPI)",
+      "description": "The common RC522 reader on the SPI bus (the small blue board)."
     },
     "rfid_rdm6300_serial": {
-      "name": "RFID: RDM6300 (serial)"
+      "name": "RFID: RDM6300 (serial)",
+      "description": "The RDM6300 reader for 125 kHz cards on a serial port."
     }
   }
 }

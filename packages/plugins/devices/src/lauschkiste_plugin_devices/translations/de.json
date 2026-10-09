@@ -2,6 +2,7 @@
   "plugins": {
     "battery": {
       "name": "Akku",
+      "description": "Überwacht den Akku: zeigt den Ladestand, warnt bei niedrigem Stand und fährt die Box sauber herunter, bevor er leer ist.",
       "fields": {
         "driver": {
           "label": "Sensor"
@@ -38,6 +39,7 @@
     },
     "gpio_controls": {
       "name": "Tasten, Drehregler, LED (GPIO)",
+      "description": "Taster, Drehgeber und eine Status-LED an den GPIO-Pins.",
       "fields": {
         "buttons": {
           "label": "Tasten",
@@ -84,6 +86,7 @@
     },
     "phat_beat": {
       "name": "Pimoroni pHAT BEAT",
+      "description": "Das Pimoroni pHAT BEAT (Pirate Radio): Tasten, LED-Balken für Lautstärke und Pegel und der Soundchip.",
       "fields": {
         "play_pause": {
           "label": "Taste Play/Pause"
@@ -130,6 +133,7 @@
     },
     "power_button": {
       "name": "Ein/Aus-Taster",
+      "description": "Ein Taster, der die Box sauber herunterfährt und danach den Strom trennt, z. B. das Pimoroni OnOff SHIM.",
       "fields": {
         "preset": {
           "label": "Hardware",

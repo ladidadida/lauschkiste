@@ -260,6 +260,7 @@ keep reading `ctx.config` with the same defaults.
     "plugins": {
       "podcast_directories": {
         "name": "Find podcasts",
+        "description": "Search for podcasts in several directories and subscribe with one tap.",
         "fields": {
           "itunes": {
             "label": "Apple Podcasts", "help": "…",
@@ -275,8 +276,13 @@ keep reading `ctx.config` with the same defaults.
   its own texts (its own always win). What is missing falls back in this order: the language asked for, English
   (the web app's, then the plugin's `en.json`), the `title`/`description` of the field in the settings model, and for
   the plugin's name its `title` class attribute (`Plugin.title`, English) and finally the plugin's name made
-  readable (`podcast_directories` becomes "Podcast directories", never the bare name). A test checks that all
-  languages of a plugin have the same keys as `en.json`.
+  readable (`podcast_directories` becomes "Podcast directories", never the bare name). The `description` is the
+  one-line text under the name in the plugin list; without a translation the first line of the plugin class's
+  docstring is shown. A test checks that every plugin has an English name and description and that all languages of a
+  plugin have the same keys as `en.json`.
+- `GET /api/v1/plugins` also carries what the package says about itself (`author`, `license`, `homepage`,
+  `documentation`, `issues`, from its metadata), so that a plugin list or a future plugin manager needs no
+  extra files.
 - `GET /api/v1/plugins` lists installed plugins (enabled, running, problem, missing extras);
   `PUT /api/v1/plugins/<name>` with `{"enabled": true}` enables one (after a restart).
 

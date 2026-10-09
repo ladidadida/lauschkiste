@@ -1,7 +1,8 @@
 {
   "plugins": {
     "samba": {
-      "name": "Samba"
+      "name": "Samba",
+      "description": "Gibt die Bibliothek als Netzlaufwerk frei und setzt das Passwort dafür."
     }
   }
 }

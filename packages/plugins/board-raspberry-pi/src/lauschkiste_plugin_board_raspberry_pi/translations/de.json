@@ -2,6 +2,7 @@
   "plugins": {
     "board_raspberry_pi": {
       "name": "Raspberry Pi",
+      "description": "Unterstützung für den Raspberry Pi: Pin-Belegung, Soundkarte, Herunterfahren und Neustart sowie ein Gesundheitscheck der Firmware.",
       "fields": {
         "debug_mode": {
           "label": "Testmodus",

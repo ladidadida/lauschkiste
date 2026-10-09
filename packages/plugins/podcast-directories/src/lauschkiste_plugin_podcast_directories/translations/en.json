@@ -2,6 +2,7 @@
   "plugins": {
     "podcast_directories": {
       "name": "Find podcasts (Apple, fyyd, Podcast Index)",
+      "description": "Search for podcasts in Apple Podcasts, fyyd and the Podcast Index and subscribe with one tap.",
       "fields": {
         "itunes": {
           "label": "Apple Podcasts",

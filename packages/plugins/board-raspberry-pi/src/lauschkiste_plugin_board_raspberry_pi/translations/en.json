@@ -2,6 +2,7 @@
   "plugins": {
     "board_raspberry_pi": {
       "name": "Raspberry Pi",
+      "description": "Support for the Raspberry Pi: pin usage, sound card, shutting down and rebooting, and a health check of the firmware.",
       "fields": {
         "debug_mode": {
           "label": "Debug mode",

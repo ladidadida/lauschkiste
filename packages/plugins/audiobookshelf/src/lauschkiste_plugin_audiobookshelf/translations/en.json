@@ -2,6 +2,7 @@
   "plugins": {
     "audiobookshelf": {
       "name": "Audiobookshelf (audiobooks from a server)",
+      "description": "Plays the audiobooks of an Audiobookshelf server on the box, streamed or downloaded, and shares the listening position with the Audiobookshelf apps.",
       "fields": {
         "server_url": {
           "label": "Server address",

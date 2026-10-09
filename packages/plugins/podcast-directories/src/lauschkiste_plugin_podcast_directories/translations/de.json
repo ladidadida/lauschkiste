@@ -2,6 +2,7 @@
   "plugins": {
     "podcast_directories": {
       "name": "Podcasts finden (Apple, fyyd, Podcast Index)",
+      "description": "Podcasts in Apple Podcasts, fyyd und dem Podcast Index suchen und mit einem Tipp abonnieren.",
       "fields": {
         "itunes": {
           "label": "Apple Podcasts",

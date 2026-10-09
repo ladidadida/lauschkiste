@@ -27,6 +27,24 @@ def readable(name: str) -> str:
     return name.replace('_', ' ').strip().capitalize()
 
 
+def package_info(dist) -> Dict[str, Optional[str]]:
+    """What the package says about itself (author, license, project addresses), for a plugin list or manager."""
+    info: Dict[str, Optional[str]] = {'author': None, 'license': None, 'homepage': None, 'documentation': None,
+                                      'issues': None}
+    try:
+        meta = dist.metadata
+        info['author'] = meta.get('Author') or meta.get('Author-email')
+        info['license'] = meta.get('License-Expression') or meta.get('License')
+        for line in meta.get_all('Project-URL') or []:
+            label, _, url = str(line).partition(',')
+            key = {'homepage': 'homepage', 'documentation': 'documentation', 'issues': 'issues'}.get(label.strip().lower())
+            if key:
+                info[key] = url.strip()
+    except Exception:
+        pass
+    return {key: value if isinstance(value, str) else None for key, value in info.items()}
+
+
 def installed() -> Dict[str, Any]:
     """Entry points of the installed plugins by name."""
     return {ep.name: ep for ep in entry_points(group=ENTRY_POINT_GROUP)}
@@ -238,6 +256,8 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
         entry: Dict[str, Any] = {'name': name, 'title': readable(name), 'enabled': name in on,
                                  'running': bool(manager and name in manager),
                                  'package': None, 'version': None, 'summary': '', 'problem': None,
+                                 'author': None, 'license': None, 'homepage': None, 'documentation': None,
+                                 'issues': None,
                                  'missing_extras': [], 'provides': [], 'needs': [], 'blocked': None,
                                  'detected': None}
         if ep is None:
@@ -246,6 +266,7 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
             cls, problem = load(ep)
             if ep.dist is not None:
                 entry['package'], entry['version'] = ep.dist.name, ep.dist.version
+                entry.update(package_info(ep.dist))
             entry['title'] = (getattr(cls, 'title', '') or '') or entry['title']
             entry['summary'] = (getattr(cls, '__doc__', None) or '').strip().split('\n', 1)[0].replace('``', '') if cls else ''
             entry['problem'] = problem or (manager.failed.get(name) if manager else None)
@@ -280,15 +301,17 @@ def _translation(ep, language: str) -> Dict[str, Any]:
 def translations(language: str) -> Dict[str, Any]:
     """What the installed plugins ship for ``language``, as part of the web app's translation file.
 
-    ``<package>/translations/<language>.json`` holds ``{"plugins": {"<plugin>": {"name": ..., "fields": ...}}}``
-    for the plugins of the package, ``fields`` shaped like ``settings.fields.<plugin>``."""
-    result: Dict[str, Any] = {'settings': {'fields': {}, 'plugins': {'names': {}}}}
+    ``<package>/translations/<language>.json`` holds ``{"plugins": {"<plugin>": {"name": ..., "description": ...,
+    "fields": ...}}}`` for the plugins of the package, ``fields`` shaped like ``settings.fields.<plugin>``."""
+    result: Dict[str, Any] = {'settings': {'fields': {}, 'plugins': {'names': {}, 'descriptions': {}}}}
     if not LANGUAGE.match(language):
         return result
     for name, ep in installed().items():
         data = _translation(ep, language.lower())
         if isinstance(data.get('name'), str) and data['name']:
             result['settings']['plugins']['names'][name] = data['name']
+        if isinstance(data.get('description'), str) and data['description']:
+            result['settings']['plugins']['descriptions'][name] = data['description']
         if isinstance(data.get('fields'), dict):
             result['settings']['fields'][name] = data['fields']
     return result

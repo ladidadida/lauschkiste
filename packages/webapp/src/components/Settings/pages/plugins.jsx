@@ -119,7 +119,7 @@ const PluginsSettings = () => {
                   }
                   secondary={
                     <>
-                      <span>{plugin.summary}</span>
+                      <span>{t(`settings.plugins.descriptions.${plugin.name}`, { defaultValue: plugin.summary })}</span>
                       {plugin.blocked && !plugin.enabled &&
                         <Alert component="span" severity="info" sx={{ display: 'flex', marginTop: 1 }}>
                           {blockedText(t, plugin.blocked)}

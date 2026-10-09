@@ -1,25 +1,32 @@
 {
   "plugins": {
     "rfid_fake_reader_gui": {
-      "name": "RFID: Test-Leser"
+      "name": "RFID: Test-Leser",
+      "description": "Ein Testleser: ein kleines Fenster, in dem man Karten anklickt. Für die Entwicklung."
     },
     "rfid_generic_nfcpy": {
-      "name": "RFID: nfcpy"
+      "name": "RFID: nfcpy",
+      "description": "NFC-Leser, die mit der Bibliothek nfcpy arbeiten (viele USB-NFC-Leser)."
     },
     "rfid_generic_usb": {
-      "name": "RFID: USB-Leser"
+      "name": "RFID: USB-Leser",
+      "description": "USB-Leser, die sich wie eine Tastatur verhalten und die Kartennummer eintippen."
     },
     "rfid_mfrc522_i2c": {
-      "name": "RFID: MFRC522 (I²C)"
+      "name": "RFID: MFRC522 (I²C)",
+      "description": "Der MFRC522-Leser am I²C-Bus."
     },
     "rfid_pn532_i2c_py532": {
-      "name": "RFID: PN532 (I²C)"
+      "name": "RFID: PN532 (I²C)",
+      "description": "Der PN532-NFC-Leser am I²C-Bus."
     },
     "rfid_rc522_spi": {
-      "name": "RFID: RC522 (SPI)"
+      "name": "RFID: RC522 (SPI)",
+      "description": "Der verbreitete RC522-Leser am SPI-Bus (die kleine blaue Platine)."
     },
     "rfid_rdm6300_serial": {
-      "name": "RFID: RDM6300 (seriell)"
+      "name": "RFID: RDM6300 (seriell)",
+      "description": "Der RDM6300-Leser für 125-kHz-Karten an einer seriellen Schnittstelle."
     }
   }
 }

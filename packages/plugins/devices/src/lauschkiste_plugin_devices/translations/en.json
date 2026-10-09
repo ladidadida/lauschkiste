@@ -2,6 +2,7 @@
   "plugins": {
     "battery": {
       "name": "Battery",
+      "description": "Watches the battery: shows the charge, warns when it is low and shuts the box down cleanly before it runs empty.",
       "fields": {
         "driver": {
           "label": "Sensor"
@@ -38,6 +39,7 @@
     },
     "gpio_controls": {
       "name": "Buttons, encoders, LED (GPIO)",
+      "description": "Buttons, rotary encoders and a status LED on the GPIO pins of any board.",
       "fields": {
         "buttons": {
           "label": "Buttons",
@@ -84,6 +86,7 @@
     },
     "phat_beat": {
       "name": "Pimoroni pHAT BEAT",
+      "description": "The Pimoroni pHAT BEAT (Pirate Radio): its buttons, LED bars for volume and level, and the sound chip.",
       "fields": {
         "play_pause": {
           "label": "Play/pause button"
@@ -130,6 +133,7 @@
     },
     "power_button": {
       "name": "Power button",
+      "description": "A button that shuts the box down cleanly and cuts the power afterwards, e.g. the Pimoroni OnOff SHIM.",
       "fields": {
         "preset": {
           "label": "Hardware",

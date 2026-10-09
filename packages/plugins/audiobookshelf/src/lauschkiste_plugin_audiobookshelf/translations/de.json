@@ -2,6 +2,7 @@
   "plugins": {
     "audiobookshelf": {
       "name": "Audiobookshelf (Hörbücher von einem Server)",
+      "description": "Spielt die Hörbücher eines Audiobookshelf-Servers auf der Box, gestreamt oder heruntergeladen, und teilt die Hörposition mit den Audiobookshelf-Apps.",
       "fields": {
         "server_url": {
           "label": "Serveradresse",

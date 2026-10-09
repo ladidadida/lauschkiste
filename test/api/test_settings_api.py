@@ -93,7 +93,8 @@ def test_plugins_list_and_enable(client, monkeypatch):
     listed = client.get('/api/v1/plugins').json()
     assert listed == [{'name': 'gadget', 'title': 'Gadget', 'enabled': False, 'running': False,
                        'package': 'lauschkiste-plugin-gadget',
-                       'version': '1.2', 'summary': 'Does things.', 'problem': None, 'missing_extras': [],
+                       'version': '1.2', 'summary': 'Does things.', 'problem': None, 'author': None, 'license': None,
+                       'homepage': None, 'documentation': None, 'issues': None, 'missing_extras': [],
                        'provides': [], 'needs': [], 'blocked': None, 'detected': None,
                        'installing': False, 'install_error': None}]
     assert client.put('/api/v1/plugins/gadget', json={'enabled': True}).json()['enabled'] is True
@@ -221,7 +222,9 @@ def test_plugins_bring_their_own_translations(client):
     english = client.get('/api/v1/translations/en').json()
     assert english['settings']['fields']['podcast_directories']['itunes']['country']['values']['de'] == 'Germany'
     # a language no plugin has: nothing, so that the web app falls back to English
-    assert client.get('/api/v1/translations/fr').json() == {'settings': {'fields': {}, 'plugins': {'names': {}}}}
+    assert german['settings']['plugins']['descriptions']['samba'].startswith('Gibt die Bibliothek')
+    assert client.get('/api/v1/translations/fr').json() == {
+        'settings': {'fields': {}, 'plugins': {'names': {}, 'descriptions': {}}}}
     assert client.get('/api/v1/translations/..%2Fx').status_code in (404, 200)
     assert client.get('/api/v1/translations/not-a-language').json()['settings']['fields'] == {}
 
@@ -254,8 +257,16 @@ def test_the_translations_of_every_plugin_cover_the_same_fields_in_each_language
                    for f in folder.iterdir() if f.name.endswith('.json')}
         assert bundles.get('en.json'), f"plugin '{name}' needs English texts (en.json) as the base"
         assert bundles['en.json'].get('name'), f"plugin '{name}' needs a name in en.json"
+        assert bundles['en.json'].get('description'), f"plugin '{name}' needs a description in en.json"
         base = keys(bundles['en.json'])
         for language, bundle in bundles.items():
             assert bundle is not None and keys(bundle) == base, f"plugin '{name}': {language} differs from en.json"
         seen.add(name)
     assert {'audiobookshelf', 'podcast_directories', 'mpd', 'samba', 'gpio_controls', 'rfid_rc522_spi'} <= seen
+
+
+def test_the_plugin_list_carries_what_the_package_says_about_itself(client):
+    entry = next(e for e in client.get('/api/v1/plugins').json() if e['name'] == 'mpd')
+    assert entry['author'] == 'the Lauschkiste contributors' and entry['license'] == 'MIT'
+    assert entry['homepage'] == 'https://github.com/ladidadida/lauschkiste'
+    assert entry['issues'].endswith('/issues') and entry['documentation'].startswith('https://')
