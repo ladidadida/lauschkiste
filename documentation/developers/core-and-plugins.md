@@ -378,6 +378,36 @@ Three extension points are needed from the start, because today's behavior depen
   add its own database as a second source, streaming services later as further ones. The webapp's
   source tabs (`list_library_sources`) already expect this shape.
 
+More that exist now: `player.level_meters` (VU meters), `player.resolvers` (turn a track address into what
+is opened plus headers, so that credentials never appear in a queue), `audiobooks.sources` (books from
+elsewhere), `cache.providers` (items that can be downloaded, see [Caching](caching.md)) and
+`podcasts.directories` (below).
+
+### Podcast directories
+
+A plugin that lets people find podcasts registers an object at `podcasts.directories` under an id (and an
+optional `label` attribute for the name shown). The `podcasts` module merges the answers of all of them for
+`podcasts.search` and `podcasts.top`, takes turns between directories, drops duplicates by feed address and names
+a directory that failed without losing the others:
+
+```python
+class MyDirectory:
+    label = "My directory"
+
+    def search(self, term: str, limit: int) -> list[dict]:
+        return [{"title": ..., "feed_url": ..., "author": ..., "image": ...}]  # author, image optional
+
+    def top(self, limit: int) -> list[dict]:
+        return [...]  # popular podcasts, same mappings
+
+# in start():
+ctx.modules.podcasts.directories.register("mine", MyDirectory())
+```
+
+Every directory has its own interface (some need a key, some need a second request), which is why a new
+one is code and not a setting. `lauschkiste-plugin-podcast-directories` shows three examples (Apple Podcasts, fyyd,
+Podcast Index). Directories send what people type to a third party; a plugin should say so in its documentation.
+
 Further extension points ("powerful plugins": e.g. a playback filter that can veto or rewrite what
 is about to play) follow the same pattern and are added when a plugin needs them.
 

@@ -58,21 +58,22 @@ With the plugin `podcast_directories` (Settings → Plugins, or `lauschctl plugi
 the button "Subscribe to podcast" opens a search: type a name, or look at the popular podcasts when the
 field is empty, and subscribe with one tap. "Add by address" is still there for a feed address.
 
-The places searched are a list in the settings of the plugin. Each entry can be switched off and its address
-changed, and you can add your own:
+Each directory has a switch and the setting that fits it in the settings of the plugin:
 
-| Kind | What it is |
-| --- | --- |
-| `itunes` | Apple Podcasts: search and popular podcasts per country (`country`, default `DE`); no key |
-| `fyyd` | fyyd, a German directory: search and popular podcasts per language; no key |
-| `podcastindex` | The Podcast Index: needs a free key and secret from podcastindex.org, entered in the settings (off until then) |
-| `json` | Any directory that answers a search with JSON: give the search address (with `{term}` and `{limit}`), the path to the list in the answer and the names of the fields for title, feed address, author and image |
+| Directory | What it offers | Settings |
+| --- | --- | --- |
+| Apple Podcasts | search and popular podcasts per country, no key | `itunes.enabled`, `itunes.country` (default `DE`) |
+| fyyd | a German directory: search and popular podcasts per language, no key | `fyyd.enabled`, `fyyd.language` |
+| Podcast Index | needs a free key and secret from podcastindex.org (off until you enter them) | `podcastindex.enabled`, `podcastindex.language`, `podcastindex_key`, `podcastindex_secret` |
+
+Every directory has its own interface, so a further one needs code: see
+[Podcast directories](../developers/core-and-plugins.md#podcast-directories).
 
 Every search goes to the directories that are switched on, so switch off those you do not want to ask.
 A directory that does not answer is named in the dialog and the others still show their results.
 
-[podcast.de](https://www.podcast.de) has no public interface, so it cannot be added as a directory (German
-podcasts are found in Apple Podcasts and fyyd as well).
+[podcast.de](https://www.podcast.de) has no public interface, so it is not among them (German podcasts are
+found in Apple Podcasts and fyyd as well).
 
 ### From and to other apps (OPML)
 

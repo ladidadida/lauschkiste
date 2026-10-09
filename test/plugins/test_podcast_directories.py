@@ -9,8 +9,7 @@ import pytest
 pytest.importorskip('lauschkiste_plugin_podcast_directories', reason="the podcast-directories plugin is not installed")
 
 from lauschkiste_plugin_podcast_directories import PodcastDirectories
-from lauschkiste_plugin_podcast_directories.directories import (DirectoryError, Fyyd, ITunes, JsonDirectory,
-                                                                PodcastIndex)
+from lauschkiste_plugin_podcast_directories.directories import DirectoryError, Fyyd, ITunes, PodcastIndex
 
 ROUTES = {}
 SEEN = []
@@ -87,19 +86,6 @@ def test_podcast_index_signs_its_requests_and_needs_a_key(server):
     assert headers['authorization'] == hashlib.sha1(('KEY' + 'SECRET' + headers['x-auth-date']).encode()).hexdigest()
 
 
-def test_a_generic_json_directory(server):
-    ROUTES['/find'] = {'data': {'items': [{'name': 'Mein Podcast', 'rss': 'https://m/feed', 'by': 'Ich'}]}}
-    directory = JsonDirectory('Mine', search_url=server + '/find?q={term}&n={limit}', results='data.items',
-                              title_key='name', feed_key='rss', author_key='by')
-    assert directory.search('mein podcast', 7) == [{'title': 'Mein Podcast', 'feed_url': 'https://m/feed',
-                                                    'author': 'Ich', 'image': None}]
-    assert SEEN[0][1] == {'q': ['mein podcast'], 'n': ['7']}
-    assert directory.top(5) == []
-    ROUTES['/find'] = {'other': 1}
-    with pytest.raises(DirectoryError, match='no list'):
-        directory.search('x', 1)
-
-
 def test_errors_are_plain(server):
     with pytest.raises(DirectoryError, match='not reachable'):
         ITunes('A', url=server).search('x', 1)  # 404
@@ -109,7 +95,29 @@ def test_errors_are_plain(server):
 
 
 def test_settings_default_to_apple_and_fyyd_on_and_the_index_off():
-    from lauschkiste_plugin_podcast_directories import default_directories
-    defaults = default_directories()
-    assert {k: v.enabled for k, v in defaults.items()} == {'itunes': True, 'fyyd': True, 'podcastindex': False}
+    values = PodcastDirectories.settings()
+    assert (values.itunes.enabled, values.fyyd.enabled, values.podcastindex.enabled) == (True, True, False)
     assert PodcastDirectories.settings.model_json_schema()['properties']['podcastindex_key']['secret'] is True
+
+
+def test_directories_follow_the_settings(tmp_path):
+    from unittest.mock import MagicMock
+
+    values = {'itunes': {'country': 'AT'}, 'fyyd': {'enabled': False}, 'podcastindex': {'enabled': True}}
+    points = MagicMock()
+    registered = {}
+    points.register.side_effect = lambda key, directory: registered.update({key: directory})
+    ctx = MagicMock()
+    ctx.modules.podcasts.directories = points
+    ctx.config.get.side_effect = lambda *keys, default=None: (
+        values.get(keys[0], {}).get(keys[1], default) if len(keys) == 2 else default)
+    plugin = PodcastDirectories()
+    plugin.start(ctx)
+    assert sorted(registered) == ['itunes', 'podcastindex'] and registered['itunes'].country == 'at'
+
+    values['fyyd'] = {}
+    values['itunes'] = {'enabled': False}
+    registered.clear()
+    plugin.settings_changed({})
+    assert sorted(registered) == ['fyyd', 'podcastindex']
+    assert {call.args[0] for call in points.unregister.call_args_list} >= {'itunes', 'podcastindex'}

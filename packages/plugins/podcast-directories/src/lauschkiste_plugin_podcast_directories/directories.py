@@ -3,7 +3,6 @@
 import hashlib
 import time
 from typing import Any, Callable, Dict, List, Optional
-from urllib.parse import quote
 
 import requests
 
@@ -109,41 +108,3 @@ class PodcastIndex:
     def top(self, limit: int) -> List[Row]:
         return self._rows(get_json(f'{self.base}/api/1.0/podcasts/trending',
                                    {'max': limit, 'lang': self.language}, self._headers()))
-
-
-def _dig(data: Any, path: str) -> Any:
-    for part in [p for p in path.split('.') if p]:
-        data = data.get(part) if isinstance(data, dict) else (data[int(part)] if isinstance(data, list)
-                                                              and part.isdigit() and int(part) < len(data) else None)
-    return data
-
-
-class JsonDirectory:
-    """Any directory that answers a search with JSON: the address (``{term}`` and ``{limit}`` are filled in) and
-    the names of the fields are set in the settings."""
-
-    def __init__(self, label: str, search_url: str = '', top_url: str = '', results: str = '', title_key: str = 'title',
-                 feed_key: str = 'feed_url', author_key: str = '', image_key: str = '', **_):
-        self.label = label
-        self.search_url, self.top_url, self.results = search_url, top_url, results
-        self.keys = {'title': title_key, 'feed_url': feed_key, 'author': author_key, 'image': image_key}
-
-    def _rows(self, data: Any) -> List[Row]:
-        rows = _dig(data, self.results) if self.results else data
-        if not isinstance(rows, list):
-            raise DirectoryError('the answer has no list at the configured place')
-        return [{name: (row.get(key) if key and isinstance(row, dict) else None) for name, key in self.keys.items()}
-                for row in rows]
-
-    def search(self, term: str, limit: int) -> List[Row]:
-        if not self.search_url:
-            return []
-        return self._rows(get_json(self.search_url.replace('{term}', quote(term)).replace('{limit}', str(limit))))
-
-    def top(self, limit: int) -> List[Row]:
-        if not self.top_url:
-            return []
-        return self._rows(get_json(self.top_url.replace('{limit}', str(limit))))
-
-
-KINDS = {'itunes': ITunes, 'fyyd': Fyyd, 'podcastindex': PodcastIndex, 'json': JsonDirectory}
