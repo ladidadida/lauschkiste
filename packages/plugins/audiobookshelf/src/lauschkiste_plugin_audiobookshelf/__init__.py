@@ -47,6 +47,7 @@ class Audiobookshelf(Plugin):
     """Audiobooks from an Audiobookshelf server, streamed or downloaded; the position is shared with its apps."""
 
     name = 'audiobookshelf'
+    title = 'Audiobookshelf'
     interface_version = '1.0'
     requires = {'audiobooks': '>=3.0,<4', 'player': '>=5.2,<6', 'cache': '>=1.0,<2'}
     settings = AudiobookshelfSettings

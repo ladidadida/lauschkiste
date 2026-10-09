@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 
 import request from '../../../utils/request';
+import { pluginName } from '../../../utils/plugin-name';
 import CliHint from '../cli-hint';
 import { useRestart } from '../restart';
 import SettingsPage from './page';
@@ -87,7 +88,7 @@ const HardwareSettings = () => {
                 sx={{ marginBottom: 2 }}
               >
                 {enabled === name ? t('settings.hardware.board-enabled')
-                  : t('settings.hardware.detected', { model, name: t(`settings.plugins.names.${name}`, { defaultValue: name }) })}
+                  : t('settings.hardware.detected', { model, name: pluginName(t, name) })}
               </Alert>
             ))}
             <Button component={RouterLink} to="/settings/plugins" variant="outlined">

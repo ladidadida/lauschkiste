@@ -91,7 +91,8 @@ def test_plugins_list_and_enable(client, monkeypatch):
     monkeypatch.setattr(plugins, 'installed', lambda: {'gadget': ep})
     monkeypatch.setattr(plugins, 'missing_extras', lambda name: [])
     listed = client.get('/api/v1/plugins').json()
-    assert listed == [{'name': 'gadget', 'enabled': False, 'running': False, 'package': 'lauschkiste-plugin-gadget',
+    assert listed == [{'name': 'gadget', 'title': 'Gadget', 'enabled': False, 'running': False,
+                       'package': 'lauschkiste-plugin-gadget',
                        'version': '1.2', 'summary': 'Does things.', 'problem': None, 'missing_extras': [],
                        'provides': [], 'needs': [], 'blocked': None, 'detected': None,
                        'installing': False, 'install_error': None}]
@@ -211,3 +212,46 @@ def test_secret_settings_are_never_sent_and_an_empty_value_keeps_them(client):
     assert response.json()['secrets_set'] == ['token']
     assert secrets.get('demo', 'token') == 's3cret'
     assert Demo.applied[-1] == {'level': 5}
+
+
+def test_plugins_bring_their_own_translations(client):
+    german = client.get('/api/v1/translations/de').json()
+    assert german['settings']['plugins']['names']['audiobookshelf'].startswith('Audiobookshelf')
+    assert german['settings']['fields']['podcast_directories']['itunes']['country']['values']['de'] == 'Deutschland'
+    english = client.get('/api/v1/translations/en').json()
+    assert english['settings']['fields']['podcast_directories']['itunes']['country']['values']['de'] == 'Germany'
+    # a language no plugin has: nothing, so that the web app falls back to English
+    assert client.get('/api/v1/translations/fr').json() == {'settings': {'fields': {}, 'plugins': {'names': {}}}}
+    assert client.get('/api/v1/translations/..%2Fx').status_code in (404, 200)
+    assert client.get('/api/v1/translations/not-a-language').json()['settings']['fields'] == {}
+
+
+def test_every_plugin_has_a_readable_title(client):
+    plugins = {entry['name']: entry for entry in client.get('/api/v1/plugins').json()}
+    assert plugins['audiobookshelf']['title'] == 'Audiobookshelf'
+    assert plugins['podcast_directories']['title'] == 'Find podcasts'
+    assert plugins['rfid_rc522_spi']['title'] == 'Rfid rc522 spi'
+
+
+def test_the_translations_of_every_plugin_cover_the_same_fields_in_each_language():
+    import json
+    from importlib import resources
+
+    import lauschkiste.contract.plugins as plugins
+
+    def keys(node, prefix=''):
+        return {f'{prefix}{k}' if not isinstance(v, dict) else None for k, v in node.items()} - {None} | {
+            key for k, v in node.items() if isinstance(v, dict) for key in keys(v, f'{prefix}{k}.')}
+
+    checked = 0
+    for name, ep in plugins.installed().items():
+        folder = resources.files(ep.value.split(':', 1)[0].split('.', 1)[0]) / 'translations'
+        if not folder.is_dir():
+            continue
+        bundles = {f.name: json.loads(f.read_text(encoding='utf-8')) for f in folder.iterdir() if f.name.endswith('.json')}
+        assert 'en.json' in bundles, f"plugin '{name}' needs English texts as the base"
+        base = keys(bundles['en.json'])
+        for language, bundle in bundles.items():
+            assert keys(bundle) == base, f"plugin '{name}': {language} differs from en.json"
+        checked += 1
+    assert checked >= 2

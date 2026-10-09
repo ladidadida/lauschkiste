@@ -59,6 +59,7 @@ class PodcastDirectories(Plugin):
     """Search for podcasts in Apple Podcasts, fyyd and the Podcast Index."""
 
     name = 'podcast_directories'
+    title = 'Find podcasts'
     interface_version = '1.0'
     requires = {'podcasts': '>=3.0,<4'}
     settings = PodcastDirectoriesSettings

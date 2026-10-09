@@ -250,6 +250,28 @@ keep reading `ctx.config` with the same defaults.
   people neither share nor back up by accident. The module still reads them with `ctx.config.get(...)`.
   On the command line: `lauschctl config set plugins.<name>.<key> --secret` (asks for the value),
   `lauschctl config get` hides them (`--reveal` shows them).
+- **Translations of a plugin** ship with the plugin: `<package>/translations/<language>.json` (`en.json` is the
+  base, `de.json` etc. are optional). The file has the plugin's display name and the texts of its settings in
+  the shape of `settings.fields.<plugin>` of the web app:
+
+  ```json
+  {
+    "name": "Find podcasts",
+    "fields": {
+      "itunes": {
+        "label": "Apple Podcasts", "help": "…",
+        "country": {"label": "Country", "help": "…", "values": {"de": "Germany"}}
+      }
+    }
+  }
+  ```
+
+  `GET /api/v1/translations/<language>` returns the bundles of all installed plugins; the web app merges them into
+  its own texts (its own always win). What is missing falls back in this order: the language asked for, English
+  (the web app's, then the plugin's `en.json`), the `title`/`description` of the field in the settings model, and for
+  the plugin's name its `title` class attribute (`Plugin.title`, English) and finally the plugin's name made
+  readable (`podcast_directories` becomes "Podcast directories", never the bare name). A test checks that all
+  languages of a plugin have the same keys as `en.json`.
 - `GET /api/v1/plugins` lists installed plugins (enabled, running, problem, missing extras);
   `PUT /api/v1/plugins/<name>` with `{"enabled": true}` enables one (after a restart).
 

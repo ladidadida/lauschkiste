@@ -1,0 +1,89 @@
+{
+  "name": "Podcasts finden (Apple, fyyd, Podcast Index)",
+  "fields": {
+    "itunes": {
+      "label": "Apple Podcasts",
+      "help": "Verzeichnis von Apple, ohne Anmeldung",
+      "enabled": {
+        "label": "In Apple Podcasts suchen",
+        "help": "Was du eintippst, geht an Apple"
+      },
+      "country": {
+        "label": "Land",
+        "help": "Bestimmt, welche Podcasts unter „Beliebt“ stehen",
+        "values": {
+          "de": "Deutschland",
+          "at": "Österreich",
+          "ch": "Schweiz",
+          "us": "USA",
+          "gb": "Großbritannien",
+          "fr": "Frankreich",
+          "it": "Italien",
+          "es": "Spanien",
+          "nl": "Niederlande",
+          "be": "Belgien",
+          "dk": "Dänemark",
+          "se": "Schweden",
+          "no": "Norwegen",
+          "fi": "Finnland",
+          "pl": "Polen",
+          "cz": "Tschechien",
+          "pt": "Portugal",
+          "ie": "Irland",
+          "ca": "Kanada",
+          "au": "Australien"
+        }
+      }
+    },
+    "fyyd": {
+      "label": "fyyd",
+      "help": "Deutsches Podcast-Verzeichnis, ohne Anmeldung",
+      "enabled": {
+        "label": "In fyyd suchen",
+        "help": "Was du eintippst, geht an fyyd.de"
+      },
+      "language": {
+        "label": "Sprache der beliebten Podcasts",
+        "values": {
+          "de": "Deutsch",
+          "en": "Englisch",
+          "fr": "Französisch",
+          "it": "Italienisch",
+          "es": "Spanisch",
+          "nl": "Niederländisch",
+          "pl": "Polnisch",
+          "tr": "Türkisch"
+        }
+      }
+    },
+    "podcastindex": {
+      "label": "Podcast Index",
+      "help": "Offenes Verzeichnis, braucht einen kostenlosen Schlüssel",
+      "enabled": {
+        "label": "Im Podcast Index suchen",
+        "help": "Zuerst unten Schlüssel und Secret von podcastindex.org eintragen"
+      },
+      "language": {
+        "label": "Sprache der beliebten Podcasts",
+        "values": {
+          "de": "Deutsch",
+          "en": "Englisch",
+          "fr": "Französisch",
+          "it": "Italienisch",
+          "es": "Spanisch",
+          "nl": "Niederländisch",
+          "pl": "Polnisch",
+          "tr": "Türkisch"
+        }
+      }
+    },
+    "podcastindex_key": {
+      "label": "Podcast-Index-Schlüssel",
+      "help": "Auf podcastindex.org kostenlos anlegen. Leer lassen, um den gespeicherten zu behalten."
+    },
+    "podcastindex_secret": {
+      "label": "Podcast-Index-Secret",
+      "help": "Gehört zum Schlüssel. Leer lassen, um das gespeicherte zu behalten."
+    }
+  }
+}

@@ -239,6 +239,11 @@ def add_plugin_routes(router: APIRouter, manager: ModuleManager, blocking) -> No
         """Installed plugins, whether they are enabled and running, and what is missing."""
         return await blocking(plugins.describe, store.cfg, manager, store.installer)
 
+    @router.get('/api/v1/translations/{language}', tags=['settings'])
+    async def plugin_translations(language: str):
+        """The texts the installed plugins ship for a language, to be merged into the web app's own."""
+        return await blocking(plugins.translations, language)
+
     @router.put('/api/v1/plugins/{name}', tags=['settings'])
     async def enable_plugin(name: str, body: PluginState):
         """Enable or disable an installed plugin; takes effect after a restart."""

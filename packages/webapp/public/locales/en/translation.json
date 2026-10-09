@@ -595,9 +595,7 @@
         "gpio_controls": "Buttons, encoders, LED (GPIO)",
         "battery": "Battery",
         "power_button": "Power button",
-        "phat_beat": "Pimoroni pHAT BEAT",
-        "audiobookshelf": "Audiobookshelf (audiobooks from a server)",
-        "podcast_directories": "Find podcasts (Apple, fyyd, Podcast Index)"
+        "phat_beat": "Pimoroni pHAT BEAT"
       },
       "install": "Install",
       "installing": "Installing packages, this can take a few minutes …",
@@ -676,92 +674,6 @@
           }
         }
       },
-      "podcast_directories": {
-        "itunes": {
-          "label": "Apple Podcasts",
-          "help": "Apple's directory, no sign-in",
-          "enabled": {
-            "label": "Search in Apple Podcasts",
-            "help": "What you type is sent to Apple"
-          },
-          "country": {
-            "label": "Country",
-            "help": "Decides which podcasts are popular",
-            "values": {
-              "de": "Germany",
-              "at": "Austria",
-              "ch": "Switzerland",
-              "us": "USA",
-              "gb": "United Kingdom",
-              "fr": "France",
-              "it": "Italy",
-              "es": "Spain",
-              "nl": "Netherlands",
-              "be": "Belgium",
-              "dk": "Denmark",
-              "se": "Sweden",
-              "no": "Norway",
-              "fi": "Finland",
-              "pl": "Poland",
-              "cz": "Czechia",
-              "pt": "Portugal",
-              "ie": "Ireland",
-              "ca": "Canada",
-              "au": "Australia"
-            }
-          }
-        },
-        "fyyd": {
-          "label": "fyyd",
-          "help": "German podcast directory, no sign-in",
-          "enabled": {
-            "label": "Search in fyyd",
-            "help": "What you type is sent to fyyd.de"
-          },
-          "language": {
-            "label": "Language of the popular podcasts",
-            "values": {
-              "de": "German",
-              "en": "English",
-              "fr": "French",
-              "it": "Italian",
-              "es": "Spanish",
-              "nl": "Dutch",
-              "pl": "Polish",
-              "tr": "Turkish"
-            }
-          }
-        },
-        "podcastindex": {
-          "label": "Podcast Index",
-          "help": "Open directory, needs a free key",
-          "enabled": {
-            "label": "Search in the Podcast Index",
-            "help": "Enter the key and secret from podcastindex.org below first"
-          },
-          "language": {
-            "label": "Language of the popular podcasts",
-            "values": {
-              "de": "German",
-              "en": "English",
-              "fr": "French",
-              "it": "Italian",
-              "es": "Spanish",
-              "nl": "Dutch",
-              "pl": "Polish",
-              "tr": "Turkish"
-            }
-          }
-        },
-        "podcastindex_key": {
-          "label": "Podcast Index key",
-          "help": "Free at podcastindex.org. Leave empty to keep the current one."
-        },
-        "podcastindex_secret": {
-          "label": "Podcast Index secret",
-          "help": "Belongs to the key. Leave empty to keep the current one."
-        }
-      },
       "cache": {
         "limit_gb": {
           "label": "Space for downloads (GB)",
@@ -774,24 +686,6 @@
         "remove_old": {
           "label": "Remove old downloads when the space is full",
           "help": "Deletes the oldest finished books and heard episodes. Items in progress stay."
-        }
-      },
-      "audiobookshelf": {
-        "server_url": {
-          "label": "Server address",
-          "help": "e.g. https://audiobookshelf.example.org or http://nas:13378"
-        },
-        "api_key": {
-          "label": "API key",
-          "help": "Create one in Audiobookshelf under Settings, API Keys, for the user the box should use. Leave empty to keep the current one."
-        },
-        "refresh_minutes": {
-          "label": "Ask for new books every (minutes)",
-          "help": "The position is always read fresh."
-        },
-        "prefer_downloaded": {
-          "label": "Play downloaded books from the box",
-          "help": "Even when the server is reachable."
         }
       }
     },

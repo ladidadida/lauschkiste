@@ -49,9 +49,10 @@
     "extras": "attribute",
     "needs": "attribute",
     "provides": "attribute",
+    "title": "attribute",
     "validate_declaration": "(cls) -> None"
   },
-  "contract_version": "2.2",
+  "contract_version": "2.3",
   "functions": {
     "action": "(func: Callable | None = None, *, method: str = 'POST', path: str | None = None, exclusive: bool = True, name: str | None = None, status_code: int | None = None)",
     "event": "(name: str, model: Type[pydantic.main.BaseModel]) -> lauschkiste.contract.declarations.EventSpec",

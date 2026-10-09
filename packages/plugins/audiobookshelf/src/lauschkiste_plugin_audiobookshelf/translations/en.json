@@ -1,0 +1,21 @@
+{
+  "name": "Audiobookshelf (audiobooks from a server)",
+  "fields": {
+    "server_url": {
+      "label": "Server address",
+      "help": "e.g. https://audiobookshelf.example.org or http://nas:13378"
+    },
+    "api_key": {
+      "label": "API key",
+      "help": "Create one in Audiobookshelf under Settings, API Keys, for the user the box should use. Leave empty to keep the current one."
+    },
+    "refresh_minutes": {
+      "label": "Ask for new books every (minutes)",
+      "help": "The position is always read fresh."
+    },
+    "prefer_downloaded": {
+      "label": "Play downloaded books from the box",
+      "help": "Even when the server is reachable."
+    }
+  }
+}

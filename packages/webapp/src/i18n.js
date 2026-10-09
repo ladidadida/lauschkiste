@@ -27,9 +27,30 @@ const i18nReady = i18n
       escapeValue: false, // not needed for react as it escapes by default
     },
     react: {
+      // plugins' texts are added after the start
+      bindI18nStore: 'added',
       useSuspense: false,
     },
   });
+
+// Plugins bring their own texts (names, the labels and help of their settings); the web app's own win, and a
+// language a plugin lacks falls back to English and then to the plugin's English schema texts.
+const loadPluginTexts = async (language) => {
+  const base = String(language || '').split('-')[0].toLowerCase();
+  await Promise.all([...new Set([base, 'en'])].filter(Boolean).map(async (code) => {
+    try {
+      const response = await fetch(`/api/v1/translations/${code}`);
+      if (!response.ok) return;
+      i18n.addResourceBundle(code, 'translation', await response.json(), true, false);
+    }
+    catch {
+      // the plugins' texts are optional
+    }
+  }));
+};
+
+i18nReady.then(() => loadPluginTexts(i18n.resolvedLanguage || i18n.language));
+i18n.on('languageChanged', loadPluginTexts);
 
 export { i18nReady };
 export default i18n;

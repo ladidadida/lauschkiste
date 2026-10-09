@@ -21,12 +21,13 @@ import {
 import SettingsIcon from '@mui/icons-material/Settings';
 
 import request from '../../../utils/request';
+import { pluginName } from '../../../utils/plugin-name';
 import ModuleSettings from '../form/module-settings';
 import { useRestart } from '../restart';
 import SettingsPage from './page';
 
 const blockedText = (t, blocked) => (blocked.taken_by
-  ? t('settings.plugins.blocked-board', { name: t(`settings.plugins.names.${blocked.taken_by}`, { defaultValue: blocked.taken_by }) })
+  ? t('settings.plugins.blocked-board', { name: pluginName(t, blocked.taken_by) })
   : t('settings.plugins.blocked-needs', {
     needs: blocked.missing.map((need) => t(`settings.plugins.capabilities.${need}`, { defaultValue: need })).join(', '),
   }));
@@ -108,7 +109,7 @@ const PluginsSettings = () => {
                 <ListItemText
                   primary={
                     <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
-                      <span>{t(`settings.plugins.names.${plugin.name}`, { defaultValue: plugin.name })}</span>
+                      <span>{pluginName(t, plugin.name, plugin.title)}</span>
                       {plugin.running && <Chip color="success" label={t('settings.plugins.running')} size="small" />}
                       {plugin.enabled && !plugin.running &&
                         <Chip color="warning" label={t('settings.plugins.not-running')} size="small" />}
@@ -166,7 +167,7 @@ const PluginSettings = () => {
   const { t } = useTranslation();
   const { name } = useParams();
   return (
-    <SettingsPage title={t(`settings.plugins.names.${name}`, { defaultValue: name })}>
+    <SettingsPage title={pluginName(t, name)}>
       <ModuleSettings module={name} title={t('settings.plugins.settings-title')} />
     </SettingsPage>
   );

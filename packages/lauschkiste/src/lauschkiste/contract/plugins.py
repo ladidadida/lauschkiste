@@ -1,10 +1,13 @@
 """Installed plugins: their extras, whether those are installed, and enabling them in the config."""
 
+import json
 import logging
+import re
 import shutil
 import subprocess
 import sys
 import threading
+from importlib import resources
 from importlib.metadata import PackageNotFoundError, distribution, entry_points
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
@@ -17,6 +20,11 @@ EXCLUSIVE = ('board',)
 INSTALL_TIMEOUT_SEC = 1800
 
 logger = logging.getLogger('lauschkiste.contract.plugins')
+
+
+def readable(name: str) -> str:
+    """``podcast_directories`` -> ``Podcast directories``: what is shown for a plugin nobody named."""
+    return name.replace('_', ' ').strip().capitalize()
 
 
 def installed() -> Dict[str, Any]:
@@ -227,7 +235,8 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
     result = []
     for name in sorted(set(available) | set(on)):
         ep = available.get(name)
-        entry: Dict[str, Any] = {'name': name, 'enabled': name in on, 'running': bool(manager and name in manager),
+        entry: Dict[str, Any] = {'name': name, 'title': readable(name), 'enabled': name in on,
+                                 'running': bool(manager and name in manager),
                                  'package': None, 'version': None, 'summary': '', 'problem': None,
                                  'missing_extras': [], 'provides': [], 'needs': [], 'blocked': None,
                                  'detected': None}
@@ -237,6 +246,7 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
             cls, problem = load(ep)
             if ep.dist is not None:
                 entry['package'], entry['version'] = ep.dist.name, ep.dist.version
+            entry['title'] = (getattr(cls, 'title', '') or '') or entry['title']
             entry['summary'] = (getattr(cls, '__doc__', None) or '').strip().split('\n', 1)[0].replace('``', '') if cls else ''
             entry['problem'] = problem or (manager.failed.get(name) if manager else None)
             entry['missing_extras'] = missing_extras(name)
@@ -247,4 +257,34 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
                     entry['blocked'] = blocker(cls, active)
         entry.update(installer.state(name) if installer else {'installing': False, 'install_error': None})
         result.append(entry)
+    return result
+
+
+LANGUAGE = re.compile(r'^[A-Za-z]{2,3}$')
+
+
+def _translation(ep, language: str) -> Dict[str, Any]:
+    package = ep.value.split(':', 1)[0].split('.', 1)[0]
+    try:
+        text = (resources.files(package) / 'translations' / f'{language}.json').read_text(encoding='utf-8')
+        data = json.loads(text)
+    except (OSError, ValueError, ModuleNotFoundError) as error:
+        if not isinstance(error, (FileNotFoundError, ModuleNotFoundError)):
+            logger.warning(f"Translation '{language}' of plugin '{ep.name}' is not usable: {error}")
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def translations(language: str) -> Dict[str, Any]:
+    """What the installed plugins ship for ``language`` (``<package>/translations/<language>.json`` with the plugin's
+    ``name`` and its ``fields``, shaped like ``settings.fields.<plugin>``), as part of the web app's translation file."""
+    result: Dict[str, Any] = {'settings': {'fields': {}, 'plugins': {'names': {}}}}
+    if not LANGUAGE.match(language):
+        return result
+    for name, ep in installed().items():
+        data = _translation(ep, language.lower())
+        if isinstance(data.get('name'), str) and data['name']:
+            result['settings']['plugins']['names'][name] = data['name']
+        if isinstance(data.get('fields'), dict):
+            result['settings']['fields'][name] = data['fields']
     return result

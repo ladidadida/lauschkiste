@@ -135,6 +135,8 @@ class Plugin(Module):
     contract: ClassVar[str] = f">={Version(CONTRACT_VERSION).major}.0,<{Version(CONTRACT_VERSION).major + 1}"
     #: Extras of the plugin's own package it needs (installed by `lauschctl plugin enable --with-extras`)
     extras: ClassVar[Tuple[str, ...]] = ()
+    #: The name shown in the plugin list when no translation exists (default: the plugin's name made readable)
+    title: ClassVar[str] = ''
     #: Capabilities it offers other plugins, e.g. ``('board', 'gpio', 'i2c')``; only one plugin may provide 'board'
     provides: ClassVar[Tuple[str, ...]] = ()
     #: Capabilities an enabled plugin must provide, e.g. ``('i2c',)``
