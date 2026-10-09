@@ -19,5 +19,5 @@ plugins:
     warning_voltage: 3300     # mV, runs warning_action once
     shutdown_voltage: 3000    # mV, shuts the box down
     interval_sec: 10
-    warning_action: {action: jingle.play, args: {sound: sounds/battery_low.wav}}
+    warning_action: {action: jingle.play, args: {sound: /path/to/low-battery.wav}}
 ```

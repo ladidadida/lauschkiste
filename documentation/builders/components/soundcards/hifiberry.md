@@ -4,10 +4,10 @@ The setup works for the most common set of HiFiBerry boards but also other "DAC"
 
 ## Automatic setup
 
-`lauschctl setup raspi` asks for the sound card: answer with the board identifier, e.g.
-`hifiberry-dac` (the question lists all of them). It adds the board's `dtoverlay` to
-`/boot/firmware/config.txt` (replacing another HiFiBerry overlay), disables the on-chip audio and
-keeps a backup of the previous file. Reboot afterwards.
+Choose the board in the web app (Settings → Plugins → Raspberry Pi → Sound card, e.g. `hifiberry-dac`), then
+run `lauschctl setup raspi` on the box and reboot. The step adds the board's `dtoverlay` to
+`/boot/firmware/config.txt` (replacing another sound overlay), switches the on-chip audio off and keeps a backup
+as `config.txt.backup`. Settings → Hardware shows while a change is still pending.
 
 The setup is based on [HiFiBerry's instructions](https://www.hifiberry.com/docs/software/configuring-linux-3-18-x/).
 
