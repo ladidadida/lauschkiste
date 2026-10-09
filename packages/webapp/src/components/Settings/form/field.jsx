@@ -127,13 +127,14 @@ const OptionsField = ({ help, label, nullable, onChange, schema, value }) => {
   );
 };
 
-const EnumField = ({ help, kind, label, nullable, onChange, schema, value }) => {
+// `valuesKey`: where this field's own names for its choices are translated (else the shared `settings.values`).
+const EnumField = ({ help, kind, label, nullable, onChange, schema, value, valuesKey }) => {
   const { t } = useTranslation();
   const id = useId();
   const options = kind === 'boolean' ? [true, false] : schema.enum;
   const optionLabel = (option) => (kind === 'boolean'
     ? t(option ? 'settings.form.on' : 'settings.form.off')
-    : t(`settings.values.${option}`, { defaultValue: String(option) }));
+    : t(`${valuesKey}.${option}`, { defaultValue: t(`settings.values.${option}`, { defaultValue: String(option) }) }));
   const current = value === null || value === undefined ? NONE : JSON.stringify(value);
   return (
     <FormControl fullWidth size="small">
@@ -242,8 +243,9 @@ const Field = ({ i18nBase, onChange, path, root, schema: rawSchema, value, witho
   }
 
   if (kind === 'enum' || kind === 'boolean') {
+    const valuesKey = i18nBase ? `${[i18nBase, ...path.filter((part) => part !== '*')].join('.')}.values` : 'settings.values';
     return <EnumField help={help} kind={kind} label={label} nullable={nullable} onChange={onChange}
-      schema={schema} value={value} />;
+      schema={schema} value={value} valuesKey={valuesKey} />;
   }
 
   if (kind === 'options') {

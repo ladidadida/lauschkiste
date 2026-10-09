@@ -12,7 +12,7 @@ Another directory needs code: a plugin that registers an object with ``search(te
 """
 
 import logging
-from typing import List
+from typing import List, Literal, get_args
 
 from pydantic import BaseModel, Field
 
@@ -22,20 +22,27 @@ from lauschkiste_plugin_podcast_directories.directories import Fyyd, ITunes, Pod
 logger = logging.getLogger('lauschkiste.podcast_directories')
 
 
+Country = Literal['de', 'at', 'ch', 'us', 'gb', 'fr', 'it', 'es', 'nl', 'be', 'dk', 'se', 'no', 'fi', 'pl', 'cz',
+                  'pt', 'ie', 'ca', 'au']
+Language = Literal['de', 'en', 'fr', 'it', 'es', 'nl', 'pl', 'tr']
+COUNTRIES = get_args(Country)
+LANGUAGES = get_args(Language)
+
+
 class AppleSettings(BaseModel):
-    enabled: bool = Field(True, title='Search in Apple Podcasts')
-    country: str = Field('DE', title='Country', description='Two letters; decides the popular podcasts')
+    enabled: bool = Field(True, title='Search in Apple Podcasts', description='What you type is sent to Apple')
+    country: Country = Field('de', title='Country', description='Decides which podcasts are popular')
 
 
 class FyydSettings(BaseModel):
-    enabled: bool = Field(True, title='Search in fyyd')
-    language: str = Field('de', title='Language of the popular podcasts')
+    enabled: bool = Field(True, title='Search in fyyd', description='What you type is sent to fyyd.de')
+    language: Language = Field('de', title='Language of the popular podcasts')
 
 
 class PodcastIndexSettings(BaseModel):
     enabled: bool = Field(False, title='Search in the Podcast Index',
                           description='Needs a free key and secret from podcastindex.org (below)')
-    language: str = Field('de', title='Language of the popular podcasts')
+    language: Language = Field('de', title='Language of the popular podcasts')
 
 
 class PodcastDirectoriesSettings(BaseModel):
@@ -78,7 +85,7 @@ class PodcastDirectories(Plugin):
             return config.get(directory, name, default=default)
 
         if setting('itunes', 'enabled', True):
-            points.register('itunes', ITunes('Apple Podcasts', country=setting('itunes', 'country', 'DE')))
+            points.register('itunes', ITunes('Apple Podcasts', country=setting('itunes', 'country', 'de')))
             self._registered.append('itunes')
         if setting('fyyd', 'enabled', True):
             points.register('fyyd', Fyyd('fyyd', language=setting('fyyd', 'language', 'de')))

@@ -25,10 +25,13 @@ SYNC_EVERY_SEC = 60.0
 
 
 class AudiobookshelfSettings(BaseModel):
-    server_url: str = Field('', title='Server address', description='e.g. https://audiobookshelf.example.org')
+    server_url: str = Field('', title='Server address',
+                            description='e.g. https://audiobookshelf.example.org or http://nas:13378')
     api_key: str = Field('', title='API key', json_schema_extra={'secret': True},
-                         description='Audiobookshelf: Settings, API Keys. Leave empty to keep the current one.')
-    refresh_minutes: int = Field(10, ge=1, le=1440, title='Refresh the book list every (minutes)')
+                         description='Create one in Audiobookshelf under Settings, API Keys, for the user the box '
+                                     'should use. Leave empty to keep the current one.')
+    refresh_minutes: int = Field(10, ge=1, le=1440, title='Ask for new books every (minutes)',
+                                 description='The position is always read fresh')
     prefer_downloaded: bool = Field(True, title='Play downloaded books from the box',
                                     description='Even when the server is reachable')
 

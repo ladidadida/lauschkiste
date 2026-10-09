@@ -78,11 +78,13 @@ class Downloads(BaseModel):
 
 
 class CacheSettings(BaseModel):
-    limit_gb: float = Field(8, ge=0.1, le=2000, title='Space for downloads (GB)')
+    limit_gb: float = Field(8, ge=0.1, le=2000, title='Space for downloads (GB)',
+                            description='All downloaded books and episodes together; a download that would not fit is refused')
     rate_playing_kbps: int = Field(1000, ge=0, le=100000, title='Download speed while playing (kB/s)',
-                                   description='0 waits until the playback stops')
-    remove_old: bool = Field(False, title='Make room by removing old downloads',
-                             description='Removes the oldest items the source allows removing (for example finished books)')
+                                   description='Slower while something plays, so that the playback does not stutter; '
+                                               '0 waits until the playback stops')
+    remove_old: bool = Field(False, title='Remove old downloads when the space is full',
+                             description='Deletes the oldest finished books and heard episodes; items in progress stay')
 
 
 def _name(value: str, what: str) -> str:

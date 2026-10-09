@@ -79,6 +79,7 @@ const LibrarySettings = () => {
     <SettingsPage title={t('settings.sections.library.title')}>
       <SettingsGeneral />
       <ModuleSettings module="library" />
+      <ModuleSettings module="cache" title={t('settings.cache.title')} />
       <SambaSettings />
     </SettingsPage>
   );
