@@ -23,7 +23,7 @@ class Claims:
 ```
 
 `GET /api/v1/hardware` lists the board's pins with their functions and who uses them; a
-resource claimed twice is a conflict. Pin fields in settings use
+resource claimed twice is a conflict, unless the claim is marked `shared` (an I²C or SPI bus used by several devices). Pin fields in settings use
 `json_schema_extra={'options': '/api/v1/hardware/pin-options'}`, which offers the board's GPIO pins
 and names their current users.
 
@@ -50,8 +50,9 @@ and is free is checked through the claims at runtime.
 
 Exactly one board plugin registers at `hardware.boards`. It describes the board (`describe()`:
 model, pins with header position and functions, interfaces), maps a pin to a GPIO line
-(`gpio_line(pin) -> (chip, line)`, used with `lgpio`/`gpiozero` on any Linux GPIO chip), powers the
-board off or reboots it, and claims what its own settings use (e.g. the I²S pins of a sound card).
+(`gpio_line(pin) -> (chip, line)`, used with `lgpio`/`gpiozero` on any Linux GPIO chip), accepts pins the way
+users write them (`pin_id`: `17` or `GPIO17`), powers the board off or reboots it, reports which boot settings
+are pending (`boot_pending`) and claims what its own settings use (e.g. the I²S pins of a sound card).
 Without a board plugin (e.g. on a desktop) there are no pins, and shutdown/reboot are not
 available.
 
