@@ -1,5 +1,8 @@
 # OnOff SHIM by Pimoroni
 
+> [!NOTE]
+> Not yet tested on real hardware.
+
 The OnOff SHIM switches the Raspberry Pi on with a button press, shuts it down cleanly with the
 next press and then cuts the power. In Lauschkiste it is the `power_button` plugin with the preset
 "Pimoroni OnOff SHIM" (button on GPIO17, power-off on GPIO4); no Pimoroni script is needed.

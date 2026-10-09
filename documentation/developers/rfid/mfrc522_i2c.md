@@ -1,5 +1,8 @@
 # MFRC522 I2C Reader
 
+> [!NOTE]
+> Not yet tested on real hardware.
+
 The MFRC522-based readers connected via I2C
 
 This reader module is based on the [mfrc522_i2c

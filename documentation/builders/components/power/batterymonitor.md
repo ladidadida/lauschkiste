@@ -1,5 +1,8 @@
 # Battery Monitor
 
+> [!NOTE]
+> Not yet tested on real hardware.
+
 The `battery` plugin reads a battery sensor on I²C, publishes the state of charge (shown under
 Settings → Status), runs an action when the battery gets low and shuts the box down cleanly before
 it is empty. It needs the plugin's `battery` extra (installed from the plugins page) and I²C,

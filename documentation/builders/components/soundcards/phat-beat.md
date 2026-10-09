@@ -1,7 +1,7 @@
 # Pimoroni pHAT BEAT (Pirate Radio)
 
 The pHAT BEAT, e.g. in Pimoroni's Pirate Radio kit, has an I²S DAC with amplifier, six buttons and
-two bars of eight RGB LEDs. In Lauschkiste it is the `phat_beat` plugin.
+two bars of eight RGB LEDs. In Lauschkiste it is the `phat_beat` plugin. It is in daily use in a Pirate Radio.
 
 1. Settings → Plugins: switch on "Pimoroni pHAT BEAT" (and install its packages when asked),
    restart. It needs the Raspberry Pi board support.

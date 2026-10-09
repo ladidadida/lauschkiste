@@ -1,5 +1,8 @@
 # Generic USB Reader
 
+> [!NOTE]
+> Not yet tested on real hardware.
+
 **place-capable**: typically no
 
 This module covers all types of USB-based RFID input readers. If you

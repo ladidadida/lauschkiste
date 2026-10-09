@@ -1,5 +1,8 @@
 # HiFiBerry
 
+> [!NOTE]
+> Not yet tested on real hardware.
+
 The setup works for the most common set of HiFiBerry boards but also other "DAC" related sound cards like `I2S PCM5102A DAC`.
 
 ## Automatic setup

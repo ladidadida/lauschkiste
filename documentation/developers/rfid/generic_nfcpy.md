@@ -1,5 +1,8 @@
 # Generic NFCPy Reader
 
+> [!NOTE]
+> Not yet tested on real hardware.
+
 This module is based on the user space NFC reader library [nfcpy](https://nfcpy.readthedocs.io/en/latest/overview.html) ([on github](https://github.com/nfcpy/nfcpy)).
 The link above also contains a list of [supported devices](https://nfcpy.readthedocs.io/en/latest/overview.html#supported-devices).
 
