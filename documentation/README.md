@@ -1,6 +1,6 @@
 # Lauschkiste documentation
 
-Lauschkiste is an RFID audio player for kids on the Raspberry Pi. It grew out of
+Lauschkiste is an RFID audio player for kids. It is made for the Raspberry Pi and runs on any Linux computer. It grew out of
 [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) (see [phoniebox.de](https://phoniebox.de/)).
 
 ## Quickstart

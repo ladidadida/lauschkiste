@@ -3,7 +3,7 @@
 <img src="https://raw.githubusercontent.com/ladidadida/lauschkiste/main/documentation/assets/logo/white/lauschkiste-logo-text-berry-white.svg" alt="Lauschkiste" width="380">
 
 **An open-source RFID audio player for kids.** Put a card on the box and music or an audiobook
-starts. Runs on a Raspberry Pi (from the Zero up), managed from any browser. Alpha software.
+starts. Made for the Raspberry Pi (from the Zero up), runs on any Linux computer, managed from any browser. Alpha software.
 
 *Lauschkiste* is German: *lauschen* means to listen closely, *die Kiste* is the box.
 

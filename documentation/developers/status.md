@@ -20,6 +20,7 @@ the [roadmap](roadmap-core-architecture.md).
 | Input | evdev devices (USB buttons, media keys, Bluetooth headset buttons) |
 | Web app | player, library, cards, settings of all modules and plugins, plugin management, hardware and pin overview, help, German and English |
 | API | REST and WebSocket, typed operations and events generated from the modules ([Core and plugins](core-and-plugins.md)) |
+| Platforms | Raspberry Pi (Zero W, 3 tested) and any Linux computer; board hardware only with a board support plugin ([Installation](../builders/installation.md#other-linux-computers)) |
 | Installation | install script, `lauschctl setup` steps (re-runnable), updates, plugins from the command line, port 80, WiFi hotspot, kiosk mode; packages for PyPI ([Releasing](releasing.md)) |
 
 ## Planned

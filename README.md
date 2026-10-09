@@ -5,7 +5,7 @@
 </p>
 
 **An open-source RFID audio player for kids.** Put a card on the box and music or an audiobook
-starts. Runs on a Raspberry Pi, managed from any browser.
+starts. Made for the Raspberry Pi, runs on any Linux computer, managed from any browser.
 
 [![Python checks and tests](https://github.com/ladidadida/lauschkiste/actions/workflows/pythonpackage_future3.yml/badge.svg?branch=main)](https://github.com/ladidadida/lauschkiste/actions/workflows/pythonpackage_future3.yml)
 [![Wheels and install](https://github.com/ladidadida/lauschkiste/actions/workflows/wheels.yml/badge.svg?branch=main)](https://github.com/ladidadida/lauschkiste/actions/workflows/wheels.yml)
@@ -27,6 +27,7 @@ Say it like "LOWSH-kiss-tuh".
 - Built-in player, no extra audio daemon needed; MPD as a plugin
 - Plugins for RFID readers, Raspberry Pi hardware (buttons, encoders, LED, battery), podcast and radio directories
   and more; plugins bring their own translations
+- Runs on a Raspberry Pi (from the Zero up) and on any Linux computer; Raspberry Pi hardware support is a plugin
 - One-line installation, setup steps you can re-run safely, updates from the command line
 
 ## Installation

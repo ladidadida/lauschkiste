@@ -69,4 +69,11 @@ lauschctl update             # install it, re-apply the setup, restart Lauschkis
 `lauschctl update` follows the way Lauschkiste was installed: from PyPI it upgrades from PyPI, from release
 wheels it takes the newest release, a git checkout pulls its branch (`--version` picks a specific version).
 
-On another Debian or Linux machine the script works the same; the Raspberry Pi specific steps are skipped.
+## Other Linux computers
+
+Lauschkiste is not tied to the Raspberry Pi. On a Debian-based computer (Debian, Ubuntu, ...) the install script works
+the same and skips the Raspberry Pi steps; it is tested in Debian 12 and 13 containers. The built-in player plays
+through the normal sound output, USB RFID readers work, and the web app and all content features (library,
+audiobooks, podcasts, radio, time limits) are the same. What needs a board (GPIO buttons, LEDs, sound cards on the
+header, battery, shutdown by a power button) is only available with a board support plugin; shutdown and reboot are
+then not offered. On other distributions, install with `--from source` and set up the system packages yourself. Windows and macOS are not supported.

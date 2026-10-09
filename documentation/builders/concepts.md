@@ -5,8 +5,8 @@ files.
 
 ## Core and plugins
 
-The **core** is everything that makes sense on every machine Lauschkiste runs on: the player, the
-music library, the card database and RFID reader handling, volume, timers and system information.
+The **core** is everything that makes sense on every machine Lauschkiste runs on (a Raspberry Pi, but also any Linux
+computer): the player, the music library, the card database and RFID reader handling, volume, timers and system information.
 It is always there.
 
 **Plugins** add platform-specific functionality (e.g. Raspberry Pi hardware: shutdown, GPIO
