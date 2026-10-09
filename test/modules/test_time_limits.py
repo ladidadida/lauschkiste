@@ -4,11 +4,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-pytest.importorskip('lauschkiste_plugin_time_limits', reason="the time-limits plugin is not installed")
-
-import lauschkiste_plugin_time_limits as module
-from lauschkiste_plugin_time_limits import TimeLimits
-from lauschkiste_plugin_time_limits.rules import limit_seconds, quiet_until
+import lauschkiste.time_limits as module
+from lauschkiste.time_limits import TimeLimits
+from lauschkiste.time_limits.rules import limit_seconds, quiet_until
 
 FRIDAY_EVENING = datetime(2026, 10, 9, 20, 0)       # a Friday
 SATURDAY_MORNING = datetime(2026, 10, 10, 6, 30)
@@ -69,7 +67,7 @@ def setup(tmp_path, monkeypatch):
     monkeypatch.setattr(module, 'SETTLE_SEC', 0.0)
 
     def make(now=MONDAY_NOON, **config):
-        defaults = {'quiet_hours': {'bedtime': {'start': '19:30', 'end': '07:00', 'days': 'every day'}},
+        defaults = {'enabled': True, 'quiet_hours': {'bedtime': {'start': '19:30', 'end': '07:00', 'days': 'every day'}},
                     'daily_limit_minutes': 1, 'weekend_limit_minutes': None, 'warn_minutes': 0, 'fade_seconds': 7}
         return Setup(tmp_path, {**defaults, **config}, now)
     return make
@@ -111,7 +109,7 @@ def test_quiet_hours_stop_playback_and_the_morning_frees_it(setup):
 
 def test_a_clock_that_is_not_synchronized_does_not_enforce_quiet_hours(tmp_path, monkeypatch):
     monkeypatch.setattr(module, 'SETTLE_SEC', 0.0)
-    s = Setup(tmp_path, {'quiet_hours': {'bedtime': {'start': '19:30', 'end': '07:00', 'days': 'every day'}},
+    s = Setup(tmp_path, {'enabled': True, 'quiet_hours': {'bedtime': {'start': '19:30', 'end': '07:00', 'days': 'every day'}},
                          'daily_limit_minutes': 0}, FRIDAY_EVENING, clock=lambda: False)
     s.tick()
     status = s.plugin.status()
@@ -156,3 +154,13 @@ def test_the_state_survives_a_restart(setup, tmp_path):
     s.plugin._save()
     saved = json.loads((tmp_path / 'time_limits.json').read_text())
     assert saved['day'] == '2026-10-12' and round(saved['played']) == 12
+
+
+def test_switched_off_nothing_is_counted_or_blocked(setup):
+    s = setup(enabled=False, daily_limit_minutes=1)
+    for _ in range(90):
+        s.tick()
+    status = s.plugin.status()
+    assert (status.enabled, status.blocked, status.played_seconds) == (False, False, 0)
+    s.ctx.modules.volume.fade_out.assert_not_called()
+    s.ctx.modules.player.stop.assert_not_called()

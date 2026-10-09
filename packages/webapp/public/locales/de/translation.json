@@ -833,6 +833,57 @@
           "label": "Alte Downloads entfernen, wenn der Platz voll ist",
           "help": "Löscht die ältesten beendeten Hörbücher und gehörten Folgen. Angefangene bleiben immer."
         }
+      },
+      "time_limits": {
+        "enabled": {
+          "label": "Zeitbegrenzung verwenden",
+          "help": "Ruhezeiten und die Hörzeit pro Tag gelten, wenn das eingeschaltet ist"
+        },
+        "quiet_hours": {
+          "label": "Ruhezeiten",
+          "help": "Zeiten, in denen nichts spielt, zum Beispiel die Nacht",
+          "start": {
+            "label": "Von",
+            "help": "Uhrzeit, z. B. 19:30"
+          },
+          "end": {
+            "label": "Bis",
+            "help": "Uhrzeit, z. B. 07:00 (am nächsten Morgen, wenn sie vor dem Beginn liegt)"
+          },
+          "days": {
+            "label": "An",
+            "help": "Der Tag, an dem die Ruhezeit beginnt",
+            "values": {
+              "every day": "Jeden Tag",
+              "weekdays": "Montag bis Freitag",
+              "weekends": "Samstag und Sonntag"
+            }
+          }
+        },
+        "daily_limit_minutes": {
+          "label": "Hörzeit pro Tag (Minuten)",
+          "help": "0: keine Begrenzung"
+        },
+        "weekend_limit_minutes": {
+          "label": "Hörzeit am Wochenende (Minuten)",
+          "help": "Leer: wie an den anderen Tagen; 0: keine Begrenzung"
+        },
+        "warn_minutes": {
+          "label": "Vorwarnung vor dem Limit (Minuten)",
+          "help": "Spielt so lange vor dem Ende den Warnton. 0: keine Vorwarnung"
+        },
+        "fade_seconds": {
+          "label": "Ausblenden über (Sekunden)",
+          "help": "Wenn das Limit erreicht wird, während etwas spielt"
+        },
+        "warning_sound": {
+          "label": "Ton für die Vorwarnung",
+          "help": "Eine Tondatei im Heimatverzeichnis; leer: keiner"
+        },
+        "blocked_sound": {
+          "label": "Ton, wenn die Wiedergabe gesperrt ist",
+          "help": "Eine Tondatei im Heimatverzeichnis; leer: keiner"
+        }
       }
     },
     "timers": {
@@ -883,6 +934,9 @@
     },
     "cache": {
       "title": "Downloads"
+    },
+    "time-limits": {
+      "title": "Zeitbegrenzung"
     }
   },
   "help": {

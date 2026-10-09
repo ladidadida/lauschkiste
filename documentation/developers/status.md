@@ -11,7 +11,7 @@ the [roadmap](roadmap-core-architecture.md).
 | Content | music, audiobooks (position per book), podcasts (feeds, position per episode), radio stations; see [Content types](content-types.md) |
 | Sources | audiobooks from an [Audiobookshelf](audiobookshelf.md) server (streaming, shared position, offline use), podcast and radio directories (Apple Podcasts, fyyd, Podcast Index, radio-browser.info), OPML and M3U/PLS import and export |
 | Downloads | a [cache in the core](caching.md) for audiobooks and podcast episodes: low priority, space limit, removal of old items |
-| Time limits | quiet hours and a daily listening time with extra time for parents ([plugin](../builders/time-limits.md)) |
+| Time limits | quiet hours and a daily listening time with extra time for parents (core module, off by default; [Time limits](../builders/time-limits.md)) |
 | Library | one folder with `music/` and `audiobooks/`, index with tags and cover art, folder watching, upload and file management in the web app, optional Samba share |
 | Cards | RFID cards with actions (play, volume, timers, shutdown, ...), learning mode, second swipe, card database in the web app |
 | Readers | RC522 (SPI), MFRC522 and PN532 (I²C), USB readers, RDM6300, NFC (nfcpy) as plugins |

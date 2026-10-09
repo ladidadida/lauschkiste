@@ -1,8 +1,8 @@
 # Time limits
 
-The plugin `time_limits` keeps listening within bounds: **quiet hours** in which nothing plays, and a **daily
-listening time**. Switch it on in Settings → Plugins (or `lauschctl plugin enable time_limits`) and set it in the
-settings of the plugin.
+Lauschkiste keeps listening within bounds: **quiet hours** in which nothing plays, and a **daily listening time**.
+It is part of the core and **off until you switch it on**: Settings → Playback & Audio → Time limits → "Use time
+limits".
 
 ## Quiet hours
 

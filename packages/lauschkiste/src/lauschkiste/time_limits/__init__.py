@@ -1,10 +1,12 @@
-"""Quiet hours and a daily listening limit.
+"""The time_limits core module: quiet hours and a daily listening limit.
 
-    plugins:
-      time_limits:
-        quiet_hours:
-          bedtime: {start: '19:30', end: '07:00', days: every day}
-        daily_limit_minutes: 120
+It is off until switched on in the settings::
+
+    time_limits:
+      enabled: true
+      quiet_hours:
+        bedtime: {start: '19:30', end: '07:00', days: every day}
+      daily_limit_minutes: 120
 
 Playback that starts in quiet hours is stopped at once. The time something plays is counted per day; when the
 limit is reached the sound fades out and the player stops, and playback stays blocked until the next day.
@@ -24,8 +26,8 @@ from typing import Any, Callable, Dict, Literal, Optional
 from pydantic import BaseModel, Field
 
 import lauschkiste.paths
-from lauschkiste.contract import Plugin, action, query
-from lauschkiste_plugin_time_limits.rules import limit_seconds, quiet_until
+from lauschkiste.contract import CoreModule, action, query
+from lauschkiste.time_limits.rules import limit_seconds, quiet_until
 
 logger = logging.getLogger('lauschkiste.time_limits')
 
@@ -48,6 +50,8 @@ def default_quiet_hours() -> Dict[str, QuietHours]:
 
 
 class TimeLimitsSettings(BaseModel):
+    enabled: bool = Field(False, title='Use time limits',
+                          description='Quiet hours and the daily listening time below apply when this is on')
     quiet_hours: Dict[str, QuietHours] = Field(default_factory=default_quiet_hours, title='Quiet hours')
     daily_limit_minutes: int = Field(120, ge=0, le=1440, title='Listening time per day (minutes)',
                                      description='0: no limit')
@@ -61,6 +65,8 @@ class TimeLimitsSettings(BaseModel):
 
 
 class TimeLimitStatus(BaseModel):
+    #: false while the time limits are switched off; nothing is blocked or counted then
+    enabled: bool = True
     #: false when the system clock is not synchronized: quiet hours are not enforced then
     clock_ok: bool
     blocked: bool
@@ -85,13 +91,12 @@ def clock_synchronized() -> Optional[bool]:
     return value == 'yes' if value in ('yes', 'no') else None
 
 
-class TimeLimits(Plugin):
-    """Quiet hours and a daily listening limit."""
+class TimeLimits(CoreModule):
+    """Quiet hours and a daily listening limit (off until switched on)."""
 
     name = 'time_limits'
-    title = 'Time limits'
     interface_version = '1.0'
-    requires = {'player': '>=6.0,<7', 'volume': '>=1.0,<2', 'jingle': '>=1.0,<2'}
+    requires = ('player', 'volume', 'jingle')
     settings = TimeLimitsSettings
 
     def __init__(self, now: Callable[[], datetime] = datetime.now, clock: Callable[[], Optional[bool]] = clock_synchronized):
@@ -174,9 +179,14 @@ class TimeLimits(Plugin):
             self._clock_ok = self._clock() is not False
         return self._clock_ok
 
+    def _enabled(self) -> bool:
+        return bool(self._ctx.config.get('enabled', default=False))
+
     def evaluate(self) -> TimeLimitStatus:
         """Where the day stands (called by the tick, the status query and the actions)."""
         now = self._now()
+        if not self._enabled():
+            return TimeLimitStatus(enabled=False, clock_ok=True, blocked=False, played_seconds=0)
         with self._lock:
             self._roll_over(now)
             state = dict(self._state)
@@ -215,6 +225,9 @@ class TimeLimits(Plugin):
                 logger.exception("The time limits could not be checked")
 
     def _tick(self, elapsed: float, now_monotonic: float) -> None:
+        if not self._enabled():
+            self._was_blocked = False
+            return
         with self._lock:
             self._roll_over(self._now())
             if self._playing and not self._fading:

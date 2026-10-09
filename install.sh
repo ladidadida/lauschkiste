@@ -35,8 +35,7 @@ FROM=github
 WHEELS=""
 BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-devices lauschkiste-plugin-mpd
                  lauschkiste-plugin-rfid-readers lauschkiste-plugin-samba lauschkiste-plugin-audiobookshelf
-                 lauschkiste-plugin-directories
-                 lauschkiste-plugin-time-limits)
+                 lauschkiste-plugin-directories)
 HOME_DIR=""
 LIBRARY_DIR=""
 ASSUME_YES=false

@@ -12,6 +12,7 @@ from lauschkiste.radio import Radio
 from lauschkiste.rfid.cards import Cards
 from lauschkiste.rfid.reader import Rfid
 from lauschkiste.system import System
+from lauschkiste.time_limits import TimeLimits
 from lauschkiste.timers import Timers
 from lauschkiste.volume import Volume
 
@@ -26,6 +27,7 @@ CORE_MODULES = [
     Podcasts,
     Volume,
     Timers,
+    TimeLimits,
     Jingle,
     InputDevices,
     Cards,

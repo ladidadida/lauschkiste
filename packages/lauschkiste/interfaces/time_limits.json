@@ -2,7 +2,7 @@
   "events": {},
   "extension_points": {},
   "interface_version": "1.0",
-  "kind": "plugin",
+  "kind": "core",
   "name": "time_limits",
   "operations": {
     "allow": {
@@ -25,6 +25,10 @@
             "type": "boolean"
           },
           "clock_ok": {
+            "type": "boolean"
+          },
+          "enabled": {
+            "default": true,
             "type": "boolean"
           },
           "extra_seconds": {
@@ -104,6 +108,10 @@
           "clock_ok": {
             "type": "boolean"
           },
+          "enabled": {
+            "default": true,
+            "type": "boolean"
+          },
           "extra_seconds": {
             "default": 0,
             "type": "integer"
@@ -181,6 +189,10 @@
           "clock_ok": {
             "type": "boolean"
           },
+          "enabled": {
+            "default": true,
+            "type": "boolean"
+          },
           "extra_seconds": {
             "default": 0,
             "type": "integer"
@@ -243,8 +255,8 @@
     }
   },
   "requires": {
-    "jingle": ">=1.0,<2",
-    "player": ">=6.0,<7",
-    "volume": ">=1.0,<2"
+    "jingle": null,
+    "player": null,
+    "volume": null
   }
 }

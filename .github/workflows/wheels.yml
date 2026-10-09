@@ -155,7 +155,6 @@ jobs:
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf
           - lauschkiste-plugin-directories
-          - lauschkiste-plugin-time-limits
     permissions:
       id-token: write
     steps:
@@ -205,7 +204,6 @@ jobs:
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf
           - lauschkiste-plugin-directories
-          - lauschkiste-plugin-time-limits
     permissions:
       id-token: write
     steps:
