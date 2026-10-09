@@ -49,7 +49,7 @@ decoding takes on the Zero (phase 0 measures it).
    - **Streaming state:** BlueZ announces when a phone starts and stops sending audio (`MediaTransport1`: `active`
      or `idle`), and, if the app supports it, what plays (`MediaPlayer1`: title, artist, album, position).
 3. **Player backend `phone`** (registered at `player.backends`): while a phone streams it is the active
-   backend. The status shows title and artist from the phone (apps that send nothing show "Phone: <name>"), and
+   backend. The status shows title and artist from the phone (apps that send nothing show "Phone: NAME"), and
    the box's play/pause/next/previous go to the phone as media keys (AVRCP). The volume is the box's (the same
    mixer as for everything else).
 
@@ -66,7 +66,7 @@ decoding takes on the Zero (phase 0 measures it).
 ### In the web app
 
 A "Bluetooth" block in the settings: state, paired phones, **Pair a phone** (with a countdown while the window is
-open), forget. The player page shows what the phone plays and a note "from <phone>". No new top-level page.
+open), forget. The player page shows what the phone plays and a note "from PHONE". No new top-level page.
 
 ### Settings
 
