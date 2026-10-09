@@ -15,7 +15,8 @@ import xml.etree.ElementTree as ElementTree
 from datetime import datetime, timezone
 from email.utils import parsedate_to_datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor
+from typing import Any, Dict, List, Optional, Protocol
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, Field
@@ -23,7 +24,8 @@ from pydantic import BaseModel, Field
 import lauschkiste.paths
 import lauschkiste.statefile as statefile
 from lauschkiste.cache import CacheFile, CachePlan
-from lauschkiste.contract import CoreModule, OperationError, action, event, query
+from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
+from lauschkiste.podcast_opml import normalize_url, parse_opml, render_opml
 from lauschkiste.resume import ResumeTracker
 
 logger = logging.getLogger('lauschkiste.podcasts')
@@ -67,6 +69,47 @@ class Episode(BaseModel):
     image: Optional[str] = None
     elapsed: float = 0.0
     heard: bool = False
+
+
+class PodcastHit(BaseModel):
+    """A podcast found in a directory."""
+    title: str
+    feed_url: str
+    author: Optional[str] = None
+    image: Optional[str] = None
+    directory: str = ''
+    subscribed: bool = False
+
+
+class SearchResult(BaseModel):
+    hits: List[PodcastHit]
+    #: directory id -> why it gave no answer
+    errors: Dict[str, str] = {}
+
+
+class DirectoryInfo(BaseModel):
+    id: str
+    label: str
+
+
+class ImportResult(BaseModel):
+    added: List[str]
+    already_subscribed: int = 0
+    invalid: int = 0
+
+
+class Opml(BaseModel):
+    content: str
+
+
+class PodcastDirectory(Protocol):
+    """A place to find podcasts, registered at ``podcasts.directories`` by a plugin."""
+
+    def search(self, term: str, limit: int) -> List[Dict[str, Any]]:
+        """Podcasts matching ``term`` as mappings with ``title``, ``feed_url`` and optionally ``author``, ``image``."""
+
+    def top(self, limit: int) -> List[Dict[str, Any]]:
+        """Popular podcasts, same mappings."""
 
 
 class PodcastsChanged(BaseModel):
@@ -232,12 +275,13 @@ class Podcasts(CoreModule):
     """Podcasts: subscribe to feeds, play episodes and continue them."""
 
     name = 'podcasts'
-    interface_version = '2.0'
+    interface_version = '3.0'
     concurrency = 'threadsafe'
     requires = ('player', 'cache')
     settings = PodcastSettings
 
     changed = event('changed', PodcastsChanged)
+    directories = extension_point('directories', PodcastDirectory)
 
     def __init__(self):
         self._ctx: Any = None
@@ -449,6 +493,119 @@ class Podcasts(CoreModule):
         self._publish()
         if failed:
             logger.warning(f"Could not refresh: {'; '.join(failed)}")
+
+    # -- finding, importing and exporting podcasts -----------------------------------------------
+
+    def _subscribed_urls(self) -> set:
+        with self._lock:
+            return {normalize_url(entry['url']) for entry in self._podcasts.values()}
+
+    def _ask(self, directory: Optional[str], call) -> SearchResult:
+        """Ask the directories (one, or all in parallel); one failing leaves the others."""
+        wanted = [(key, item) for key, item in self.directories.items() if directory in (None, key)]
+        if directory and not wanted:
+            raise OperationError(404, 'unknown_directory', f"No podcast directory '{directory}'")
+        errors: Dict[str, str] = {}
+
+        def run(entry):
+            key, item = entry
+            try:
+                return key, call(item), None
+            except Exception as error:
+                return key, [], f'{error.__class__.__name__}: {error}'
+
+        found: List[List[PodcastHit]] = []
+        if wanted:
+            with ThreadPoolExecutor(max_workers=len(wanted)) as pool:
+                for key, rows, error in pool.map(run, wanted):
+                    if error:
+                        errors[key] = error
+                        logger.warning(f"Podcast directory '{key}': {error}")
+                    found.append([PodcastHit(directory=key, **{k: v for k, v in row.items()
+                                                               if k in ('title', 'feed_url', 'author', 'image')})
+                                  for row in rows if row.get('title') and row.get('feed_url')])
+        subscribed, seen, hits = self._subscribed_urls(), set(), []
+        # the directories take turns, so that one does not fill the whole list
+        for rank in range(max((len(rows) for rows in found), default=0)):
+            for rows in found:
+                if rank < len(rows):
+                    hit = rows[rank]
+                    key = normalize_url(hit.feed_url)
+                    if key not in seen:
+                        seen.add(key)
+                        hit.subscribed = key in subscribed
+                        hits.append(hit)
+        return SearchResult(hits=hits, errors=errors)
+
+    @query(path='/directories')
+    def list_directories(self) -> List[DirectoryInfo]:
+        """The places podcasts can be searched in (added by plugins)."""
+        return [DirectoryInfo(id=key, label=getattr(item, 'label', key)) for key, item in self.directories.items()]
+
+    @query(path='/search')
+    def search(self, term: str, directory: Optional[str] = None, limit: int = 20) -> SearchResult:
+        """Search the directories for podcasts."""
+        term = term.strip()
+        if not term:
+            return SearchResult(hits=[])
+        return self._ask(directory, lambda item: item.search(term, max(1, min(limit, 50))))
+
+    @query(path='/top')
+    def top(self, directory: Optional[str] = None, limit: int = 20) -> SearchResult:
+        """Popular podcasts of the directories."""
+        return self._ask(directory, lambda item: item.top(max(1, min(limit, 50))))
+
+    @action(path='/import_opml')
+    def import_opml(self, content: str) -> ImportResult:
+        """Subscribe to all feeds of an OPML file (for example exported by AntennaPod). The episodes
+        are fetched in the background."""
+        try:
+            feeds = parse_opml(content)
+        except ValueError as error:
+            raise OperationError(422, 'invalid_opml', str(error)) from None
+        added, known, skipped, invalid, new_keys = [], self._subscribed_urls(), 0, 0, []
+        with self._lock:
+            for feed in feeds:
+                try:
+                    url = _check_url(feed['url'])
+                except OperationError:
+                    invalid += 1
+                    continue
+                if normalize_url(url) in known:
+                    skipped += 1
+                    continue
+                known.add(normalize_url(url))
+                name = feed['title'] or url
+                base = _slug(name)
+                key, number = base, 2
+                while key in self._podcasts:
+                    key, number = f'{base}-{number}', number + 1
+                self._podcasts[key] = {'name': name, 'url': url}
+                added.append(name)
+                new_keys.append(key)
+        if new_keys:
+            self._store()
+            self._publish()
+            self._ctx.executor('feeds').submit(self._fetch_new, new_keys)
+        return ImportResult(added=added, already_subscribed=skipped, invalid=invalid)
+
+    def _fetch_new(self, keys: List[str]) -> None:
+        for key in keys:
+            try:
+                self._feed(key, refresh=True)
+            except OperationError as error:
+                logger.warning(f"Podcast '{key}': {error.message}")
+            except Exception:
+                logger.exception(f"Podcast '{key}' could not be fetched")
+        self._store()
+        self._publish()
+
+    @query(path='/export_opml')
+    def export_opml(self) -> Opml:
+        """The subscriptions as an OPML file."""
+        with self._lock:
+            entries = [(value.get('name') or key, value['url']) for key, value in self._podcasts.items()]
+        return Opml(content=render_opml(sorted(entries, key=lambda entry: entry[0].casefold())))
 
     @action()
     def play(self, podcast: str, episode: Optional[str] = None) -> None:

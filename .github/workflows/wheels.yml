@@ -154,6 +154,7 @@ jobs:
           - lauschkiste-plugin-rfid-readers
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf
+          - lauschkiste-plugin-podcast-directories
     permissions:
       id-token: write
     steps:
@@ -202,6 +203,7 @@ jobs:
           - lauschkiste-plugin-rfid-readers
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf
+          - lauschkiste-plugin-podcast-directories
     permissions:
       id-token: write
     steps:

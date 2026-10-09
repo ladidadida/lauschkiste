@@ -1,8 +1,9 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import {
+  Alert,
   Avatar,
   Badge,
   Box,
@@ -20,9 +21,11 @@ import AddIcon from '@mui/icons-material/Add';
 import PodcastsIcon from '@mui/icons-material/Podcasts';
 
 import PubSubContext from '../../../context/pubsub/context';
-import request from '../../../utils/request';
+import request, { requestErrorMessage } from '../../../utils/request';
 import { PODCASTS_TOPIC } from '../../../config';
 import FormDialog from './form-dialog';
+import ItemMenu from './item-menu';
+import PodcastSearch from './podcast-search';
 
 const Podcasts = ({ musicFilter }) => {
   const { t } = useTranslation();
@@ -30,6 +33,10 @@ const Podcasts = ({ musicFilter }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [directories, setDirectories] = useState([]);
+  const [notice, setNotice] = useState(null);
+  const fileInput = useRef(null);
   const { state: { [PODCASTS_TOPIC]: changed } = {} } = useContext(PubSubContext);
 
   const load = useCallback(async () => {
@@ -49,6 +56,31 @@ const Podcasts = ({ musicFilter }) => {
     }
   }, [changed, load]);
 
+  useEffect(() => {
+    request('podcastDirectories').then(({ result }) => setDirectories(result || []));
+  }, []);
+
+  const importFile = async (event) => {
+    const [file] = event.target.files;
+    event.target.value = '';
+    if (!file) return;
+    const { result, error: requestError } = await request('importPodcastOpml', { content: await file.text() });
+    if (requestError) setNotice({ severity: 'error', text: requestErrorMessage(requestError) || t('library.podcasts.opml-failed') });
+    else if (result.added.length) setNotice({ severity: 'success', text: t('library.podcasts.opml-imported', { count: result.added.length }) });
+    else setNotice({ severity: 'info', text: t('library.podcasts.opml-nothing') });
+    load();
+  };
+
+  const exportFile = async () => {
+    const { result } = await request('exportPodcastOpml');
+    if (!result) return;
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(new Blob([result.content], { type: 'text/x-opml' }));
+    link.download = 'lauschkiste-podcasts.opml';
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
   const visible = useMemo(() => {
     const query = musicFilter.toLowerCase();
     return query ? podcasts.filter(({ name }) => name.toLowerCase().includes(query)) : podcasts;
@@ -59,11 +91,26 @@ const Podcasts = ({ musicFilter }) => {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', paddingX: 1 }}>
-        <Button onClick={() => setIsAdding(true)} startIcon={<AddIcon />}>
+      <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'flex-end', paddingX: 1 }}>
+        <Button onClick={() => (directories.length ? setIsSearching(true) : setIsAdding(true))} startIcon={<AddIcon />}>
           {t('library.podcasts.add')}
         </Button>
+        <ItemMenu
+          items={[
+            { label: t('library.podcasts.by-address'), onClick: () => setIsAdding(true) },
+            { label: t('library.podcasts.import-opml'), onClick: () => fileInput.current?.click() },
+            { label: t('library.podcasts.export-opml'), onClick: exportFile },
+          ]}
+          label={t('library.content.more')}
+        />
+        <input accept=".opml,.xml,text/xml,text/x-opml" hidden onChange={importFile} ref={fileInput} type="file" />
       </Box>
+      {notice && <Alert onClose={() => setNotice(null)} severity={notice.severity} sx={{ margin: 1 }}>{notice.text}</Alert>}
+      {!directories.length && !podcasts.length &&
+        <Typography color="text.secondary" sx={{ padding: 1 }} variant="body2">
+          {t('library.podcasts.directories-missing')}
+        </Typography>
+      }
       {!podcasts.length && <Typography sx={{ padding: 1 }}>{t('library.podcasts.empty')}</Typography>}
       {podcasts.length > 0 && !visible.length && <Typography>{t('library.albums.no-music')}</Typography>}
       <List sx={{ width: '100%' }}>
@@ -97,6 +144,16 @@ const Podcasts = ({ musicFilter }) => {
           </ListItem>
         ))}
       </List>
+      <PodcastSearch
+        directories={directories}
+        onAddByAddress={() => {
+          setIsSearching(false);
+          setIsAdding(true);
+        }}
+        onClose={() => setIsSearching(false)}
+        onSubscribed={load}
+        open={isSearching}
+      />
       <FormDialog
         confirmLabel={t('library.podcasts.subscribe')}
         fields={[

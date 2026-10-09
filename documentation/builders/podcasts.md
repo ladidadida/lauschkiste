@@ -51,3 +51,32 @@ continues where you stopped it streaming (the position belongs to the episode). 
 and speed settings of the cache (Settings → Cache, [Audiobooks](audiobooks.md#downloading-books)); with
 `remove_old` switched on, heard episodes are removed first when the space is full. Unsubscribing from a
 podcast removes its downloaded episodes.
+
+## Find podcasts
+
+With the plugin `podcast_directories` (Settings → Plugins, or `lauschctl plugin enable podcast_directories`)
+the button "Subscribe to podcast" opens a search: type a name, or look at the popular podcasts when the
+field is empty, and subscribe with one tap. "Add by address" is still there for a feed address.
+
+The places searched are a list in the settings of the plugin. Each entry can be switched off and its address
+changed, and you can add your own:
+
+| Kind | What it is |
+| --- | --- |
+| `itunes` | Apple Podcasts: search and popular podcasts per country (`country`, default `DE`); no key |
+| `fyyd` | fyyd, a German directory: search and popular podcasts per language; no key |
+| `podcastindex` | The Podcast Index: needs a free key and secret from podcastindex.org, entered in the settings (off until then) |
+| `json` | Any directory that answers a search with JSON: give the search address (with `{term}` and `{limit}`), the path to the list in the answer and the names of the fields for title, feed address, author and image |
+
+Every search goes to the directories that are switched on, so switch off those you do not want to ask.
+A directory that does not answer is named in the dialog and the others still show their results.
+
+[podcast.de](https://www.podcast.de) has no public interface, so it cannot be added as a directory (German
+podcasts are found in Apple Podcasts and fyyd as well).
+
+### From and to other apps (OPML)
+
+The menu next to the button imports and exports an OPML file, the list format of podcast apps. To move
+over from AntennaPod, export your subscriptions there (Settings → Import/Export → OPML export) and choose
+"Import from an OPML file". The episodes are loaded in the background; podcasts you already follow are skipped.
+"Export as an OPML file" gives the other direction.

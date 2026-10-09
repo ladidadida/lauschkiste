@@ -309,7 +309,22 @@
       "episode-menu": "Aktionen für {{title}}",
       "progress-label": "Fortschritt von {{title}}",
       "unsubscribe-title": "{{name}} abbestellen?",
-      "unsubscribe-text": "Karten, die diesen Podcast abspielen, funktionieren danach nicht mehr."
+      "unsubscribe-text": "Karten, die diesen Podcast abspielen, funktionieren danach nicht mehr.",
+      "search": {
+        "title": "Podcast finden",
+        "label": "Suchen",
+        "popular": "Beliebt",
+        "none": "Nichts gefunden",
+        "subscribed": "Abonniert",
+        "by-address": "Per Adresse hinzufügen"
+      },
+      "directories-missing": "Zum Suchen von Podcasts das Plugin \"podcast_directories\" unter Einstellungen → Plugins einschalten.",
+      "import-opml": "Aus einer OPML-Datei importieren",
+      "export-opml": "Als OPML-Datei exportieren",
+      "by-address": "Per Adresse hinzufügen",
+      "opml-imported": "{{count}} Podcasts abonniert. Die Folgen werden im Hintergrund geladen.",
+      "opml-nothing": "Nichts Neues in der Datei.",
+      "opml-failed": "Die Datei konnte nicht gelesen werden."
     },
     "music": {
       "empty": "Noch keine Musik. Lade Alben unter „Ordner“ hoch, je Album ein Ordner.",

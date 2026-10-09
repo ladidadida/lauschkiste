@@ -178,6 +178,24 @@ const commands = {
     rest: { method: 'GET', path: '/api/v1/podcasts/{podcast}/episodes' },
     argKeys: ['podcast'],
   },
+  podcastDirectories: {
+    rest: { method: 'GET', path: '/api/v1/podcasts/directories' },
+  },
+  podcastSearch: {
+    rest: { method: 'GET', path: '/api/v1/podcasts/search' },
+    argKeys: ['term', 'directory'],
+  },
+  podcastTop: {
+    rest: { method: 'GET', path: '/api/v1/podcasts/top' },
+    argKeys: ['directory'],
+  },
+  importPodcastOpml: {
+    rest: { method: 'POST', path: '/api/v1/podcasts/import_opml' },
+    argKeys: ['content'],
+  },
+  exportPodcastOpml: {
+    rest: { method: 'GET', path: '/api/v1/podcasts/export_opml' },
+  },
   addPodcast: {
     rest: { method: 'POST', path: '/api/v1/podcasts' },
     argKeys: ['url', 'name'],

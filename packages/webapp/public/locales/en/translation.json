@@ -309,7 +309,22 @@
       "episode-menu": "Actions for {{title}}",
       "progress-label": "Progress of {{title}}",
       "unsubscribe-title": "Unsubscribe from {{name}}?",
-      "unsubscribe-text": "Cards playing this podcast stop working."
+      "unsubscribe-text": "Cards playing this podcast stop working.",
+      "search": {
+        "title": "Find a podcast",
+        "label": "Search",
+        "popular": "Popular",
+        "none": "Nothing found",
+        "subscribed": "Subscribed",
+        "by-address": "Add by address"
+      },
+      "directories-missing": "To search for podcasts, switch on the plugin \"podcast_directories\" in Settings → Plugins.",
+      "import-opml": "Import from an OPML file",
+      "export-opml": "Export as an OPML file",
+      "by-address": "Add by address",
+      "opml-imported": "Subscribed to {{count}} podcasts. The episodes are loaded in the background.",
+      "opml-nothing": "Nothing new in the file.",
+      "opml-failed": "The file could not be read."
     },
     "music": {
       "empty": "No music yet. Upload albums under \"Folders\", one folder per album.",
