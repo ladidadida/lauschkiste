@@ -146,6 +146,31 @@ for asset in json.load(sys.stdin).get("assets", []):
     (cd "$target" && xargs -n1 curl -fsSLO < urls)
 }
 
+# `uv tool install --force` removes the working installation before it knows the new one can be installed:
+# keep the old one aside and put it back when the new one fails
+tool_install() {
+    local env bin
+    env="$(uv tool dir)/lauschkiste"
+    bin="$(uv tool dir --bin)"
+    if [[ -d "$env" ]]; then
+        rm -rf "${env}.previous"
+        mv "$env" "${env}.previous"
+    fi
+    if uv tool install --force --compile-bytecode --python python3 "$@"; then
+        rm -rf "${env}.previous"
+        return
+    fi
+    if [[ -d "${env}.previous" ]]; then
+        rm -rf "$env"
+        mv "${env}.previous" "$env"
+        for name in lauschctl lauschkiste; do
+            [[ -e "${env}/bin/${name}" ]] && ln -sf "${env}/bin/${name}" "${bin}/${name}"
+        done
+        die "the installation failed; the previous installation was restored"
+    fi
+    die "the installation failed"
+}
+
 install_from_index() {
     local requirement=lauschkiste args=()
     [[ "$VERSION" == latest ]] || requirement="lauschkiste==${VERSION}"
@@ -168,7 +193,7 @@ install_from_index() {
     local with=()
     for plugin in "${BUNDLED_PLUGINS[@]}"; do with+=(--with "$plugin"); done
     log "Installing ${requirement} from ${FROM}"
-    uv tool install --force --compile-bytecode --python python3 "${args[@]}" "$requirement" "${with[@]}"
+    tool_install "${args[@]}" "$requirement" "${with[@]}"
     CTL="$(uv tool dir --bin)/lauschctl"
 }
 
@@ -191,7 +216,7 @@ install_package() {
         [[ "$wheel" == "$cli" ]] || with+=(--with "$wheel")
     done
     log "Installing the Lauschkiste package"
-    uv tool install --force --compile-bytecode --python python3 "$cli" "${with[@]}"
+    tool_install "$cli" "${with[@]}"
     CTL="$(uv tool dir --bin)/lauschctl"
 }
 
