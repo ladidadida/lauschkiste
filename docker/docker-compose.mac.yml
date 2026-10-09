@@ -1,8 +1,0 @@
-services:
-  mpd:
-    volumes:
-      - ~/.config/pulse:/root/.config/pulse
-
-  lauschkiste:
-    volumes:
-      - ~/.config/pulse:/root/.config/pulse

@@ -1,17 +1,12 @@
 # Development Environment
 
-You have 3 development options. Each option has its pros and cons. To interact with GPIO or other hardware, it's required to develop directly on a Raspberry Pi. For general development of Python code (Lauschkiste) or JavaScript (Web App), we recommend Docker. Developing on your local machine (Linux, Mac, Windows) works as well and requires all dependencies to be installed locally.
+You have two development options. To interact with GPIO or other hardware, it's required to develop directly on a Raspberry Pi. For general development of Python code (Lauschkiste) or JavaScript (Web App), your own machine (Linux, Mac, Windows) is enough.
 
 - [Development Environment](#development-environment)
-  - [Develop in Docker](#develop-in-docker)
   - [Develop on Raspberry Pi](#develop-on-raspberry-pi)
     - [Steps to install](#steps-to-install)
   - [Develop on local machine](#develop-on-local-machine)
     - [Using WSL](#using-wsl)
-
-## Develop in Docker
-
-There is a complete [Docker setup](./docker.md).
 
 ## Develop on Raspberry Pi
 

@@ -32,7 +32,6 @@ packages/          uv workspace members
   webapp/          React front-end (the touch/web UI), talks to the core via HTTP/WebSocket
                    (FastAPI, `/api/v1/*`). Not a uv workspace member (npm/Vite project), but lives
                    alongside the Python packages structurally.
-docker/            Dockerfiles + compose files for a non-Pi development environment
 install.sh         Installer (curl | bash): base packages, uv, Lauschkiste (release wheels or --source),
                    then `lauschctl setup`
 shared/            LAUSCHKISTE_HOME when running from this checkout (set it to this directory): settings, library,
@@ -151,7 +150,6 @@ bam build                       # build the webapp into packages/webapp/build/, 
                                  # alone serves both the API and the UI on :5556 -- no npm start
                                  # needed just to use the app (no hot-reload though; for active
                                  # frontend dev use `cd packages/webapp && npm run dev` instead)
-bam docker-dev                  # local mpd+lauschkiste+webapp stack without PulseAudio/hardware
 uv run lauschctl debug sniff      # print all messages on the publishing queue
 ```
 
@@ -170,10 +168,7 @@ Webapp (`cd packages/webapp`): `npm run dev`, `npm run build`, `npm test`, `npm 
 
 The default `player.backend: local_audio` + `generic_usb`/`fake_reader_gui` RFID readers need no
 Pi-specific hardware or extra system packages at all -- `uv run lauschkiste` plays through this
-machine's normal audio output directly. The Docker dev environment
-(`documentation/developers/docker.md`) is still useful for testing the full stack (core and webapp)
-in isolation, but is no longer required just to avoid GPIO/
-mpd/RFID hardware.
+machine's normal audio output directly.
 
 ## Key docs to read before larger changes
 
@@ -183,5 +178,4 @@ mpd/RFID hardware.
 - `documentation/developers/coreapps.md` — what each core entry-point script does
 - `documentation/developers/python.md` — Python dev environment notes
 - `documentation/developers/webapp.md` — webapp dev notes
-- `documentation/developers/docker.md` — Docker-based dev environment
 - `documentation/developers/status.md` — what works and what is planned

@@ -118,13 +118,6 @@ tasks:
     outputs:
       - packages/webapp/build/
 
-  docker-dev:
-    # Brings up mpd+lauschkiste+webapp locally without PulseAudio/hardware (MPD gets a null audio
-    # output) -- for checking frontend/backend integration and library browsing. Foreground
-    # process: Ctrl-C stops and tears the stack down again. See documentation/developers/docker.md.
-    command: docker compose -f docker/docker-compose.yml -f docker/docker-compose.no-audio.yml up --build
-    interactive: true
-
   # ── Aggregate CI ──────────────────────────────────────────────────────────────
 
   ci-checks:

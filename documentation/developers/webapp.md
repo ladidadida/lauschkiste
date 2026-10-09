@@ -15,7 +15,7 @@ and browser tests); it publishes nothing.
 ## Develop the Web App
 
 The Web App is a React application built with Vite. Use Node.js 22 and npm 10
-or newer on a workstation or in the provided Docker environment:
+or newer on a workstation:
 
 ```bash
 cd ~/lauschkiste/packages/webapp
