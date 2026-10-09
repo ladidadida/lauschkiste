@@ -23,8 +23,6 @@
           "timer_stop_player": "Player stoppen",
           "timer_fade_volume": "Lautstärke ausblenden und herunterfahren",
           "toggle_output": "Audio-Ausgang umschalten",
-          "sync_rfidcards_all": "Alle Audiodateien und Karteneinträge synchronisieren",
-          "sync_rfidcards_change_on_rfid_scan": "Aktivierung ändern für 'on RFID scan'",
           "next_song": "Nächster Song",
           "pause": "Pause",
           "play": "Abspielen",

@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 """Serve the built webapp, its fallback pages, and the /logs directory directly from FastAPI.
 
-Replaces nginx (see documentation/developers/roadmap-core-architecture.md, "Simplify away ZMQ and
-nginx"): nginx's only jobs here were reverse-proxying /api/ to the browser bridge (now just
-FastAPI itself, nothing to proxy to) and serving the webapp's static build, a "build
-missing"/generic-404 fallback page, and a /logs directory listing. Small enough to do directly.
-
-Deliberately matches the old `resources/default-settings/nginx.default` behavior rather than
-adding new behavior (e.g. no SPA deep-link fallback to index.html for unknown paths -- nginx's
-`try_files $uri $uri/ =404` didn't do that either, so neither does this).
+Serves the webapp's static build, a "build missing"/generic-404 fallback page and a /logs
+directory listing. Unknown paths get the 404 page; there is no SPA deep-link fallback to index.html.
 """
 
 import html
@@ -80,9 +74,7 @@ def register_webapp_routes(app: FastAPI, *, build_dir: Path, logs_dir: Path) -> 
         return _serve_html(build_dir / 'index.html', NO_BUILD_HTML)
 
     # Registered last: anything else the webapp build ships at its root (favicon, manifest,
-    # locales/*, ...) if the exact file exists, else the generic 404 page -- matches nginx's
-    # `try_files $uri $uri/ =404` + `error_page 404 = /404.html`, deliberately not a SPA
-    # deep-link fallback (nginx didn't do that here either).
+    # locales/*, ...) if the exact file exists, else the generic 404 page (no SPA deep-link fallback).
     @app.get('/{path:path}')
     async def webapp_catch_all(request: Request, path: str):
         candidate = (build_dir / path).resolve()

@@ -88,9 +88,7 @@ library:
   watch: true
   watch_interval_sec: 5
 api:
-  # 0.0.0.0 (all interfaces): nginx used to be the only thing reachable from the LAN, reverse
-  # proxying to a loopback-only API server. There is no separate reverse proxy anymore -- this
-  # server (webapp static files + /api/*) needs to be reachable directly.
+  # 0.0.0.0: reachable from the LAN; the same server serves the web app and /api/*
   bind_address: 0.0.0.0
   port: 5556
 rfid:
@@ -120,9 +118,6 @@ input:
   #       BTN_TRIGGER: {action: player.toggle}
   #       BTN_THUMB: {action: volume.change_volume, args: {step: 5}}
   devices: {}
-sync_rfidcards:
-  enable: false
-  config_file: settings/sync_rfidcards.yaml
 webapp:
   # Cover art cache of the mpd plugin
   coverart_cache_path: cache/mpd-covers

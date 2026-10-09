@@ -119,11 +119,11 @@ class _BodyTooLarge(Exception):
 
 
 def _is_same_origin(websocket: WebSocket) -> bool:
-    """Reject cross-origin WebSocket handshakes, matching Tornado's default `check_origin`.
+    """Reject cross-origin WebSocket handshakes.
 
     Without this, any page in the browser could open a WebSocket to this API and read (or, via
     future write-capable topics, trigger) whatever it exposes -- classic cross-site WebSocket
-    hijacking. Starlette/FastAPI don't check this by default, unlike Tornado's WebSocketHandler.
+    hijacking. Starlette/FastAPI don't check this by default.
     """
     origin = websocket.headers.get('origin')
     if origin is None:
@@ -252,8 +252,7 @@ class FastApiServer(threading.Thread):
 
         # broker.publish is called synchronously from whatever thread published (see
         # lauschkiste.publishing.bus.EventBus); it hands off to this server's event loop itself via
-        # asyncio.run_coroutine_threadsafe (see _WebSocketClient.write_message), so no separate
-        # subscriber loop/bridging is needed here -- unlike the old ZMQ SUB-socket version.
+        # asyncio.run_coroutine_threadsafe (see _WebSocketClient.write_message).
         self.bus.register(self.broker.publish)
 
         serve_task = asyncio.ensure_future(self._server.serve())

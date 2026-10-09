@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Transport-neutral pieces of the browser events-over-websocket bridge.
-
-Split out of the old Tornado bridge (`lauschkiste.api.server`, removed once `lauschkiste.api.fastapi_server`
-became the sole HTTP/WebSocket bridge) so nothing here depends on a specific web framework.
-"""
+"""Transport-neutral pieces of the browser events-over-websocket bridge (no web framework involved)."""
 
 MAX_MESSAGE_SIZE = 1024 * 1024
 

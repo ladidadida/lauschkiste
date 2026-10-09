@@ -1,8 +1,6 @@
 # Packaging, Installation and Setup
 
-> Plan for the "Packaging/install overhaul" track of
-> [roadmap-core-architecture.md](roadmap-core-architecture.md). Implementation status: see
-> "Implementation plan" below.
+> How Lauschkiste is packaged, installed, set up and updated.
 
 ## Goals
 
@@ -10,8 +8,8 @@
   core, bundled plugins, web app, default settings and sounds. No git checkout needed.
 - **Runnable from source, equally supported:** clone the repository, `uv sync`, `uv run lauschkiste`.
   The code never assumes it runs from a checkout.
-- **Setup in Python:** everything the Bash installer does today becomes idempotent
-  `lauschctl setup <step>` commands. An install script only bootstraps: base packages, `uv`, the
+- **Setup in Python:** everything that configures the machine is an idempotent
+  `lauschctl setup <step>` command. An install script only bootstraps: base packages, `uv`, the
   Lauschkiste itself (package or source), then `lauschctl setup`.
 - **Plugins from the CLI:** `lauschctl plugin list|enable|disable|install`.
 - **Distribution:** wheels attached to GitHub releases and the packages on PyPI; see
@@ -19,7 +17,7 @@
 
 ## Where things live: `LAUSCHKISTE_HOME`
 
-All runtime data lives in one directory, `LAUSCHKISTE_HOME`, with the layout `shared/` has today:
+All runtime data lives in one directory, `LAUSCHKISTE_HOME`, with this layout:
 
 ```text
 $LAUSCHKISTE_HOME/
@@ -37,18 +35,14 @@ $LAUSCHKISTE_HOME/
   a checkout use `export LAUSCHKISTE_HOME=$PWD/shared`. A `.env` file is not read by Lauschkiste; the
   git-ignored `.env`/`.env.local` only hold local test credentials for scripts.
 - Relative paths in the configuration are resolved against `LAUSCHKISTE_HOME`, not against the working
-  directory. Existing configurations (`shared/settings/cards.yaml` style values from a checkout
-  install) keep working: a relative path starting with `shared/` is resolved against the home's
-  parent.
+  directory.
 - The configuration file is `$LAUSCHKISTE_HOME/settings/lauschkiste.yaml` unless `--conf`/`LAUSCHKISTE_CONF`
-  says otherwise. Missing files are created from the packaged templates on first run (already the
-  case today).
+  says otherwise. Missing files are created from the packaged templates on first run.
 
 ## Package data
 
-- Default settings, sounds, the systemd unit template, mpd/autohotspot templates move from the
-  top-level `resources/` into the `lauschkiste` package (`lauschkiste/resources/`), read with
-  `importlib.resources`. Source and package installs use the same files.
+- Default settings, sounds and the mpd/autohotspot templates are part of the `lauschkiste` package
+  (`lauschkiste/resources/`), read with `importlib.resources`. Source and package installs use the same files.
 - The web app build is included in the wheel (`lauschkiste/webapp/`). A source checkout serves
   `packages/webapp/build` instead; `api.webapp_dir` / `LAUSCHKISTE_WEBAPP_DIR` override both.
 - Configuration values that point at packaged files use the value `default` (e.g.
@@ -57,18 +51,17 @@ $LAUSCHKISTE_HOME/
 ## Command line
 
 ```text
-lauschkiste                      start the daemon (as today)
+lauschkiste                      start the daemon
 lauschctl home                     print LAUSCHKISTE_HOME and the config file in use
 lauschctl plugin list              installed plugins, enabled or not, and why one failed to load
 lauschctl plugin enable <name>     add to `plugins:`; installs the plugin package's extras if asked
 lauschctl plugin disable <name>
 lauschctl plugin install <spec>    install a plugin package (pip/uv) into Lauschkiste's environment
 lauschctl setup                    run all setup steps for this machine (interactive by default)
-lauschctl setup <step>             run one step: service, audio, mpd, samba, autohotspot, kiosk,
-                                 rfid, boot, ...
+lauschctl setup <step>             run one step (`lauschctl setup --list` lists them)
 lauschctl setup --check            report which steps are applied, change nothing
 lauschctl update                   update Lauschkiste (package: newer release; source: git pull +
-                                 uv sync) and apply configuration migrations
+                                 uv sync) and re-apply the setup
 ```
 
 ## Setup steps
@@ -78,10 +71,9 @@ asks. Steps are idempotent: running `lauschctl setup` again repairs or updates, 
 Answers are stored in `$LAUSCHKISTE_HOME/settings/setup.yaml` so unattended re-runs
 (`lauschctl setup --yes`) reuse them.
 
-Steps port the former Bash installer routines: system packages, Raspberry Pi
-settings, the systemd user service, mpd (only when the `mpd` plugin is chosen), Samba, autohotspot,
-kiosk mode, RFID readers (the existing reader configuration tool), audio output, boot-time
-optimisation. Steps needing root run their commands through `sudo`.
+The steps: system packages, Raspberry Pi boot settings, the systemd user service, mpd (only when the `mpd`
+plugin is chosen), plugins, Samba, port 80, autohotspot, kiosk mode, RFID readers, audio output, boot-time
+optimisation and the login message. Steps needing root run their commands through `sudo`.
 
 ## Packages and releases
 
@@ -115,26 +107,26 @@ optimisation. Steps needing root run their commands through `sudo`.
      (`--home`, default `<checkout>/shared`) in the shell profile and the service.
 4. Runs `lauschctl setup`.
 
-## Implementation plan
+## Details
 
-1. **Paths** -- *done*: `LAUSCHKISTE_HOME`, path resolution against it, resources as package data, web
+1. **Paths**: `LAUSCHKISTE_HOME`, path resolution against it, resources as package data, web
    app directory configurable.
-2. **Wheels** -- *done*: `ci/build_wheels.sh` (also `bam wheels`) builds the web app, copies it into
+2. **Wheels**: `ci/build_wheels.sh` (also `bam wheels`) builds the web app, copies it into
    the `lauschkiste` package and builds the wheels of core, CLI and bundled plugins.
    `.github/workflows/wheels.yml` builds them on every push/PR, installs them into a fresh
    environment and starts Lauschkiste; a tag `v<version>` attaches them to a GitHub release
    (the tag is compared after PEP 440 normalization: `v0.1.0-alpha.1` matches `0.1.0a1`; tags with a
    `-` become pre-releases). Without a stable release, `install.sh` and `lauschctl update` use the
    newest pre-release.
-3. **Plugin commands** -- *done*: `lauschctl plugin list|enable|disable|install`
+3. **Plugin commands**: `lauschctl plugin list|enable|disable|install`
    (`packages/cli/src/lauschkiste_cli/plugin.py`). `Plugin.extras` (contract 1.1) names the extras of
    the plugin's package that `enable --with-extras` installs; installs go through `uv pip` into the
    Lauschkiste's own environment, `pip` as fallback.
-4. **Setup framework and steps** -- *done*: `packages/cli/src/lauschkiste_cli/setup/`. `System` wraps
+4. **Setup framework and steps**: `packages/cli/src/lauschkiste_cli/setup/`. `System` wraps
    commands, files and machine facts (tests swap in a fake with a temporary root); steps:
    `packages`, `raspi`, `mpd`, `plugins`, `service`, `samba`, `rfid`, `kiosk`, `autohotspot`,
    `boot`, `welcome` (`lauschctl setup --list`). Missing Debian packages of all chosen steps are
-   installed in one `apt-get` call before the steps run. Differences to the Bash installer:
+   installed in one `apt-get` call before the steps run. Notes:
    - The service is a user unit in `~/.config/systemd/user/`, generated with the actual
      `lauschkiste` executable and `LAUSCHKISTE_HOME`; `loginctl enable-linger` starts it at boot (default
      on a Pi) instead of relying on autologin. It only wants `mpd.service` if the `mpd` plugin is
@@ -147,7 +139,7 @@ optimisation. Steps needing root run their commands through `sudo`.
    - `rfid` runs the interactive reader configuration and is skipped with `--yes`.
    - Runtime packages only: the default player needs neither ffmpeg nor mpg123; the PipeWire
      stack is installed on a Pi only (desktops bring their own sound server).
-5. **Install script** -- *done*: `install.sh` (options in its header and in
+5. **Install script**: `install.sh` (options in its header and in
    `documentation/builders/installation.md`). Package mode: `uv tool install` of the release
    wheels (or `--wheels DIR`) with the system `python3`. Source mode: clone (or reuse) a checkout,
    `uv sync --no-dev --frozen`, web app built with npm if available, else taken from the latest
@@ -162,20 +154,10 @@ optimisation. Steps needing root run their commands through `sudo`.
    its wheels are installed with `uv pip` into the running environment, so other installed plugins
    stay, and the extras of enabled plugins are kept. Afterwards `lauschctl setup --yes` runs in a new
    process (the updated steps) and an active service is restarted. `--check` only reports.
-   Configuration migrations: none needed so far; a versioned migration step gets added with the
-   first incompatible configuration change.
-7. **Remove the Bash installer** -- *done*: `migrate_to_cli/` (installer, RFID and audio tools,
-   now `lauschctl setup rfid` / `lauschctl setup audio`; the HifiBerry script is the `sound_card`
-   question of `lauschctl setup raspi`), its Debian CI (`ci/ci-debian.Dockerfile`,
-   `ci/installation/`, `test_docker_debian*_v3.yml`), `packages-core.txt`, the service template
-   (the unit is generated) and the upstream-only `bundle_webapp_and_release_v3.yml`.
 
 ## Open points
 
 - The `service` step is covered by unit tests only; the CI containers have no systemd.
-- A first release (tag `v<version>`) is needed before `install.sh` works without `--source`/`--wheels`.
-- Configurations from upstream installs (`modules:`, `gpioz:`, `host:`, ...) are not converted to
-  the plugin configuration; only their paths keep working.
 
 ## Decisions
 

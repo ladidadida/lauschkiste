@@ -56,7 +56,7 @@ Lauschkiste grew out of [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID
 ([phoniebox.de](https://phoniebox.de/)), the RFID jukebox started by Micz Flor, and keeps its
 history. Thanks to the Phoniebox community for many years of work and ideas. Lauschkiste
 reworked the core (REST API, plugin system, packaging) and goes its own way since; see
-[the roadmap](documentation/developers/roadmap-core-architecture.md). It is not a drop-in replacement:
+[the design record](documentation/developers/roadmap-core-architecture.md). It is not a drop-in replacement:
 settings and card files of Phoniebox are not compatible.
 
 The RC522 driver in the RFID reader plugin is [pi-rc522-gpiozero](https://github.com/hoffie/pi-rc522-gpiozero), a

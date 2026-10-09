@@ -63,10 +63,6 @@ loggers:
     # In case you recursion problems, make sure this logger does not go to the publisher
     # propagate: false
     # handlers: [console]
-  tornado:
-    level: WARNING
-    handlers: [console]
-    propagate: false
   mpd:
     level: WARNING
   urllib3:

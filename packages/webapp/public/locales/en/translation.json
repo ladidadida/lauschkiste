@@ -23,8 +23,6 @@
           "timer_stop_player": "Stop player",
           "timer_fade_volume": "Fade volume and Shut Down",
           "toggle_output": "Toggle audio output",
-          "sync_rfidcards_all": "Sync all audiofiles and card entries",
-          "sync_rfidcards_change_on_rfid_scan": "Change activation of 'on RFID scan'",
           "next_song": "Next song",
           "pause": "Pause",
           "play": "Play",

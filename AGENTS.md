@@ -5,10 +5,9 @@ Guidance for AI coding agents (Claude, Codex, Copilot, etc.) working in this rep
 ## What this project is
 
 **Lauschkiste**: an RFID-controlled audio player for kids on the Raspberry Pi, grown out of
-Phoniebox (RPi-Jukebox-RFID "future3") and largely rewritten since. Kids (and others) tap an RFID card on a reader and the box
-plays a specific playlist/album — no screen required. This branch (`future3/develop`) is a
-from-scratch rewrite of the legacy (v2, shell-script based) project; do not assume v2 conventions
-apply.
+Phoniebox (RPi-Jukebox-RFID) and largely rewritten since. Kids (and others) tap an RFID card on a reader and the box
+plays a specific playlist/album, audiobook, podcast or station — no screen required. Do not assume Phoniebox
+conventions apply.
 
 ## Repository layout
 
@@ -19,17 +18,15 @@ packages/          uv workspace members
   lauschkiste/     Python core application ("Lauschkiste core") — the daemon that runs on the Pi
     pyproject.toml Real [project] table (package=true), runtime dependencies, hatchling backend
     src/lauschkiste/   The installable package: the core/plugin contract (contract/), the core
-                   modules (core_modules.py: system, library, player, volume, timers, jingle,
-                   input, cards, rfid), FastAPI API bridge
-                   (api/), in-process event bus (publishing/), config handling. Removed former
-                   components come back as core modules (volume, timers, jingle, system info,
-                   input devices) or plugins (board support, devices, mqtt, card sync) -- see
-                   documentation/developers/core-and-plugins.md.
+                   modules (core_modules.py: system, hardware, library, player, audiobooks, cache,
+                   radio, podcasts, volume, timers, time_limits, jingle, input, cards, rfid), FastAPI API
+                   bridge (api/), in-process event bus (publishing/), config handling. What is
+                   platform-specific lives in plugins -- see documentation/developers/core-and-plugins.md.
     interfaces/    Interface snapshots of the framework contract and every core module, checked
                    by test/contract/test_snapshots.py (see "Core and plugins" below)
   cli/             Distribution `lauschkiste` (the package users install; import package lauschkiste_cli,
                    the core is the distribution `lauschkiste-core`, import package lauschkiste): `lauschkiste` (start the daemon), `home`,
-                   `plugin list|enable|disable|install`, `update`, `setup` (machine setup steps in
+                   `plugin list|enable|disable|install`, `config get|set`, `update`, `setup` (machine setup steps in
                    lauschkiste_cli/setup/, see documentation/developers/packaging-and-setup.md),
                    `debug sniff` (publishing-bus WebSocket sniffer).
   webapp/          React front-end (the touch/web UI), talks to the core via HTTP/WebSocket
@@ -68,10 +65,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `GET /api/v1/modules` (active modules, their operations/events, skipped plugins) and
   `GET /api/v1/actions` (card actions with argument schemas). Card entries, card removal actions
   and the second-swipe action are stored as `action: <module>.<action>` plus named `args`
-  (`documentation/builders/actions.md`). ZeroMQ, the
-  generic HTTP RPC endpoint and the old call registry are gone. A first CLI slice exists
-  (`packages/cli`, `lauschkiste`/`lauschctl debug sniff`), but a dedicated CLI for the API is not
-  designed yet.
+  (`documentation/builders/actions.md`).
 - **Event bus** (`lauschkiste.publishing.get_bus()`, a `lauschkiste.publishing.bus.EventBus`): thread-safe,
   in-process, last-value cached. Modules publish typed events through `ctx.publish(event,
   payload)` (validated against the event's model; raises with `LAUSCHKISTE_STRICT=1`, logs and drops
@@ -85,7 +79,11 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   their raw status into the typed `player.status` event (`lauschkiste.player.status.PlayerStatus`).
 - **Library** (`lauschkiste.library`): owns the music library -- file management, a SQLite index of
   tags/durations (`$LAUSCHKISTE_HOME/settings/library.sqlite`), cover art (`$LAUSCHKISTE_HOME/cache/covers`), and the
-  `library.sources` extension point for further catalogs (mpd, streaming). Browsing routes are
+  `library.sources` extension point for further catalogs (mpd, streaming).
+- **Content and downloads**: `audiobooks`, `podcasts` and `radio` are core modules
+  (`documentation/developers/content-types.md`); the `cache` module downloads items of sources that register at
+  `cache.providers` (`documentation/developers/caching.md`); `time_limits` implements quiet hours and a daily
+  limit (off by default). Browsing routes are
   `/api/v1/library/*`; the local source id is `local`.
 - **Paths** (`lauschkiste.paths`): all runtime data lives in `LAUSCHKISTE_HOME` (`--home`, `$LAUSCHKISTE_HOME`,
   default `$XDG_DATA_HOME/lauschkiste`; development in this checkout uses `shared/`). Relative paths in
@@ -98,13 +96,14 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
 - **Bundled plugins** live in `packages/plugins/*` (uv workspace members, installed by `uv sync`
   but only loaded when enabled under `plugins:`): `board-raspberry-pi` (board support: pins,
   interfaces, sound cards, power, firmware health; the installer enables it on a Pi), `devices`
-  (`gpio_controls`, `battery`, `power_button`, board-independent, see
+  (`gpio_controls`, `battery`, `power_button`, `phat_beat`, board-independent, see
   `documentation/developers/hardware.md`), `mpd` (player backend) and `rfid-readers`
   (one plugin per reader driver, `rfid_<driver>`; each driver's dependencies are an extra of that
   package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`) and `samba` (the
   library's network share and Samba password from the web app; `lauschctl setup samba` enables it) and
   `audiobookshelf` (books of an Audiobookshelf server at `audiobooks.sources`, resolver at
-  `player.resolvers`; `documentation/developers/audiobookshelf.md`).
+  `player.resolvers`; `documentation/developers/audiobookshelf.md`) and `directories` (podcast and radio
+  search services at `podcasts.directories` and `radio.directories`). `devices` also holds `phat_beat`.
 - **Settings:** modules and plugins describe their config section as a pydantic model
   (`settings = ...`); the web app renders forms from its schema
   (`/api/v1/settings/modules/<name>`), see "Settings" in `documentation/developers/core-and-plugins.md`.
@@ -112,13 +111,10 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
 ## Languages, tools, conventions
 
 - **Python** (core, min version 3.11): PEP 8 style, enforced by **ruff** (`[tool.ruff]` in
-  `pyproject.toml`, max line 127, max-complexity 12 — mirrors the old flake8 config, not yet
-  running ruff's isort/pyupgrade rules or `ruff format` on the existing tree, see
-  `documentation/developers/roadmap-core-architecture.md`). All Python plugin/config folder & file
-  names are `snake_case`, descriptive, general→specific (see `CONTRIBUTING.md` "Naming
-  conventions" section) — this is a deliberate v2→v3 break, follow it strictly.
-- **JavaScript/React** (`packages/webapp`): Create React App (`react-scripts`), MUI v5, i18next for
-  translations (`de`/`en` under `packages/webapp/public/locales`), Ramda, react-router-dom.
+  `pyproject.toml`, max line 127, max-complexity 12). `ruff format` is not applied to the tree. Python
+  package, plugin and file names are `snake_case`, descriptive, general→specific (see `CONTRIBUTING.md`).
+- **JavaScript/React** (`packages/webapp`): Vite, MUI, i18next for translations (`de`/`en` under
+  `packages/webapp/public/locales`; plugins ship their own in `translations/`), react-router-dom.
 - **Config format**: YAML (`ruamel.yaml`), defaults in `packages/lauschkiste/src/lauschkiste/resources/default-settings/`.
 - Everything under any `scratch*`-named folder is git- and ruff-ignored — safe scratch space,
   never a place for real code.
@@ -127,7 +123,6 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
 
 Package manager is **uv**; the dev/CI workflow is driven by **[bam](https://gitlab.com/cascascade/bam)**
 (`bam.yaml`), a content-addressed task runner — cached, so re-running an unchanged task is instant.
-The old `run_*.sh` wrapper scripts are gone.
 
 ```bash
 export LAUSCHKISTE_HOME=$PWD/shared   # data directory of this checkout (default: ~/.local/share/lauschkiste)
@@ -143,11 +138,11 @@ uv run lauschctl config set library.path DIR  # change one setting in the config
                                  # [--with-extras], install <spec> [--enable]
 uv run lauschctl setup --check    # what `lauschctl setup [<step>...]` would change on this machine
                                  # (steps: `lauschctl setup --list`; answers in settings/setup.yaml)
-uv run lauschctl update --check   # newer release / upstream commits? (`lauschctl update` applies it)
+uv run lauschctl update --check   # newer release / new commits? (`lauschctl update` applies it)
 bam lint                        # ruff check (cached)
 bam format                      # ruff format (auto-fix)
-bam format-check                # ruff format --check (informational only for now, see roadmap)
-bam typecheck                   # pyright (informational only for now, see roadmap)
+bam format-check                # ruff format --check (informational only)
+bam typecheck                   # pyright (informational only)
 bam test                        # pytest, writes .reports/junit.xml
 bam docs                        # regenerate API docs (pydoc-markdown)
 bam markdownlint                # lint markdown docs (needs packages/webapp/node_modules)
@@ -160,7 +155,7 @@ bam docker-dev                  # local mpd+lauschkiste+webapp stack without Pul
 uv run lauschctl debug sniff      # print all messages on the publishing queue
 ```
 
-Webapp (`cd packages/webapp`): standard CRA scripts — `npm start`, `npm run build`, `npm test`.
+Webapp (`cd packages/webapp`): `npm run dev`, `npm run build`, `npm test`, `npm run lint`, `npm run test:e2e`.
 
 ## Before committing / opening a PR
 
@@ -168,9 +163,7 @@ Webapp (`cd packages/webapp`): standard CRA scripts — `npm start`, `npm run bu
   in the PR).
 - Run `bam test` if you touched code with test coverage, and add tests for new modules
   under `test/`.
-- Commit message prefixes `(docs)`, `(maint)`, `(packaging)` are used for trivial changes that
-  don't need an issue number.
-- Target branch is `future3/develop`, not `future3/main`, unless told otherwise.
+- Target branch is `main`.
 - Full contributor guidelines: `CONTRIBUTING.md`.
 
 ## Testing without Raspberry Pi hardware
@@ -178,8 +171,8 @@ Webapp (`cd packages/webapp`): standard CRA scripts — `npm start`, `npm run bu
 The default `player.backend: local_audio` + `generic_usb`/`fake_reader_gui` RFID readers need no
 Pi-specific hardware or extra system packages at all -- `uv run lauschkiste` plays through this
 machine's normal audio output directly. The Docker dev environment
-(`documentation/developers/docker.md`) is still useful for testing the full stack (core, webapp and
-nginx-free FastAPI static serving) in isolation, but is no longer required just to avoid GPIO/
+(`documentation/developers/docker.md`) is still useful for testing the full stack (core and webapp)
+in isolation, but is no longer required just to avoid GPIO/
 mpd/RFID hardware.
 
 ## Key docs to read before larger changes

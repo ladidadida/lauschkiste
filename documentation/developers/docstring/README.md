@@ -2345,11 +2345,6 @@ Take a station off the "continue" list (it stays a station).
 
 Thread-safe in-process pub/sub bus with last-value caching.
 
-Replaces the ZMQ-based Publisher/PublishServer pair (see
-documentation/developers/roadmap-core-architecture.md, "Simplify away ZMQ and nginx"): this is a
-single-process app, so a plain thread-safe broadcast is enough -- ZMQ solved a distributed-systems
-problem (many independent processes, high throughput) that doesn't apply here.
-
 `publish()` can be called from any thread (components run in RFID reader threads, timer threads,
 etc.); subscriber callbacks are invoked synchronously on the publishing thread, so they must be
 fast and must not block. The FastAPI bridge hands off to its own event loop via
@@ -2789,10 +2784,7 @@ Parse the folder ``path`` and create a playlist from its content
 
 # lauschkiste.api.events
 
-Transport-neutral pieces of the browser events-over-websocket bridge.
-
-Split out of the old Tornado bridge (`lauschkiste.api.server`, removed once `lauschkiste.api.fastapi_server`
-became the sole HTTP/WebSocket bridge) so nothing here depends on a specific web framework.
+Transport-neutral pieces of the browser events-over-websocket bridge (no web framework involved).
 
 
 <a id="lauschkiste.api.events.EventBroker"></a>
@@ -2913,14 +2905,8 @@ The timeout only catches a hung start; slow boards (Pi Zero) need well over 5 s.
 
 Serve the built webapp, its fallback pages, and the /logs directory directly from FastAPI.
 
-Replaces nginx (see documentation/developers/roadmap-core-architecture.md, "Simplify away ZMQ and
-nginx"): nginx's only jobs here were reverse-proxying /api/ to the browser bridge (now just
-FastAPI itself, nothing to proxy to) and serving the webapp's static build, a "build
-missing"/generic-404 fallback page, and a /logs directory listing. Small enough to do directly.
-
-Deliberately matches the old `resources/default-settings/nginx.default` behavior rather than
-adding new behavior (e.g. no SPA deep-link fallback to index.html for unknown paths -- nginx's
-`try_files $uri $uri/ =404` didn't do that either, so neither does this).
+Serves the webapp's static build, a "build missing"/generic-404 fallback page and a /logs
+directory listing. Unknown paths get the 404 page; there is no SPA deep-link fallback to index.html.
 
 
 <a id="lauschkiste.api.webapp_static.HASHED_ASSETS_DIR"></a>

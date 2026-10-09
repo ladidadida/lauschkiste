@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 """Thread-safe in-process pub/sub bus with last-value caching.
 
-Replaces the ZMQ-based Publisher/PublishServer pair (see
-documentation/developers/roadmap-core-architecture.md, "Simplify away ZMQ and nginx"): this is a
-single-process app, so a plain thread-safe broadcast is enough -- ZMQ solved a distributed-systems
-problem (many independent processes, high throughput) that doesn't apply here.
-
 `publish()` can be called from any thread (components run in RFID reader threads, timer threads,
 etc.); subscriber callbacks are invoked synchronously on the publishing thread, so they must be
 fast and must not block. The FastAPI bridge hands off to its own event loop via

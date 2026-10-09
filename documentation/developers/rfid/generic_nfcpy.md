@@ -9,7 +9,7 @@ driver, and thus cannot be used with the [genericusb](genericusb.md) module. Als
 > [!NOTE]
 > Since nfcpy is a user-space library, it is required to supress the kernel from loading its driver.
 > The setup will do this automatically, so make sure the device is connected
-> before running the [RFID reader configuration tool](../coreapps.md#RFID-Reader).
+> before running the [RFID reader configuration tool](../coreapps.md#rfid-reader).
 
 ## Configuration
 

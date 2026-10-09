@@ -32,8 +32,7 @@ the [roadmap](roadmap-core-architecture.md).
 - Installing straight from a git branch or tag without a release (the web app would have to be built on the
   box or taken from a CI build).
 - A switch for Bluetooth on the Raspberry Pi, more board support plugins, general LED strip control.
-- An MQTT plugin (the [old documentation](../builders/components/mqtt/mqtt-integration.md) still describes
-  the earlier implementation).
+- An MQTT plugin (Home Assistant and other home automation).
 
 ## Not carried over from Phoniebox 2.x and the first future3 versions
 

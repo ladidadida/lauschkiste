@@ -23,7 +23,7 @@ Lauschkiste is an RFID audio player for kids on the Raspberry Pi. It grew out of
   REST routes come from the same declarations
 * Installable as a package (`install.sh`, `lauschctl setup`, `lauschctl update`) or run from a
   source checkout ([packaging and setup](./developers/packaging-and-setup.md))
-* Where it is heading: [roadmap](./developers/roadmap-core-architecture.md)
+* How it came about: [design record of the core architecture](./developers/roadmap-core-architecture.md) (historical)
 
 ## Help wanted
 

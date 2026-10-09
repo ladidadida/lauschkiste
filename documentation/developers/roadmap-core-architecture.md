@@ -74,7 +74,7 @@ Fork goals, roughly in the order we're tackling them:
    drives system setup instead of ~20 bash scripts. Done: see
    [packaging-and-setup.md](packaging-and-setup.md) (wheels, `install.sh`, `jukebox setup`,
    `jukebox plugin`, `jukebox update`).
-4. **New name** — Lauschkiste; plan in [renaming-lauschkiste.md](renaming-lauschkiste.md).
+4. **New name** — Lauschkiste (done).
 
 ## Current state (inherited from future3/develop)
 

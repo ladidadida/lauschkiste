@@ -5,7 +5,6 @@ import signal
 import functools
 import logging
 import threading
-import time
 import queue
 import tkinter as tk
 from tkinter import ttk
@@ -161,38 +160,6 @@ class ReaderClass(ReaderBaseClass):
         self._lab_card_place = ttk.Label(self._if3_2, text='No card on reader', padding=0)
         self._lab_card_place.pack(side='top', padx=default_padx, pady=default_pady, fill='x')
 
-        # Need to break circular dependency:
-        # GPIOZ registers a callback with RFID. But TKGUI is part of RFID reader and needs to query GPIOZ about devices
-        # And both modules need to be loaded via the plugin interface
-        # Since this mock reader is non-production code and for development only, we take the short cut and import
-        # GPIOZ here after the plugin initialization has been done
-        # The proper way would be to separate the TKGUI from the Fake RFID reader...
-        try:
-            import jukebox.gpio.gpioz.plugin as gpioz
-        except KeyError:
-            pass
-        else:
-            import lauschkiste_plugin_rfid_readers.fake_reader_gui.gpioz_gui_addon as gpioz_gui
-
-            if gpioz.IS_ENABLED and gpioz.IS_MOCKED:
-                # This happens during finalize
-                self._lframe4 = ttk.Labelframe(self._window, text='GPIOZero config')
-                self._lframe4.grid(column=1, row=0, padx=default_padx, pady=default_pady, sticky='NSEW')
-                self._lframe5 = ttk.Labelframe(self._window, text='GPIOZero Input Devices')
-                self._lframe5.grid(column=1, row=1, padx=default_padx, pady=default_pady, ipady=default_pady / 2,
-                                   sticky='NSEW', rowspan=2)
-                self._lframe6 = ttk.Labelframe(self._window, text='GPIOZero Outputs')
-                self._lframe6.grid(column=1, row=3, padx=default_padx, pady=default_pady, sticky='NSEW', rowspan=1)
-                # Frame 4
-                self._gpioz_label = ttk.Label(self._lframe4, text=f"{gpioz.CONFIG_FILE}", padding=0)
-                self._gpioz_label.pack(side='top', padx=default_padx, pady=default_pady, anchor='w')
-                # Frame 5
-                self._gpoioz_input_devices = gpioz_gui.create_inputs(self._lframe5, default_btn_width,
-                                                                     default_padx, default_pady)
-                # Frame 6
-                self._gpoioz_output_devices = gpioz_gui.create_outputs(self._lframe6, default_btn_width,
-                                                                       default_padx, default_pady)
-
         self._window.protocol("WM_DELETE_WINDOW", gui_close)
 
         # Set initial status
@@ -210,12 +177,6 @@ class ReaderClass(ReaderBaseClass):
             self._window.tkraise()
         else:
             self._window.lower()
-
-    def _gpioz_press(self, device, duration=0):
-        logger.debug(f"Press button {device.pin.number}")
-        device.pin.drive_low()
-        time.sleep(duration)
-        device.pin.drive_high()
 
     def _btn_database_callback(self):
         new_file = filedialog.askopenfilename(initialdir=".", title="Select file",

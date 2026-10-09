@@ -1,18 +1,14 @@
 # Python Development Notes
 
-## Prerequisites
-
-> [!NOTE]
-> All Python scripts must be run within a [virtual environment](https://docs.python.org/3/library/venv.html) (`.venv`). All Python plugins are installed encapsulated within this environment.
-
-Before you can run Python code, you need to enable the virtual environment. On the Raspberry Pi, it's located in the project root `~/lauschkiste/.venv`. Depending on your setup, the absolute path can vary.
+All Python code runs in a virtual environment. In a source checkout, [uv](https://docs.astral.sh/uv/) creates
+it (`uv sync --group dev`) and runs commands in it:
 
 ```bash
-$ source ~/lauschkiste/.venv/bin/activate
+uv run lauschkiste        # the server
+uv run lauschctl --help   # the management tool
+uv run pytest             # the tests
 ```
 
-If the virtual environment has been activated correctly, your terminal will now show a prefix (`.venv`). If you want to leave the venv again execute deactivate.
-
-```bash
-$ deactivate
-```
+To work in the environment directly, activate it (`source .venv/bin/activate`) and leave it again with
+`deactivate`. A box installed with `install.sh --from github|pypi` keeps Lauschkiste in uv's tool environment;
+`lauschkiste` and `lauschctl` are on the `PATH` there and `lauschctl plugin install` adds packages to it.

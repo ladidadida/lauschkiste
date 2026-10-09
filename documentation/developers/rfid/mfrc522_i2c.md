@@ -7,7 +7,11 @@ library](https://github.com/cpranzl/mfrc522_i2c) and uses the I2C bus.
 
 ## Options
 
-There are no configurable options for this module.
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `i2c_bus` | `1` | number of the I2C bus (`/dev/i2c-1`) |
+| `i2c_address` | `0x28` | I2C address of the reader |
+| `log_all_cards` | `false` | log every read, even while a card stays on the reader (debugging) |
 
 ## Hardware
 
@@ -23,8 +27,7 @@ Then query all I2C addresses using:
 
 `i2cdetect -y 1`
 
-The address you see in the output will be a hex value (e.g. the hex value `0x28` is the decimal value `40`).
-Convert this to decimal, then add this to your `rfid.yaml` settings file.
+Enter the address you see in `rfid.yaml` as `i2c_address` (YAML accepts hex, e.g. `0x29`).
 
 ## Board Connections
 

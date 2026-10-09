@@ -1,8 +1,7 @@
 # Core and Plugin Contract
 
-> First step of the "Advanced plugin system" track in
-> [roadmap-core-architecture.md](roadmap-core-architecture.md). Implementation status: see
-> "Implementation plan" below.
+> Reference for what the core, its modules and plugins are, and the contract between them. What works today:
+> [Feature status](status.md).
 
 ## Terms
 
@@ -31,13 +30,15 @@ and pins.
 | Core | Plugins |
 | --- | --- |
 | Player (with the `local_audio` backend) | Board support: `board_raspberry_pi` |
-| Library (index, metadata, cover art, see below) | Devices: `gpio_controls`, `battery`, `power_button` |
-| Hardware (pins and buses in use, board, shutdown/reboot) | Player backend `mpd` |
-| Card database and card action dispatch | RFID reader drivers (one plugin per driver) |
-| Settings / system | MQTT |
-| System info (IP address, disk usage, CPU temperature, restart Lauschkiste service) | Card synchronisation |
+| Library (index, metadata, cover art, see below) | Devices: `gpio_controls`, `battery`, `power_button`, `phat_beat` |
+| Audiobooks, podcasts, radio ([Content types](content-types.md)) | Player backend `mpd` |
+| Cache for downloads ([Caching](caching.md)) | RFID reader drivers (one plugin per driver) |
+| Hardware (pins and buses in use, board, shutdown/reboot) | Audiobookshelf server as a source |
+| Card database and card action dispatch | Podcast and radio directories |
+| Settings / system | Samba share |
+| System info (IP address, disk usage, CPU temperature, restart Lauschkiste service) | |
 | Volume (incl. output selection, e.g. speakers vs. Bluetooth) | |
-| Timers | |
+| Timers, time limits | |
 | Jingle (startup/shutdown sound) | |
 | Input devices via evdev (USB buttons, media keys, Bluetooth headset buttons) | |
 
@@ -45,25 +46,21 @@ Board support plugins (one per board family) describe the board's pins and inter
 off; device plugins (buttons, battery, power button) are board-independent and get their pins
 through the core `hardware` module. Details in [Hardware](hardware.md).
 
-**Autohotspot** is network configuration, not runtime functionality, and moves to `lauschctl setup`.
+**Autohotspot** is network configuration, not runtime functionality, and is done by `lauschctl setup autohotspot`.
 
 ### Library
 
-With `local_audio` as the default backend there is no mpd database behind the player anymore, so
-the core **Library** module owns what mpd used to provide. Today `local_audio` reports only file
-name, position and state (no title, artist, album or duration), album/artist browsing returns 501,
-and cover art only covers embedded MP3 (ID3) images through the mpd backend. The Library module:
+With `local_audio` as the default backend there is no mpd database behind the player, so the core **Library**
+module provides what browsing needs:
 
-- keeps an index of the music library in SQLite, built from tags read with `mutagen` (MP3, FLAC,
-  MP4/M4A, Ogg/Opus, ...). A scan runs on `library.update()` (the existing refresh endpoint) and
-  after uploads and deletions through the library API;
-- answers album/artist listings, songs of an album and search from that index;
-- provides cover art per song and album from embedded images or folder images
-  (`cover.jpg`/`folder.jpg`/...), cached;
-- supplies title, artist, album, track and duration for the player status, independent of the
-  active backend.
+- an index of the music library in SQLite, built from tags read with `mutagen` (MP3, FLAC, MP4/M4A, Ogg/Opus,
+  ...). A scan runs on `library.update()` (the refresh endpoint), when files change and after uploads and
+  deletions through the library API;
+- album/artist listings, songs of an album and search from that index;
+- cover art per song and album from embedded images or folder images (`cover.jpg`/`folder.jpg`/...), cached;
+- title, artist, album, track and duration for the player status, independent of the active backend.
 
-Already backend-independent and staying as is: folder playlists
+Backend-independent as well: folder playlists
 (`lauschkiste.playlistgenerator.PlaylistCollector`, including `.m3u`) and file management (upload,
 folders, delete). Audiobooks, radio and podcasts are separate core modules, see
 [Content types](content-types.md).
@@ -85,39 +82,15 @@ Core never special-cases a plugin. Where core behavior needs a platform-specific
 - Shutting down itself stays simple: the plugin calls `poweroff`, systemd sends SIGTERM, and the
   core runs its normal graceful shutdown (jingle, stop playback, save state).
 
-## Why
-
-Today every piece of functionality is wired up by hand in several places:
-
-- `lauschkiste.daemon.run()` calls each module's `register()`/`start()`/`stop()` explicitly, and start
-  order is encoded only in comments.
-- Every REST route in `lauschkiste.api.fastapi_server` is hand-written per method and reaches the object
-  via the former `jukebox.registry.get()`.
-- RFID card actions, `card_removal_action` and `second_swipe_action` are stored as
-  `(package, plugin, method)` plus untyped `args`/`kwargs`; arguments are only checked when a card is
-  swiped. Aliases live separately in `command_aliases.py`.
-- Nothing states which threads may call a module: the API executor (4 workers), the RFID reader
-  thread and timers all call the same objects.
-- Player backends and reader drivers are selected by importing a module path from a hard-coded
-  table; their dependencies are `pyproject.toml` extras of the core package.
-
 ## Goals
 
-- One declaration per operation yields the REST route (typed, OpenAPI), the card action and the
-  in-process call.
+- One declaration per operation yields the REST route (typed, OpenAPI), the card action and the in-process call.
 - Plugins as real packages: own dependencies, discovered via entry points, enabled by config.
 - Start/stop order derived from declared dependencies.
 - A stated threading model with a safe default.
 - Card actions validated when they are stored, not when a card is swiped.
-- Existing `cards.yaml` files keep working (automatic migration).
-- REST paths the webapp uses today stay unchanged.
 
-## Non-goals (for now)
-
-- Webapp UI contributed by plugins.
-- Extension points beyond player backends, reader drivers and library sources (see "Extension
-  points").
-- A plugin index, versioned plugin API or sandboxing.
+Not provided: web app UI contributed by plugins, a plugin index, sandboxing.
 
 ## The contract
 
@@ -167,9 +140,9 @@ Core modules subclass `CoreModule` instead of `Plugin`; everything else is ident
   declares them (`@action(method="PUT", path="/level")`). Card action ids and in-process calls are
   unaffected by the path.
 - `path` is relative to `/api/v1/<name>`. An absolute path (starting with `/api/`) is allowed only
-  for core modules, to keep today's webapp paths stable (e.g. `/api/v1/settings`).
+  for core modules, to keep the web app's paths stable (e.g. `/api/v1/settings`).
 - An operation a backend doesn't support raises `NotImplementedError`; the framework maps it to
-  HTTP 501 (as `_run_on_executor` does today).
+  HTTP 501 .
 - Return values are serialized as JSON; `None` becomes `204 No Content`.
 - `name=` overrides the operation name where the method name can't be used, e.g.
   `@action(name='stop') def stop_playback(...)` next to the lifecycle method `stop()`.
@@ -208,11 +181,7 @@ class Player(CoreModule):
 - Payloads are validated when published: in tests and development mode a mismatch raises; in
   production it is logged and the event is dropped, so a faulty plugin cannot break the event
   stream for everyone.
-- Existing topics (`playerstatus`, `rfid.card_id`, `core.*`) get proper models in step 2, replacing
-  today's mpd-style string fields (`'elapsed': '42.000'`, `'random': '0'`), and are renamed to the
-  `<name>.<event>` scheme (`playerstatus` -> `player.status`). The webapp is updated in the same
-  step. The player status gains title, artist, album and duration once the
-  Library module provides them.
+- Event topics follow the `<name>.<event>` scheme (`player.status`, `rfid.card_detected`, ...).
 
 ### `Context`
 
@@ -294,20 +263,20 @@ switch.
 **Plugins** advertise themselves under the entry-point group `lauschkiste.plugins`:
 
 ```toml
-# packages/plugins/mqtt/pyproject.toml
+# packages/plugins/example/pyproject.toml
 [project]
-name = "lauschkiste-plugin-mqtt"
-dependencies = ["lauschkiste", "paho-mqtt"]
+name = "lauschkiste-plugin-example"
+dependencies = ["lauschkiste-core", "paho-mqtt"]
 
 [project.entry-points."lauschkiste.plugins"]
-mqtt = "lauschkiste_plugin_mqtt:Mqtt"
+example = "lauschkiste_plugin_example:Example"
 ```
 
 and are enabled by listing them in `lauschkiste.yaml`; their config lives under the same key:
 
 ```yaml
 plugins:
-  mqtt:
+  example:
     host: 192.168.1.10
   board_raspberry_pi:
     sound_card: max98357a
@@ -320,9 +289,8 @@ plugins:
 
 - Installed but not listed: not loaded (not even imported).
 - Listed but not installed: logged as an error, everything else starts.
-- Bundled plugins live under `packages/plugins/<name>/` as uv workspace members. Their
-  dependencies move out of the core `pyproject.toml` extras into each plugin package. The installer
-  installs the bundled plugins and pre-fills `plugins:` for the ones the user selected.
+- Bundled plugins live under `packages/plugins/<name>/` as uv workspace members, each with its own
+  dependencies. The installer installs them and pre-fills `plugins:` for the ones the user selected.
 - `lauschctl plugin list|enable|disable|install` manages this from the command line. A plugin whose
   dependencies are optional extras of its package names them in `extras` (e.g.
   `extras = ('gpio',)`); `lauschctl plugin enable <name> --with-extras` installs them.
@@ -399,17 +367,15 @@ def start(self, ctx):
     ctx.modules.player.backends.register("mpd", MpdBackend(ctx.config))
 ```
 
-Three extension points are needed from the start, because today's behavior depends on them:
+The basic extension points:
 
-- **Player backends** (`player.backends`) - `local_audio` is registered by the core; `mpd` becomes a
-  plugin. `player.backend` config keeps selecting the active one. The duck-typed backend surface
-  `PlayerCoordinator` calls today becomes an explicit protocol.
+- **Player backends** (`player.backends`) - `local_audio` is registered by the core, `mpd` is a
+  plugin. The `player.backend` setting selects the active one; the backend surface is an explicit protocol.
 - **RFID reader drivers** (`rfid.readers`) - every bundled driver is a plugin (`rfid_<driver>`,
   all shipped in the `rfid-readers` package) that registers a reader factory. The reader framework keeps owning threads, timing and
   dispatch.
 - **Library sources** (`library.sources`) - the core index is the local source; the `mpd` plugin can
-  add its own database as a second source, streaming services later as further ones. The webapp's
-  source tabs (`list_library_sources`) already expect this shape.
+  add its own database as a second source, streaming services can be further ones.
 
 More that exist now: `player.level_meters` (VU meters), `player.resolvers` (turn a track address into what
 is opened plus headers, so that credentials never appear in a queue), `audiobooks.sources` (books from
@@ -447,7 +413,7 @@ is about to play) follow the same pattern and are added when a plugin needs them
 
 ## Card actions
 
-New storage format in `cards.yaml` (also used for `card_removal_action` and `second_swipe_action`
+Storage format in `cards.yaml` (also used for `card_removal_action` and `second_swipe_action`
 in `lauschkiste.yaml`):
 
 ```yaml
@@ -466,64 +432,3 @@ in `lauschkiste.yaml`):
 - Unknown or invalid entries on load (e.g. a plugin that is not enabled) are kept in the file,
   logged and reported by `GET /api/v1/cards` with an `error` field, never silently dropped. They
   become valid again once the plugin is enabled.
-
-## What goes away
-
-- The former `jukebox.registry` (`register`, `call`, `tag`/`callable_method`), replaced by the module manager.
-- `command_aliases.py` and `lauschkiste.utils.{decode_rpc_command,bind_rpc_command,decode_and_call_rpc_command}`.
-- The hand-written `register_player_routes`/`register_settings_routes`/`register_cards_routes` in
-  `fastapi_server.py`.
-- The backend/driver import tables in `lauschkiste.player.plugin` and `lauschkiste.rfid.reader`, and the
-  `mpd`/`rpi-gpio`/reader extras in `packages/lauschkiste/pyproject.toml`.
-- `documentation/builders/rpc-commands.md`, replaced by a generated list of card actions.
-
-## Implementation plan
-
-1. **Framework** (`lauschkiste.contract`) -- *done*: `CoreModule`, `Plugin`, `Context`,
-   `@action`/`@query`/`event`/`extension_point`, module manager (entry-point discovery, opt-in,
-   ordering, version checks, lifecycle incl. `ready()`, locks), route generation, action catalog
-   with validation, interface snapshots and the CI check (`test/contract/`).
-2. **Migrate the core** -- *done*: `system` (info, logs, web app settings), `cards`, `player`
-   (backend extension point, typed `player.status`), `rfid` (reader framework, driver extension
-   point, `rfid.card_detected`). REST paths the webapp uses stayed the same except
-   `DELETE /api/v1/cards/{card_id}`; topics were renamed (`playerstatus` -> `player.status`,
-   `rfid.card_id` -> `rfid.card_detected`, `core.*` -> `system.info`) and the webapp follows.
-   Card dispatch goes through the action catalog.
-3. **First bundled plugins** -- *done*: `packages/plugins/mpd` (player backend) and
-   `packages/plugins/rfid-readers` (one plugin per driver in one package; driver dependencies are
-   extras of that package). The core has no optional dependencies left. The RFID reader
-   configuration tool moved along (`lauschkiste_plugin_rfid_readers.configure`) and enables the driver plugins
-   of the readers it configures. Snapshots of bundled plugins live in `<package>/interfaces/`.
-4. **Remove the old mechanism** -- *done together with step 2*: registry, command aliases, RPC
-   helpers, hand-written routes and the player backend import table are gone.
-5. **Library** -- *done*: `lauschkiste.library` core module with a SQLite index (`mutagen` tags and
-   durations, incremental rescans on start-up, refresh, upload and delete), album/song/search
-   queries, cover art (embedded pictures or folder images, cached, served at
-   `/api/v1/library/covers/<name>`), and the `library.sources` extension point (the `mpd` plugin
-   registers its database there). The player plays library albums through the new backend
-   operation `play_files` and fills title/artist/album/duration/cover of `player.status` from the
-   index. The library's routes moved from `/api/v1/player/*` to `/api/v1/library/*`; the local
-   source id is `local`. Streaming uploads stay a hand-written route (`extra_routes`); an ASGI
-   middleware limits all other request bodies to 1 MiB.
-6. **Remaining core modules** -- *done*: `volume` (PulseAudio/PipeWire via pulsectl, falling
-   back to the player backend's volume; soft maximum, mute, outputs with per-output volume limit,
-   fade-out), `timers` (named countdowns that run an action; `shutdown` only works with a
-   board support plugin), `jingle` (startup/shutdown sound through the same PortAudio output as
-   `local_audio`, `jingle.play` for cards), system info in `system` (IP addresses, disk usage, CPU
-   temperature, periodic `system.health`, `say_my_ip`, `restart_service`), and `input` (evdev
-   devices by name with key -> action mappings, optional media keys). Not carried over: the idle-shutdown timer
-   and the separate `evdev.yaml` file (device mappings now live under `input:`).
-7. **Hardware** -- *done*: core module `hardware` (pins and buses in use, conflicts,
-   shutdown/reboot through the board), board support plugin `board_raspberry_pi` (pin map,
-   interfaces, sound card/I²C/SPI/power-off pin for `config.txt` via `lauschctl setup raspi`,
-   `debug_mode`, firmware health) and the board-independent device plugins `gpio_controls`
-   (buttons, rotary encoders, status LED), `battery` (MAX17048, INA219, simulator) and
-   `power_button` (OnOff SHIM preset). See [Hardware](hardware.md). Not carried over: the ADS1015
-   battery driver, the OnOff SHIM script, the idle-shutdown timer and the old `gpio.yaml` format.
-   Autohotspot moves to the installer/`lauschctl setup` track instead.
-
-Each step leaves the daemon runnable and the test suites green.
-
-## Open questions
-
-None at the moment.
