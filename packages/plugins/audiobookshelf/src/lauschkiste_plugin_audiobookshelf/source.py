@@ -352,6 +352,9 @@ class AudiobookshelfSource:
     def files(self, book: str) -> List[str]:
         return [track.url for track in self.tracks(book)]
 
+    def cover_url(self, book: str) -> str:
+        return f'{COVER_ROUTE}/{book}'
+
     def title(self, book: str) -> str:
         for item in self.known_items():
             if item.get('id') == book:

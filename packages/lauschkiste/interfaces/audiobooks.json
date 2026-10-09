@@ -9,10 +9,34 @@
       "title": "(self, book: str) -> str"
     }
   },
-  "interface_version": "3.0",
+  "interface_version": "4.0",
   "kind": "core",
   "name": "audiobooks",
   "operations": {
+    "hide_from_continue": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          },
+          "source": {
+            "default": "local",
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobooks/hide_from_continue",
+      "returns": {
+        "type": "null"
+      }
+    },
     "list_books": {
       "args": {
         "additionalProperties": false,
@@ -66,6 +90,10 @@
               "type": "number"
             },
             "finished": {
+              "default": false,
+              "type": "boolean"
+            },
+            "hidden": {
               "default": false,
               "type": "boolean"
             },

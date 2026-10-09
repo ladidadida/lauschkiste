@@ -50,10 +50,10 @@ const Player = () => {
     setCoverImage(undefined);
     setBackgroundImage('none');
     if (cover_url && show_covers) {
-      setCoverImage(cover_url);
+      setCoverImage(coverSrc(cover_url));
       setBackgroundImage([
         'linear-gradient(to bottom, rgba(18, 18, 18, 0.5), rgba(18, 18, 18, 1))',
-        `url(${cover_url})`
+        `url(${coverSrc(cover_url)})`
       ].join(','));
     }
     else if (file && show_covers) {

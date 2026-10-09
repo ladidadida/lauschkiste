@@ -122,7 +122,7 @@ def test_play_newest_unheard_then_continue(podcasts):
     ctrl.playerstatus.return_value = {'state': 'play', 'file': 'https://example.org/2.mp3', 'song': '0'}
     assert client.get('/api/v1/player/status').json()['context'] == {
         'kind': 'podcast', 'title': 'Kakadu: Newer', 'action': 'podcasts.play',
-        'args': {'podcast': 'kakadu', 'episode': newer}}
+        'args': {'podcast': 'kakadu', 'episode': newer}, 'image': 'https://example.org/kakadu.jpg'}
     ctrl.playerstatus.return_value = {'state': 'stop'}
 
     client.post('/api/v1/podcasts/set_heard', json={'podcast': 'kakadu', 'episode': newer})
@@ -148,3 +148,14 @@ def test_unknown_podcast_or_episode(podcasts):
     assert client.post('/api/v1/podcasts/play', json={'podcast': 'nope'}).status_code == 404
     client.post('/api/v1/podcasts', json={'url': 'https://example.org/feed.xml'})
     assert client.post('/api/v1/podcasts/play', json={'podcast': 'kakadu', 'episode': 'x'}).status_code == 404
+
+
+def test_a_podcast_can_be_taken_off_the_continue_list_until_something_changes(podcasts):
+    client, _, fetch, _ = podcasts
+    client.post('/api/v1/podcasts', json={'url': 'https://example.org/feed.xml'})
+    newer, older = [e['id'] for e in client.get('/api/v1/podcasts/kakadu/episodes').json()]
+    assert client.get('/api/v1/podcasts').json()[0]['hidden'] is False
+    assert client.post('/api/v1/podcasts/hide_from_continue', json={'podcast': 'kakadu'}).status_code == 204
+    assert client.get('/api/v1/podcasts').json()[0]['hidden'] is True
+    client.post('/api/v1/podcasts/set_heard', json={'podcast': 'kakadu', 'episode': newer})
+    assert client.get('/api/v1/podcasts').json()[0]['hidden'] is False

@@ -349,7 +349,9 @@
     },
     "continue": {
       "empty": "Audiobooks in progress and new podcast episodes show up here.",
-      "new-episodes": "New episodes"
+      "new-episodes": "New episodes",
+      "remove": "Remove from \"Continue\"",
+      "radio": "Recently played stations"
     },
     "downloads": {
       "download": "Download to the box",

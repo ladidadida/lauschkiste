@@ -1,7 +1,7 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "plugin",
   "name": "phat_beat",
   "needs": [
@@ -11,6 +11,6 @@
   "operations": {},
   "requires": {
     "hardware": ">=1.0,<2",
-    "player": ">=5.1,<6"
+    "player": ">=6.0,<7"
   }
 }

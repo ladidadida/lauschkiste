@@ -375,9 +375,9 @@ class PhatBeat(Plugin):
 
     name = 'phat_beat'
     title = 'Pimoroni pHAT BEAT'
-    interface_version = '1.0'
+    interface_version = '1.1'
     needs = ('gpio', 'i2s')
-    requires = {'hardware': '>=1.0,<2', 'player': '>=5.1,<6'}
+    requires = {'hardware': '>=1.0,<2', 'player': '>=6.0,<7'}
     extras = ('gpio',)
     settings = PhatBeatSettings
     button_reader: Optional[Callable[[int, List[int]], Any]] = None

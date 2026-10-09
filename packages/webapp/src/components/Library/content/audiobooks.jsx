@@ -38,7 +38,7 @@ export const progressOf = ({ duration, finished, listened }) => {
 // Books of other sources (not the local library) name their source in every request.
 const sourceArg = (book) => (book.source && book.source !== 'local' ? { source: book.source } : {});
 
-export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigin = false }) => {
+export const AudiobookItem = ({ book, download, onChanged, onHide, showCovers, showOrigin = false }) => {
   const { t } = useTranslation();
   const progress = progressOf(book);
   const started = progress > 0 && !book.finished;
@@ -71,6 +71,7 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigi
     : downloadMenuItems(t, { source: book.source, item: book.book, download, onChanged });
 
   const menuItems = [
+    ...(onHide ? [{ label: t('library.continue.remove'), onClick: onHide }] : []),
     ...downloadItems,
     {
       label: t('library.audiobooks.restart'),

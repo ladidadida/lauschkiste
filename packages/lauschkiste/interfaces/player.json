@@ -55,6 +55,17 @@
                   "default": {},
                   "type": "object"
                 },
+                "image": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
                 "kind": {
                   "enum": [
                     "music",
@@ -98,6 +109,17 @@
           ],
           "default": null
         },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "duration": {
           "anyOf": [
             {
@@ -114,6 +136,17 @@
           "type": "number"
         },
         "file": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "genre": {
           "anyOf": [
             {
               "type": "string"
@@ -244,7 +277,7 @@
       "resolve": "(self, url: str) -> Tuple[str, Dict[str, str]]"
     }
   },
-  "interface_version": "5.2",
+  "interface_version": "6.0",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -581,6 +614,17 @@
                     "default": {},
                     "type": "object"
                   },
+                  "image": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
                   "kind": {
                     "enum": [
                       "music",
@@ -763,6 +807,17 @@
                     "default": {},
                     "type": "object"
                   },
+                  "image": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
                   "kind": {
                     "enum": [
                       "music",
@@ -806,6 +861,17 @@
             ],
             "default": null
           },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
           "duration": {
             "anyOf": [
               {
@@ -822,6 +888,17 @@
             "type": "number"
           },
           "file": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "genre": {
             "anyOf": [
               {
                 "type": "string"

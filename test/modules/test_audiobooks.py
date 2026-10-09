@@ -359,3 +359,20 @@ def test_books_say_where_they_come_from(setup):
     (directory / 'meta.json').write_text('{"title": "Remote", "files": [{"name": "f.mp3", "size": 5, "duration": 1}]}')
     assert {(b.source, b.availability) for b in audiobooks.invoke('list_books')} == {
         ('local', 'local'), ('fake', 'cached')}
+
+
+def test_an_audiobook_can_be_taken_off_the_continue_list_until_it_is_played_on(setup):
+    start, ctrl, status, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    status(file=BOOK[1], elapsed='70.0', duration='300')
+    status(file=BOOK[1], state='pause', elapsed='75.5', duration='300')
+    assert wait_for(lambda: [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0].listened > 0)
+    pippi = lambda: [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]  # noqa: E731
+    assert pippi().hidden is False
+    audiobooks.invoke('hide_from_continue', 'Pippi')
+    assert pippi().hidden is True
+    status(file=BOOK[1], state='pause', elapsed='120.0', duration='300')
+    assert wait_for(lambda: pippi().hidden is False)
+    with pytest.raises(OperationError):
+        audiobooks.invoke('hide_from_continue', 'Nope')

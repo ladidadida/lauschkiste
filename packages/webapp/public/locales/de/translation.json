@@ -349,7 +349,9 @@
     },
     "continue": {
       "empty": "Hier erscheinen angefangene Hörbücher und neue Podcast-Folgen.",
-      "new-episodes": "Neue Folgen"
+      "new-episodes": "Neue Folgen",
+      "remove": "Aus „Weiterhören“ entfernen",
+      "radio": "Zuletzt gehörte Sender"
     },
     "downloads": {
       "download": "Auf die Box laden",

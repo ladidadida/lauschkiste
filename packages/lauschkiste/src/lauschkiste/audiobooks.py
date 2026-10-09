@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field
 
 import lauschkiste.paths
 from lauschkiste.contract import CoreModule, OperationError, action, extension_point, query
+from lauschkiste.dismissed import Dismissed
 from lauschkiste.resume import ResumeTracker
 
 logger = logging.getLogger('lauschkiste.audiobooks')
@@ -20,6 +21,7 @@ logger = logging.getLogger('lauschkiste.audiobooks')
 LOCAL = 'local'
 
 DEFAULT_STATE_FILE = 'settings/audiobooks.json'
+DEFAULT_HIDDEN_FILE = 'settings/audiobooks_hidden.json'
 
 
 class AudiobookSource(Protocol):
@@ -59,6 +61,8 @@ class Audiobook(BaseModel):
     source: str = LOCAL
     #: 'local' (a folder of the library), 'cached' (downloaded from the source) or 'stream' (played over the network)
     availability: str = 'local'
+    #: taken off the "continue" list; it comes back when the book is played on
+    hidden: bool = False
 
 
 def natural_key(text: str):
@@ -76,7 +80,7 @@ class Audiobooks(CoreModule):
     """Audiobooks: play, continue, start over, mark as finished."""
 
     name = 'audiobooks'
-    interface_version = '3.0'
+    interface_version = '4.0'
     concurrency = 'threadsafe'
     requires = ('library', 'player', 'cache')
     settings = AudiobookSettings
@@ -85,6 +89,7 @@ class Audiobooks(CoreModule):
     def __init__(self):
         self._ctx: Any = None
         self._resume: Any = None
+        self._dismissed: Any = None
 
     def start(self, ctx) -> None:
         self._ctx = ctx
@@ -93,6 +98,7 @@ class Audiobooks(CoreModule):
             rewind_sec=float(ctx.config.get('rewind_sec', default=10)),
             save_interval_sec=float(ctx.config.get('save_interval_sec', default=10)))
         self._resume.start()
+        self._dismissed = Dismissed(lauschkiste.paths.resolve(DEFAULT_HIDDEN_FILE))
 
     def stop(self):
         self._resume.stop()
@@ -156,16 +162,21 @@ class Audiobooks(CoreModule):
                               for entry in implementation.list_books())
             except Exception as error:
                 logger.warning(f"Audiobooks of source '{source}' are not available: {error}")
+        for entry in result:
+            entry.hidden = self._dismissed.is_hidden(f'{entry.source}/{entry.book}', round(entry.listened))
         return result
 
     def _context(self, book: str, source: str = LOCAL) -> Dict[str, Any]:
         args = {'book': book} if source == LOCAL else {'book': book, 'source': source}
+        image = None
         if source != LOCAL:
-            title = self._source(source).title(book)
+            implementation = self._source(source)
+            title = implementation.title(book)
+            image = getattr(implementation, 'cover_url', lambda _book: None)(book)
         else:
             songs = self._songs(book)
             title = next((song.album for song in songs if song.album), None) or book
-        return {'kind': 'audiobook', 'title': title, 'action': 'audiobooks.play', 'args': args}
+        return {'kind': 'audiobook', 'title': title, 'action': 'audiobooks.play', 'args': args, 'image': image}
 
     def _source(self, source: str):
         if source not in self.sources:
@@ -184,6 +195,14 @@ class Audiobooks(CoreModule):
     def play(self, book: str, source: str = LOCAL) -> None:
         """Play an audiobook where it stopped (from the beginning when it is new or finished)."""
         self._play(book, source, True)
+
+    @action()
+    def hide_from_continue(self, book: str, source: str = LOCAL) -> None:
+        """Take an audiobook off the "continue" list until it is played on."""
+        entry = next((b for b in self.list_books() if b.book == book and b.source == source), None)
+        if entry is None:
+            raise OperationError(404, 'unknown_audiobook', f"No audiobook '{book}'")
+        self._dismissed.hide(f'{source}/{book}', round(entry.listened))
 
     @action()
     def restart(self, book: str, source: str = LOCAL) -> None:

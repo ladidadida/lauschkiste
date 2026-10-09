@@ -54,7 +54,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '5.2'
+    interface_version = '6.0'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -143,6 +143,8 @@ class Player(CoreModule):
                   if value is not None and getattr(status, key) is None}
         with self._metadata_lock:
             update['context'] = self._context
+        if self._context and self._context.image and not update.get('cover_url') and not status.cover_url:
+            update['cover_url'] = self._context.image
         return status.model_copy(update=update)
 
     def _set_context(self, kind: ContentKind, title: Optional[str], action: str, args: Dict[str, Any]) -> None:

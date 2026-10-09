@@ -9,6 +9,10 @@
                 "default": 0,
                 "type": "integer"
               },
+              "hidden": {
+                "default": false,
+                "type": "boolean"
+              },
               "id": {
                 "type": "string"
               },
@@ -67,7 +71,7 @@
       "top": "(self, limit: int) -> List[Dict[str, Any]]"
     }
   },
-  "interface_version": "3.0",
+  "interface_version": "4.0",
   "kind": "core",
   "name": "podcasts",
   "operations": {
@@ -103,6 +107,10 @@
           "episodes": {
             "default": 0,
             "type": "integer"
+          },
+          "hidden": {
+            "default": false,
+            "type": "boolean"
           },
           "id": {
             "type": "string"
@@ -187,6 +195,26 @@
           "content"
         ],
         "type": "object"
+      }
+    },
+    "hide_from_continue": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "podcast": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "podcast"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/podcasts/hide_from_continue",
+      "returns": {
+        "type": "null"
       }
     },
     "import_opml": {
@@ -359,6 +387,10 @@
             "episodes": {
               "default": 0,
               "type": "integer"
+            },
+            "hidden": {
+              "default": false,
+              "type": "boolean"
             },
             "id": {
               "type": "string"
@@ -699,6 +731,10 @@
           "episodes": {
             "default": 0,
             "type": "integer"
+          },
+          "hidden": {
+            "default": false,
+            "type": "boolean"
           },
           "id": {
             "type": "string"

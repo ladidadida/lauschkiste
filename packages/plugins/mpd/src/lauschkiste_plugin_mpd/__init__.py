@@ -89,8 +89,8 @@ class Mpd(Plugin):
 
     name = 'mpd'
     title = 'mpd'
-    interface_version = '1.4'
-    requires = {'player': '>=5.0,<6', 'library': '>=1.0,<2'}
+    interface_version = '1.5'
+    requires = {'player': '>=6.0,<7', 'library': '>=1.0,<2'}
     settings = MpdSettings
 
     def start(self, ctx) -> None:

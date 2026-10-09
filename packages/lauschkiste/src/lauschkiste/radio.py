@@ -6,8 +6,10 @@ Stations are kept in ``radio.stations_file``. A station URL may point to the str
 
 import logging
 import re
+import time
 import threading
 import unicodedata
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol
 from urllib.parse import urlparse
@@ -24,6 +26,7 @@ from lauschkiste.radio_playlist import parse_stations, render_m3u
 logger = logging.getLogger('lauschkiste.radio')
 
 DEFAULT_STATIONS_FILE = 'settings/radio.yaml'
+DEFAULT_RECENT_FILE = 'settings/radio_recent.json'
 PLAYLIST_SUFFIXES = ('.m3u', '.pls')
 PLAYLIST_TIMEOUT_SEC = 10
 PLAYLIST_MAX_BYTES = 64 * 1024
@@ -34,6 +37,8 @@ class Station(BaseModel):
     name: str
     url: str
     logo: Optional[str] = None
+    #: when it was last played (UTC); empty for a station never played here or taken off the "continue" list
+    last_played: Optional[str] = None
 
 
 class StationHit(BaseModel):
@@ -115,7 +120,7 @@ class Radio(CoreModule):
     """Internet radio stations."""
 
     name = 'radio'
-    interface_version = '2.0'
+    interface_version = '3.0'
     concurrency = 'threadsafe'
     requires = ('player',)
 
@@ -127,6 +132,8 @@ class Radio(CoreModule):
         self._lock = threading.Lock()
         self._path = Path(DEFAULT_STATIONS_FILE)
         self._stations: Dict[str, Dict[str, Any]] = {}
+        self._recent_path = Path(DEFAULT_RECENT_FILE)
+        self._recent: Dict[str, float] = {}
 
     def start(self, ctx) -> None:
         self._ctx = ctx
@@ -137,6 +144,9 @@ class Radio(CoreModule):
             stations = {}
         self._stations = {str(key): dict(value) for key, value in stations.items()
                           if isinstance(value, dict) and value.get('url')}
+        self._recent_path = lauschkiste.paths.resolve(DEFAULT_RECENT_FILE)
+        self._recent = {key: float(value) for key, value in statefile.read_json(self._recent_path).items()
+                        if isinstance(value, (int, float))}
 
     def ready(self) -> None:
         self._publish()
@@ -148,7 +158,9 @@ class Radio(CoreModule):
 
     def _list(self) -> List[Station]:
         with self._lock:
-            stations = [Station(id=key, name=value.get('name') or key, url=value['url'], logo=value.get('logo'))
+            stations = [Station(id=key, name=value.get('name') or key, url=value['url'], logo=value.get('logo'),
+                                last_played=datetime.fromtimestamp(self._recent[key], timezone.utc).isoformat()
+                                if key in self._recent else None)
                         for key, value in self._stations.items()]
         return sorted(stations, key=lambda station: station.name.casefold())
 
@@ -309,4 +321,26 @@ class Radio(CoreModule):
         """Play a station."""
         entry = self._get(station)
         self._ctx.modules.player.play_files([self._stream_url(entry.url)], context={
-            'kind': 'radio', 'title': entry.name, 'action': 'radio.play', 'args': {'station': station}})
+            'kind': 'radio', 'title': entry.name, 'action': 'radio.play', 'args': {'station': station},
+            'image': entry.logo})
+        with self._lock:
+            self._recent[station] = time.time()
+            recent = dict(self._recent)
+        self._save_recent(recent)
+        self._publish()
+
+    def _save_recent(self, recent: Dict[str, float]) -> None:
+        try:
+            statefile.write_json(self._recent_path, recent)
+        except OSError as error:
+            logger.warning(f"Could not save the recently played stations: {error}")
+
+    @action()
+    def forget_recent(self, station: str) -> None:
+        """Take a station off the "continue" list (it stays a station)."""
+        self._get(station)
+        with self._lock:
+            self._recent.pop(station, None)
+            recent = dict(self._recent)
+        self._save_recent(recent)
+        self._publish()

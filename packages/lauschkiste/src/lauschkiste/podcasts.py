@@ -24,6 +24,7 @@ import lauschkiste.directories as directories
 import lauschkiste.paths
 import lauschkiste.statefile as statefile
 from lauschkiste.cache import CacheFile, CachePlan
+from lauschkiste.dismissed import Dismissed
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.podcast_opml import normalize_url, parse_opml, render_opml
 from lauschkiste.resume import ResumeTracker
@@ -33,6 +34,7 @@ logger = logging.getLogger('lauschkiste.podcasts')
 DEFAULT_PODCASTS_FILE = 'settings/podcasts.yaml'
 DEFAULT_STATE_FILE = 'settings/podcast_positions.json'
 DEFAULT_CACHE_DIR = 'cache/podcasts'
+DEFAULT_HIDDEN_FILE = 'settings/podcasts_hidden.json'
 FEED_TIMEOUT_SEC = 15
 FEED_MAX_BYTES = 10 * 1024 * 1024
 
@@ -54,6 +56,8 @@ class Podcast(BaseModel):
     episodes: int = 0
     unheard: int = 0
     updated_at: Optional[str] = None
+    #: taken off the "continue" list; it comes back with a new episode or when one is heard
+    hidden: bool = False
 
 
 class Episode(BaseModel):
@@ -275,7 +279,7 @@ class Podcasts(CoreModule):
     """Podcasts: subscribe to feeds, play episodes and continue them."""
 
     name = 'podcasts'
-    interface_version = '3.0'
+    interface_version = '4.0'
     concurrency = 'threadsafe'
     requires = ('player', 'cache')
     settings = PodcastSettings
@@ -294,6 +298,7 @@ class Podcasts(CoreModule):
         self._refresh_sec = 3600.0
         self._max_episodes = 100
         self._resume: Any = None
+        self._dismissed: Any = None
 
     def start(self, ctx) -> None:
         self._ctx = ctx
@@ -311,6 +316,7 @@ class Podcasts(CoreModule):
             rewind_sec=float(ctx.config.get('rewind_sec', default=10)),
             save_interval_sec=float(ctx.config.get('save_interval_sec', default=10)))
         self._resume.start()
+        self._dismissed = Dismissed(lauschkiste.paths.resolve(DEFAULT_HIDDEN_FILE))
         ctx.modules.cache.providers.register(SOURCE, EpisodeProvider(self))
 
     def ready(self) -> None:
@@ -401,9 +407,15 @@ class Podcasts(CoreModule):
             feed = dict(self._feeds.get(key) or {})
         episodes = self._episodes(key, feed)
         fetched_at = feed.get('fetched_at')
+        unheard = [episode for episode in episodes if not episode.heard]
         return Podcast(id=key, name=entry.get('name') or key, url=entry['url'], image=entry.get('image'),
-                       episodes=len(episodes), unheard=sum(1 for episode in episodes if not episode.heard),
-                       updated_at=datetime.fromtimestamp(fetched_at, timezone.utc).isoformat() if fetched_at else None)
+                       episodes=len(episodes), unheard=len(unheard),
+                       updated_at=datetime.fromtimestamp(fetched_at, timezone.utc).isoformat() if fetched_at else None,
+                       hidden=self._dismissed.is_hidden(key, self._continue_marker(unheard)))
+
+    @staticmethod
+    def _continue_marker(unheard: List[Episode]) -> str:
+        return f"{len(unheard)}:{unheard[0].id if unheard else ''}"
 
     def _list(self) -> List[Podcast]:
         with self._lock:
@@ -581,6 +593,16 @@ class Podcasts(CoreModule):
         return Opml(content=render_opml(sorted(entries, key=lambda entry: entry[0].casefold())))
 
     @action()
+    def hide_from_continue(self, podcast: str) -> None:
+        """Take a podcast off the "continue" list until a new episode comes or one is heard."""
+        self._get(podcast)
+        with self._lock:
+            feed = dict(self._feeds.get(podcast) or {})
+        unheard = [episode for episode in self._episodes(podcast, feed) if not episode.heard]
+        self._dismissed.hide(podcast, self._continue_marker(unheard))
+        self._publish()
+
+    @action()
     def play(self, podcast: str, episode: Optional[str] = None) -> None:
         """Play an episode where it stopped; without ``episode`` the newest unheard one (or the
         newest, when all are heard)."""
@@ -597,6 +619,7 @@ class Podcasts(CoreModule):
         local = self._ctx.modules.cache.files(SOURCE, cache_item(podcast, chosen.id))
         self._resume.play(f'{podcast}/{chosen.id}', [local.files[0].path if local else chosen.url],
                           names=[chosen.url], context={
+            'image': chosen.image or self._get(podcast).get('image'),
             'kind': 'podcast', 'title': f'{name}: {chosen.title}', 'action': 'podcasts.play',
             'args': {'podcast': podcast, 'episode': chosen.id}})
 

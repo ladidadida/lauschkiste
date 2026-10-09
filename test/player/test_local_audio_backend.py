@@ -468,3 +468,13 @@ def test_portaudio_sink_starts_and_ends_softly(monkeypatch):
     assert samples[0] == 0
     assert samples[0] < samples[50] < samples[100] < samples[150] < 20000
     assert all(sample == 20000 for sample in samples[200:])
+
+
+def test_a_stream_reports_what_it_says_about_itself():
+    backend = local_audio_backend(_queue=['http://radio/live'], _index=0, _state='play', _stream_metadata={
+        'StreamTitle': 'Artist - Song', 'icy-name': 'Kinderlieder Radio', 'icy-genre': 'Kinderlieder',
+        'icy-description': 'Songs fuer Kinder'})
+    status = backend._status_dict()
+    assert (status['title'], status['name'], status['genre'], status['description']) == (
+        'Artist - Song', 'Kinderlieder Radio', 'Kinderlieder', 'Songs fuer Kinder')
+    assert 'genre' not in local_audio_backend(_queue=['a.mp3'], _index=0)._status_dict()

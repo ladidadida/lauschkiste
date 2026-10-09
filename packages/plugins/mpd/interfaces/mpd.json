@@ -1,12 +1,12 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.4",
+  "interface_version": "1.5",
   "kind": "plugin",
   "name": "mpd",
   "operations": {},
   "requires": {
     "library": ">=1.0,<2",
-    "player": ">=5.0,<6"
+    "player": ">=6.0,<7"
   }
 }

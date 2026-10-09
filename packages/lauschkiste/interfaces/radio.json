@@ -8,6 +8,17 @@
               "id": {
                 "type": "string"
               },
+              "last_played": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "logo": {
                 "anyOf": [
                   {
@@ -48,7 +59,7 @@
       "top": "(self, limit: int) -> List[Dict[str, Any]]"
     }
   },
-  "interface_version": "2.0",
+  "interface_version": "3.0",
   "kind": "core",
   "name": "radio",
   "operations": {
@@ -87,6 +98,17 @@
         "properties": {
           "id": {
             "type": "string"
+          },
+          "last_played": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "logo": {
             "anyOf": [
@@ -153,6 +175,26 @@
           "content"
         ],
         "type": "object"
+      }
+    },
+    "forget_recent": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "station": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "station"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/radio/forget_recent",
+      "returns": {
+        "type": "null"
       }
     },
     "import_playlist": {
@@ -236,6 +278,17 @@
           "properties": {
             "id": {
               "type": "string"
+            },
+            "last_played": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
             },
             "logo": {
               "anyOf": [
@@ -588,6 +641,17 @@
         "properties": {
           "id": {
             "type": "string"
+          },
+          "last_played": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "logo": {
             "anyOf": [

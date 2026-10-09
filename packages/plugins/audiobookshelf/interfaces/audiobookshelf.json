@@ -1,7 +1,7 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "plugin",
   "name": "audiobookshelf",
   "operations": {
@@ -47,8 +47,8 @@
     }
   },
   "requires": {
-    "audiobooks": ">=3.0,<4",
+    "audiobooks": ">=4.0,<5",
     "cache": ">=1.0,<2",
-    "player": ">=5.2,<6"
+    "player": ">=6.0,<7"
   }
 }

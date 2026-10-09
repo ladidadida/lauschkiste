@@ -23,7 +23,8 @@ const lines = (status, t) => {
   const kind = contentKind(context);
   if (kind === 'radio') {
     const station = status.name || context?.title || t('player.display.unknown-title');
-    return [station, status.title !== station ? status.title : null];
+    return [station, status.title !== station ? status.title : null,
+      [status.genre, status.description].filter(Boolean).join(' · ')];
   }
   if (kind === 'audiobook') {
     const chapter = status.playlist_length > 1
@@ -56,7 +57,7 @@ const Display = () => {
     );
   }
 
-  const [title, subtitle] = lines(playerstatus, t);
+  const [title, subtitle, extra] = lines(playerstatus, t);
 
   return (
     <Grid container>
@@ -72,6 +73,9 @@ const Display = () => {
       </MuiLink>
       {subtitle &&
         <Typography sx={dontBreak} variant="subtitle1" color="textSecondary">{subtitle}</Typography>
+      }
+      {extra &&
+        <Typography sx={dontBreak} variant="body2" color="textSecondary">{extra}</Typography>
       }
     </Grid>
   );

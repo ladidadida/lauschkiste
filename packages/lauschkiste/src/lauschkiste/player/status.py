@@ -14,6 +14,8 @@ class PlaybackContext(BaseModel):
     title: Optional[str] = None
     action: Optional[str] = None
     args: Dict[str, Any] = {}
+    #: A picture of what plays (a station's logo, a podcast's artwork); shown when the file has no cover of its own
+    image: Optional[str] = None
 
 
 class PlayerStatus(BaseModel):
@@ -27,6 +29,9 @@ class PlayerStatus(BaseModel):
     title: Optional[str] = None
     #: Name of a stream (radio station)
     name: Optional[str] = None
+    #: What the stream says about itself (radio): its genre and a short description
+    genre: Optional[str] = None
+    description: Optional[str] = None
     artist: Optional[str] = None
     album: Optional[str] = None
     albumartist: Optional[str] = None
@@ -75,6 +80,8 @@ def status_from_backend(raw: Mapping[str, Any], provider: str) -> PlayerStatus:
         duration=_number(raw.get('duration')),
         title=_text(raw.get('title')),
         name=_text(raw.get('name')),
+        genre=_text(raw.get('genre')),
+        description=_text(raw.get('description')),
         artist=_text(raw.get('artist')),
         album=_text(raw.get('album')),
         albumartist=_text(raw.get('albumartist')),

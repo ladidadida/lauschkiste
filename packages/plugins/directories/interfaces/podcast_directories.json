@@ -1,11 +1,11 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "plugin",
   "name": "podcast_directories",
   "operations": {},
   "requires": {
-    "podcasts": ">=3.0,<4"
+    "podcasts": ">=4.0,<5"
   }
 }

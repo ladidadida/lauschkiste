@@ -123,6 +123,10 @@ const commands = {
     cardAction: 'audiobooks.restart',
     argKeys: ['book'],
   },
+  audiobookHide: {
+    rest: { method: 'POST', path: '/api/v1/audiobooks/hide_from_continue' },
+    argKeys: ['book', 'source'],
+  },
   audiobookSetFinished: {
     rest: { method: 'POST', path: '/api/v1/audiobooks/set_finished' },
     argKeys: ['book', 'finished'],
@@ -162,6 +166,10 @@ const commands = {
   },
   deleteRadioStation: {
     rest: { method: 'DELETE', path: '/api/v1/radio/stations/{station}' },
+    argKeys: ['station'],
+  },
+  forgetRadioRecent: {
+    rest: { method: 'POST', path: '/api/v1/radio/forget_recent' },
     argKeys: ['station'],
   },
   radioDirectories: {
@@ -234,6 +242,10 @@ const commands = {
     rest: { method: 'POST', path: '/api/v1/podcasts/play' },
     cardAction: 'podcasts.play',
     argKeys: ['podcast', 'episode'],
+  },
+  podcastHide: {
+    rest: { method: 'POST', path: '/api/v1/podcasts/hide_from_continue' },
+    argKeys: ['podcast'],
   },
   podcastSetHeard: {
     rest: { method: 'POST', path: '/api/v1/podcasts/set_heard' },

@@ -21,7 +21,7 @@ from lauschkiste_plugin_devices.phat_beat import (BAR, OFF, RAINBOW, RED, VOLUME
 
 class Player(CoreModule):
     name = 'player'
-    interface_version = '5.1'
+    interface_version = '6.0'
     level_meters = extension_point('level_meters', LevelMeter)
     calls = []
 

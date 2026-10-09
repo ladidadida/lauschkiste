@@ -60,8 +60,8 @@ class PodcastDirectories(Plugin):
 
     name = 'podcast_directories'
     title = 'Find podcasts'
-    interface_version = '1.0'
-    requires = {'podcasts': '>=3.0,<4'}
+    interface_version = '1.1'
+    requires = {'podcasts': '>=4.0,<5'}
     settings = PodcastDirectoriesSettings
 
     def __init__(self):
@@ -114,8 +114,8 @@ class RadioDirectories(Plugin):
 
     name = 'radio_directories'
     title = 'Find radio stations'
-    interface_version = '1.0'
-    requires = {'radio': '>=2.0,<3'}
+    interface_version = '1.1'
+    requires = {'radio': '>=3.0,<4'}
     settings = RadioDirectoriesSettings
 
     def __init__(self):

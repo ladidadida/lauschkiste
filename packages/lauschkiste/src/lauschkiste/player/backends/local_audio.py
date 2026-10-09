@@ -340,6 +340,10 @@ class PlayerLocalAudio:
             status['title'] = metadata['StreamTitle']
         if metadata.get('icy-name'):
             status['name'] = metadata['icy-name']
+        if metadata.get('icy-genre'):
+            status['genre'] = metadata['icy-genre']
+        if metadata.get('icy-description'):
+            status['description'] = metadata['icy-description']
         return status
 
     def get_player_type_and_version(self):

@@ -54,3 +54,13 @@ you type is sent to radio-browser.info. "Add by address" in the menu is still th
 The menu next to the button imports an `.m3u` or `.pls` file, the list format radio apps and players use, and
 exports your stations as an `.m3u` file. Imported stations are named from the file; addresses you already have
 are skipped.
+
+## Now playing and the "Continue" list
+
+The player shows the station's logo as the picture, its name, and what the stream says about itself: the
+current title (artist and song, as far as the station sends it, and it changes while you listen) and the genre or
+description the station announces. Stations that send nothing show just their name.
+
+Stations you played last are listed under "Continue" (Library → Continue, "Recently played stations"). The menu of
+an entry has **Remove from "Continue"**; the station itself stays. The same works for audiobooks and podcasts there:
+an audiobook comes back when you listen on, a podcast when a new episode arrives or you hear one.
