@@ -60,7 +60,7 @@ Needs the `local_audio` player. A book that is not downloaded needs the server t
 In the Audiobooks tab, the menu of an Audiobookshelf book has **Download to the box**. The files go to
 `cache/audiobookshelf/` in the Lauschkiste home (not into the library, so the book stays one entry and keeps
 sharing its position with the server). A downloaded book plays from the box even when the server is
-reachable (`prefer_downloaded`). Downloading is a function of the core (module `cache`, Settings → Cache):
+reachable (`prefer_downloaded`). Downloading is a function of the core (module `cache`, Settings → Library → Cache):
 the download runs in a process of its own with the lowest priority; while something plays it is slowed to
 `rate_playing_kbps` (1000 kB/s, `0` waits until the playback stops). `limit_gb` (8) caps the space for all
 downloads together; a book that would not fit is refused with the numbers. A stopped download keeps what it

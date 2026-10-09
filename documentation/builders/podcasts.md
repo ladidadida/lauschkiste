@@ -1,8 +1,8 @@
 # Podcasts
 
 A podcast is an RSS (or Atom) feed. Subscribed podcasts are kept in `settings/podcasts.yaml` and
-managed through the web app or the API. Episodes are streamed, not downloaded, so playing them
-needs an internet connection.
+managed through the web app or the API. Episodes are streamed, so playing them needs an
+internet connection, unless you [download them](#download-episodes).
 
 The episodes of a feed are cached and fetched again when they are older than `refresh_minutes`; if
 the feed can't be reached, the cached episodes are used. Each episode continues where it stopped,
@@ -48,7 +48,7 @@ podcasts:
 
 The menu of an episode has **Download to the box**. A downloaded episode plays without the network and
 continues where you stopped it streaming (the position belongs to the episode). Downloads share the space
-and speed settings of the cache (Settings → Cache, [Audiobooks](audiobooks.md#downloading-books)); with
+and speed settings of the cache (Settings → Library → Cache, [Audiobooks](audiobooks.md#downloading-books)); with
 `remove_old` switched on, heard episodes are removed first when the space is full. Unsubscribing from a
 podcast removes its downloaded episodes.
 
@@ -62,7 +62,7 @@ Each directory has a switch and the setting that fits it in the settings of the 
 
 | Directory | What it offers | Settings |
 | --- | --- | --- |
-| Apple Podcasts | search and popular podcasts per country, no key | `itunes.enabled`, `itunes.country` (default `DE`) |
+| Apple Podcasts | search and popular podcasts per country, no key | `itunes.enabled`, `itunes.country` (default `de`) |
 | fyyd | a German directory: search and popular podcasts per language, no key | `fyyd.enabled`, `fyyd.language` |
 | Podcast Index | needs a free key and secret from podcastindex.org (off until you enter them) | `podcastindex.enabled`, `podcastindex.language`, `podcastindex_key`, `podcastindex_secret` |
 

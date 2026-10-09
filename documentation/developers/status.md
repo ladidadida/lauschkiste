@@ -27,7 +27,7 @@ the [roadmap](roadmap-core-architecture.md).
 - Playing from a phone over Bluetooth, for apps that cannot be integrated, such as the Onleihe
   ([plan](phone-audio.md)).
 - A handover to other rooms through Music Assistant (needs the same Audiobookshelf user; see the
-  [Audiobookshelf plan](audiobookshelf.md)), m4b audiobooks with chapters in one file.
+  [Audiobookshelf](audiobookshelf.md)), m4b audiobooks with chapters in one file.
 - Release on PyPI ([Releasing](releasing.md)).
 - Installing straight from a git branch or tag without a release (the web app would have to be built on the
   box or taken from a CI build).

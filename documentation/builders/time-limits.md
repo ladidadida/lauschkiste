@@ -1,7 +1,7 @@
 # Time limits
 
 Lauschkiste keeps listening within bounds: **quiet hours** in which nothing plays, and a **daily listening time**.
-It is part of the core and **off until you switch it on**: Settings → Playback & Audio → Time limits → "Use time
+It is part of the core and **off until you switch it on**: Settings → Playback & audio → Time limits → "Use time
 limits".
 
 ## Quiet hours
@@ -17,7 +17,7 @@ Whatever is started in quiet hours stops at once. The player shows "Quiet time u
 
 The minutes something plays are counted per day (pausing does not count); the count starts again at midnight.
 `daily_limit_minutes` is the limit (0 for none), `weekend_limit_minutes` can be a different one for Saturday and
-Sunday. A warning sound plays `warn_minutes` before the end, if you set one. When the time is used up, the sound
+Sunday. `daily_limit_minutes` is 120 by default. A warning sound plays `warn_minutes` (5) before the end; 0 switches the warning off. When the time is used up, the sound
 fades out over `fade_seconds` and the player stops; playing again the same day stops at once.
 
 ## Extra time for parents
@@ -28,7 +28,7 @@ and keep it where the children do not find it. `time_limits.reset_today` counts 
 
 ## What it cannot do
 
-- **It is not a lock.** Anyone who can open the web app or knows the card can add time or switch the plugin off.
+- **It is not a lock.** Anyone who can open the web app or knows the card can add time or switch the time limits off.
   It is a helper for agreements in the family, not protection against a determined child.
 - **It needs the right time.** The box has no clock of its own; it takes the time from the network. If the clock is
   not synchronized (for example in a car without WiFi) quiet hours are *not* enforced, because the time cannot be

@@ -17,7 +17,7 @@ PyPI after a manual approval (one job per package).
   Conduct and `SECURITY.md` send reports there.
 - [x] Repository description, topics and social preview image are set.
 - [ ] The accounts, pending publishers and environments below exist.
-- [ ] A test upload to TestPyPI and a fresh installation from it on a box worked.
+- [x] A test upload to TestPyPI and a fresh installation from it on a box worked.
 
 ## One-time setup
 
@@ -28,7 +28,7 @@ publishing"). What has to be done once, by the owner of the PyPI account:
    separate accounts, both with two-factor authentication).
 2. On each of them, for every package below, add a **pending publisher** (Account settings →
    Publishing → "Add a new pending publisher", tab GitHub). The package is created by its first upload.
-   The same four values everywhere:
+   The same three values everywhere:
 
    | Field | Value |
    | --- | --- |

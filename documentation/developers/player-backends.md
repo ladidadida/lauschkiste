@@ -1,93 +1,55 @@
 # Player Backends
 
-The player package exposes one stable action and RFID-card contract while routing
-content to one of several playback backends. The first registered backend is
-the default for legacy calls that do not include a provider.
+The `player` core module plays through a **backend**. `local_audio` is built in (PyAV decoding, PortAudio
+output); the `mpd` plugin adds an MPD server as a second one. A further backend is a plugin that registers at the
+extension point `player.backends`.
 
-## Register A Backend
-
-Create the backend during player initialization and register it with a stable,
-lowercase identifier:
+## Register a backend
 
 ```python
-coordinator.register_backend('streaming', backend)
+def start(self, ctx):
+    ctx.modules.player.backends.register('streaming', StreamingBackend())
 ```
 
-Passing `make_active=True` selects the backend immediately. Normal content
-playback selects a backend from the request's `provider`; switching stops the
-previous backend first.
+The name is a stable, lowercase identifier. The setting `player.backend` selects the backend that is active at
+start and is the default one: folder playback, local files and library updates go to the default backend; transport
+controls (pause, next, seek, volume) go to the active one. Switching stops the previous backend first
+(`GET /api/v1/player/backends` lists them).
 
-A backend may implement `set_active(active)`. The coordinator calls it whenever
-selection changes so polling backends can publish `playerstatus` only while
-active. Status payloads must include the backend identifier as `provider`.
+## The backend protocol
 
-## Playback Contract
+`lauschkiste.player.backend.PlayerBackend` lists what a backend implements: transport (`play`, `pause`, `stop`,
+`next`, `prev`, `seek`, `toggle`, `shuffle`, `repeat`, `jump`, `stop_after_current`), content (`play_single`,
+`play_folder`, `play_files`), the second swipe (`is_second_swipe`, `play_second_swipe`), `playerstatus`,
+`playlistinfo`, `get_volume`/`set_volume` and `exit`.
 
-Provider-aware calls keep the existing command names:
+- `set_status_callback(callback)` receives the raw status mapping whenever it changes. The coordinator forwards it
+  only while the backend is active (`set_active(active)` is called on every change), so a polling backend can stop
+  polling while inactive. The player module turns the raw status into the typed `player.status` event.
+- `play_files(paths, start, position, ordered)` replaces the queue and plays from `position` seconds into entry
+  `start`. Audiobooks, podcasts and radio use it, so they work with every backend that implements it.
+- Optional capabilities are looked up by name when needed: a backend without them makes the operation answer 501.
+  Examples: `set_resolver(resolve)` (receives the function that resolves track URLs, see below),
+  `set_level_callback(callback)` (reports the output level for level meters; only `local_audio` measures it).
 
-```python
-play_single(song_url, provider=None)
-play_album(albumartist, album, content_uri=None, provider=None)
-```
+## Related extension points
 
-Cover lookup and catalog-detail calls accept the same provider metadata.
-Calls without `provider` route to the default backend, preserving existing
-RFID cards and local paths. Provider integrations must therefore store their
-identifier alongside the stable content URI when creating a card action.
+- `player.level_meters`: a device plugin (for example `phat_beat`) registers `level(left, right, delay)` and gets
+  the RMS level of each channel about ten times a second.
+- `player.resolvers`: a plugin registers a `resolve(url) -> (url, headers)` for a URL scheme (for example `abs:`),
+  so that tracks of authenticated sources carry no credentials in queues, status or logs. Only `local_audio`
+  uses resolvers.
 
-Folder playback, folder browsing, local library updates, and cover-cache
-flushing route to the default backend. Transport controls such as pause, next,
-seek, and volume continue to target the active backend.
+## Library sources
 
-## Library Contract
+A catalog (an MPD database, a streaming service) is added to the library at `library.sources`, not through the
+player. A source implements `lauschkiste.library.module.LibrarySource`:
 
-Each catalog backend describes its Web App navigation through
-`library_source()`:
+- `describe()` returns `{'id', 'label', 'views': [{'id', 'label', 'kind', 'content_types'}]}`; `kind: items` is a
+  catalog list rendered with the shared album and track views.
+- `list_items(content_types)` returns entries with `albumartist`, `album`, `content_type`, `content_uri` and
+  optionally `cover_url`; `list_songs`, `get_song`, `cover(song_url)` and `refresh()` complete it.
 
-```python
-{
-    'id': 'streaming',
-    'label': 'Streaming',
-    'views': [
-        {
-            'id': 'playlists',
-            'label': 'Playlists',
-            'kind': 'items',
-            'content_types': ['playlist'],
-        },
-    ],
-}
-```
-
-Use `kind: items` for catalog lists rendered with the shared item and track
-views. The built-in local backend also uses `kind: folders` for file
-management.
-
-Implement `list_library_items(content_types=None)` and return entries in this
-shape:
-
-```python
-{
-    'provider': 'streaming',
-    'content_type': 'playlist',
-    'content_uri': 'service:playlist:stable-id',
-    'albumartist': 'Owner or artist',
-    'album': 'Display title',
-    'cover_url': 'https://example.test/cover.jpg',
-}
-```
-
-`content_uri` must remain stable because playback and RFID assignments retain
-it. `cover_url` may be `None`; cover lookup can instead return either a remote
-URL or a filename from the local cover cache.
-
-The coordinator combines available sources and items for the overview while
-isolating failures from optional catalogs. A request for one explicit provider
-returns that provider's error to the caller.
-
-## Compatibility
-
-The legacy `list_albums`, album/song lookup, and playback commands remain
-available. Local album and song results now carry provider metadata, while
-older clients can ignore the additional fields. Existing library URLs are
-redirected to the source-aware routes.
+`content_uri` must stay stable, because playback and card assignments keep it. Cards for such items store the
+source (`provider`) next to the URI. An overview combines all sources and isolates the failure of an optional one;
+a request for one explicit source returns that source's error. The built-in local source has the id `local`.
