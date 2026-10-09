@@ -26,7 +26,8 @@ MB = 1 << 20
 class CacheFile(BaseModel):
     name: str
     url: str
-    size: int
+    #: bytes; 0 when the source does not know (the size is then taken from the download)
+    size: int = 0
     duration: Optional[float] = None
     headers: Dict[str, str] = {}
 
@@ -211,7 +212,9 @@ class Cache(CoreModule):
         plan = provider.plan(item)
         if not plan.files:
             raise OperationError(422, 'nothing_to_download', 'The item has no files')
-        needed = sum(entry.size for entry in plan.files) - self._store.partial_bytes(source, item)
+        # a source that does not know a size: about 128 kbit/s of audio
+        needed = sum(entry.size or int((entry.duration or 1800) * 16000) for entry in plan.files) \
+            - self._store.partial_bytes(source, item)
         if self._ctx.config.get('remove_old', default=False):
             self._make_room(needed)
         used, limit, free = self._store.used_bytes(), self._limit_bytes(), self._store.free_bytes()

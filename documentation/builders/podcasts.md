@@ -43,3 +43,11 @@ podcasts:
   max_episodes: 100      # episodes kept per podcast
   rewind_sec: 10         # go back this far when continuing
 ```
+
+## Download episodes
+
+The menu of an episode has **Download to the box**. A downloaded episode plays without the network and
+continues where you stopped it streaming (the position belongs to the episode). Downloads share the space
+and speed settings of the cache (Settings → Cache, [Audiobooks](audiobooks.md#downloading-books)); with
+`remove_old` switched on, heard episodes are removed first when the space is full. Unsubscribing from a
+podcast removes its downloaded episodes.

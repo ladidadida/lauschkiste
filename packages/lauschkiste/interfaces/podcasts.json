@@ -62,7 +62,7 @@
     }
   },
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "2.0",
   "kind": "core",
   "name": "podcasts",
   "operations": {
@@ -182,6 +182,10 @@
       "returns": {
         "items": {
           "properties": {
+            "availability": {
+              "default": "stream",
+              "type": "string"
+            },
             "duration": {
               "anyOf": [
                 {
@@ -214,6 +218,10 @@
                 }
               ],
               "default": null
+            },
+            "item": {
+              "default": "",
+              "type": "string"
             },
             "published": {
               "anyOf": [
@@ -461,6 +469,7 @@
     }
   },
   "requires": {
+    "cache": null,
     "player": null
   }
 }

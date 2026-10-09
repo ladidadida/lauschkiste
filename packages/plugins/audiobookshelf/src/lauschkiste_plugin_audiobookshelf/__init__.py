@@ -45,7 +45,7 @@ class Audiobookshelf(Plugin):
 
     name = 'audiobookshelf'
     interface_version = '1.0'
-    requires = {'audiobooks': '>=2.0,<3', 'player': '>=5.2,<6', 'cache': '>=1.0,<2'}
+    requires = {'audiobooks': '>=3.0,<4', 'player': '>=5.2,<6', 'cache': '>=1.0,<2'}
     settings = AudiobookshelfSettings
 
     def __init__(self):

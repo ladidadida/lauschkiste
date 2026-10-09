@@ -24,6 +24,7 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import AppSettingsContext from '../../../context/appsettings/context';
 import PubSubContext from '../../../context/pubsub/context';
 import request from '../../../utils/request';
+import { downloadMenuItems, downloadStatus, useDownloads } from './downloads';
 import { coverSrc, toHHMMSS } from '../../../utils/utils';
 import { LIBRARY_SCANNED_TOPIC } from '../../../config';
 import ItemMenu from './item-menu';
@@ -53,9 +54,7 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigi
       : t('library.audiobooks.chapters', { count: book.chapters });
   const duration = book.duration ? ` · ${toHHMMSS(book.duration)}` : '';
   const isLocal = book.source === undefined || book.source === 'local';
-  const availability = isLocal
-    ? 'local'
-    : { done: 'cached' }[download?.state] || (download === undefined ? null : 'stream');
+  const availability = book.availability || (isLocal ? 'local' : null);
   const origin = [
     isLocal ? null : t(`library.sources.${book.source}`, { defaultValue: book.source }),
     availability && (showOrigin || !isLocal) && t(`library.origin.${availability}`),
@@ -66,42 +65,13 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigi
     onChanged();
   };
 
-  const downloadState = download?.state;
-  const downloadPercent = download?.total ? Math.floor((100 * download.done) / download.total) : 0;
-  const downloadStatus = {
-    queued: t('library.audiobooks.queued'),
-    downloading: t('library.audiobooks.downloading', { progress: downloadPercent }),
-    error: t('library.audiobooks.download-error'),
-    done: download?.update_available ? t('library.audiobooks.update-available') : undefined,
-  }[downloadState];
-  const downloadRequest = async (command) => {
-    await request(command, { source: book.source, item: book.book });
-    onChanged();
-  };
-  const downloadItem = (() => {
-    if (book.source === undefined || book.source === 'local') return [];
-    if (downloadState === 'done') {
-      return [
-        ...(download.update_available
-          ? [{
-            label: t('library.audiobooks.download-again'),
-            onClick: async () => {
-              await request('cacheRemove', { source: book.source, item: book.book });
-              await downloadRequest('cacheDownload');
-            },
-          }]
-          : []),
-        { label: t('library.audiobooks.remove-download'), onClick: () => downloadRequest('cacheRemove') },
-      ];
-    }
-    if (downloadState === 'downloading' || downloadState === 'queued') {
-      return [{ label: t('library.audiobooks.cancel-download'), onClick: () => downloadRequest('cacheCancel') }];
-    }
-    return [{ label: t('library.audiobooks.download'), onClick: () => downloadRequest('cacheDownload') }];
-  })();
+  const downloadText = downloadStatus(t, download);
+  const downloadItems = isLocal
+    ? []
+    : downloadMenuItems(t, { source: book.source, item: book.book, download, onChanged });
 
   const menuItems = [
-    ...downloadItem,
+    ...downloadItems,
     {
       label: t('library.audiobooks.restart'),
       onClick: () => request('audiobook_restart', { book: book.book, ...sourceArg(book) }).then(onChanged),
@@ -129,14 +99,14 @@ export const AudiobookItem = ({ book, download, onChanged, showCovers, showOrigi
             <Box component="span" sx={{ alignItems: 'center', display: 'flex', gap: 0.5 }}>
               {book.title}
               {book.finished && <CheckCircleIcon color="success" fontSize="small" titleAccess={status} />}
-              {downloadState === 'done' &&
-                <DownloadDoneIcon fontSize="small" titleAccess={t('library.audiobooks.downloaded')} />}
+              {book.availability === 'cached' &&
+                <DownloadDoneIcon fontSize="small" titleAccess={t('library.origin.cached')} />}
             </Box>
           }
           secondary={
             <Box component="span" sx={{ display: 'block' }}>
               <Box component="span" sx={{ display: 'block' }}>{`${status}${duration}`}</Box>
-              {downloadStatus && <Box component="span" sx={{ display: 'block' }}>{downloadStatus}</Box>}
+              {downloadText && <Box component="span" sx={{ display: 'block' }}>{downloadText}</Box>}
               {origin && <Box component="span" sx={{ color: 'text.disabled', display: 'block', fontSize: '0.8em' }}>{origin}</Box>}
               {started &&
                 <LinearProgress
@@ -174,21 +144,8 @@ const Audiobooks = ({ musicFilter }) => {
     load();
   }, [load, lastScan]);
 
-  const [downloads, setDownloads] = useState({});
-  const loadDownloads = useCallback(async () => {
-    const { result } = await request('cacheDownloads');
-    setDownloads(result ? Object.fromEntries(result.items.map((entry) => [`${entry.source}/${entry.item}`, entry])) : {});
-  }, []);
   const hasRemoteBooks = books.some(({ source }) => source && source !== 'local');
-  useEffect(() => {
-    if (hasRemoteBooks) loadDownloads();
-  }, [hasRemoteBooks, loadDownloads]);
-  const downloading = Object.values(downloads).some(({ state }) => state === 'downloading' || state === 'queued');
-  useEffect(() => {
-    if (!downloading) return undefined;
-    const timer = setInterval(loadDownloads, 3000);
-    return () => clearInterval(timer);
-  }, [downloading, loadDownloads]);
+  const [downloads, loadDownloads] = useDownloads(hasRemoteBooks);
   const [serverStatus, setServerStatus] = useState(null);
   const loadStatus = useCallback(async () => {
     const { result } = await request('audiobookshelfStatus');

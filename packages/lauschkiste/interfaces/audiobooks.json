@@ -9,7 +9,7 @@
       "title": "(self, book: str) -> str"
     }
   },
-  "interface_version": "2.0",
+  "interface_version": "3.0",
   "kind": "core",
   "name": "audiobooks",
   "operations": {
@@ -25,6 +25,10 @@
       "returns": {
         "items": {
           "properties": {
+            "availability": {
+              "default": "local",
+              "type": "string"
+            },
             "book": {
               "type": "string"
             },
@@ -165,6 +169,7 @@
     }
   },
   "requires": {
+    "cache": null,
     "library": null,
     "player": null
   }

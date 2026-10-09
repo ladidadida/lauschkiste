@@ -260,3 +260,17 @@ def test_the_speed_follows_the_playback(cache):
     assert store.rate_file.read_text() == '-1'
     cache.instance._on_status('player.status', {'state': 'pause'})
     assert store.rate_file.read_text() == '0'
+
+
+def test_a_file_of_unknown_size_is_loaded_from_the_start_and_its_length_counts(server, tmp_path):
+    store = CacheStore(tmp_path)
+    plan = plan_for(server)
+    for entry in plan.files:
+        entry.size = 0
+    directory = prepare(store, plan)
+    (directory / '002_b.mp3.part').write_bytes(b'stale')
+    Download(directory, store.rate_file).run()
+    meta = store.complete('demo', 'one')
+    assert [f['size'] for f in meta['files']] == [len(CONTENT[n]) for n in ('a.mp3', 'b.mp3', 'c.mp3')]
+    assert (directory / '002_b.mp3').read_bytes() == CONTENT['b.mp3']
+    assert meta['size'] == sum(map(len, CONTENT.values()))

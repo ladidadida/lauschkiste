@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field
 
 import lauschkiste.paths
 import lauschkiste.statefile as statefile
+from lauschkiste.cache import CacheFile, CachePlan
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 from lauschkiste.resume import ResumeTracker
 
@@ -55,6 +56,10 @@ class Podcast(BaseModel):
 
 class Episode(BaseModel):
     id: str
+    #: the item id at ``cache`` (the episode can be downloaded)
+    item: str = ''
+    #: 'stream' (played over the network) or 'cached' (downloaded to the box)
+    availability: str = 'stream'
     title: str
     url: str
     published: Optional[str] = None
@@ -70,6 +75,38 @@ class PodcastsChanged(BaseModel):
 
 class FeedError(Exception):
     pass
+
+
+SOURCE = 'podcasts'
+
+
+def cache_item(podcast: str, episode: str) -> str:
+    return f'{podcast}~{episode}'
+
+
+class EpisodeProvider:
+    """``cache.providers`` entry ``podcasts``: an episode is the file of its feed entry."""
+
+    def __init__(self, module):
+        self._module = module
+
+    def plan(self, item: str) -> CachePlan:
+        podcast, _, episode = item.partition('~')
+        found = next((e for e in self._module._feed(podcast).get('episodes') or [] if e['id'] == episode), None)
+        if found is None:
+            raise OperationError(404, 'unknown_episode', f"Podcast '{podcast}' has no episode '{episode}'")
+        extension = Path(urlparse(found['url']).path).suffix.lower()
+        name = self._module._get(podcast).get('name') or podcast
+        return CachePlan(title=f"{name}: {found['title']}", files=[CacheFile(
+            name=f"episode{extension if extension in ('.mp3', '.m4a', '.ogg', '.opus', '.aac', '.wav') else '.mp3'}",
+            url=found['url'], duration=found.get('duration'))])
+
+    def version(self, item: str):
+        return None
+
+    def removable(self, item: str) -> bool:
+        podcast, _, episode = item.partition('~')
+        return bool(self._module._resume.entries().get(f'{podcast}/{episode}', {}).get('finished'))
 
 
 def _check_url(url: str) -> str:
@@ -195,9 +232,9 @@ class Podcasts(CoreModule):
     """Podcasts: subscribe to feeds, play episodes and continue them."""
 
     name = 'podcasts'
-    interface_version = '1.0'
+    interface_version = '2.0'
     concurrency = 'threadsafe'
-    requires = ('player',)
+    requires = ('player', 'cache')
     settings = PodcastSettings
 
     changed = event('changed', PodcastsChanged)
@@ -230,6 +267,7 @@ class Podcasts(CoreModule):
             rewind_sec=float(ctx.config.get('rewind_sec', default=10)),
             save_interval_sec=float(ctx.config.get('save_interval_sec', default=10)))
         self._resume.start()
+        ctx.modules.cache.providers.register(SOURCE, EpisodeProvider(self))
 
     def ready(self) -> None:
         self._publish()
@@ -302,12 +340,15 @@ class Podcasts(CoreModule):
 
     def _episodes(self, podcast: str, feed: Dict[str, Any]) -> List[Episode]:
         positions = self._resume.entries()
+        cached = {entry.item for entry in self._ctx.modules.cache.cached(SOURCE)}
         result = []
         for data in feed.get('episodes') or []:
             position = positions.get(f"{podcast}/{data['id']}", {})
             heard = bool(position.get('finished'))
             elapsed = float(position.get('elapsed') or 0) if not heard else 0.0
-            result.append(Episode(**data, elapsed=elapsed, heard=heard))
+            item = cache_item(podcast, data['id'])
+            result.append(Episode(**data, item=item, availability='cached' if item in cached else 'stream',
+                                  elapsed=elapsed, heard=heard))
         return result
 
     def _podcast(self, key: str) -> Podcast:
@@ -386,6 +427,9 @@ class Podcasts(CoreModule):
             self._feeds.pop(podcast, None)
         self._store()
         self._cache_file(podcast).unlink(missing_ok=True)
+        for entry in self._ctx.modules.cache.cached(SOURCE):
+            if entry.item.startswith(f'{podcast}~'):
+                self._ctx.modules.cache.remove(SOURCE, entry.item)
         self._publish()
 
     @action(path='/refresh')
@@ -420,7 +464,9 @@ class Podcasts(CoreModule):
             if chosen is None:
                 raise OperationError(404, 'unknown_episode', f"Podcast '{podcast}' has no episode '{episode}'")
         name = self._get(podcast).get('name') or podcast
-        self._resume.play(f'{podcast}/{chosen.id}', [chosen.url], context={
+        local = self._ctx.modules.cache.files(SOURCE, cache_item(podcast, chosen.id))
+        self._resume.play(f'{podcast}/{chosen.id}', [local.files[0].path if local else chosen.url],
+                          names=[chosen.url], context={
             'kind': 'podcast', 'title': f'{name}: {chosen.title}', 'action': 'podcasts.play',
             'args': {'podcast': podcast, 'episode': chosen.id}})
 

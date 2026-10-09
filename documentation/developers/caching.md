@@ -1,7 +1,7 @@
 # Caching content on the box
 
-Status: step 1 is implemented (the `cache` core module and the Audiobookshelf plugin as its first provider);
-the steps after it are still design. The download cache of the Audiobookshelf plugin
+Status: steps 1 to 3 are implemented (the `cache` core module, the Audiobookshelf plugin and the podcast
+episodes as providers, `availability` on audiobooks and episodes); music and radio are still open. The download cache of the Audiobookshelf plugin
 ([Audiobookshelf](audiobookshelf.md), "Offline use") became a core module so that other plugins (podcasts,
 Music Assistant, further sources) get it for free.
 
@@ -85,9 +85,13 @@ The web app has one component for the download button and its state, used by eve
    code is gone. Decisions: one global limit; automatic removal only of what the provider marks removable
    (finished books, later heard episodes), never an item in progress; the offline ledger of positions stays in
    the plugin. The name `cache` and the wording in the web app are still open (a symbol may be better than a word).
-2. **`source` and `availability`** on audiobook items and the web app line and chips; the same for podcasts
-   and radio (and music where a second source exists).
-3. **Podcast episodes** as the second provider.
+2. **`source` and `availability`** (done for audiobooks and podcast episodes): the lists show where an item
+   comes from and whether it is streamed or on the box, with filter chips per source for audiobooks. Radio
+   stations show their address; music has the source chips but no line per album yet.
+3. **Podcast episodes** as the second provider (done): the item id is `<podcast>~<episode>`, the files are the
+   enclosure (its listed size is ignored, the worker takes the length it downloaded). An episode plays from
+   the box when it is there and continues at the position of the stream, because the position is kept under
+   the episode's address, not the file that plays. The "heard" ones may be removed to make room.
 4. Later: per-source limits, "keep" flags, automatic downloads (for example the next books of a series while
    on WiFi).
 

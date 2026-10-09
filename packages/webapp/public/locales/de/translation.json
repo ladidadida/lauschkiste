@@ -271,18 +271,9 @@
       "mark-unfinished": "Als nicht gehört markieren",
       "menu": "Aktionen für {{title}}",
       "progress-label": "Fortschritt von {{title}}",
-      "download": "Auf die Box laden",
-      "remove-download": "Download entfernen",
-      "cancel-download": "Download abbrechen",
-      "downloading": "Lade {{progress}} %",
-      "queued": "Wartet auf den Download",
-      "downloaded": "Auf der Box",
-      "download-error": "Der Download ist fehlgeschlagen",
       "server-down": "Audiobookshelf ist nicht erreichbar ({{error}}). Heruntergeladene Bücher spielen weiter.",
       "waiting": "{{count}} gemerkte Position wird gesendet, sobald der Server wieder da ist.",
-      "waiting_other": "{{count}} gemerkte Positionen werden gesendet, sobald der Server wieder da ist.",
-      "update-available": "Auf dem Server geändert",
-      "download-again": "Erneut laden"
+      "waiting_other": "{{count}} gemerkte Positionen werden gesendet, sobald der Server wieder da ist."
     },
     "radio": {
       "empty": "Noch keine Sender. Füge einen Sender mit seiner Stream-Adresse hinzu.",
@@ -327,6 +318,16 @@
     "continue": {
       "empty": "Hier erscheinen angefangene Hörbücher und neue Podcast-Folgen.",
       "new-episodes": "Neue Folgen"
+    },
+    "downloads": {
+      "download": "Auf die Box laden",
+      "remove-download": "Download entfernen",
+      "cancel-download": "Download abbrechen",
+      "downloading": "Lade {{progress}} %",
+      "queued": "Wartet auf den Download",
+      "download-error": "Der Download ist fehlgeschlagen",
+      "update-available": "Auf dem Server geändert",
+      "download-again": "Erneut laden"
     }
   },
   "navigation": {

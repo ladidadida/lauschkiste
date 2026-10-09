@@ -59,6 +59,7 @@ class ResumeTracker:
         self._saved_at = 0.0
         self._key: Optional[str] = None
         self._files: List[str] = []
+        self._names: Dict[str, str] = {}
         self._activated_at = 0.0
         self._last: Optional[Dict[str, float]] = None
         self._worker = ctx.executor('resume')
@@ -118,10 +119,12 @@ class ResumeTracker:
     # -- playback -------------------------------------------------------------------------------
 
     def play(self, key: str, files: List[str], resume: bool = True, context: Optional[Dict[str, Any]] = None,
-             store: Optional[PositionStore] = None) -> None:
+             store: Optional[PositionStore] = None, names: Optional[List[str]] = None) -> None:
         """Play an item: where it stopped (``resume``), else from the beginning. The item that is
         already playing keeps playing, a paused one continues. With a ``store`` the position is read
-        from and reported to it instead of the tracker's file."""
+        from and reported to it instead of the tracker's file. ``names`` identify the files in the saved
+        position when they differ from what is played (a stream and its downloaded copy are the same file)."""
+        names = names or files
         player = self._ctx.modules.player
         status = player.playerstatus()
         with self._lock:
@@ -141,13 +144,14 @@ class ResumeTracker:
         if store is not None and resume:
             entry = store.load()
         start, position = 0, 0.0
-        if not entry.get('finished') and entry.get('file') in files:
-            start = files.index(entry['file'])
+        if not entry.get('finished') and entry.get('file') in names:
+            start = names.index(entry['file'])
             position = max(0.0, _number(entry.get('elapsed')) - self._rewind)
         player.play_files(files, start, position, True, context)
         with self._lock:
             self._flush_store()
             self._key, self._files, self._last = key, list(files), None
+            self._names = dict(zip(files, names))
             self._store, self._store_entry, self._store_saved_at = store, None, 0.0
             self._store_sent = None
             self._activated_at = time.monotonic()
@@ -205,7 +209,7 @@ class ResumeTracker:
         if self._store is not None and not _number(status.get('duration')):
             return False
         elapsed = _number(status.get('elapsed'))
-        entry = {'file': file, 'elapsed': elapsed, 'finished': False}
+        entry = {'file': self._names.get(file, file), 'elapsed': elapsed, 'finished': False}
         self._last = {'index': self._files.index(file), 'elapsed': elapsed,
                       'duration': _number(status.get('duration'))}
         if self._store is None:

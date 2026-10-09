@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
+import lauschkiste.cache
 import lauschkiste.podcasts
 import lauschkiste.resume
 from lauschkiste.podcasts import FeedError, parse_feed
@@ -65,7 +66,7 @@ def podcasts(api_client, mocked_player, tmp_path, monkeypatch):
     ctrl.playerstatus.return_value = {'state': 'stop'}
     config = {'podcasts': {'podcasts_file': str(tmp_path / 'podcasts.yaml'), 'cache_dir': str(tmp_path / 'cache'),
                            'state_file': str(tmp_path / 'positions.json'), 'save_interval_sec': 0}}
-    with api_client([mocked_player(ctrl), lauschkiste.podcasts.Podcasts], config) as client:
+    with api_client([mocked_player(ctrl), lauschkiste.podcasts.Podcasts, lauschkiste.cache.Cache], config) as client:
         yield client, ctrl, fetch, tmp_path
 
 

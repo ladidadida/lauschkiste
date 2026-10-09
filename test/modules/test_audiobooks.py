@@ -8,6 +8,7 @@ import pytest
 
 import lauschkiste.resume
 from lauschkiste.audiobooks import Audiobooks
+from lauschkiste.cache import Cache
 from lauschkiste.cfghandler import ConfigHandler
 from lauschkiste.contract import OperationError
 from lauschkiste.contract.manager import ModuleManager
@@ -88,7 +89,7 @@ def setup(tmp_path, library_dir, monkeypatch):
     managers = []
 
     def start():
-        manager = ModuleManager([Library, TestPlayer, Audiobooks], cfg, bus, plugins={}, strict=True)
+        manager = ModuleManager([Library, TestPlayer, Audiobooks, Cache], cfg, bus, plugins={}, strict=True)
         manager.load()
         manager.start()
         manager.ready()
@@ -329,3 +330,32 @@ def test_an_unchanged_position_is_not_reported_again(setup):
     assert len(source.saved) == 1
     status(file='fake://b/2', state='pause', elapsed='56.0', duration='100')
     assert wait_for(lambda: len(source.saved) == 2)
+
+
+class CacheProvider:
+    def plan(self, item):
+        raise NotImplementedError
+
+    def version(self, item):
+        return None
+
+    def removable(self, item):
+        return False
+
+
+def test_books_say_where_they_come_from(setup):
+    start, _, _, _ = setup
+    audiobooks = start()
+    manager = start.managers[-1]
+    manager.handle('audiobooks').instance.sources.register('fake', FakeSource())
+    manager.handle('cache').instance.providers.register('fake', CacheProvider())
+    assert {(b.source, b.availability) for b in audiobooks.invoke('list_books')} == {
+        ('local', 'local'), ('fake', 'stream')}
+
+    store = manager.handle('cache').instance._store
+    directory = store.directory('fake', 'b')
+    directory.mkdir(parents=True)
+    (directory / 'f.mp3').write_bytes(b'12345')
+    (directory / 'meta.json').write_text('{"title": "Remote", "files": [{"name": "f.mp3", "size": 5, "duration": 1}]}')
+    assert {(b.source, b.availability) for b in audiobooks.invoke('list_books')} == {
+        ('local', 'local'), ('fake', 'cached')}

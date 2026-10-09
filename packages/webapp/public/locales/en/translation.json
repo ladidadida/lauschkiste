@@ -271,18 +271,9 @@
       "mark-unfinished": "Mark as not finished",
       "menu": "Actions for {{title}}",
       "progress-label": "Progress of {{title}}",
-      "download": "Download to the box",
-      "remove-download": "Remove the download",
-      "cancel-download": "Stop the download",
-      "downloading": "Downloading {{progress}} %",
-      "queued": "Waiting to download",
-      "downloaded": "On the box",
-      "download-error": "The download failed",
       "server-down": "Audiobookshelf is not reachable ({{error}}). Downloaded books still play.",
       "waiting": "{{count}} saved position will be sent when the server is back.",
-      "waiting_other": "{{count}} saved positions will be sent when the server is back.",
-      "update-available": "Changed on the server",
-      "download-again": "Download again"
+      "waiting_other": "{{count}} saved positions will be sent when the server is back."
     },
     "radio": {
       "empty": "No stations yet. Add a station with its stream address.",
@@ -327,6 +318,16 @@
     "continue": {
       "empty": "Audiobooks in progress and new podcast episodes show up here.",
       "new-episodes": "New episodes"
+    },
+    "downloads": {
+      "download": "Download to the box",
+      "remove-download": "Remove the download",
+      "cancel-download": "Stop the download",
+      "downloading": "Downloading {{progress}} %",
+      "queued": "Waiting to download",
+      "download-error": "The download failed",
+      "update-available": "Changed on the server",
+      "download-again": "Download again"
     }
   },
   "navigation": {

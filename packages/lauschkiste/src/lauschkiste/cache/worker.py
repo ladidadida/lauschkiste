@@ -69,29 +69,35 @@ class Download:
         files = plan['files']
         if not files:
             raise DownloadError('there is nothing to download')
-        self.total = sum(int(entry['size']) for entry in files)
+        self.total = sum(int(entry.get('size') or 0) for entry in files)
         self.status('downloading')
+        sizes = []
         for entry in files:
             target = self.dest / entry['name']
-            size = int(entry['size'])
-            if target.exists() and target.stat().st_size == size:
+            size = int(entry.get('size') or 0)
+            if size and target.exists() and target.stat().st_size == size:
                 self.done += size
-                continue
-            self.fetch(entry['url'], entry.get('headers') or {}, target, size)
+            else:
+                size = self.fetch(entry['url'], entry.get('headers') or {}, target, size)
+            sizes.append(size)
         write_json(self.dest / 'meta.json', {
             'source': self.source, 'item': self.item, 'title': plan.get('title') or '', 'version': plan.get('version'),
-            'size': self.total, 'files': [{'name': entry['name'], 'size': int(entry['size']),
-                                          'duration': entry.get('duration')} for entry in files]})
+            'size': sum(sizes), 'files': [{'name': entry['name'], 'size': size, 'duration': entry.get('duration')}
+                                         for entry, size in zip(files, sizes)]})
         self.status('done')
 
-    def fetch(self, url: str, headers: Dict[str, str], target: Path, size: int) -> None:
+    def fetch(self, url: str, headers: Dict[str, str], target: Path, size: int) -> int:
+        """Download one file; returns its size. Without a known ``size`` the file is loaded from the start
+        (a listed size is often wrong) and the length it ends up with counts."""
         part = target.with_name(target.name + '.part')
+        if not size and part.exists():
+            part.unlink()
         have = part.stat().st_size if part.exists() else 0
-        if have > size:
+        if size and have > size:
             part.unlink()
             have = 0
         self.done += have
-        if have < size:
+        if not size or have < size:
             request_headers = {**headers, **({'Range': f'bytes={have}-'} if have else {})}
             with self.session.get(url, headers=request_headers, stream=True, timeout=TIMEOUT) as response:
                 if response.status_code in (401, 403):
@@ -103,12 +109,19 @@ class Download:
                 if have and response.status_code != 206:
                     part.unlink()
                     raise DownloadError('the server does not continue partial downloads, try again')
+                if not size:
+                    self.total += int(response.headers.get('Content-Length') or 0)
                 with open(part, 'ab') as stream:
                     self.copy(response, stream)
-        if part.stat().st_size != size:
+        if size and part.stat().st_size != size:
             part.unlink()
             raise DownloadError(f'{target.name} has the wrong size')
+        final = part.stat().st_size
+        if not final:
+            part.unlink()
+            raise DownloadError(f'{target.name} is empty')
         os.replace(part, target)
+        return final
 
     def copy(self, response, stream) -> None:
         started, sent = time.monotonic(), 0

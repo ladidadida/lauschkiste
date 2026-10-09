@@ -20,6 +20,7 @@ import {
 
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DownloadDoneIcon from '@mui/icons-material/DownloadDone';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PodcastsIcon from '@mui/icons-material/Podcasts';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -28,6 +29,7 @@ import request, { requestErrorMessage } from '../../../utils/request';
 import { toHHMMSS } from '../../../utils/utils';
 import ConfirmDialog from './confirm-dialog';
 import FormDialog from './form-dialog';
+import { downloadMenuItems, downloadStatus, useDownloads } from './downloads';
 import ItemMenu from './item-menu';
 
 const formatDate = (iso, language) => {
@@ -51,6 +53,7 @@ const PodcastEpisodes = ({ musicFilter }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isRenaming, setIsRenaming] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [downloads, loadDownloads] = useDownloads();
 
   const load = useCallback(async () => {
     const [{ result: podcasts }, { result, error: requestError }] = await Promise.all([
@@ -78,6 +81,11 @@ const PodcastEpisodes = ({ musicFilter }) => {
     setIsRefreshing(false);
     if (requestError) setError(requestErrorMessage(requestError) || t('library.loading-error'));
     else load();
+  };
+
+  const downloadsChanged = () => {
+    load();
+    loadDownloads();
   };
 
   const setHeard = async (episode, heard) => {
@@ -148,6 +156,8 @@ const PodcastEpisodes = ({ musicFilter }) => {
             episode.duration ? toHHMMSS(episode.duration) : null,
             episode.heard ? t('library.podcasts.heard') : null,
           ].filter(Boolean).join(' · ');
+          const download = downloads[`podcasts/${episode.item}`];
+          const downloadText = downloadStatus(t, download);
 
           return (
             <ListItem
@@ -155,9 +165,14 @@ const PodcastEpisodes = ({ musicFilter }) => {
               key={episode.id}
               secondaryAction={
                 <ItemMenu
-                  items={[episode.heard
-                    ? { label: t('library.podcasts.mark-unheard'), onClick: () => setHeard(episode.id, false) }
-                    : { label: t('library.podcasts.mark-heard'), onClick: () => setHeard(episode.id, true) }]}
+                  items={[
+                    ...downloadMenuItems(t, {
+                      source: 'podcasts', item: episode.item, download, onChanged: downloadsChanged,
+                    }),
+                    episode.heard
+                      ? { label: t('library.podcasts.mark-unheard'), onClick: () => setHeard(episode.id, false) }
+                      : { label: t('library.podcasts.mark-heard'), onClick: () => setHeard(episode.id, true) },
+                  ]}
                   label={t('library.podcasts.episode-menu', { title: episode.title })}
                 />
               }
@@ -170,11 +185,17 @@ const PodcastEpisodes = ({ musicFilter }) => {
                     <Box component="span" sx={{ alignItems: 'center', display: 'flex', gap: 0.5 }}>
                       {episode.title}
                       {episode.heard && <CheckCircleIcon color="success" fontSize="small" />}
+                      {episode.availability === 'cached' &&
+                        <DownloadDoneIcon fontSize="small" titleAccess={t('library.origin.cached')} />}
                     </Box>
                   }
                   secondary={
                     <Box component="span" sx={{ display: 'block' }}>
                       <Box component="span" sx={{ display: 'block' }}>{details}</Box>
+                      {downloadText && <Box component="span" sx={{ display: 'block' }}>{downloadText}</Box>}
+                      <Box component="span" sx={{ color: 'text.disabled', display: 'block', fontSize: '0.8em' }}>
+                        {t(`library.origin.${episode.availability || 'stream'}`)}
+                      </Box>
                       {progress > 0 && !episode.heard &&
                         <LinearProgress
                           aria-label={t('library.podcasts.progress-label', { title: episode.title })}

@@ -57,6 +57,8 @@ class Audiobook(BaseModel):
     finished: bool = False
     cover_url: Optional[str] = None
     source: str = LOCAL
+    #: 'local' (a folder of the library), 'cached' (downloaded from the source) or 'stream' (played over the network)
+    availability: str = 'local'
 
 
 def natural_key(text: str):
@@ -74,9 +76,9 @@ class Audiobooks(CoreModule):
     """Audiobooks: play, continue, start over, mark as finished."""
 
     name = 'audiobooks'
-    interface_version = '2.0'
+    interface_version = '3.0'
     concurrency = 'threadsafe'
-    requires = ('library', 'player')
+    requires = ('library', 'player', 'cache')
     settings = AudiobookSettings
     sources = extension_point('sources', AudiobookSource)
 
@@ -147,7 +149,11 @@ class Audiobooks(CoreModule):
                                     cover_url=cover_url))
         for source, implementation in self.sources.items():
             try:
-                result.extend(Audiobook(**{**entry, 'source': source}) for entry in implementation.list_books())
+                cached = {entry.item for entry in self._ctx.modules.cache.cached(source)} \
+                    if source in self._ctx.modules.cache.providers else set()
+                result.extend(Audiobook(**{**entry, 'source': source,
+                                           'availability': 'cached' if entry['book'] in cached else 'stream'})
+                              for entry in implementation.list_books())
             except Exception as error:
                 logger.warning(f"Audiobooks of source '{source}' are not available: {error}")
         return result
