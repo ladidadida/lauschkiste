@@ -62,6 +62,7 @@ class PowerButton(Plugin):
     """Power button: shut down cleanly on a press, cut the power afterwards (e.g. Pimoroni OnOff SHIM)."""
 
     name = 'power_button'
+    title = 'Power button'
     interface_version = '1.0'
     needs = ('gpio', 'poweroff')
     requires = {'hardware': '>=1.0,<2'}

@@ -230,7 +230,7 @@ def test_every_plugin_has_a_readable_title(client):
     plugins = {entry['name']: entry for entry in client.get('/api/v1/plugins').json()}
     assert plugins['audiobookshelf']['title'] == 'Audiobookshelf'
     assert plugins['podcast_directories']['title'] == 'Find podcasts'
-    assert plugins['rfid_rc522_spi']['title'] == 'Rfid rc522 spi'
+    assert plugins['rfid_rc522_spi']['title'] == 'RFID reader: rc522 spi'
 
 
 def test_the_translations_of_every_plugin_cover_the_same_fields_in_each_language():
@@ -240,18 +240,22 @@ def test_the_translations_of_every_plugin_cover_the_same_fields_in_each_language
     import lauschkiste.contract.plugins as plugins
 
     def keys(node, prefix=''):
-        return {f'{prefix}{k}' if not isinstance(v, dict) else None for k, v in node.items()} - {None} | {
-            key for k, v in node.items() if isinstance(v, dict) for key in keys(v, f'{prefix}{k}.')}
+        found = set()
+        for key, value in node.items():
+            found.add(f'{prefix}{key}')
+            if isinstance(value, dict):
+                found |= keys(value, f'{prefix}{key}.')
+        return found
 
-    checked = 0
+    seen = set()
     for name, ep in plugins.installed().items():
         folder = resources.files(ep.value.split(':', 1)[0].split('.', 1)[0]) / 'translations'
-        if not folder.is_dir():
-            continue
-        bundles = {f.name: json.loads(f.read_text(encoding='utf-8')) for f in folder.iterdir() if f.name.endswith('.json')}
-        assert 'en.json' in bundles, f"plugin '{name}' needs English texts as the base"
+        bundles = {f.name: json.loads(f.read_text(encoding='utf-8'))['plugins'].get(name)
+                   for f in folder.iterdir() if f.name.endswith('.json')}
+        assert bundles.get('en.json'), f"plugin '{name}' needs English texts (en.json) as the base"
+        assert bundles['en.json'].get('name'), f"plugin '{name}' needs a name in en.json"
         base = keys(bundles['en.json'])
         for language, bundle in bundles.items():
-            assert keys(bundle) == base, f"plugin '{name}': {language} differs from en.json"
-        checked += 1
-    assert checked >= 2
+            assert bundle is not None and keys(bundle) == base, f"plugin '{name}': {language} differs from en.json"
+        seen.add(name)
+    assert {'audiobookshelf', 'podcast_directories', 'mpd', 'samba', 'gpio_controls', 'rfid_rc522_spi'} <= seen

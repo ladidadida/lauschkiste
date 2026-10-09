@@ -1,0 +1,153 @@
+{
+  "plugins": {
+    "battery": {
+      "name": "Battery",
+      "fields": {
+        "driver": {
+          "label": "Sensor"
+        },
+        "shunt_ohms": {
+          "label": "Shunt resistor (ohms)",
+          "help": "INA219 only"
+        },
+        "empty_voltage": {
+          "label": "Empty at (mV)",
+          "help": "Not used by the MAX17048"
+        },
+        "full_voltage": {
+          "label": "Full at (mV)",
+          "help": "Not used by the MAX17048"
+        },
+        "warning_voltage": {
+          "label": "Warn below (mV)"
+        },
+        "shutdown_voltage": {
+          "label": "Shut down below (mV)"
+        },
+        "interval_sec": {
+          "label": "Measure every (seconds)"
+        },
+        "warning_action": {
+          "label": "When the battery runs low"
+        },
+        "i2c_bus": {
+          "label": "I²C bus",
+          "help": "Linux bus number (/dev/i2c-1 is 1)"
+        }
+      }
+    },
+    "gpio_controls": {
+      "name": "Buttons, encoders, LED (GPIO)",
+      "fields": {
+        "buttons": {
+          "label": "Buttons",
+          "pin": {
+            "label": "Pin"
+          },
+          "on_press": {
+            "label": "When pressed"
+          },
+          "on_hold": {
+            "label": "When held"
+          },
+          "hold_time": {
+            "label": "Hold for (seconds)"
+          },
+          "pull_up": {
+            "label": "Internal pull-up",
+            "help": "Off for buttons wired to 3.3 V"
+          },
+          "bounce_time": {
+            "label": "Debounce (seconds)"
+          }
+        },
+        "rotary_encoders": {
+          "label": "Rotary encoders",
+          "pin_a": {
+            "label": "Pin A"
+          },
+          "pin_b": {
+            "label": "Pin B"
+          },
+          "clockwise": {
+            "label": "Turned clockwise"
+          },
+          "counter_clockwise": {
+            "label": "Turned counter-clockwise"
+          }
+        },
+        "status_led": {
+          "label": "Status LED",
+          "help": "Lights up while Lauschkiste runs"
+        }
+      }
+    },
+    "phat_beat": {
+      "name": "Pimoroni pHAT BEAT",
+      "fields": {
+        "play_pause": {
+          "label": "Play/pause button"
+        },
+        "next": {
+          "label": "Next button"
+        },
+        "previous": {
+          "label": "Previous button"
+        },
+        "volume_up": {
+          "label": "Volume up button",
+          "help": "Repeats while held"
+        },
+        "volume_down": {
+          "label": "Volume down button",
+          "help": "Repeats while held"
+        },
+        "power": {
+          "label": "On/off button (held)"
+        },
+        "power_hold_time": {
+          "label": "Hold the on/off button for (seconds)"
+        },
+        "leds": {
+          "label": "LEDs",
+          "help": "vu: level meter while playing, volume and cards shown over it; status: only volume and cards"
+        },
+        "reverse": {
+          "label": "Reverse direction",
+          "help": "The bars fill from the other end (depends on how the pHAT BEAT is mounted)"
+        },
+        "colors": {
+          "label": "Colors",
+          "help": "Colors of the level meter and the animations, bottom to top"
+        },
+        "animations": {
+          "label": "Start and shutdown animation"
+        },
+        "brightness": {
+          "label": "LED brightness"
+        }
+      }
+    },
+    "power_button": {
+      "name": "Power button",
+      "fields": {
+        "preset": {
+          "label": "Hardware",
+          "help": "OnOff SHIM: button GPIO17, power-off GPIO4"
+        },
+        "button_pin": {
+          "label": "Button pin",
+          "help": "Custom only; pressed connects it to ground"
+        },
+        "poweroff_pin": {
+          "label": "Power-off pin",
+          "help": "Custom only; pulled low once the system has halted"
+        },
+        "hold_time": {
+          "label": "Press for (seconds)",
+          "help": "How long the button must be pressed to shut down"
+        }
+      }
+    }
+  }
+}

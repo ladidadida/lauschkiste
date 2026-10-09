@@ -88,6 +88,7 @@ class Mpd(Plugin):
     """Registers the ``mpd`` player backend and its database as library source."""
 
     name = 'mpd'
+    title = 'mpd'
     interface_version = '1.4'
     requires = {'player': '>=5.0,<6', 'library': '>=1.0,<2'}
     settings = MpdSettings

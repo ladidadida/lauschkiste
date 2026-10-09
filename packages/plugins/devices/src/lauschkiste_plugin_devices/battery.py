@@ -167,6 +167,7 @@ class Battery(Plugin):
     """Battery monitor: state of charge, warning action and clean shutdown when it runs empty."""
 
     name = 'battery'
+    title = 'Battery'
     interface_version = '1.0'
     needs = ('i2c',)
     requires = {'hardware': '>=1.0,<2'}

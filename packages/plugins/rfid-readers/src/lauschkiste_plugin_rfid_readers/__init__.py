@@ -40,6 +40,7 @@ class ReaderDriverPlugin(Plugin):
 def _driver_plugin(class_name: str, driver: str, extras=(), needs=()) -> type:
     return type(class_name, (ReaderDriverPlugin,), {
         'name': f'rfid_{driver}',
+        'title': 'RFID reader: ' + driver.replace('_', ' '),
         'driver': driver,
         'extras': tuple(extras),
         'needs': tuple(needs),

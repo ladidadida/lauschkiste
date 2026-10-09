@@ -1,0 +1,25 @@
+{
+  "plugins": {
+    "rfid_fake_reader_gui": {
+      "name": "RFID: Test-Leser"
+    },
+    "rfid_generic_nfcpy": {
+      "name": "RFID: nfcpy"
+    },
+    "rfid_generic_usb": {
+      "name": "RFID: USB-Leser"
+    },
+    "rfid_mfrc522_i2c": {
+      "name": "RFID: MFRC522 (I²C)"
+    },
+    "rfid_pn532_i2c_py532": {
+      "name": "RFID: PN532 (I²C)"
+    },
+    "rfid_rc522_spi": {
+      "name": "RFID: RC522 (SPI)"
+    },
+    "rfid_rdm6300_serial": {
+      "name": "RFID: RDM6300 (seriell)"
+    }
+  }
+}

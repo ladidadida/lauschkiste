@@ -374,6 +374,7 @@ class PhatBeat(Plugin):
     """Pimoroni pHAT BEAT: buttons, LED bars (volume, cards, level meter) and its DAC."""
 
     name = 'phat_beat'
+    title = 'Pimoroni pHAT BEAT'
     interface_version = '1.0'
     needs = ('gpio', 'i2s')
     requires = {'hardware': '>=1.0,<2', 'player': '>=5.1,<6'}

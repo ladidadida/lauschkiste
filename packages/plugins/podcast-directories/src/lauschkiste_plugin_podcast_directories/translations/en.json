@@ -1,89 +1,93 @@
 {
-  "name": "Find podcasts (Apple, fyyd, Podcast Index)",
-  "fields": {
-    "itunes": {
-      "label": "Apple Podcasts",
-      "help": "Apple's directory, no sign-in",
-      "enabled": {
-        "label": "Search in Apple Podcasts",
-        "help": "What you type is sent to Apple"
-      },
-      "country": {
-        "label": "Country",
-        "help": "Decides which podcasts are popular",
-        "values": {
-          "de": "Germany",
-          "at": "Austria",
-          "ch": "Switzerland",
-          "us": "USA",
-          "gb": "United Kingdom",
-          "fr": "France",
-          "it": "Italy",
-          "es": "Spain",
-          "nl": "Netherlands",
-          "be": "Belgium",
-          "dk": "Denmark",
-          "se": "Sweden",
-          "no": "Norway",
-          "fi": "Finland",
-          "pl": "Poland",
-          "cz": "Czechia",
-          "pt": "Portugal",
-          "ie": "Ireland",
-          "ca": "Canada",
-          "au": "Australia"
+  "plugins": {
+    "podcast_directories": {
+      "name": "Find podcasts (Apple, fyyd, Podcast Index)",
+      "fields": {
+        "itunes": {
+          "label": "Apple Podcasts",
+          "help": "Apple's directory, no sign-in",
+          "enabled": {
+            "label": "Search in Apple Podcasts",
+            "help": "What you type is sent to Apple"
+          },
+          "country": {
+            "label": "Country",
+            "help": "Decides which podcasts are popular",
+            "values": {
+              "de": "Germany",
+              "at": "Austria",
+              "ch": "Switzerland",
+              "us": "USA",
+              "gb": "United Kingdom",
+              "fr": "France",
+              "it": "Italy",
+              "es": "Spain",
+              "nl": "Netherlands",
+              "be": "Belgium",
+              "dk": "Denmark",
+              "se": "Sweden",
+              "no": "Norway",
+              "fi": "Finland",
+              "pl": "Poland",
+              "cz": "Czechia",
+              "pt": "Portugal",
+              "ie": "Ireland",
+              "ca": "Canada",
+              "au": "Australia"
+            }
+          }
+        },
+        "fyyd": {
+          "label": "fyyd",
+          "help": "German podcast directory, no sign-in",
+          "enabled": {
+            "label": "Search in fyyd",
+            "help": "What you type is sent to fyyd.de"
+          },
+          "language": {
+            "label": "Language of the popular podcasts",
+            "values": {
+              "de": "German",
+              "en": "English",
+              "fr": "French",
+              "it": "Italian",
+              "es": "Spanish",
+              "nl": "Dutch",
+              "pl": "Polish",
+              "tr": "Turkish"
+            }
+          }
+        },
+        "podcastindex": {
+          "label": "Podcast Index",
+          "help": "Open directory, needs a free key",
+          "enabled": {
+            "label": "Search in the Podcast Index",
+            "help": "Enter the key and secret from podcastindex.org below first"
+          },
+          "language": {
+            "label": "Language of the popular podcasts",
+            "values": {
+              "de": "German",
+              "en": "English",
+              "fr": "French",
+              "it": "Italian",
+              "es": "Spanish",
+              "nl": "Dutch",
+              "pl": "Polish",
+              "tr": "Turkish"
+            }
+          }
+        },
+        "podcastindex_key": {
+          "label": "Podcast Index key",
+          "help": "Free at podcastindex.org. Leave empty to keep the current one."
+        },
+        "podcastindex_secret": {
+          "label": "Podcast Index secret",
+          "help": "Belongs to the key. Leave empty to keep the current one."
         }
       }
-    },
-    "fyyd": {
-      "label": "fyyd",
-      "help": "German podcast directory, no sign-in",
-      "enabled": {
-        "label": "Search in fyyd",
-        "help": "What you type is sent to fyyd.de"
-      },
-      "language": {
-        "label": "Language of the popular podcasts",
-        "values": {
-          "de": "German",
-          "en": "English",
-          "fr": "French",
-          "it": "Italian",
-          "es": "Spanish",
-          "nl": "Dutch",
-          "pl": "Polish",
-          "tr": "Turkish"
-        }
-      }
-    },
-    "podcastindex": {
-      "label": "Podcast Index",
-      "help": "Open directory, needs a free key",
-      "enabled": {
-        "label": "Search in the Podcast Index",
-        "help": "Enter the key and secret from podcastindex.org below first"
-      },
-      "language": {
-        "label": "Language of the popular podcasts",
-        "values": {
-          "de": "German",
-          "en": "English",
-          "fr": "French",
-          "it": "Italian",
-          "es": "Spanish",
-          "nl": "Dutch",
-          "pl": "Polish",
-          "tr": "Turkish"
-        }
-      }
-    },
-    "podcastindex_key": {
-      "label": "Podcast Index key",
-      "help": "Free at podcastindex.org. Leave empty to keep the current one."
-    },
-    "podcastindex_secret": {
-      "label": "Podcast Index secret",
-      "help": "Belongs to the key. Leave empty to keep the current one."
     }
   }
 }

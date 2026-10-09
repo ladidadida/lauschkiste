@@ -39,6 +39,7 @@ class Samba(Plugin):
     """Share the library on the network (Samba) and set its password."""
 
     name = 'samba'
+    title = 'Samba'
     interface_version = '1.0'
 
     def __init__(self):

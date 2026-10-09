@@ -272,12 +272,16 @@ def _translation(ep, language: str) -> Dict[str, Any]:
         if not isinstance(error, (FileNotFoundError, ModuleNotFoundError)):
             logger.warning(f"Translation '{language}' of plugin '{ep.name}' is not usable: {error}")
         return {}
-    return data if isinstance(data, dict) else {}
+    entries = data.get('plugins') if isinstance(data, dict) else None
+    entry = entries.get(ep.name) if isinstance(entries, dict) else None
+    return entry if isinstance(entry, dict) else {}
 
 
 def translations(language: str) -> Dict[str, Any]:
-    """What the installed plugins ship for ``language`` (``<package>/translations/<language>.json`` with the plugin's
-    ``name`` and its ``fields``, shaped like ``settings.fields.<plugin>``), as part of the web app's translation file."""
+    """What the installed plugins ship for ``language``, as part of the web app's translation file.
+
+    ``<package>/translations/<language>.json`` holds ``{"plugins": {"<plugin>": {"name": ..., "fields": ...}}}``
+    for the plugins of the package, ``fields`` shaped like ``settings.fields.<plugin>``."""
     result: Dict[str, Any] = {'settings': {'fields': {}, 'plugins': {'names': {}}}}
     if not LANGUAGE.match(language):
         return result

@@ -64,6 +64,7 @@ class BoardRaspberryPi(Plugin):
     """Raspberry Pi board support: pins, interfaces, sound cards, shutdown/reboot and firmware health."""
 
     name = 'board_raspberry_pi'
+    title = 'Raspberry Pi'
     interface_version = '1.0'
     requires = {'hardware': '>=1.0,<2'}
     provides = ('board', 'gpio', 'i2c', 'spi', 'i2s', 'uart', 'poweroff')

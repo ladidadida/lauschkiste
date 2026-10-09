@@ -1,0 +1,40 @@
+{
+  "plugins": {
+    "board_raspberry_pi": {
+      "name": "Raspberry Pi",
+      "fields": {
+        "debug_mode": {
+          "label": "Testmodus",
+          "help": "Herunterfahren und Neustart nur protokollieren"
+        },
+        "hdmi_power_down": {
+          "label": "HDMI abschalten",
+          "help": "Spart Strom ohne Bildschirm"
+        },
+        "wlan_power_save": {
+          "label": "WLAN-Stromsparen",
+          "help": "Aus hält die Box erreichbar"
+        },
+        "wlan_interface": {
+          "label": "WLAN-Schnittstelle"
+        },
+        "sound_card": {
+          "label": "Soundkarte (I²S)",
+          "help": "Eine I²S-Soundkarte am Pin-Header; wirkt nach „lauschctl setup raspi“ und einem Neustart"
+        },
+        "onboard_audio": {
+          "label": "Eingebauter Ton (Kopfhörerbuchse)",
+          "help": "Aus bei externer Soundkarte (mit I²S-Soundkarte immer aus)"
+        },
+        "i2c": {
+          "label": "I²C",
+          "help": "Wird für einen Akku-Sensor auch automatisch eingeschaltet"
+        },
+        "spi": {
+          "label": "SPI",
+          "help": "Wird für einen RC522-Leser auch automatisch eingeschaltet"
+        }
+      }
+    }
+  }
+}

@@ -178,6 +178,7 @@ class GpioControls(Plugin):
     """GPIO buttons, rotary encoders and a status LED (any board with GPIO)."""
 
     name = 'gpio_controls'
+    title = 'Buttons, encoders, LED (GPIO)'
     interface_version = '1.0'
     needs = ('gpio',)
     requires = {'hardware': '>=1.0,<2'}

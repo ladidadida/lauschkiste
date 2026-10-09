@@ -250,17 +250,22 @@ keep reading `ctx.config` with the same defaults.
   people neither share nor back up by accident. The module still reads them with `ctx.config.get(...)`.
   On the command line: `lauschctl config set plugins.<name>.<key> --secret` (asks for the value),
   `lauschctl config get` hides them (`--reveal` shows them).
-- **Translations of a plugin** ship with the plugin: `<package>/translations/<language>.json` (`en.json` is the
-  base, `de.json` etc. are optional). The file has the plugin's display name and the texts of its settings in
-  the shape of `settings.fields.<plugin>` of the web app:
+- **Translations of a plugin** ship with its package: `<package>/translations/<language>.json` (`en.json` is
+  the base and complete, `de.json` etc. are optional). A package with several plugins (devices, RFID readers) lists
+  them all in one file. For every plugin the file has its display name and the texts of its settings in the shape
+  of `settings.fields.<plugin>` of the web app:
 
   ```json
   {
-    "name": "Find podcasts",
-    "fields": {
-      "itunes": {
-        "label": "Apple Podcasts", "help": "…",
-        "country": {"label": "Country", "help": "…", "values": {"de": "Germany"}}
+    "plugins": {
+      "podcast_directories": {
+        "name": "Find podcasts",
+        "fields": {
+          "itunes": {
+            "label": "Apple Podcasts", "help": "…",
+            "country": {"label": "Country", "help": "…", "values": {"de": "Germany"}}
+          }
+        }
       }
     }
   }

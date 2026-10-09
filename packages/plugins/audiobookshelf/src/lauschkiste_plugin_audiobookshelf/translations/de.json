@@ -1,21 +1,25 @@
 {
-  "name": "Audiobookshelf (Hörbücher von einem Server)",
-  "fields": {
-    "server_url": {
-      "label": "Serveradresse",
-      "help": "Zum Beispiel https://audiobookshelf.example.org oder http://nas:13378"
-    },
-    "api_key": {
-      "label": "API-Schlüssel",
-      "help": "In Audiobookshelf unter Einstellungen → API-Schlüssel für den Benutzer anlegen, den die Box nutzen soll. Leer lassen, um den gespeicherten zu behalten."
-    },
-    "refresh_minutes": {
-      "label": "Nach neuen Büchern fragen alle (Minuten)",
-      "help": "Die Position wird immer frisch geholt."
-    },
-    "prefer_downloaded": {
-      "label": "Heruntergeladene Bücher von der Box abspielen",
-      "help": "Auch wenn der Server erreichbar ist."
+  "plugins": {
+    "audiobookshelf": {
+      "name": "Audiobookshelf (Hörbücher von einem Server)",
+      "fields": {
+        "server_url": {
+          "label": "Serveradresse",
+          "help": "Zum Beispiel https://audiobookshelf.example.org oder http://nas:13378"
+        },
+        "api_key": {
+          "label": "API-Schlüssel",
+          "help": "In Audiobookshelf unter Einstellungen → API-Schlüssel für den Benutzer anlegen, den die Box nutzen soll. Leer lassen, um den gespeicherten zu behalten."
+        },
+        "refresh_minutes": {
+          "label": "Nach neuen Büchern fragen alle (Minuten)",
+          "help": "Die Position wird immer frisch geholt."
+        },
+        "prefer_downloaded": {
+          "label": "Heruntergeladene Bücher von der Box abspielen",
+          "help": "Auch wenn der Server erreichbar ist."
+        }
+      }
     }
   }
 }

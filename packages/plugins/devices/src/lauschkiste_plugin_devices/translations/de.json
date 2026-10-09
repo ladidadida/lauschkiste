@@ -1,0 +1,153 @@
+{
+  "plugins": {
+    "battery": {
+      "name": "Akku",
+      "fields": {
+        "driver": {
+          "label": "Sensor"
+        },
+        "shunt_ohms": {
+          "label": "Shunt-Widerstand (Ohm)",
+          "help": "Nur INA219"
+        },
+        "empty_voltage": {
+          "label": "Leer bei (mV)",
+          "help": "Beim MAX17048 nicht nötig"
+        },
+        "full_voltage": {
+          "label": "Voll bei (mV)",
+          "help": "Beim MAX17048 nicht nötig"
+        },
+        "warning_voltage": {
+          "label": "Warnen unter (mV)"
+        },
+        "shutdown_voltage": {
+          "label": "Herunterfahren unter (mV)"
+        },
+        "interval_sec": {
+          "label": "Messen alle (Sekunden)"
+        },
+        "warning_action": {
+          "label": "Wenn der Akku schwach wird"
+        },
+        "i2c_bus": {
+          "label": "I²C-Bus",
+          "help": "Linux-Busnummer (/dev/i2c-1 ist 1)"
+        }
+      }
+    },
+    "gpio_controls": {
+      "name": "Tasten, Drehregler, LED (GPIO)",
+      "fields": {
+        "buttons": {
+          "label": "Tasten",
+          "pin": {
+            "label": "Pin"
+          },
+          "on_press": {
+            "label": "Beim Drücken"
+          },
+          "on_hold": {
+            "label": "Beim Halten"
+          },
+          "hold_time": {
+            "label": "Halten für (Sekunden)"
+          },
+          "pull_up": {
+            "label": "Interner Pull-up",
+            "help": "Aus für Tasten an 3,3 V"
+          },
+          "bounce_time": {
+            "label": "Entprellen (Sekunden)"
+          }
+        },
+        "rotary_encoders": {
+          "label": "Drehregler",
+          "pin_a": {
+            "label": "Pin A"
+          },
+          "pin_b": {
+            "label": "Pin B"
+          },
+          "clockwise": {
+            "label": "Im Uhrzeigersinn"
+          },
+          "counter_clockwise": {
+            "label": "Gegen den Uhrzeigersinn"
+          }
+        },
+        "status_led": {
+          "label": "Status-LED",
+          "help": "Leuchtet, solange Lauschkiste läuft"
+        }
+      }
+    },
+    "phat_beat": {
+      "name": "Pimoroni pHAT BEAT",
+      "fields": {
+        "play_pause": {
+          "label": "Taste Play/Pause"
+        },
+        "next": {
+          "label": "Taste Vor"
+        },
+        "previous": {
+          "label": "Taste Zurück"
+        },
+        "volume_up": {
+          "label": "Taste Lauter",
+          "help": "Wiederholt sich, solange sie gedrückt ist"
+        },
+        "volume_down": {
+          "label": "Taste Leiser",
+          "help": "Wiederholt sich, solange sie gedrückt ist"
+        },
+        "power": {
+          "label": "Ein/Aus-Taste (gedrückt halten)"
+        },
+        "power_hold_time": {
+          "label": "Ein/Aus-Taste halten für (Sekunden)"
+        },
+        "leds": {
+          "label": "LEDs",
+          "help": "Lautstärke und Karten werden kurz angezeigt, bei Pegelanzeige über dem Pegel"
+        },
+        "reverse": {
+          "label": "Laufrichtung umkehren",
+          "help": "Die Balken füllen sich vom anderen Ende her (je nachdem, wie der pHAT BEAT eingebaut ist)"
+        },
+        "colors": {
+          "label": "Farben",
+          "help": "Farben der Pegelanzeige und der Animationen, von unten nach oben"
+        },
+        "animations": {
+          "label": "Animation beim Starten und Herunterfahren"
+        },
+        "brightness": {
+          "label": "LED-Helligkeit"
+        }
+      }
+    },
+    "power_button": {
+      "name": "Ein/Aus-Taster",
+      "fields": {
+        "preset": {
+          "label": "Hardware",
+          "help": "OnOff SHIM: Taster GPIO17, Abschalten GPIO4"
+        },
+        "button_pin": {
+          "label": "Taster-Pin",
+          "help": "Nur „eigene Pins“; der Taster verbindet ihn mit Masse"
+        },
+        "poweroff_pin": {
+          "label": "Abschalt-Pin",
+          "help": "Nur „eigene Pins“; geht nach dem Herunterfahren auf Low"
+        },
+        "hold_time": {
+          "label": "Drücken für (Sekunden)",
+          "help": "So lange muss der Taster gedrückt werden"
+        }
+      }
+    }
+  }
+}

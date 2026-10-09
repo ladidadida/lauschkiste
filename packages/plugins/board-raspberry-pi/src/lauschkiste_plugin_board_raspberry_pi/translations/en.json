@@ -1,0 +1,40 @@
+{
+  "plugins": {
+    "board_raspberry_pi": {
+      "name": "Raspberry Pi",
+      "fields": {
+        "debug_mode": {
+          "label": "Debug mode",
+          "help": "Log shutdown and reboot instead of doing them"
+        },
+        "hdmi_power_down": {
+          "label": "Switch HDMI off",
+          "help": "Saves power without a display"
+        },
+        "wlan_power_save": {
+          "label": "WLAN power saving",
+          "help": "Off keeps the box reachable; empty leaves the system setting"
+        },
+        "wlan_interface": {
+          "label": "WLAN interface"
+        },
+        "sound_card": {
+          "label": "Sound card (I²S)",
+          "help": "An I²S sound card on the header; takes effect after 'lauschctl setup raspi' and a reboot"
+        },
+        "onboard_audio": {
+          "label": "On-chip audio (headphone jack)",
+          "help": "Off with an external sound card (always off with an I²S sound card)"
+        },
+        "i2c": {
+          "label": "I²C",
+          "help": "Also switched on for a battery sensor"
+        },
+        "spi": {
+          "label": "SPI",
+          "help": "Also switched on for an RC522 reader"
+        }
+      }
+    }
+  }
+}
