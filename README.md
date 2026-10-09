@@ -19,10 +19,14 @@ Say it like "LOWSH-kiss-tuh".
 
 ## Features
 
-- RFID/NFC cards start albums, playlists or actions (volume, timers, shutdown, ...)
-- Web app for the library, cards, settings and playback
+- RFID/NFC cards start albums, audiobooks, podcasts, radio stations or actions (volume, timers, shutdown, ...)
+- Music, audiobooks (also from an [Audiobookshelf](https://www.audiobookshelf.org) server, with downloads for
+  offline use), podcasts (search, subscribe, import from other apps) and internet radio (search, M3U/PLS)
+- Quiet hours and a daily listening time
+- Web app for the library, cards, settings and playback, in German and English
 - Built-in player, no extra audio daemon needed; MPD as a plugin
-- Plugins for RFID readers, Raspberry Pi hardware (buttons, encoders, LED, battery) and more
+- Plugins for RFID readers, Raspberry Pi hardware (buttons, encoders, LED, battery), podcast and radio directories
+  and more; plugins bring their own translations
 - One-line installation, setup steps you can re-run safely, updates from the command line
 
 ## Installation

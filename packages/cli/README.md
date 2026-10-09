@@ -10,6 +10,8 @@ starts. Runs on a Raspberry Pi (from the Zero up), managed from any browser. Alp
 ## Features
 
 - RFID/NFC cards start albums, audiobooks, podcasts, radio stations or actions (volume, timers, shutdown, ...)
+- Audiobooks also from an Audiobookshelf server (with downloads for offline use); podcast and radio search
+- Quiet hours and a daily listening time
 - Web app for the library, cards, settings and playback
 - Built-in player, no extra audio daemon needed; MPD as a plugin
 - Plugins for RFID readers, Raspberry Pi hardware (buttons, encoders, LEDs, battery) and more

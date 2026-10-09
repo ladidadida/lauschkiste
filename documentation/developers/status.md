@@ -9,6 +9,9 @@ the [roadmap](roadmap-core-architecture.md).
 | --- | --- |
 | Playback | built-in player (`local_audio`, PyAV and PortAudio), MPD as a plugin; shuffle, repeat, sleep timer, playback speed for audiobooks and podcasts, queue |
 | Content | music, audiobooks (position per book), podcasts (feeds, position per episode), radio stations; see [Content types](content-types.md) |
+| Sources | audiobooks from an [Audiobookshelf](audiobookshelf.md) server (streaming, shared position, offline use), podcast and radio directories (Apple Podcasts, fyyd, Podcast Index, radio-browser.info), OPML and M3U/PLS import and export |
+| Downloads | a [cache in the core](caching.md) for audiobooks and podcast episodes: low priority, space limit, removal of old items |
+| Time limits | quiet hours and a daily listening time with extra time for parents ([plugin](../builders/time-limits.md)) |
 | Library | one folder with `music/` and `audiobooks/`, index with tags and cover art, folder watching, upload and file management in the web app, optional Samba share |
 | Cards | RFID cards with actions (play, volume, timers, shutdown, ...), learning mode, second swipe, card database in the web app |
 | Readers | RC522 (SPI), MFRC522 and PN532 (I²C), USB readers, RDM6300, NFC (nfcpy) as plugins |
@@ -21,8 +24,10 @@ the [roadmap](roadmap-core-architecture.md).
 
 ## Planned
 
-- [Audiobookshelf](audiobookshelf.md) as an audiobook source, with offline use and a handover to other
-  rooms through Music Assistant.
+- Playing from a phone over Bluetooth, for apps that cannot be integrated, such as the Onleihe
+  ([plan](phone-audio.md)).
+- A handover to other rooms through Music Assistant (needs the same Audiobookshelf user; see the
+  [Audiobookshelf plan](audiobookshelf.md)), m4b audiobooks with chapters in one file.
 - Release on PyPI ([Releasing](releasing.md)).
 - Installing straight from a git branch or tag without a release (the web app would have to be built on the
   box or taken from a CI build).
