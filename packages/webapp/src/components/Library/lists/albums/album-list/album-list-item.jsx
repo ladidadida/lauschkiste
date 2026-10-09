@@ -13,12 +13,14 @@ import {
   ListItemText,
 } from '@mui/material';
 
-import noCover from '../../../../../assets/noCover.jpg';
 
 import AppSettingsContext from '../../../../../context/appsettings/context';
 import request from '../../../../../utils/request';
 import { coverSrc } from '../../../../../utils/utils';
 import { LOCAL_LIBRARY_SOURCE } from '../../../../../config';
+
+// The bear of the logo stands in for a missing cover
+const noCover = '/logo192.png';
 
 const AlbumListItem = ({
   albumartist,

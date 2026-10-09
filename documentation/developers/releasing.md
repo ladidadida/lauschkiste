@@ -7,8 +7,10 @@ PyPI after a manual approval (one job per package).
 
 ## Before the first release
 
-- [ ] Clarified with the Phoniebox project: that Lauschkiste is named as its origin, and the origin of the
-  start and shutdown sounds.
+- [x] Origin: the code stays under the MIT license of Phoniebox (its copyright line is in `LICENSE`) and the README
+  names Phoniebox as the origin. The start and shutdown sounds and the placeholder cover that came from Phoniebox
+  were replaced by our own (`ci/make_sounds.py`, the logo bear), so nothing of unclear origin is left.
+  The Phoniebox project was told about the project and asked (Matrix); an answer is welcome but not needed.
 - [x] Searched for conflicts with the name "Lauschkiste" (trademark registers of the DPMA and EUIPO) and for
   similar logos (October 2026: no problems expected).
 - [x] Private vulnerability reporting is switched on (repository Settings → Code security): the Code of
