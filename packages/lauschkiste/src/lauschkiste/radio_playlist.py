@@ -12,7 +12,7 @@ def _name_from(url: str) -> str:
 
 
 def parse_stations(content: str) -> List[Dict[str, str]]:
-    """``[{'name', 'url'}]`` of every stream in an M3U (with ``#EXTINF`` names) or PLS playlist.
+    """``[{"name", "url"}]`` of every stream in an M3U (with names from its EXTINF lines) or PLS playlist.
 
     Raises ValueError if ``content`` has no stream or is too big."""
     if len(content.encode()) > MAX_BYTES:

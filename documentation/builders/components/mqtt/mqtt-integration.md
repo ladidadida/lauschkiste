@@ -1,5 +1,9 @@
 # MQTT Integration
 
+> [!WARNING]
+> Not available in Lauschkiste yet: the MQTT module of the earlier versions is gone and an MQTT plugin is
+> planned (see [Feature status](../../../developers/status.md)). The text below describes the old implementation.
+
 The MQTT integration allows you to control your Lauschkiste via the MQTT protocol. This feature enables not only MQTT
 control but also integration with home automation systems like Home Assistant.
 

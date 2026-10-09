@@ -2,14 +2,14 @@
 
 We have made a point of providing extensive log messages.
 In full debug mode, this may become very verbose. In fact, better observability
-has been one of the design goals for version 3.
+is a design goal.
 
 There are various options to get access to debug information.
 
 Debugging your setup runs in several steps
 
 1. Check that [audio output works](audio.md#checking-system-sound-output)
-2. Check that [MPD works](system.md#music-player-daemon-mpd)
+2. If you use the `mpd` plugin: check that [MPD works](system.md#music-player-daemon-mpd)
 3. Checking log messages from the Lauschkiste core App as described below
 
 ## The short answer

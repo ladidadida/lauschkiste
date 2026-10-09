@@ -4,17 +4,19 @@ A few words on how the system is setup and interacts.
 
 The system consists of
 
-1. [Music Player Daemon (MPD)](system.md#music-player-daemon-mpd) which we use for all music playback (local, stream, podcast, ...)
+1. Optionally the [Music Player Daemon (MPD)](system.md#music-player-daemon-mpd), used when the `mpd` plugin is enabled (the built-in player needs no MPD)
 2. [Audio (PipeWire)](system.md#audio-pipewire) for flexible audio output support
-3. [Lauschkiste service](system.md#lauschkiste-service) for controlling MPD and the audio outputs and providing all the features
+3. [Lauschkiste service](system.md#lauschkiste-service) for playback, the audio outputs and all the features
 4. [Web App](system.md#web-app-ui) as User Interface (UI) for a web browser
 5. A set of [Configuration Tools](../developers/coreapps.md#configuration-tools) and a set of [Developer Tools](../developers/coreapps.md#developer-tools)
 
 > [!NOTE]
-> The default install puts everything into the users home folder `~/lauschkiste`.
+> On a Raspberry Pi the install puts everything into the users home folder `~/lauschkiste`.
 > Another folder might work, but is certainly not tested.
 
 ## Music Player Daemon (MPD)
+
+Only relevant with the `mpd` plugin (`lauschctl setup mpd`).
 
 The Music Player Daemon runs as *user-local* service (not as system-wide service which is usually the default).
 This is important for the interaction with the user-session audio server.

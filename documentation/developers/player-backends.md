@@ -1,6 +1,6 @@
 # Player Backends
 
-The player package exposes one stable RPC and RFID-card contract while routing
+The player package exposes one stable action and RFID-card contract while routing
 content to one of several playback backends. The first registered backend is
 the default for legacy calls that do not include a provider.
 

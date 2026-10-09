@@ -6,8 +6,6 @@ machine - probably in a Python virtual environment.
 
 **place-capable**: yes
 
-If you [mock the GPIO pins](../../builders/gpio.md#use-mock-pins), this GUI will show the GPIO devices.
-
 ![image](mock_reader.png)
 
 > [!NOTE]

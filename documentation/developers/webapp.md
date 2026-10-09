@@ -45,7 +45,7 @@ memory. Browser folder selections retain their relative paths; the Web App
 creates the selected folder trees through the `folders` endpoint before
 uploading their files sequentially. Raw directory listing, batch deletion,
 and MPD refresh use the corresponding `entries` and `refresh` endpoints.
-Uploads are exempt from the 1 MiB body-size cap that applies to RPC and other
+Uploads are exempt from the 1 MiB body-size cap that applies to other
 JSON requests.
 
 The old ZeroMQ-over-WebSocket endpoints on ports `5556` and `5557` were

@@ -16,11 +16,11 @@
 * [Playing from a phone (Bluetooth, plan)](./phone-audio.md)
 * [RFID Readers](./rfid/README.md)
 * [Docstring API Docs (from py files)](./docstring/README.md)
-* [Plugin Reference](./docstring/README.md#jukebox.plugs)
+* [Core and plugins](./core-and-plugins.md)
 * [Feature Status](./status.md)
 * [Known Issues](./known-issues.md)
 
-## RPC
+## API
 
 * [Web App API](./webapp.md#backend-api)
 * [Actions](../builders/actions.md)

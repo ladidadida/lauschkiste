@@ -22,7 +22,7 @@ The default configuration is
 
 ## Disabling automatism
 
-Auto-Hotspot can be enabled or disabled using the Web App or RPC Commands.
+Auto-Hotspot is set up with `lauschctl setup autohotspot` (see [Installing Lauschkiste](installation.md)). To switch it off, stop and disable the timer: `sudo systemctl disable --now autohotspot.timer`.
 
 Disabling the Auto-Hotspot will run the WiFi check again and maintain the last connection state until reboot.
 

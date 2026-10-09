@@ -13,7 +13,6 @@
   * [Bluetooth audio buttons](./bluetooth-audio-buttons.md)
 * [GPIO Recipes](./gpio.md)
 * [Card Database](./card-database.md)
-  * [RFID Cards synchronisation](./components/synchronisation/rfidcards.md)
 * [Auto Hotspot](./autohotspot.md)
 * File Management
   * [Copying music](./copying-music.md): web app, Samba

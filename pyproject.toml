@@ -34,7 +34,7 @@ processors = [{ type = "filter" }, { type = "sphinx" }, { type = "crossref" }]
 type = "markdown"
 render_toc = true
 filename = "./documentation/developers/docstring/README.md"
-render_page_title = true
+render_page_title = false
 
 [tool.ruff]
 line-length = 127

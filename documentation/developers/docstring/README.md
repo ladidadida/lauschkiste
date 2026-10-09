@@ -1,6 +1,4 @@
-# None
-
-## Table of Contents
+# Table of Contents
 
 * [lauschkiste](#lauschkiste)
 * [lauschkiste.utils](#lauschkiste.utils)
@@ -19,6 +17,8 @@
 * [lauschkiste.library.watch](#lauschkiste.library.watch)
   * [Snapshot](#lauschkiste.library.watch.Snapshot)
   * [snapshot](#lauschkiste.library.watch.snapshot)
+  * [Inotify](#lauschkiste.library.watch.Inotify)
+    * [wait](#lauschkiste.library.watch.Inotify.wait)
   * [FolderWatcher](#lauschkiste.library.watch.FolderWatcher)
 * [lauschkiste.library.files](#lauschkiste.library.files)
   * [LibraryError](#lauschkiste.library.files.LibraryError)
@@ -51,6 +51,18 @@
 * [lauschkiste.library](#lauschkiste.library)
   * [root](#lauschkiste.library.root)
 * [lauschkiste.podcasts](#lauschkiste.podcasts)
+  * [Podcast](#lauschkiste.podcasts.Podcast)
+    * [hidden](#lauschkiste.podcasts.Podcast.hidden)
+  * [Episode](#lauschkiste.podcasts.Episode)
+    * [item](#lauschkiste.podcasts.Episode.item)
+    * [availability](#lauschkiste.podcasts.Episode.availability)
+  * [PodcastHit](#lauschkiste.podcasts.PodcastHit)
+  * [SearchResult](#lauschkiste.podcasts.SearchResult)
+    * [errors](#lauschkiste.podcasts.SearchResult.errors)
+  * [PodcastDirectory](#lauschkiste.podcasts.PodcastDirectory)
+    * [search](#lauschkiste.podcasts.PodcastDirectory.search)
+    * [top](#lauschkiste.podcasts.PodcastDirectory.top)
+  * [EpisodeProvider](#lauschkiste.podcasts.EpisodeProvider)
   * [parse\_feed](#lauschkiste.podcasts.parse_feed)
   * [Podcasts](#lauschkiste.podcasts.Podcasts)
     * [list\_podcasts](#lauschkiste.podcasts.Podcasts.list_podcasts)
@@ -59,15 +71,29 @@
     * [update\_podcast](#lauschkiste.podcasts.Podcasts.update_podcast)
     * [delete\_podcast](#lauschkiste.podcasts.Podcasts.delete_podcast)
     * [refresh](#lauschkiste.podcasts.Podcasts.refresh)
+    * [list\_directories](#lauschkiste.podcasts.Podcasts.list_directories)
+    * [search](#lauschkiste.podcasts.Podcasts.search)
+    * [top](#lauschkiste.podcasts.Podcasts.top)
+    * [import\_opml](#lauschkiste.podcasts.Podcasts.import_opml)
+    * [export\_opml](#lauschkiste.podcasts.Podcasts.export_opml)
+    * [hide\_from\_continue](#lauschkiste.podcasts.Podcasts.hide_from_continue)
     * [play](#lauschkiste.podcasts.Podcasts.play)
     * [set\_heard](#lauschkiste.podcasts.Podcasts.set_heard)
+* [lauschkiste.directories](#lauschkiste.directories)
+  * [ask](#lauschkiste.directories.ask)
+  * [interleave](#lauschkiste.directories.interleave)
+* [lauschkiste.radio\_playlist](#lauschkiste.radio_playlist)
+  * [parse\_stations](#lauschkiste.radio_playlist.parse_stations)
+  * [render\_m3u](#lauschkiste.radio_playlist.render_m3u)
 * [lauschkiste.rfid.reader](#lauschkiste.rfid.reader)
   * [ReaderDriver](#lauschkiste.rfid.reader.ReaderDriver)
     * [create\_reader](#lauschkiste.rfid.reader.ReaderDriver.create_reader)
+  * [ReaderSetting](#lauschkiste.rfid.reader.ReaderSetting)
   * [CardDetected](#lauschkiste.rfid.reader.CardDetected)
     * [learned](#lauschkiste.rfid.reader.CardDetected.learned)
   * [CardRemovalTimer](#lauschkiste.rfid.reader.CardRemovalTimer)
   * [Rfid](#lauschkiste.rfid.reader.Rfid)
+    * [claims](#lauschkiste.rfid.reader.Rfid.claims)
     * [resolve\_config\_action](#lauschkiste.rfid.reader.Rfid.resolve_config_action)
     * [learn](#lauschkiste.rfid.reader.Rfid.learn)
     * [stop\_learning](#lauschkiste.rfid.reader.Rfid.stop_learning)
@@ -84,33 +110,64 @@
 * [lauschkiste.rfid.cardutils](#lauschkiste.rfid.cardutils)
   * [card\_command\_to\_str](#lauschkiste.rfid.cardutils.card_command_to_str)
 * [lauschkiste.audiobooks](#lauschkiste.audiobooks)
+  * [AudiobookSource](#lauschkiste.audiobooks.AudiobookSource)
+    * [list\_books](#lauschkiste.audiobooks.AudiobookSource.list_books)
+    * [files](#lauschkiste.audiobooks.AudiobookSource.files)
+    * [title](#lauschkiste.audiobooks.AudiobookSource.title)
+    * [position](#lauschkiste.audiobooks.AudiobookSource.position)
+    * [set\_finished](#lauschkiste.audiobooks.AudiobookSource.set_finished)
+  * [Audiobook](#lauschkiste.audiobooks.Audiobook)
+    * [availability](#lauschkiste.audiobooks.Audiobook.availability)
+    * [hidden](#lauschkiste.audiobooks.Audiobook.hidden)
   * [Audiobooks](#lauschkiste.audiobooks.Audiobooks)
     * [list\_books](#lauschkiste.audiobooks.Audiobooks.list_books)
     * [play](#lauschkiste.audiobooks.Audiobooks.play)
+    * [hide\_from\_continue](#lauschkiste.audiobooks.Audiobooks.hide_from_continue)
     * [restart](#lauschkiste.audiobooks.Audiobooks.restart)
     * [set\_finished](#lauschkiste.audiobooks.Audiobooks.set_finished)
 * [lauschkiste.volume](#lauschkiste.volume)
   * [PlayerMixer](#lauschkiste.volume.PlayerMixer)
   * [PulseMixer](#lauschkiste.volume.PulseMixer)
+  * [pulse\_sinks](#lauschkiste.volume.pulse_sinks)
   * [Volume](#lauschkiste.volume.Volume)
     * [get\_volume](#lauschkiste.volume.Volume.get_volume)
     * [set\_volume](#lauschkiste.volume.Volume.set_volume)
     * [change\_volume](#lauschkiste.volume.Volume.change_volume)
     * [mute](#lauschkiste.volume.Volume.mute)
+    * [list\_sinks](#lauschkiste.volume.Volume.list_sinks)
     * [set\_soft\_max\_volume](#lauschkiste.volume.Volume.set_soft_max_volume)
     * [get\_outputs](#lauschkiste.volume.Volume.get_outputs)
     * [set\_output](#lauschkiste.volume.Volume.set_output)
     * [toggle\_output](#lauschkiste.volume.Volume.toggle_output)
     * [fade\_out](#lauschkiste.volume.Volume.fade_out)
+* [lauschkiste.startup](#lauschkiste.startup)
+  * [import\_fastapi](#lauschkiste.startup.import_fastapi)
 * [lauschkiste.nv\_manager](#lauschkiste.nv_manager)
+* [lauschkiste.dismissed](#lauschkiste.dismissed)
+  * [Dismissed](#lauschkiste.dismissed.Dismissed)
 * [lauschkiste.radio](#lauschkiste.radio)
+  * [Station](#lauschkiste.radio.Station)
+    * [last\_played](#lauschkiste.radio.Station.last_played)
+  * [StationHit](#lauschkiste.radio.StationHit)
+    * [added](#lauschkiste.radio.StationHit.added)
+  * [SearchResult](#lauschkiste.radio.SearchResult)
+    * [errors](#lauschkiste.radio.SearchResult.errors)
+  * [RadioDirectory](#lauschkiste.radio.RadioDirectory)
+    * [search](#lauschkiste.radio.RadioDirectory.search)
+    * [top](#lauschkiste.radio.RadioDirectory.top)
   * [streams\_in\_playlist](#lauschkiste.radio.streams_in_playlist)
   * [Radio](#lauschkiste.radio.Radio)
     * [list\_stations](#lauschkiste.radio.Radio.list_stations)
     * [add\_station](#lauschkiste.radio.Radio.add_station)
     * [update\_station](#lauschkiste.radio.Radio.update_station)
     * [delete\_station](#lauschkiste.radio.Radio.delete_station)
+    * [list\_directories](#lauschkiste.radio.Radio.list_directories)
+    * [search](#lauschkiste.radio.Radio.search)
+    * [top](#lauschkiste.radio.Radio.top)
+    * [import\_playlist](#lauschkiste.radio.Radio.import_playlist)
+    * [export\_playlist](#lauschkiste.radio.Radio.export_playlist)
     * [play](#lauschkiste.radio.Radio.play)
+    * [forget\_recent](#lauschkiste.radio.Radio.forget_recent)
 * [lauschkiste.publishing.bus](#lauschkiste.publishing.bus)
   * [EventBus](#lauschkiste.publishing.bus.EventBus)
     * [publish](#lauschkiste.publishing.bus.EventBus.publish)
@@ -118,6 +175,30 @@
     * [cache\_snapshot](#lauschkiste.publishing.bus.EventBus.cache_snapshot)
 * [lauschkiste.publishing](#lauschkiste.publishing)
   * [get\_bus](#lauschkiste.publishing.get_bus)
+* [lauschkiste.cache.worker](#lauschkiste.cache.worker)
+  * [Download](#lauschkiste.cache.worker.Download)
+    * [fetch](#lauschkiste.cache.worker.Download.fetch)
+* [lauschkiste.cache.manager](#lauschkiste.cache.manager)
+* [lauschkiste.cache](#lauschkiste.cache)
+  * [CacheFile](#lauschkiste.cache.CacheFile)
+    * [size](#lauschkiste.cache.CacheFile.size)
+  * [CacheProvider](#lauschkiste.cache.CacheProvider)
+    * [plan](#lauschkiste.cache.CacheProvider.plan)
+    * [version](#lauschkiste.cache.CacheProvider.version)
+    * [removable](#lauschkiste.cache.CacheProvider.removable)
+  * [Cache](#lauschkiste.cache.Cache)
+    * [downloads](#lauschkiste.cache.Cache.downloads)
+    * [files](#lauschkiste.cache.Cache.files)
+    * [cached](#lauschkiste.cache.Cache.cached)
+    * [download](#lauschkiste.cache.Cache.download)
+    * [cancel](#lauschkiste.cache.Cache.cancel)
+    * [remove](#lauschkiste.cache.Cache.remove)
+* [lauschkiste.cache.store](#lauschkiste.cache.store)
+  * [INTERNAL](#lauschkiste.cache.store.INTERNAL)
+  * [CacheStore](#lauschkiste.cache.store.CacheStore)
+    * [complete](#lauschkiste.cache.store.CacheStore.complete)
+    * [items](#lauschkiste.cache.store.CacheStore.items)
+    * [set\_rate](#lauschkiste.cache.store.CacheStore.set_rate)
 * [lauschkiste.playlistgenerator](#lauschkiste.playlistgenerator)
   * [TYPE\_DECODE](#lauschkiste.playlistgenerator.TYPE_DECODE)
   * [PlaylistCollector](#lauschkiste.playlistgenerator.PlaylistCollector)
@@ -142,6 +223,10 @@
 * [lauschkiste.version](#lauschkiste.version)
   * [version](#lauschkiste.version.version)
   * [version\_info](#lauschkiste.version.version_info)
+* [lauschkiste.podcast\_opml](#lauschkiste.podcast_opml)
+  * [normalize\_url](#lauschkiste.podcast_opml.normalize_url)
+  * [parse\_opml](#lauschkiste.podcast_opml.parse_opml)
+  * [render\_opml](#lauschkiste.podcast_opml.render_opml)
 * [lauschkiste.cfghandler](#lauschkiste.cfghandler)
   * [ConfigHandler](#lauschkiste.cfghandler.ConfigHandler)
     * [loaded\_from](#lauschkiste.cfghandler.ConfigHandler.loaded_from)
@@ -166,9 +251,15 @@
     * [cancel](#lauschkiste.timers.Timers.cancel)
     * [toggle](#lauschkiste.timers.Timers.toggle)
 * [lauschkiste.audio\_output](#lauschkiste.audio_output)
+  * [volume\_gain](#lauschkiste.audio_output.volume_gain)
+  * [scale\_gain](#lauschkiste.audio_output.scale_gain)
   * [scale\_volume](#lauschkiste.audio_output.scale_volume)
   * [AudioSink](#lauschkiste.audio_output.AudioSink)
+    * [close](#lauschkiste.audio_output.AudioSink.close)
   * [PortAudioSink](#lauschkiste.audio_output.PortAudioSink)
+    * [LATENCY](#lauschkiste.audio_output.PortAudioSink.LATENCY)
+    * [CHUNK\_SECONDS](#lauschkiste.audio_output.PortAudioSink.CHUNK_SECONDS)
+    * [LEAD\_IN\_SECONDS](#lauschkiste.audio_output.PortAudioSink.LEAD_IN_SECONDS)
   * [play\_file](#lauschkiste.audio_output.play_file)
 * [lauschkiste.core\_modules](#lauschkiste.core_modules)
 * [lauschkiste.statefile](#lauschkiste.statefile)
@@ -177,6 +268,7 @@
   * [Evdev](#lauschkiste.input_devices.Evdev)
     * [key\_downs](#lauschkiste.input_devices.Evdev.key_downs)
   * [InputDevices](#lauschkiste.input_devices.InputDevices)
+    * [available\_devices](#lauschkiste.input_devices.InputDevices.available_devices)
     * [list\_devices](#lauschkiste.input_devices.InputDevices.list_devices)
 * [lauschkiste.multitimer](#lauschkiste.multitimer)
   * [MultiTimer](#lauschkiste.multitimer.MultiTimer)
@@ -225,6 +317,25 @@
     * [\_\_init\_\_](#lauschkiste.misc.loggingext.ColorFilter.__init__)
   * [PubStream](#lauschkiste.misc.loggingext.PubStream)
   * [PubStreamHandler](#lauschkiste.misc.loggingext.PubStreamHandler)
+* [lauschkiste.time\_limits](#lauschkiste.time_limits)
+  * [SETTLE\_SEC](#lauschkiste.time_limits.SETTLE_SEC)
+  * [TimeLimitStatus](#lauschkiste.time_limits.TimeLimitStatus)
+    * [enabled](#lauschkiste.time_limits.TimeLimitStatus.enabled)
+    * [clock\_ok](#lauschkiste.time_limits.TimeLimitStatus.clock_ok)
+    * [reason](#lauschkiste.time_limits.TimeLimitStatus.reason)
+    * [until](#lauschkiste.time_limits.TimeLimitStatus.until)
+  * [clock\_synchronized](#lauschkiste.time_limits.clock_synchronized)
+  * [TimeLimits](#lauschkiste.time_limits.TimeLimits)
+    * [evaluate](#lauschkiste.time_limits.TimeLimits.evaluate)
+    * [status](#lauschkiste.time_limits.TimeLimits.status)
+    * [allow](#lauschkiste.time_limits.TimeLimits.allow)
+    * [reset\_today](#lauschkiste.time_limits.TimeLimits.reset_today)
+* [lauschkiste.time\_limits.rules](#lauschkiste.time_limits.rules)
+  * [quiet\_until](#lauschkiste.time_limits.rules.quiet_until)
+  * [limit\_seconds](#lauschkiste.time_limits.rules.limit_seconds)
+* [lauschkiste.contract.secrets](#lauschkiste.contract.secrets)
+  * [SecretStore](#lauschkiste.contract.secrets.SecretStore)
+    * [set](#lauschkiste.contract.secrets.SecretStore.set)
 * [lauschkiste.contract.interfaces](#lauschkiste.contract.interfaces)
   * [format\_signature](#lauschkiste.contract.interfaces.format_signature)
 * [lauschkiste.contract.declarations](#lauschkiste.contract.declarations)
@@ -249,7 +360,10 @@
     * [lock](#lauschkiste.contract.context.Context.lock)
     * [subscribe](#lauschkiste.contract.context.Context.subscribe)
 * [lauschkiste.contract.routes](#lauschkiste.contract.routes)
+  * [response\_adapter](#lauschkiste.contract.routes.response_adapter)
+  * [add\_response\_schemas](#lauschkiste.contract.routes.add_response_schemas)
   * [add\_settings\_routes](#lauschkiste.contract.routes.add_settings_routes)
+  * [add\_plugin\_routes](#lauschkiste.contract.routes.add_plugin_routes)
 * [lauschkiste.contract.manager](#lauschkiste.contract.manager)
   * [discover\_plugins](#lauschkiste.contract.manager.discover_plugins)
   * [ModuleHandle](#lauschkiste.contract.manager.ModuleHandle)
@@ -265,6 +379,10 @@
   * [CoreModule](#lauschkiste.contract.module.CoreModule)
   * [Plugin](#lauschkiste.contract.module.Plugin)
     * [extras](#lauschkiste.contract.module.Plugin.extras)
+    * [title](#lauschkiste.contract.module.Plugin.title)
+    * [provides](#lauschkiste.contract.module.Plugin.provides)
+    * [needs](#lauschkiste.contract.module.Plugin.needs)
+    * [detect](#lauschkiste.contract.module.Plugin.detect)
 * [lauschkiste.contract.version](#lauschkiste.contract.version)
   * [CONTRACT\_VERSION](#lauschkiste.contract.version.CONTRACT_VERSION)
 * [lauschkiste.contract](#lauschkiste.contract)
@@ -272,6 +390,8 @@
   * [check\_target](#lauschkiste.contract.snapshots.check_target)
 * [lauschkiste.contract.settings](#lauschkiste.contract.settings)
   * [ActionEntry](#lauschkiste.contract.settings.ActionEntry)
+  * [storage](#lauschkiste.contract.settings.storage)
+  * [secret\_fields](#lauschkiste.contract.settings.secret_fields)
   * [current\_values](#lauschkiste.contract.settings.current_values)
   * [SettingsStore](#lauschkiste.contract.settings.SettingsStore)
 * [lauschkiste.contract.errors](#lauschkiste.contract.errors)
@@ -279,15 +399,27 @@
   * [OperationError](#lauschkiste.contract.errors.OperationError)
   * [ActionError](#lauschkiste.contract.errors.ActionError)
 * [lauschkiste.contract.plugins](#lauschkiste.contract.plugins)
+  * [readable](#lauschkiste.contract.plugins.readable)
+  * [package\_info](#lauschkiste.contract.plugins.package_info)
   * [installed](#lauschkiste.contract.plugins.installed)
   * [load](#lauschkiste.contract.plugins.load)
+  * [taken\_by](#lauschkiste.contract.plugins.taken_by)
+  * [missing\_needs](#lauschkiste.contract.plugins.missing_needs)
+  * [blocker](#lauschkiste.contract.plugins.blocker)
+  * [why\_not\_enable](#lauschkiste.contract.plugins.why_not_enable)
+  * [detected\_boards](#lauschkiste.contract.plugins.detected_boards)
   * [plugin\_extras](#lauschkiste.contract.plugins.plugin_extras)
   * [missing\_extras](#lauschkiste.contract.plugins.missing_extras)
+  * [install\_command](#lauschkiste.contract.plugins.install_command)
+  * [ExtrasInstaller](#lauschkiste.contract.plugins.ExtrasInstaller)
+    * [start](#lauschkiste.contract.plugins.ExtrasInstaller.start)
   * [set\_enabled](#lauschkiste.contract.plugins.set_enabled)
   * [describe](#lauschkiste.contract.plugins.describe)
+  * [translations](#lauschkiste.contract.plugins.translations)
 * [lauschkiste.system](#lauschkiste.system)
   * [cpu\_temperature](#lauschkiste.system.cpu_temperature)
   * [ip\_addresses](#lauschkiste.system.ip_addresses)
+  * [own\_unit](#lauschkiste.system.own_unit)
   * [System](#lauschkiste.system.System)
     * [log](#lauschkiste.system.System.log)
     * [get\_info](#lauschkiste.system.System.get_info)
@@ -299,8 +431,22 @@
     * [get\_app\_settings](#lauschkiste.system.System.get_app_settings)
     * [set\_app\_settings](#lauschkiste.system.System.set_app_settings)
     * [noop](#lauschkiste.system.System.noop)
+* [lauschkiste.hardware](#lauschkiste.hardware)
+  * [Claim](#lauschkiste.hardware.Claim)
+  * [Board](#lauschkiste.hardware.Board)
+    * [describe](#lauschkiste.hardware.Board.describe)
+    * [pin\_id](#lauschkiste.hardware.Board.pin_id)
+    * [gpio\_line](#lauschkiste.hardware.Board.gpio_line)
+    * [boot\_pending](#lauschkiste.hardware.Board.boot_pending)
+  * [Hardware](#lauschkiste.hardware.Hardware)
+    * [get\_state](#lauschkiste.hardware.Hardware.get_state)
+    * [pin\_options](#lauschkiste.hardware.Hardware.pin_options)
+    * [gpio\_line](#lauschkiste.hardware.Hardware.gpio_line)
+    * [shutdown](#lauschkiste.hardware.Hardware.shutdown)
+    * [reboot](#lauschkiste.hardware.Hardware.reboot)
 * [lauschkiste.resume](#lauschkiste.resume)
   * [relative](#lauschkiste.resume.relative)
+  * [PositionStore](#lauschkiste.resume.PositionStore)
   * [ResumeTracker](#lauschkiste.resume.ResumeTracker)
     * [set\_finished](#lauschkiste.resume.ResumeTracker.set_finished)
     * [play](#lauschkiste.resume.ResumeTracker.play)
@@ -351,8 +497,10 @@
     * [select\_backend](#lauschkiste.player.module.Player.select_backend)
 * [lauschkiste.player.status](#lauschkiste.player.status)
   * [PlaybackContext](#lauschkiste.player.status.PlaybackContext)
+    * [image](#lauschkiste.player.status.PlaybackContext.image)
   * [PlayerStatus](#lauschkiste.player.status.PlayerStatus)
     * [name](#lauschkiste.player.status.PlayerStatus.name)
+    * [genre](#lauschkiste.player.status.PlayerStatus.genre)
   * [status\_from\_backend](#lauschkiste.player.status.status_from_backend)
 * [lauschkiste.player](#lauschkiste.player)
 * [lauschkiste.player.backend](#lauschkiste.player.backend)
@@ -361,8 +509,14 @@
     * [jump](#lauschkiste.player.backend.PlayerBackend.jump)
     * [stop\_after\_current](#lauschkiste.player.backend.PlayerBackend.stop_after_current)
     * [play\_files](#lauschkiste.player.backend.PlayerBackend.play_files)
+  * [LevelMeter](#lauschkiste.player.backend.LevelMeter)
+    * [level](#lauschkiste.player.backend.LevelMeter.level)
+  * [Resolver](#lauschkiste.player.backend.Resolver)
+    * [resolve](#lauschkiste.player.backend.Resolver.resolve)
 * [lauschkiste.player.backends.local\_audio](#lauschkiste.player.backends.local_audio)
+  * [ca\_file](#lauschkiste.player.backends.local_audio.ca_file)
   * [PlayerLocalAudio](#lauschkiste.player.backends.local_audio.PlayerLocalAudio)
+    * [set\_level\_callback](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.set_level_callback)
     * [rewind](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.rewind)
     * [replay](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.replay)
 * [lauschkiste.player.backends](#lauschkiste.player.backends)
@@ -532,6 +686,28 @@ def snapshot(root: str) -> Snapshot
 State of the folder tree below ``root``; growing files count as changes too.
 
 
+<a id="lauschkiste.library.watch.Inotify"></a>
+
+## Inotify Objects
+
+```python
+class Inotify()
+```
+
+Linux inotify on a folder tree: wakes up only when something below it changes.
+
+
+<a id="lauschkiste.library.watch.Inotify.wait"></a>
+
+#### wait
+
+```python
+def wait(timeout: float, wake_fd: int) -> bool
+```
+
+True if something changed within ``timeout`` seconds; returns early when ``wake_fd`` is readable.
+
+
 <a id="lauschkiste.library.watch.FolderWatcher"></a>
 
 ## FolderWatcher Objects
@@ -542,7 +718,8 @@ class FolderWatcher()
 
 Calls ``on_change`` once the tree below ``root()`` changed and then stayed unchanged for one
 
-interval. Polls instead of using inotify, so it works on every file system.
+interval. Uses inotify where available (no work while nothing changes); otherwise, or on file
+systems where it can't be set up, it polls.
 
 
 <a id="lauschkiste.library.files"></a>
@@ -894,6 +1071,113 @@ Subscribed podcasts are kept in ``podcasts.podcasts_file``, the episodes of each
 per episode; an episode played to the end counts as heard.
 
 
+<a id="lauschkiste.podcasts.Podcast"></a>
+
+## Podcast Objects
+
+```python
+class Podcast(BaseModel)
+```
+
+<a id="lauschkiste.podcasts.Podcast.hidden"></a>
+
+#### hidden
+
+taken off the "continue" list; it comes back with a new episode or when one is heard
+
+
+<a id="lauschkiste.podcasts.Episode"></a>
+
+## Episode Objects
+
+```python
+class Episode(BaseModel)
+```
+
+<a id="lauschkiste.podcasts.Episode.item"></a>
+
+#### item
+
+the item id at ``cache`` (the episode can be downloaded)
+
+
+<a id="lauschkiste.podcasts.Episode.availability"></a>
+
+#### availability
+
+'stream' (played over the network) or 'cached' (downloaded to the box)
+
+
+<a id="lauschkiste.podcasts.PodcastHit"></a>
+
+## PodcastHit Objects
+
+```python
+class PodcastHit(BaseModel)
+```
+
+A podcast found in a directory.
+
+
+<a id="lauschkiste.podcasts.SearchResult"></a>
+
+## SearchResult Objects
+
+```python
+class SearchResult(BaseModel)
+```
+
+<a id="lauschkiste.podcasts.SearchResult.errors"></a>
+
+#### errors
+
+directory id -> why it gave no answer
+
+
+<a id="lauschkiste.podcasts.PodcastDirectory"></a>
+
+## PodcastDirectory Objects
+
+```python
+class PodcastDirectory(Protocol)
+```
+
+A place to find podcasts, registered at ``podcasts.directories`` by a plugin.
+
+
+<a id="lauschkiste.podcasts.PodcastDirectory.search"></a>
+
+#### search
+
+```python
+def search(term: str, limit: int) -> List[Dict[str, Any]]
+```
+
+Podcasts matching ``term`` as mappings with ``title``, ``feed_url`` and optionally ``author``, ``image``.
+
+
+<a id="lauschkiste.podcasts.PodcastDirectory.top"></a>
+
+#### top
+
+```python
+def top(limit: int) -> List[Dict[str, Any]]
+```
+
+Popular podcasts, same mappings.
+
+
+<a id="lauschkiste.podcasts.EpisodeProvider"></a>
+
+## EpisodeProvider Objects
+
+```python
+class EpisodeProvider()
+```
+
+``cache.providers`` entry ``podcasts``: an episode is the file of its feed entry.
+
+
 <a id="lauschkiste.podcasts.parse_feed"></a>
 
 #### parse\_feed
@@ -990,6 +1274,82 @@ def refresh(podcast: Optional[str] = None) -> None
 Fetch the episodes of one podcast, or of all.
 
 
+<a id="lauschkiste.podcasts.Podcasts.list_directories"></a>
+
+#### list\_directories
+
+```python
+@query(path='/directories')
+def list_directories() -> List[DirectoryInfo]
+```
+
+The places podcasts can be searched in (added by plugins).
+
+
+<a id="lauschkiste.podcasts.Podcasts.search"></a>
+
+#### search
+
+```python
+@query(path='/search')
+def search(term: str,
+           directory: Optional[str] = None,
+           limit: int = 20) -> SearchResult
+```
+
+Search the directories for podcasts.
+
+
+<a id="lauschkiste.podcasts.Podcasts.top"></a>
+
+#### top
+
+```python
+@query(path='/top')
+def top(directory: Optional[str] = None, limit: int = 20) -> SearchResult
+```
+
+Popular podcasts of the directories.
+
+
+<a id="lauschkiste.podcasts.Podcasts.import_opml"></a>
+
+#### import\_opml
+
+```python
+@action(path='/import_opml')
+def import_opml(content: str) -> ImportResult
+```
+
+Subscribe to all feeds of an OPML file (for example exported by AntennaPod). The episodes
+
+are fetched in the background.
+
+
+<a id="lauschkiste.podcasts.Podcasts.export_opml"></a>
+
+#### export\_opml
+
+```python
+@query(path='/export_opml')
+def export_opml() -> Opml
+```
+
+The subscriptions as an OPML file.
+
+
+<a id="lauschkiste.podcasts.Podcasts.hide_from_continue"></a>
+
+#### hide\_from\_continue
+
+```python
+@action()
+def hide_from_continue(podcast: str) -> None
+```
+
+Take a podcast off the "continue" list until a new episode comes or one is heard.
+
+
 <a id="lauschkiste.podcasts.Podcasts.play"></a>
 
 #### play
@@ -1014,6 +1374,75 @@ def set_heard(podcast: str, episode: str, heard: bool = True) -> None
 ```
 
 Mark an episode as heard (or not); either way it starts from the beginning next time.
+
+
+<a id="lauschkiste.directories"></a>
+
+# lauschkiste.directories
+
+Asking several directories at once and merging what they answer (podcast and radio directories).
+
+
+<a id="lauschkiste.directories.ask"></a>
+
+#### ask
+
+```python
+def ask(directories: Iterable[Tuple[str, Any]], only: Optional[str],
+        call: Callable[[Any], List[Row]],
+        what: str) -> Tuple[List[Tuple[str, List[Row]]], Dict[str, str]]
+```
+
+Ask all directories (or just ``only``) in parallel with ``call(directory)``.
+
+Returns the rows of each directory and, for a directory that failed, why; one failing leaves the others.
+
+
+<a id="lauschkiste.directories.interleave"></a>
+
+#### interleave
+
+```python
+def interleave(answers: List[Tuple[str, List[Row]]],
+               key_of: Callable[[Row], str],
+               usable: Callable[[Row], bool],
+               limit: Optional[int] = None) -> List[Row]
+```
+
+One list from the answers: the directories take turns (so that none fills it), duplicates (same ``key_of``)
+
+are dropped, and every row gets the id of the directory it came from as ``directory``.
+
+
+<a id="lauschkiste.radio_playlist"></a>
+
+# lauschkiste.radio\_playlist
+
+Station lists as ``.m3u`` and ``.pls`` files, which radio apps and players import and export.
+
+
+<a id="lauschkiste.radio_playlist.parse_stations"></a>
+
+#### parse\_stations
+
+```python
+def parse_stations(content: str) -> List[Dict[str, str]]
+```
+
+``[{"name", "url"}]`` of every stream in an M3U (with names from its EXTINF lines) or PLS playlist.
+
+Raises ValueError if ``content`` has no stream or is too big.
+
+
+<a id="lauschkiste.radio_playlist.render_m3u"></a>
+
+#### render\_m3u
+
+```python
+def render_m3u(stations: Iterable[Dict[str, str]]) -> str
+```
+
+An extended M3U for ``{'name', 'url'}`` pairs.
 
 
 <a id="lauschkiste.rfid.reader"></a>
@@ -1045,6 +1474,17 @@ def create_reader(reader_cfg_key: str) -> Any
 Return a reader for the reader config key: a context manager that iterates card ids
 
 ('' on timeout) and has ``stop()``.
+
+
+<a id="lauschkiste.rfid.reader.ReaderSetting"></a>
+
+## ReaderSetting Objects
+
+```python
+class ReaderSetting(BaseModel)
+```
+
+How a reader behaves; its driver and wiring (``module``, ``config``) are kept as they are.
 
 
 <a id="lauschkiste.rfid.reader.CardDetected"></a>
@@ -1082,6 +1522,17 @@ class Rfid(CoreModule)
 ```
 
 RFID readers: detect cards and run their actions.
+
+
+<a id="lauschkiste.rfid.reader.Rfid.claims"></a>
+
+#### claims
+
+```python
+def claims() -> List[Claim]
+```
+
+Pins and buses of the configured readers whose driver says what it uses.
 
 
 <a id="lauschkiste.rfid.reader.Rfid.resolve_config_action"></a>
@@ -1255,6 +1706,96 @@ order. The position is kept per audiobook in ``audiobooks.state_file``; chapters
 regardless of shuffle and repeat.
 
 
+<a id="lauschkiste.audiobooks.AudiobookSource"></a>
+
+## AudiobookSource Objects
+
+```python
+class AudiobookSource(Protocol)
+```
+
+Audiobooks from somewhere else (e.g. a server), registered at ``audiobooks.sources`` under the
+
+source id. Their position is kept by the source, not in ``audiobooks.state_file``.
+
+
+<a id="lauschkiste.audiobooks.AudiobookSource.list_books"></a>
+
+#### list\_books
+
+```python
+def list_books() -> List[Dict[str, Any]]
+```
+
+The books as mappings with the fields of :class:`Audiobook` (``source`` is added).
+
+
+<a id="lauschkiste.audiobooks.AudiobookSource.files"></a>
+
+#### files
+
+```python
+def files(book: str) -> List[str]
+```
+
+The track URLs to play, in order; raises :class:`OperationError` if there is no such book.
+
+
+<a id="lauschkiste.audiobooks.AudiobookSource.title"></a>
+
+#### title
+
+```python
+def title(book: str) -> str
+```
+
+The title shown while it plays.
+
+
+<a id="lauschkiste.audiobooks.AudiobookSource.position"></a>
+
+#### position
+
+```python
+def position(book: str) -> Any
+```
+
+A ``lauschkiste.resume.PositionStore`` for the book.
+
+
+<a id="lauschkiste.audiobooks.AudiobookSource.set_finished"></a>
+
+#### set\_finished
+
+```python
+def set_finished(book: str, finished: bool) -> None
+```
+
+Mark the book finished or not (either way it starts from the beginning next time).
+
+
+<a id="lauschkiste.audiobooks.Audiobook"></a>
+
+## Audiobook Objects
+
+```python
+class Audiobook(BaseModel)
+```
+
+<a id="lauschkiste.audiobooks.Audiobook.availability"></a>
+
+#### availability
+
+'local' (a folder of the library), 'cached' (downloaded from the source) or 'stream' (played over the network)
+
+
+<a id="lauschkiste.audiobooks.Audiobook.hidden"></a>
+
+#### hidden
+
+taken off the "continue" list; it comes back when the book is played on
+
+
 <a id="lauschkiste.audiobooks.Audiobooks"></a>
 
 ## Audiobooks Objects
@@ -1284,10 +1825,22 @@ All audiobooks with their progress.
 
 ```python
 @action()
-def play(book: str) -> None
+def play(book: str, source: str = LOCAL) -> None
 ```
 
 Play an audiobook where it stopped (from the beginning when it is new or finished).
+
+
+<a id="lauschkiste.audiobooks.Audiobooks.hide_from_continue"></a>
+
+#### hide\_from\_continue
+
+```python
+@action()
+def hide_from_continue(book: str, source: str = LOCAL) -> None
+```
+
+Take an audiobook off the "continue" list until it is played on.
 
 
 <a id="lauschkiste.audiobooks.Audiobooks.restart"></a>
@@ -1296,7 +1849,7 @@ Play an audiobook where it stopped (from the beginning when it is new or finishe
 
 ```python
 @action()
-def restart(book: str) -> None
+def restart(book: str, source: str = LOCAL) -> None
 ```
 
 Play an audiobook from the beginning.
@@ -1308,7 +1861,9 @@ Play an audiobook from the beginning.
 
 ```python
 @action()
-def set_finished(book: str, finished: bool = True) -> None
+def set_finished(book: str,
+                 finished: bool = True,
+                 source: str = LOCAL) -> None
 ```
 
 Mark an audiobook as finished (or not); either way it starts from the beginning next time.
@@ -1344,6 +1899,17 @@ class PulseMixer()
 ```
 
 PulseAudio/PipeWire default sink; ``volume_limit`` of an output scales 0..100 to 0..limit.
+
+
+<a id="lauschkiste.volume.pulse_sinks"></a>
+
+#### pulse\_sinks
+
+```python
+def pulse_sinks() -> List[Choice]
+```
+
+Sinks of the PulseAudio/PipeWire server; empty if there is none.
 
 
 <a id="lauschkiste.volume.Volume"></a>
@@ -1403,6 +1969,18 @@ def mute(mute: Optional[bool] = None) -> VolumeState
 ```
 
 Mute or unmute; toggles when ``mute`` is left out.
+
+
+<a id="lauschkiste.volume.Volume.list_sinks"></a>
+
+#### list\_sinks
+
+```python
+@query(path='/sinks')
+def list_sinks() -> List[Choice]
+```
+
+Audio devices of the PulseAudio/PipeWire server, for choosing outputs.
 
 
 <a id="lauschkiste.volume.Volume.set_soft_max_volume"></a>
@@ -1465,9 +2043,49 @@ def fade_out(seconds: float = 10.0) -> None
 Lower the volume to zero over ``seconds``, stop playback, then restore the volume.
 
 
+<a id="lauschkiste.startup"></a>
+
+# lauschkiste.startup
+
+Start-up helpers for small boards.
+
+
+<a id="lauschkiste.startup.import_fastapi"></a>
+
+#### import\_fastapi
+
+```python
+def import_fastapi() -> None
+```
+
+Import FastAPI with the schemas of its OpenAPI models built on first use instead of now.
+
+They are only needed for ``/openapi.json``; building them at import takes seconds on a Pi Zero.
+
+
 <a id="lauschkiste.nv_manager"></a>
 
 # lauschkiste.nv\_manager
+
+<a id="lauschkiste.dismissed"></a>
+
+# lauschkiste.dismissed
+
+What was taken off the "continue" list: an item stays off until its progress changes.
+
+
+<a id="lauschkiste.dismissed.Dismissed"></a>
+
+## Dismissed Objects
+
+```python
+class Dismissed()
+```
+
+``key -> marker`` in a JSON file. The marker says how far the item was when it was taken off; an item whose
+
+marker differs from the saved one (it was played on, a new episode came) is back on the list.
+
 
 <a id="lauschkiste.radio"></a>
 
@@ -1477,6 +2095,89 @@ The radio core module: internet radio stations, one per card.
 
 Stations are kept in ``radio.stations_file``. A station URL may point to the stream itself or to an
 ``.m3u``/``.pls`` playlist, which is resolved to its first stream when the station is played.
+
+
+<a id="lauschkiste.radio.Station"></a>
+
+## Station Objects
+
+```python
+class Station(BaseModel)
+```
+
+<a id="lauschkiste.radio.Station.last_played"></a>
+
+#### last\_played
+
+when it was last played (UTC); empty for a station never played here or taken off the "continue" list
+
+
+<a id="lauschkiste.radio.StationHit"></a>
+
+## StationHit Objects
+
+```python
+class StationHit(BaseModel)
+```
+
+A station found in a directory.
+
+
+<a id="lauschkiste.radio.StationHit.added"></a>
+
+#### added
+
+already one of the stations
+
+
+<a id="lauschkiste.radio.SearchResult"></a>
+
+## SearchResult Objects
+
+```python
+class SearchResult(BaseModel)
+```
+
+<a id="lauschkiste.radio.SearchResult.errors"></a>
+
+#### errors
+
+directory id -> why it gave no answer
+
+
+<a id="lauschkiste.radio.RadioDirectory"></a>
+
+## RadioDirectory Objects
+
+```python
+class RadioDirectory(Protocol)
+```
+
+A place to find stations, registered at ``radio.directories`` by a plugin.
+
+
+<a id="lauschkiste.radio.RadioDirectory.search"></a>
+
+#### search
+
+```python
+def search(term: str, limit: int) -> List[Dict[str, Any]]
+```
+
+Stations matching ``term`` as mappings with ``name`` and ``url``, optionally ``logo``, ``country``, ``tags``,
+
+``codec`` and ``bitrate``.
+
+
+<a id="lauschkiste.radio.RadioDirectory.top"></a>
+
+#### top
+
+```python
+def top(limit: int) -> List[Dict[str, Any]]
+```
+
+Popular stations, same mappings.
 
 
 <a id="lauschkiste.radio.streams_in_playlist"></a>
@@ -1552,6 +2253,68 @@ def delete_station(station: str) -> None
 Delete a station. Cards playing it stop working.
 
 
+<a id="lauschkiste.radio.Radio.list_directories"></a>
+
+#### list\_directories
+
+```python
+@query(path='/directories')
+def list_directories() -> List[DirectoryInfo]
+```
+
+The places stations can be searched in (added by plugins).
+
+
+<a id="lauschkiste.radio.Radio.search"></a>
+
+#### search
+
+```python
+@query(path='/search')
+def search(term: str,
+           directory: Optional[str] = None,
+           limit: int = 20) -> SearchResult
+```
+
+Search the directories for stations.
+
+
+<a id="lauschkiste.radio.Radio.top"></a>
+
+#### top
+
+```python
+@query(path='/top')
+def top(directory: Optional[str] = None, limit: int = 20) -> SearchResult
+```
+
+Popular stations of the directories.
+
+
+<a id="lauschkiste.radio.Radio.import_playlist"></a>
+
+#### import\_playlist
+
+```python
+@action(path='/import_playlist')
+def import_playlist(content: str) -> ImportResult
+```
+
+Add all streams of an M3U or PLS file as stations; known addresses are skipped.
+
+
+<a id="lauschkiste.radio.Radio.export_playlist"></a>
+
+#### export\_playlist
+
+```python
+@query(path='/export_playlist')
+def export_playlist() -> Playlist
+```
+
+The stations as an M3U file.
+
+
 <a id="lauschkiste.radio.Radio.play"></a>
 
 #### play
@@ -1562,6 +2325,18 @@ def play(station: str) -> None
 ```
 
 Play a station.
+
+
+<a id="lauschkiste.radio.Radio.forget_recent"></a>
+
+#### forget\_recent
+
+```python
+@action()
+def forget_recent(station: str) -> None
+```
+
+Take a station off the "continue" list (it stays a station).
 
 
 <a id="lauschkiste.publishing.bus"></a>
@@ -1638,6 +2413,253 @@ def get_bus() -> EventBus
 ```
 
 The shared, thread-safe event bus.
+
+
+<a id="lauschkiste.cache.worker"></a>
+
+# lauschkiste.cache.worker
+
+Downloads the files of one item into its folder. Runs as a process of its own, with the lowest priority.
+
+python -m lauschkiste.cache.worker DEST RATE_FILE
+
+``DEST/plan.json`` (readable for the user only, removed when the worker ends) lists the files with their address,
+size and request headers. ``RATE_FILE`` holds the speed limit in kB/s (empty or 0: none, -1: wait) and is read
+again while downloading. Progress goes to ``DEST/status.json``; files are renamed into place when complete and
+``meta.json`` marks the item as complete.
+
+
+<a id="lauschkiste.cache.worker.Download"></a>
+
+## Download Objects
+
+```python
+class Download()
+```
+
+<a id="lauschkiste.cache.worker.Download.fetch"></a>
+
+#### fetch
+
+```python
+def fetch(url: str, headers: Dict[str, str], target: Path, size: int) -> int
+```
+
+Download one file; returns its size. Without a known ``size`` the file is loaded from the start
+
+(a listed size is often wrong) and the length it ends up with counts.
+
+
+<a id="lauschkiste.cache.manager"></a>
+
+# lauschkiste.cache.manager
+
+Runs the worker process for one item after the other.
+
+
+<a id="lauschkiste.cache"></a>
+
+# lauschkiste.cache
+
+The cache core module: items of a source (an audiobook, an episode, ...) downloaded to the box.
+
+A plugin or module that can provide content for download registers a provider at ``cache.providers`` under
+its source id. The module fetches what the provider's plan lists, in a process of its own with the lowest
+priority, keeps the space limit and shows the state.
+
+
+<a id="lauschkiste.cache.CacheFile"></a>
+
+## CacheFile Objects
+
+```python
+class CacheFile(BaseModel)
+```
+
+<a id="lauschkiste.cache.CacheFile.size"></a>
+
+#### size
+
+bytes; 0 when the source does not know (the size is then taken from the download)
+
+
+<a id="lauschkiste.cache.CacheProvider"></a>
+
+## CacheProvider Objects
+
+```python
+class CacheProvider(Protocol)
+```
+
+<a id="lauschkiste.cache.CacheProvider.plan"></a>
+
+#### plan
+
+```python
+def plan(item: str) -> CachePlan
+```
+
+The files that make up an item, with the headers to fetch them; raises :class:`OperationError`.
+
+
+<a id="lauschkiste.cache.CacheProvider.version"></a>
+
+#### version
+
+```python
+def version(item: str) -> Optional[str]
+```
+
+A value that changes when the server's copy of the item changes (from what is already known; no request).
+
+
+<a id="lauschkiste.cache.CacheProvider.removable"></a>
+
+#### removable
+
+```python
+def removable(item: str) -> bool
+```
+
+Whether the item may be removed to make room (for example finished or heard). Never for one in progress.
+
+
+<a id="lauschkiste.cache.Cache"></a>
+
+## Cache Objects
+
+```python
+class Cache(CoreModule)
+```
+
+Downloads items of a source to the box, so that they play without the network.
+
+
+<a id="lauschkiste.cache.Cache.downloads"></a>
+
+#### downloads
+
+```python
+@query(path='/downloads')
+def downloads(source: Optional[str] = None) -> Downloads
+```
+
+Downloaded and downloading items and the space they use.
+
+
+<a id="lauschkiste.cache.Cache.files"></a>
+
+#### files
+
+```python
+@query(path='/files')
+def files(source: str, item: str) -> Optional[CachedItem]
+```
+
+The files of a complete download (in order), or nothing.
+
+
+<a id="lauschkiste.cache.Cache.cached"></a>
+
+#### cached
+
+```python
+@query(path='/cached')
+def cached(source: str) -> List[CachedItem]
+```
+
+All complete downloads of a source.
+
+
+<a id="lauschkiste.cache.Cache.download"></a>
+
+#### download
+
+```python
+@action()
+def download(source: str, item: str) -> None
+```
+
+Download an item so that it plays without the network.
+
+
+<a id="lauschkiste.cache.Cache.cancel"></a>
+
+#### cancel
+
+```python
+@action()
+def cancel(source: str, item: str) -> None
+```
+
+Stop a download; what was loaded is kept and continued next time.
+
+
+<a id="lauschkiste.cache.Cache.remove"></a>
+
+#### remove
+
+```python
+@action()
+def remove(source: str, item: str) -> None
+```
+
+Delete the downloaded files of an item.
+
+
+<a id="lauschkiste.cache.store"></a>
+
+# lauschkiste.cache.store
+
+The folder of downloaded items: ``<root>/<source>/<item>/``.
+
+
+<a id="lauschkiste.cache.store.INTERNAL"></a>
+
+#### INTERNAL
+
+Files of the cache machinery itself; they do not count as used space
+
+
+<a id="lauschkiste.cache.store.CacheStore"></a>
+
+## CacheStore Objects
+
+```python
+class CacheStore()
+```
+
+<a id="lauschkiste.cache.store.CacheStore.complete"></a>
+
+#### complete
+
+```python
+def complete(source: str, item: str) -> Optional[Dict[str, Any]]
+```
+
+The metadata of a complete download whose files are all there, else None.
+
+
+<a id="lauschkiste.cache.store.CacheStore.items"></a>
+
+#### items
+
+```python
+def items(source: Optional[str] = None) -> List[Tuple[str, str]]
+```
+
+``(source, item)`` of every folder, complete or not.
+
+
+<a id="lauschkiste.cache.store.CacheStore.set_rate"></a>
+
+#### set\_rate
+
+```python
+def set_rate(kbps: float) -> None
+```
+
+The speed limit of the worker in kB/s: 0 none, -1 wait.
 
 
 <a id="lauschkiste.playlistgenerator"></a>
@@ -1955,6 +2977,49 @@ def version_info()
 Return the Lauschkiste version as a tuple of three numbers
 
 If this is a development version, an identifier string will be appended after the third integer.
+
+
+<a id="lauschkiste.podcast_opml"></a>
+
+# lauschkiste.podcast\_opml
+
+OPML, the list format podcast apps (AntennaPod and others) import and export their subscriptions with.
+
+
+<a id="lauschkiste.podcast_opml.normalize_url"></a>
+
+#### normalize\_url
+
+```python
+def normalize_url(url: str) -> str
+```
+
+A feed address for comparing: scheme and host in lower case, no fragment, no trailing slash.
+
+
+<a id="lauschkiste.podcast_opml.parse_opml"></a>
+
+#### parse\_opml
+
+```python
+def parse_opml(content: str) -> List[Dict[str, str]]
+```
+
+``[{'title', 'url'}]`` of every feed in an OPML document (outlines may be nested in folders).
+
+Raises ValueError if ``content`` is not OPML.
+
+
+<a id="lauschkiste.podcast_opml.render_opml"></a>
+
+#### render\_opml
+
+```python
+def render_opml(podcasts: Iterable[Tuple[str, str]],
+                title: str = 'Lauschkiste') -> str
+```
+
+OPML 2.0 for ``(name, feed address)`` pairs.
 
 
 <a id="lauschkiste.cfghandler"></a>
@@ -2332,6 +3397,30 @@ Start the timer if it is not running, cancel it otherwise.
 PCM output through sounddevice/PortAudio, shared by the local_audio backend and the jingle.
 
 
+<a id="lauschkiste.audio_output.volume_gain"></a>
+
+#### volume\_gain
+
+```python
+def volume_gain(volume: int) -> float
+```
+
+Gain of a 0-100 volume setting. Cubic like PulseAudio's, so equal steps of the slider sound about
+
+equally loud: 50 % is -18 dB, not -6 dB as a linear gain would be.
+
+
+<a id="lauschkiste.audio_output.scale_gain"></a>
+
+#### scale\_gain
+
+```python
+def scale_gain(data: bytes, gain: float) -> bytes
+```
+
+Scale packed s16 PCM by ``gain``. No-op at full gain (the common case).
+
+
 <a id="lauschkiste.audio_output.scale_volume"></a>
 
 #### scale\_volume
@@ -2340,7 +3429,7 @@ PCM output through sounddevice/PortAudio, shared by the local_audio backend and 
 def scale_volume(data: bytes, volume: int) -> bytes
 ```
 
-Scale packed s16 PCM by volume (0-100). No-op at full volume (the common case).
+Scale packed s16 PCM linearly by volume (0-100), e.g. a sound relative to the current output volume.
 
 
 <a id="lauschkiste.audio_output.AudioSink"></a>
@@ -2352,6 +3441,17 @@ class AudioSink()
 ```
 
 What a decoded track is written to. Exists so tests don't need a real audio device.
+
+
+<a id="lauschkiste.audio_output.AudioSink.close"></a>
+
+#### close
+
+```python
+def close(discard: bool = False) -> float
+```
+
+Stop the output; ``discard`` drops what is still buffered. Returns the dropped seconds.
 
 
 <a id="lauschkiste.audio_output.PortAudioSink"></a>
@@ -2369,6 +3469,29 @@ killing the daemon.
 
 The stream starts once ``PREFILL_SECONDS`` of audio are decoded, so the slow start of a track
 (opening and probing the file) doesn't empty the device buffer right away.
+
+
+<a id="lauschkiste.audio_output.PortAudioSink.LATENCY"></a>
+
+#### LATENCY
+
+A larger device buffer means fewer wake-ups: on a Pi Zero 0.3 s needs half the CPU of the default 35 ms
+
+
+<a id="lauschkiste.audio_output.PortAudioSink.CHUNK_SECONDS"></a>
+
+#### CHUNK\_SECONDS
+
+Writes are collected to this length: fewer calls through PortAudio and ALSA
+
+
+<a id="lauschkiste.audio_output.PortAudioSink.LEAD_IN_SECONDS"></a>
+
+#### LEAD\_IN\_SECONDS
+
+Amplifiers like the MAX98357A thump when the clock starts or stops with the signal. So the stream
+
+starts with silence, the first audio fades in, and it ends with silence.
 
 
 <a id="lauschkiste.audio_output.play_file"></a>
@@ -2460,6 +3583,18 @@ class InputDevices(CoreModule)
 ```
 
 Keys of input devices run actions.
+
+
+<a id="lauschkiste.input_devices.InputDevices.available_devices"></a>
+
+#### available\_devices
+
+```python
+@query(path='/available')
+def available_devices() -> List[Choice]
+```
+
+Names of the input devices connected right now, for configuring keys.
 
 
 <a id="lauschkiste.input_devices.InputDevices.list_devices"></a>
@@ -3085,6 +4220,201 @@ Using this Handler, we can output to PubStream whithout
 support code to instantiate PubStream keeping this file generic
 
 
+<a id="lauschkiste.time_limits"></a>
+
+# lauschkiste.time\_limits
+
+The time_limits core module: quiet hours and a daily listening limit.
+
+It is off until switched on in the settings::
+
+    time_limits:
+      enabled: true
+      quiet_hours:
+        bedtime: {start: '19:30', end: '07:00', days: every day}
+      daily_limit_minutes: 120
+
+Playback that starts in quiet hours is stopped at once. The time something plays is counted per day; when the
+limit is reached the sound fades out and the player stops, and playback stays blocked until the next day.
+The action ``time_limits.allow`` adds time for today (and lifts quiet hours for that time); put it on a card
+for the parents.
+
+
+<a id="lauschkiste.time_limits.SETTLE_SEC"></a>
+
+#### SETTLE\_SEC
+
+after stopping the player the rules are not applied again for this long (the status needs a moment to follow)
+
+
+<a id="lauschkiste.time_limits.TimeLimitStatus"></a>
+
+## TimeLimitStatus Objects
+
+```python
+class TimeLimitStatus(BaseModel)
+```
+
+<a id="lauschkiste.time_limits.TimeLimitStatus.enabled"></a>
+
+#### enabled
+
+false while the time limits are switched off; nothing is blocked or counted then
+
+
+<a id="lauschkiste.time_limits.TimeLimitStatus.clock_ok"></a>
+
+#### clock\_ok
+
+false when the system clock is not synchronized: quiet hours are not enforced then
+
+
+<a id="lauschkiste.time_limits.TimeLimitStatus.reason"></a>
+
+#### reason
+
+'quiet' (quiet hours) or 'limit' (the day's time is used up)
+
+
+<a id="lauschkiste.time_limits.TimeLimitStatus.until"></a>
+
+#### until
+
+for quiet hours, when they end ("07:00")
+
+
+<a id="lauschkiste.time_limits.clock_synchronized"></a>
+
+#### clock\_synchronized
+
+```python
+def clock_synchronized() -> Optional[bool]
+```
+
+Whether the clock is synchronized (None if the system cannot tell).
+
+
+<a id="lauschkiste.time_limits.TimeLimits"></a>
+
+## TimeLimits Objects
+
+```python
+class TimeLimits(CoreModule)
+```
+
+Quiet hours and a daily listening limit (off until switched on).
+
+
+<a id="lauschkiste.time_limits.TimeLimits.evaluate"></a>
+
+#### evaluate
+
+```python
+def evaluate() -> TimeLimitStatus
+```
+
+Where the day stands (called by the tick, the status query and the actions).
+
+
+<a id="lauschkiste.time_limits.TimeLimits.status"></a>
+
+#### status
+
+```python
+@query(path='/status')
+def status() -> TimeLimitStatus
+```
+
+Quiet hours, the time used today and what is left.
+
+
+<a id="lauschkiste.time_limits.TimeLimits.allow"></a>
+
+#### allow
+
+```python
+@action()
+def allow(minutes: int = 30) -> TimeLimitStatus
+```
+
+Add listening time for today; quiet hours are lifted for that long as well. Meant for parents (put it on a card).
+
+
+<a id="lauschkiste.time_limits.TimeLimits.reset_today"></a>
+
+#### reset\_today
+
+```python
+@action()
+def reset_today() -> TimeLimitStatus
+```
+
+Count today's listening time from zero again.
+
+
+<a id="lauschkiste.time_limits.rules"></a>
+
+# lauschkiste.time\_limits.rules
+
+The rules of the time limits, without clocks or threads: quiet hours and the allowance of a day.
+
+
+<a id="lauschkiste.time_limits.rules.quiet_until"></a>
+
+#### quiet\_until
+
+```python
+def quiet_until(ranges: Dict[str, Tuple[str, str, str]],
+                now: datetime) -> Optional[datetime]
+```
+
+When the quiet hours that cover ``now`` end, or None. A range that runs past midnight belongs to the day it
+
+starts on: 19:30-07:00 on weekdays covers Friday evening until Saturday morning.
+
+
+<a id="lauschkiste.time_limits.rules.limit_seconds"></a>
+
+#### limit\_seconds
+
+```python
+def limit_seconds(weekday_minutes: int, weekend_minutes: Optional[int],
+                  now: datetime) -> Optional[int]
+```
+
+The listening time of the day in seconds; None for no limit.
+
+
+<a id="lauschkiste.contract.secrets"></a>
+
+# lauschkiste.contract.secrets
+
+Secrets (API keys, passwords) of modules, kept apart from the main configuration.
+
+They live in ``secrets.yaml`` next to the configuration file, readable for the user only, under the
+same key path as the setting (``plugins.<name>.<key>``). Modules read them through ``ctx.config`` as
+if they were ordinary settings; the main configuration, which people share and back up, never holds them.
+
+
+<a id="lauschkiste.contract.secrets.SecretStore"></a>
+
+## SecretStore Objects
+
+```python
+class SecretStore()
+```
+
+<a id="lauschkiste.contract.secrets.SecretStore.set"></a>
+
+#### set
+
+```python
+def set(*keys: str, value: Any) -> None
+```
+
+Store a value and write the file; an empty value removes it.
+
+
 <a id="lauschkiste.contract.interfaces"></a>
 
 # lauschkiste.contract.interfaces
@@ -3342,6 +4672,28 @@ Call ``callback(topic, payload)`` for every event under ``topic_prefix``; payloa
 FastAPI routes generated from module operations, plus ``GET /api/v1/modules``.
 
 
+<a id="lauschkiste.contract.routes.response_adapter"></a>
+
+#### response\_adapter
+
+```python
+def response_adapter(op: Operation) -> TypeAdapter
+```
+
+Validates and serializes the return value; built on first use, which keeps start-up fast on small boards.
+
+
+<a id="lauschkiste.contract.routes.add_response_schemas"></a>
+
+#### add\_response\_schemas
+
+```python
+def add_response_schemas(schema: Dict[str, Any], operations) -> Dict[str, Any]
+```
+
+Add the operations' return types to an OpenAPI ``schema`` (FastAPI doesn't know them).
+
+
 <a id="lauschkiste.contract.routes.add_settings_routes"></a>
 
 #### add\_settings\_routes
@@ -3351,7 +4703,19 @@ def add_settings_routes(router: APIRouter, manager: ModuleManager,
                         executor) -> None
 ```
 
-Settings of the modules, installed plugins, and whether a restart is pending.
+Settings of the modules and whether a restart is pending.
+
+
+<a id="lauschkiste.contract.routes.add_plugin_routes"></a>
+
+#### add\_plugin\_routes
+
+```python
+def add_plugin_routes(router: APIRouter, manager: ModuleManager,
+                      blocking) -> None
+```
+
+Installed plugins: list, enable or disable, install missing extras.
 
 
 <a id="lauschkiste.contract.manager"></a>
@@ -3512,6 +4876,41 @@ Separately installed, opt-in module. Declares which framework contract it target
 Extras of the plugin's own package it needs (installed by `lauschctl plugin enable --with-extras`)
 
 
+<a id="lauschkiste.contract.module.Plugin.title"></a>
+
+#### title
+
+The name shown in the plugin list when no translation exists (default: the plugin's name made readable)
+
+
+<a id="lauschkiste.contract.module.Plugin.provides"></a>
+
+#### provides
+
+Capabilities it offers other plugins, e.g. ``('board', 'gpio', 'i2c')``; only one plugin may provide 'board'
+
+
+<a id="lauschkiste.contract.module.Plugin.needs"></a>
+
+#### needs
+
+Capabilities an enabled plugin must provide, e.g. ``('i2c',)``
+
+
+<a id="lauschkiste.contract.module.Plugin.detect"></a>
+
+#### detect
+
+```python
+@classmethod
+def detect(cls, read: Callable[[str], Optional[str]]) -> Optional[str]
+```
+
+The hardware of this plugin found on this machine (e.g. a board model), or None.
+
+``read(path)`` returns a file's text or None.
+
+
 <a id="lauschkiste.contract.version"></a>
 
 # lauschkiste.contract.version
@@ -3569,6 +4968,30 @@ class ActionEntry(BaseModel)
 ```
 
 An action with its arguments, as on cards (shown as an action picker in the web app).
+
+
+<a id="lauschkiste.contract.settings.storage"></a>
+
+#### storage
+
+```python
+def storage(handle, cfg) -> tuple
+```
+
+(config handler, key path) of a module's settings: its section of the main config, unless the
+
+module keeps them elsewhere (``settings_storage()``).
+
+
+<a id="lauschkiste.contract.settings.secret_fields"></a>
+
+#### secret\_fields
+
+```python
+def secret_fields(model: type) -> Set[str]
+```
+
+Fields marked ``json_schema_extra={'secret': True}``: shown as password fields, never sent to the client.
 
 
 <a id="lauschkiste.contract.settings.current_values"></a>
@@ -3637,6 +5060,28 @@ An action id or its arguments are invalid.
 Installed plugins: their extras, whether those are installed, and enabling them in the config.
 
 
+<a id="lauschkiste.contract.plugins.readable"></a>
+
+#### readable
+
+```python
+def readable(name: str) -> str
+```
+
+``podcast_directories`` -> ``Podcast directories``: what is shown for a plugin nobody named.
+
+
+<a id="lauschkiste.contract.plugins.package_info"></a>
+
+#### package\_info
+
+```python
+def package_info(dist) -> Dict[str, Optional[str]]
+```
+
+What the package says about itself (author, license, project addresses), for a plugin list or manager.
+
+
 <a id="lauschkiste.contract.plugins.installed"></a>
 
 #### installed
@@ -3657,6 +5102,61 @@ def load(ep)
 ```
 
 (plugin class, None) or (None, reason it can't be imported).
+
+
+<a id="lauschkiste.contract.plugins.taken_by"></a>
+
+#### taken\_by
+
+```python
+def taken_by(cls, others: Iterable[type]) -> Optional[str]
+```
+
+The other plugin already providing an exclusive capability of ``cls`` (e.g. the board).
+
+
+<a id="lauschkiste.contract.plugins.missing_needs"></a>
+
+#### missing\_needs
+
+```python
+def missing_needs(cls, others: Iterable[type]) -> List[str]
+```
+
+Capabilities ``cls`` needs that none of ``others`` provides.
+
+
+<a id="lauschkiste.contract.plugins.blocker"></a>
+
+#### blocker
+
+```python
+def blocker(cls, others: Iterable[type]) -> Optional[Dict[str, Any]]
+```
+
+Why ``cls`` can't run next to ``others``: ``{'taken_by': name}`` or ``{'missing': [...]}``.
+
+
+<a id="lauschkiste.contract.plugins.why_not_enable"></a>
+
+#### why\_not\_enable
+
+```python
+def why_not_enable(cfg, name: str) -> Optional[str]
+```
+
+Why the installed plugin ``name`` can't be enabled next to the enabled ones, None if it can.
+
+
+<a id="lauschkiste.contract.plugins.detected_boards"></a>
+
+#### detected\_boards
+
+```python
+def detected_boards(read=read_text) -> List[Dict[str, str]]
+```
+
+Installed board plugins whose board this machine is: ``[{'name', 'model'}]``.
 
 
 <a id="lauschkiste.contract.plugins.plugin_extras"></a>
@@ -3681,6 +5181,39 @@ def missing_extras(name: str) -> List[str]
 ``plugin_extras(name)`` whose dependencies are not (all) installed in this environment.
 
 
+<a id="lauschkiste.contract.plugins.install_command"></a>
+
+#### install\_command
+
+```python
+def install_command(requirements: List[str]) -> List[str]
+```
+
+Install into the environment Lauschkiste runs in: uv (also from ~/.local/bin) or pip.
+
+
+<a id="lauschkiste.contract.plugins.ExtrasInstaller"></a>
+
+## ExtrasInstaller Objects
+
+```python
+class ExtrasInstaller()
+```
+
+Installs the missing extras of plugins in the background, one plugin at a time.
+
+
+<a id="lauschkiste.contract.plugins.ExtrasInstaller.start"></a>
+
+#### start
+
+```python
+def start(name: str) -> bool
+```
+
+Start installing; False if nothing is missing or an installation is running.
+
+
 <a id="lauschkiste.contract.plugins.set_enabled"></a>
 
 #### set\_enabled
@@ -3697,10 +5230,27 @@ Enable or disable ``name`` in the config (disabling drops its settings); True if
 #### describe
 
 ```python
-def describe(cfg, manager=None) -> List[Dict[str, Any]]
+def describe(
+        cfg,
+        manager=None,
+        installer: Optional[ExtrasInstaller] = None) -> List[Dict[str, Any]]
 ```
 
 Installed (and enabled but missing) plugins: package, summary, enabled, running, problem, missing extras.
+
+
+<a id="lauschkiste.contract.plugins.translations"></a>
+
+#### translations
+
+```python
+def translations(language: str) -> Dict[str, Any]
+```
+
+What the installed plugins ship for ``language``, as part of the web app's translation file.
+
+``<package>/translations/<language>.json`` holds ``{"plugins": {"<plugin>": {"name": ..., "description": ...,
+"fields": ...}}}`` for the plugins of the package, ``fields`` shaped like ``settings.fields.<plugin>``.
 
 
 <a id="lauschkiste.system"></a>
@@ -3730,6 +5280,17 @@ def ip_addresses() -> List[str]
 ```
 
 Non-loopback IPv4 addresses of this machine.
+
+
+<a id="lauschkiste.system.own_unit"></a>
+
+#### own\_unit
+
+```python
+def own_unit(cgroup: str = '/proc/self/cgroup') -> Optional[str]
+```
+
+The systemd service this process runs in (e.g. ``lauschkiste.service``), None outside one.
 
 
 <a id="lauschkiste.system.System"></a>
@@ -3807,7 +5368,7 @@ Speak the IP address (needs espeak).
 def restart_service() -> None
 ```
 
-Restart the Lauschkiste systemd user service.
+Restart the systemd user service Lauschkiste runs in.
 
 
 <a id="lauschkiste.system.System.get_log"></a>
@@ -3858,6 +5419,153 @@ def noop(message: str = '') -> None
 Do nothing (logs ``message`` as a warning if given).
 
 
+<a id="lauschkiste.hardware"></a>
+
+# lauschkiste.hardware
+
+The hardware core module: the active board, which pins and buses are used by whom, and power.
+
+Board-neutral: a board support plugin registers at ``hardware.boards`` and describes its pins and
+interfaces; modules using pins or buses register at ``hardware.claims``. See
+documentation/developers/hardware.md.
+
+
+<a id="lauschkiste.hardware.Claim"></a>
+
+## Claim Objects
+
+```python
+class Claim(BaseModel)
+```
+
+A resource (pin or interface) a module uses; buses like I²C can be shared.
+
+
+<a id="lauschkiste.hardware.Board"></a>
+
+## Board Objects
+
+```python
+class Board(Protocol)
+```
+
+<a id="lauschkiste.hardware.Board.describe"></a>
+
+#### describe
+
+```python
+def describe() -> Dict[str, Any]
+```
+
+``{'name', 'model', 'pins': [{'id', 'label', 'position', 'functions'}],
+
+'interfaces': [{'id', 'label', 'pins'}]}``
+
+
+<a id="lauschkiste.hardware.Board.pin_id"></a>
+
+#### pin\_id
+
+```python
+def pin_id(value: Any) -> Optional[str]
+```
+
+The board's id of a pin given as the user wrote it (e.g. ``17`` or ``'GPIO17'``), None if unknown.
+
+
+<a id="lauschkiste.hardware.Board.gpio_line"></a>
+
+#### gpio\_line
+
+```python
+def gpio_line(pin: str) -> Tuple[int, int]
+```
+
+(gpiochip number, line) of a GPIO pin.
+
+
+<a id="lauschkiste.hardware.Board.boot_pending"></a>
+
+#### boot\_pending
+
+```python
+def boot_pending() -> List[str]
+```
+
+Settings that need the boot configuration changed (``lauschctl setup``) and a reboot.
+
+
+<a id="lauschkiste.hardware.Hardware"></a>
+
+## Hardware Objects
+
+```python
+class Hardware(CoreModule)
+```
+
+The board Lauschkiste runs on, its pins and who uses them; shutdown and reboot.
+
+
+<a id="lauschkiste.hardware.Hardware.get_state"></a>
+
+#### get\_state
+
+```python
+@query(path='/')
+def get_state() -> HardwareState
+```
+
+The board, its pins and interfaces, who uses them, conflicts and pending boot changes.
+
+
+<a id="lauschkiste.hardware.Hardware.pin_options"></a>
+
+#### pin\_options
+
+```python
+@query(path='/pin-options')
+def pin_options() -> List[Choice]
+```
+
+GPIO pins of the board for choosing in settings, with their current users.
+
+
+<a id="lauschkiste.hardware.Hardware.gpio_line"></a>
+
+#### gpio\_line
+
+```python
+@query(path='/gpio-line')
+def gpio_line(pin: str) -> GpioLine
+```
+
+GPIO chip and line of a pin (for device plugins).
+
+
+<a id="lauschkiste.hardware.Hardware.shutdown"></a>
+
+#### shutdown
+
+```python
+@action()
+def shutdown() -> None
+```
+
+Shut the box down.
+
+
+<a id="lauschkiste.hardware.Hardware.reboot"></a>
+
+#### reboot
+
+```python
+@action()
+def reboot() -> None
+```
+
+Reboot the box.
+
+
 <a id="lauschkiste.resume"></a>
 
 # lauschkiste.resume
@@ -3878,6 +5586,17 @@ def relative(file: Optional[str]) -> Optional[str]
 ```
 
 ``file`` relative to the library if it is an absolute path below it.
+
+
+<a id="lauschkiste.resume.PositionStore"></a>
+
+## PositionStore Objects
+
+```python
+class PositionStore(Protocol)
+```
+
+Where the position of one item is kept when not in the tracker's own file (e.g. on a server).
 
 
 <a id="lauschkiste.resume.ResumeTracker"></a>
@@ -3910,12 +5629,16 @@ Mark an item as finished or forget it; either way it starts from the beginning n
 def play(key: str,
          files: List[str],
          resume: bool = True,
-         context: Optional[Dict[str, Any]] = None) -> None
+         context: Optional[Dict[str, Any]] = None,
+         store: Optional[PositionStore] = None,
+         names: Optional[List[str]] = None) -> None
 ```
 
 Play an item: where it stopped (``resume``), else from the beginning. The item that is
 
-already playing keeps playing, a paused one continues.
+already playing keeps playing, a paused one continues. With a ``store`` the position is read
+from and reported to it instead of the tracker's file. ``names`` identify the files in the saved
+position when they differ from what is played (a stream and its downloaded copy are the same file).
 
 
 <a id="lauschkiste.player.coordinator"></a>
@@ -4469,6 +6192,13 @@ class PlaybackContext(BaseModel)
 What is playing: its content type, a title, and the card action that plays it.
 
 
+<a id="lauschkiste.player.status.PlaybackContext.image"></a>
+
+#### image
+
+A picture of what plays (a station's logo, a podcast's artwork); shown when the file has no cover of its own
+
+
 <a id="lauschkiste.player.status.PlayerStatus"></a>
 
 ## PlayerStatus Objects
@@ -4482,6 +6212,13 @@ class PlayerStatus(BaseModel)
 #### name
 
 Name of a stream (radio station)
+
+
+<a id="lauschkiste.player.status.PlayerStatus.genre"></a>
+
+#### genre
+
+What the stream says about itself (radio): its genre and a short description
 
 
 <a id="lauschkiste.player.status.status_from_backend"></a>
@@ -4570,6 +6307,48 @@ Replace the queue with ``paths`` (absolute or relative to the library) and play 
 ignoring shuffle and repeat until other content is played.
 
 
+<a id="lauschkiste.player.backend.LevelMeter"></a>
+
+## LevelMeter Objects
+
+```python
+class LevelMeter(Protocol)
+```
+
+<a id="lauschkiste.player.backend.LevelMeter.level"></a>
+
+#### level
+
+```python
+def level(left: float, right: float, delay: float) -> None
+```
+
+RMS level (0..1) of each channel of the output, audible in ``delay`` seconds; about ten times a second
+
+while playing (only with backends that can measure it, e.g. local_audio).
+
+
+<a id="lauschkiste.player.backend.Resolver"></a>
+
+## Resolver Objects
+
+```python
+class Resolver(Protocol)
+```
+
+<a id="lauschkiste.player.backend.Resolver.resolve"></a>
+
+#### resolve
+
+```python
+def resolve(url: str) -> Tuple[str, Dict[str, str]]
+```
+
+The URL to open and the HTTP headers to send for a track URL with the scheme this resolver is
+
+registered for (``player.resolvers``), so that credentials never appear in queues, status or logs.
+
+
 <a id="lauschkiste.player.backends.local_audio"></a>
 
 # lauschkiste.player.backends.local\_audio
@@ -4590,6 +6369,17 @@ whenever it's told to (re)start one. This keeps the state machine in one place i
 to signal a live decode loop with finer-grained commands.
 
 
+<a id="lauschkiste.player.backends.local_audio.ca_file"></a>
+
+#### ca\_file
+
+```python
+def ca_file()
+```
+
+The CA bundle for https streams: the ffmpeg of the av wheels does not know the system's.
+
+
 <a id="lauschkiste.player.backends.local_audio.PlayerLocalAudio"></a>
 
 ## PlayerLocalAudio Objects
@@ -4599,6 +6389,17 @@ class PlayerLocalAudio()
 ```
 
 Decode-and-output player backend. See module docstring for the state machine.
+
+
+<a id="lauschkiste.player.backends.local_audio.PlayerLocalAudio.set_level_callback"></a>
+
+#### set\_level\_callback
+
+```python
+def set_level_callback(callback)
+```
+
+``callback(left, right, delay)`` for the level of the output, or None.
 
 
 <a id="lauschkiste.player.backends.local_audio.PlayerLocalAudio.rewind"></a>

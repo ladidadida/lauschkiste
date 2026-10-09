@@ -37,5 +37,5 @@ the [roadmap](roadmap-core-architecture.md).
 
 ## Not carried over from Phoniebox 2.x and the first future3 versions
 
-Spotify, the idle shutdown timer, the old GPIO configuration file format, the C command line client and
+Spotify, the card synchronisation between boxes, the idle shutdown timer, the old GPIO configuration file format, the C command line client and
 ZeroMQ. Some may come back as plugins.
