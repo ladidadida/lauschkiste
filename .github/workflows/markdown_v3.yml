@@ -16,10 +16,10 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Linting markdown
-      uses: DavidAnson/markdownlint-cli2-action@v15
+      uses: DavidAnson/markdownlint-cli2-action@v24
       with:
         config: .markdownlint-cli2.yaml
       #continue-on-error: true
