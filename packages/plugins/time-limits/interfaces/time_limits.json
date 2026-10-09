@@ -1,0 +1,250 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "plugin",
+  "name": "time_limits",
+  "operations": {
+    "allow": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "minutes": {
+            "default": 30,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/time_limits/allow",
+      "returns": {
+        "properties": {
+          "blocked": {
+            "type": "boolean"
+          },
+          "clock_ok": {
+            "type": "boolean"
+          },
+          "extra_seconds": {
+            "default": 0,
+            "type": "integer"
+          },
+          "limit_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "played_seconds": {
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "remaining_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "clock_ok",
+          "blocked",
+          "played_seconds"
+        ],
+        "type": "object"
+      }
+    },
+    "reset_today": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/time_limits/reset_today",
+      "returns": {
+        "properties": {
+          "blocked": {
+            "type": "boolean"
+          },
+          "clock_ok": {
+            "type": "boolean"
+          },
+          "extra_seconds": {
+            "default": 0,
+            "type": "integer"
+          },
+          "limit_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "played_seconds": {
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "remaining_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "clock_ok",
+          "blocked",
+          "played_seconds"
+        ],
+        "type": "object"
+      }
+    },
+    "status": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/time_limits/status",
+      "returns": {
+        "properties": {
+          "blocked": {
+            "type": "boolean"
+          },
+          "clock_ok": {
+            "type": "boolean"
+          },
+          "extra_seconds": {
+            "default": 0,
+            "type": "integer"
+          },
+          "limit_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "played_seconds": {
+            "type": "integer"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "remaining_seconds": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "until": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "clock_ok",
+          "blocked",
+          "played_seconds"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "requires": {
+    "jingle": ">=1.0,<2",
+    "player": ">=6.0,<7",
+    "volume": ">=1.0,<2"
+  }
+}

@@ -109,6 +109,11 @@ const commands = {
     argKeys: ['position'],
   },
 
+  // Time limits (plugin)
+  timeLimitsStatus: {
+    rest: { method: 'GET', path: '/api/v1/time_limits/status' },
+  },
+
   // Audiobooks
   audiobooksList: {
     rest: { method: 'GET', path: '/api/v1/audiobooks' },

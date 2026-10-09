@@ -19,6 +19,7 @@ members = [
     "lauschkiste-plugin-mpd",
     "lauschkiste-plugin-rfid-readers",
     "lauschkiste-plugin-samba",
+    "lauschkiste-plugin-time-limits",
 ]
 
 [manifest.dependency-groups]
@@ -1096,6 +1097,17 @@ requires-dist = [
     { name = "lauschkiste", editable = "packages/cli" },
     { name = "lauschkiste-core", editable = "packages/lauschkiste" },
 ]
+
+[[package]]
+name = "lauschkiste-plugin-time-limits"
+version = "0.1.0a3"
+source = { editable = "packages/plugins/time-limits" }
+dependencies = [
+    { name = "lauschkiste-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "lauschkiste-core", editable = "packages/lauschkiste" }]
 
 [[package]]
 name = "lgpio"

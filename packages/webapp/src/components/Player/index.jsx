@@ -7,6 +7,7 @@ import Controls from './controls';
 import PlayerActions from './actions';
 import UnknownCard from './unknown-card';
 import Display from './display';
+import TimeLimitNotice from './time-limit-notice';
 import SeekBar from './seekbar';
 import Volume from './volume';
 
@@ -86,6 +87,7 @@ const Player = () => {
           <Cover coverImage={coverImage} />
         </Grid>
         <Grid size={{ xs: 12, sm: 7 }}>
+          <TimeLimitNotice />
           <Display />
           <SeekBar />
           <Controls />

@@ -454,6 +454,12 @@
     },
     "speed": {
       "title": "Abspielgeschwindigkeit"
+    },
+    "time-limit": {
+      "quiet": "Ruhezeit bis {{until}} Uhr",
+      "used-up": "Die Hörzeit für heute ist aufgebraucht",
+      "little-left_one": "Heute ist noch {{minutes}} Minute Hörzeit übrig",
+      "little-left_other": "Heute sind noch {{minutes}} Minuten Hörzeit übrig"
     }
   },
   "settings": {

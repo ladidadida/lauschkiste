@@ -454,6 +454,12 @@
     },
     "speed": {
       "title": "Playback speed"
+    },
+    "time-limit": {
+      "quiet": "Quiet time until {{until}}",
+      "used-up": "Today's listening time is used up",
+      "little-left_one": "Only {{minutes}} minute of listening time left today",
+      "little-left_other": "Only {{minutes}} minutes of listening time left today"
     }
   },
   "settings": {

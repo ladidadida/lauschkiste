@@ -52,6 +52,7 @@ lauschctl update           # newer version
 | `lauschkiste-plugin-mpd` | MPD as a player backend |
 | `lauschkiste-plugin-samba` | share the library on the network |
 | `lauschkiste-plugin-audiobookshelf` | audiobooks from an Audiobookshelf server |
+| `lauschkiste-plugin-time-limits` | quiet hours and a daily listening limit |
 | `lauschkiste-plugin-directories` | find podcasts and radio stations (Apple, fyyd, Podcast Index, radio-browser) |
 
 Plugins are installed next to this package and switched on in the web app or with

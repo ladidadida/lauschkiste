@@ -48,6 +48,7 @@ publishing"). What has to be done once, by the owner of the PyPI account:
    | `lauschkiste-plugin-samba` | `testpypi-lauschkiste-plugin-samba` | `pypi-lauschkiste-plugin-samba` |
    | `lauschkiste-plugin-audiobookshelf` | `testpypi-lauschkiste-plugin-audiobookshelf` | `pypi-lauschkiste-plugin-audiobookshelf` |
    | `lauschkiste-plugin-directories` | `testpypi-lauschkiste-plugin-directories` | `pypi-lauschkiste-plugin-directories` |
+   | `lauschkiste-plugin-time-limits` | `testpypi-lauschkiste-plugin-time-limits` | `pypi-lauschkiste-plugin-time-limits` |
 
    PyPI allows **three pending publishers at a time** (an entry no longer counts once its first upload
    has created the project). So register three, upload, register the next three and upload again; see
@@ -66,7 +67,7 @@ The workflow has one job per package. A job whose package has no trusted publish
 1. Register the next (up to three) pending publishers of the packages that failed.
 2. In the workflow run on GitHub choose **Re-run failed jobs**: only those uploads run again.
 
-Repeat until all nine jobs are green (three rounds: 3 + 3 + 3). This is needed once per registry (TestPyPI,
+Repeat until all ten jobs are green (four rounds: 3 + 3 + 3 + 1). This is needed once per registry (TestPyPI,
 PyPI); later uploads need no pending publishers any more.
 
 ## Test on TestPyPI

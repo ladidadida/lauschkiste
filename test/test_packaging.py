@@ -21,7 +21,8 @@ def test_distribution_names():
     assert names == {'lauschkiste', 'lauschkiste-core', 'lauschkiste-plugin-board-raspberry-pi',
                      'lauschkiste-plugin-devices', 'lauschkiste-plugin-mpd', 'lauschkiste-plugin-rfid-readers',
                      'lauschkiste-plugin-samba', 'lauschkiste-plugin-audiobookshelf',
-                     'lauschkiste-plugin-directories'}
+                     'lauschkiste-plugin-directories',
+                     'lauschkiste-plugin-time-limits'}
 
 
 def test_all_packages_have_the_version_of_the_program():

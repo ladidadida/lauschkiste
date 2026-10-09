@@ -21,6 +21,7 @@
 * [Audiobooks](./audiobooks.md)
 * [Radio](./radio.md)
 * [Podcasts](./podcasts.md)
+* [Time limits](./time-limits.md): quiet hours and a daily listening time
 
 ## Hardware Components
 
