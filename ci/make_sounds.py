@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Generates the start and shutdown sounds of the box (``resources/audio``): a quick run of soft, wooden notes that rises
-for the start and falls for the shutdown (the style ``glide`` is a single sliding tone instead). Nothing is sampled; the sounds are made from sine waves, so they belong to the
-project (MIT, like the rest).
+"""Generates the start and shutdown sounds of the box (``resources/audio``): a quick run of soft, wooden notes that
+rises for the start and falls for the shutdown (the style ``glide`` is a single sliding tone instead).
+
+Nothing is sampled; the sounds are made from sine waves, so they belong to the project (MIT, like the rest).
 
     ci/make_sounds.py                 # writes the sounds to packages/lauschkiste/src/lauschkiste/resources/audio
     ci/make_sounds.py glide DIR       # another style (glide or run) into another directory, e.g. to listen first
