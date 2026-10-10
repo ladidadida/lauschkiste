@@ -17,7 +17,7 @@ Run the install script and follow the questions:
 curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash
 ```
 
-It installs a few base packages and [uv](https://docs.astral.sh/uv/), then Lauschkiste, and runs
+It installs a few base packages, then Lauschkiste, and runs
 `lauschctl setup`, which asks what to set up on this machine (RFID reader, Samba share, WiFi hotspot, kiosk mode,
 boot optimisation, ...). Run it in `screen` or `tmux` if your SSH connection is unreliable.
 
@@ -34,6 +34,14 @@ Choose with `--from` (pass options with `bash -s --`, e.g. `curl ... | bash -s -
 > [!NOTE]
 > `--from testpypi` installs test uploads.
 
+### uv or pip
+
+[uv](https://docs.astral.sh/uv/) is the preferred installer, but nothing forces it on you: if `uv` is not on the
+machine, the packages (`pypi`, `github`) are installed with `pip` into their own virtual environment
+(`~/.local/share/lauschkiste-venv`), which needs less space and nothing else. `uv` is installed only for
+`--from source`, test indexes, or when it is already there. An existing installation always stays the way it was
+installed; the script never switches it. Whichever way: if an installation fails, the previous one is put back.
+
 ### More options
 
 | Option | Meaning |
@@ -43,6 +51,7 @@ Choose with `--from` (pass options with `bash -s --`, e.g. `curl ... | bash -s -
 | `--repo OWNER/NAME` | install from a fork |
 | `--wheels DIR` | install the wheel files in `DIR` instead of downloading a release |
 | `--yes` | don't ask, use the defaults |
+| `--no-dev` | with `--from source`: leave out the development tools (pytest, ruff, `bam`, ...), which are installed by default |
 | `--no-setup` | only install; run `lauschctl setup` later |
 
 ## 3. After the installation

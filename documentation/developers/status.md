@@ -29,11 +29,14 @@ the [roadmap](roadmap-core-architecture.md).
   ([plan](phone-audio.md)).
 - A handover to other rooms through Music Assistant (needs the same Audiobookshelf user; see the
   [Audiobookshelf](audiobookshelf.md)), m4b audiobooks with chapters in one file.
-- Release on PyPI ([Releasing](releasing.md)).
 - Installing straight from a git branch or tag without a release (the web app would have to be built on the
   box or taken from a CI build).
 - A switch for Bluetooth on the Raspberry Pi, more board support plugins, general LED strip control.
 - An MQTT plugin (Home Assistant and other home automation).
+- Bluetooth headphones paired by holding them against an NFC tag on the box (and a way to unpair again), next to
+  the phone sink above.
+- A reduced kiosk view of the web app for the screen on the box, so that children cannot change settings, as a
+  plugin, with themes for the web app.
 
 ## Not carried over from Phoniebox 2.x and the first future3 versions
 

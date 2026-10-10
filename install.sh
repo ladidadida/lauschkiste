@@ -22,6 +22,7 @@
 #                      ~/.local/share/lauschkiste elsewhere, DIR/shared with --source)
 #   --library DIR      the library (music, audiobooks) in DIR instead of <home>/library
 #   --yes              don't ask, use defaults (also passed to `lauschctl setup`)
+#   --no-dev           with --from source: leave out the development tools (pytest, ruff, bam, ...)
 #   --no-setup         only install, don't run `lauschctl setup`
 
 set -euo pipefail
@@ -33,6 +34,8 @@ BRANCH=main
 VERSION=latest
 FROM=
 WHEELS=""
+VENV_DIR="${HOME}/.local/share/lauschkiste-venv"
+INSTALLER=""
 BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-devices lauschkiste-plugin-mpd
                  lauschkiste-plugin-rfid-readers lauschkiste-plugin-samba lauschkiste-plugin-audiobookshelf
                  lauschkiste-plugin-directories)
@@ -40,6 +43,7 @@ HOME_DIR=""
 LIBRARY_DIR=""
 ASSUME_YES=false
 RUN_SETUP=true
+DEV_TOOLS=true
 MARKER="# lauschkiste (added by install.sh)"
 
 log() { printf '\033[1m==> %s\033[0m\n' "$*"; }
@@ -62,6 +66,7 @@ parse_args() {
             --home) HOME_DIR="$2"; shift ;;
             --library) LIBRARY_DIR="$2"; shift ;;
             --yes|-y) ASSUME_YES=true ;;
+            --no-dev) DEV_TOOLS=false ;;
             --no-setup) RUN_SETUP=false ;;
             -h|--help) echo "See the comment at the top of install.sh for the options."; exit 0 ;;
             *) die "unknown option $1 (see --help)" ;;
@@ -146,6 +151,54 @@ for asset in json.load(sys.stdin).get("assets", []):
     (cd "$target" && xargs -n1 curl -fsSLO < urls)
 }
 
+# uv is the preferred way to install, but nobody is forced to have it: an existing installation is kept the way
+# it is, a fresh one uses uv if it is there and a plain venv with pip otherwise. Source checkouts and test indexes
+# always use uv.
+choose_installer() {
+    export PATH="${HOME}/.local/bin:${PATH}"
+    if [[ "$MODE" == source || ( "$FROM" != pypi && "$FROM" != github ) ]]; then
+        INSTALLER=uv
+    elif [[ -d "$VENV_DIR" ]]; then
+        INSTALLER=pip
+    elif command -v uv >/dev/null; then
+        INSTALLER=uv
+    else
+        INSTALLER=pip
+    fi
+}
+
+link_commands() {
+    local bin="${HOME}/.local/bin" name
+    mkdir -p "$bin"
+    for name in lauschctl lauschkiste; do
+        [[ -e "${VENV_DIR}/bin/${name}" ]] && ln -sf "${VENV_DIR}/bin/${name}" "${bin}/${name}"
+    done
+    CTL="${bin}/lauschctl"
+}
+
+# The same safety as tool_install: the working installation stays until the new one is installed
+venv_install() {
+    local opts=()
+    # 32-bit ARM: piwheels has prebuilt wheels, PyPI often only sources that cannot be built here
+    case "$(uname -m)" in armv6l|armv7l) opts+=(--only-binary :all:) ;; esac
+    if [[ -d "$VENV_DIR" ]]; then
+        rm -rf "${VENV_DIR}.previous"
+        mv "$VENV_DIR" "${VENV_DIR}.previous"
+    fi
+    if python3 -m venv "$VENV_DIR" && "${VENV_DIR}/bin/pip" install --disable-pip-version-check "${opts[@]}" "$@"; then
+        rm -rf "${VENV_DIR}.previous"
+        link_commands
+        return
+    fi
+    rm -rf "$VENV_DIR"
+    if [[ -d "${VENV_DIR}.previous" ]]; then
+        mv "${VENV_DIR}.previous" "$VENV_DIR"
+        link_commands
+        die "the installation failed; the previous installation was restored"
+    fi
+    die "the installation failed"
+}
+
 # `uv tool install --force` removes the working installation before it knows the new one can be installed:
 # keep the old one aside and put it back when the new one fails
 tool_install() {
@@ -174,6 +227,15 @@ tool_install() {
 install_from_index() {
     local requirement=lauschkiste args=()
     [[ "$VERSION" == latest ]] || requirement="lauschkiste==${VERSION}"
+    if [[ "$INSTALLER" == pip ]]; then
+        local packages=("$requirement") plugin
+        for plugin in "${BUNDLED_PLUGINS[@]}"; do
+            if [[ "$VERSION" == latest ]]; then packages+=("$plugin"); else packages+=("${plugin}==${VERSION}"); fi
+        done
+        log "Installing ${requirement} from ${FROM} with pip"
+        venv_install "${packages[@]}"
+        return
+    fi
     case "$FROM" in
         pypi)
             # piwheels (32-bit ARM) lists the Lauschkiste projects without their newest versions and would hide them
@@ -207,14 +269,19 @@ install_package() {
         wheels="$(mktemp -d)"
         download_release_wheels "$wheels"
     fi
-    local cli with=()
+    local cli with=() others=()
     cli="$(ls "$wheels"/lauschkiste-[0-9]*.whl 2>/dev/null | head -n1)"
     [[ -n "$cli" ]] || die "no lauschkiste wheel in ${wheels}"
     ls "$wheels"/lauschkiste_core-*.whl >/dev/null 2>&1 \
         || die "the wheels in ${wheels} are from before the packages were renamed (no lauschkiste_core wheel): use a newer release, --from source or --wheels"
     for wheel in "$wheels"/*.whl; do
-        [[ "$wheel" == "$cli" ]] || with+=(--with "$wheel")
+        [[ "$wheel" == "$cli" ]] || { with+=(--with "$wheel"); others+=("$wheel"); }
     done
+    if [[ "$INSTALLER" == pip ]]; then
+        log "Installing the Lauschkiste package with pip"
+        venv_install "$cli" "${others[@]}"
+        return
+    fi
     log "Installing the Lauschkiste package"
     tool_install "$cli" "${with[@]}"
     CTL="$(uv tool dir --bin)/lauschctl"
@@ -228,7 +295,9 @@ install_source() {
         git clone --branch "$BRANCH" "https://github.com/${REPO}.git" "$SOURCE_DIR"
     fi
     log "Installing the Python environment"
-    (cd "$SOURCE_DIR" && uv sync --no-dev --frozen --python python3)
+    local sync=(--frozen --python python3)
+    [[ "$DEV_TOOLS" == true ]] || sync+=(--no-dev)
+    (cd "$SOURCE_DIR" && uv sync "${sync[@]}")
     if [[ ! -f "${SOURCE_DIR}/packages/webapp/build/index.html" ]]; then
         if command -v npm >/dev/null; then
             log "Building the web app"
@@ -253,7 +322,8 @@ PYTHON
     fi
     mkdir -p "${HOME}/.local/bin"
     local command
-    for command in lauschkiste lauschctl; do
+    for command in lauschkiste lauschctl bam; do
+        [[ -e "${SOURCE_DIR}/.venv/bin/${command}" ]] || continue
         ln -sf "${SOURCE_DIR}/.venv/bin/${command}" "${HOME}/.local/bin/${command}"
     done
     CTL="${SOURCE_DIR}/.venv/bin/lauschctl"
@@ -286,8 +356,11 @@ main() {
     fi
 
     install_system_packages
-    install_uv
-    configure_piwheels
+    choose_installer
+    if [[ "$INSTALLER" == uv ]]; then
+        install_uv
+        configure_piwheels
+    fi
     if [[ "$MODE" == source ]]; then install_source; else install_package; fi
     add_to_shell_profile 'export PATH="$HOME/.local/bin:$PATH"'
     choose_home
