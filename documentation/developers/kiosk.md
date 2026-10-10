@@ -56,7 +56,9 @@ About 6 to 9 days.
 
 - **The device.** Chromium in kiosk mode is the heavy part, not the bundle: the normal web app is 1.2 MB of
   JavaScript (not compressed). A Pi Zero W with 427 MB RAM is probably too small for a Chromium kiosk; a Pi 3 or Zero 2
-  and better should be fine. Phase 0 measures this on the real device.
+  and better should be fine. The first test device is a Pi 3B (1 GB RAM) with a HiFiBerry amplifier and a
+  third-party touch display; phase 0 measures on it. It currently runs another audio software, which the
+  installation of Lauschkiste would replace (a fresh Raspberry Pi OS Lite image).
 - **Shared components** need a clean split (no code in the normal web app that only works with its router or settings
   context); this is most of phase 2.
 - **Lightweight alternative.** A kiosk app without React (plain JavaScript or Preact) would load faster, but cannot
@@ -66,7 +68,7 @@ About 6 to 9 days.
 
 ## Questions
 
-1. Which device and display will it run on first (model, screen size)?
+1. Display model, size and resolution of the test device (how the display is connected and how touch is wired).
 2. Should a child be able to see the queue, or only the current title?
 3. Should the kiosk be locked to the app (no way out to the normal web app)? Chromium's `--kiosk` already prevents
    it from the screen.
