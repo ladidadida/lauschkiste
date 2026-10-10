@@ -35,8 +35,8 @@ the [roadmap](roadmap-core-architecture.md).
 - An MQTT plugin (Home Assistant and other home automation).
 - Bluetooth headphones paired by holding them against an NFC tag on the box (and a way to unpair again), next to
   the phone sink above.
-- A reduced kiosk view of the web app for the screen on the box, so that children cannot change settings, as a
-  plugin, with themes for the web app.
+- A reduced kiosk app for the screen on the box, so that children cannot change settings, as a plugin with its own
+  themes ([plan](kiosk.md)).
 
 ## Not carried over from Phoniebox 2.x and the first future3 versions
 
