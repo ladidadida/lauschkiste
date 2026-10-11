@@ -293,18 +293,30 @@ class AudioStep(Step):
             return ['no primary audio output chosen']
         return []
 
-    def _sinks(self):
+    @staticmethod
+    def _label(description, card, hat):
+        """PipeWire describes every sound card as "Built-in Audio"; use the HAT or card name instead."""
+        if not description.startswith('Built-in Audio') or not card:
+            return description
+        if hat and hat.vendor.lower().replace(' ', '') in card.lower().replace('_', ''):
+            return hat.label
+        return card.removeprefix('snd_rpi_').replace('_', ' ')
+
+    def _sinks(self, ctx):
         import pulsectl
+        from .hardware import _detected_hat
+        hat = _detected_hat(ctx)
         try:
             with pulsectl.Pulse('lauschkiste-setup') as pulse:
-                return [(sink.name, sink.description) for sink in pulse.sink_list()]
+                return [(sink.name, self._label(sink.description, sink.proplist.get('alsa.card_name', ''), hat))
+                        for sink in pulse.sink_list()]
         except pulsectl.PulseError as error:
             raise SetupError(f'no PulseAudio/PipeWire server reachable: {error}') from None
 
     def apply(self, ctx):
         if ctx.assume_yes:
             raise StepSkipped("choosing the outputs is interactive; run 'lauschctl setup audio' later")
-        sinks = self._sinks()
+        sinks = self._sinks(ctx)
         if not sinks:
             raise SetupError('the sound server reports no audio outputs')
         for index, (name, description) in enumerate(sinks):

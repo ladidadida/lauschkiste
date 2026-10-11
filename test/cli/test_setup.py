@@ -201,7 +201,7 @@ def test_audio_is_skipped_unattended_and_writes_outputs_interactively(tmp_path, 
     assert failed == 0
 
     monkeypatch.setattr(extras_steps.AudioStep, '_sinks',
-                        lambda self: [('alsa_output.analog', 'Speakers'), ('bluez_sink.x', 'Headset')])
+                        lambda self, ctx: [('alsa_output.analog', 'Speakers'), ('bluez_sink.x', 'Headset')])
     answers = iter([0, 1])
     monkeypatch.setattr(extras_steps.typer, 'prompt', lambda *a, **k: next(answers))
     ctx.assume_yes = False
@@ -475,3 +475,15 @@ def test_hardware_step_offers_the_detected_sound_card(tmp_path, home, extras):
     assert 'HiFiBerry DAC+' in question.help(ctx)
     system.write('/proc/device-tree/hat/product', 'Something else\x00')
     assert question.default_for(ctx) == 'none' and 'not a sound card' in question.help(ctx)
+
+
+def test_audio_output_label_names_the_sound_card():
+    from collections import namedtuple
+    from lauschkiste_cli.setup.steps.extras import AudioStep
+    hat = namedtuple('Hat', 'vendor label')('HiFiBerry', 'HiFiBerry DAC+')
+    label = AudioStep._label
+    assert label('Built-in Audio Stereo', 'snd_rpi_hifiberry_dacplus', hat) == 'HiFiBerry DAC+'
+    assert label('Built-in Audio Stereo', 'snd_rpi_hifiberry_dacplus', None) == 'hifiberry dacplus'
+    assert label('Built-in Audio Stereo', 'bcm2835 Headphones', None) == 'bcm2835 Headphones'
+    assert label('Built-in Audio Stereo', '', None) == 'Built-in Audio Stereo'
+    assert label('Speakers', 'snd_rpi_hifiberry_dacplus', hat) == 'Speakers'
