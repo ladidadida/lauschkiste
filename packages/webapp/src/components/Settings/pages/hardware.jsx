@@ -100,8 +100,15 @@ const HardwareSettings = () => {
     }
     const used = state.pins.filter((pin) => pin.used_by.length);
     const free = state.pins.filter((pin) => !pin.used_by.length);
+    const SEVERITY = { ok: 'success', todo: 'warning', info: 'info' };
     return (
       <>
+        {(state.notes || []).map((note) => (
+          <Alert key={`${note.id}:${note.text}`} severity={SEVERITY[note.level] || 'info'}>
+            {note.text}
+            {note.hint && <> ({t('setup-notice.hint')} <code>{note.hint}</code>)</>}
+          </Alert>
+        ))}
         <Card>
           <CardHeader subheader={state.board} title={state.model} />
           <Divider />

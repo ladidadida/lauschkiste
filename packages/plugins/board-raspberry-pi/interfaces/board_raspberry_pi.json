@@ -1,7 +1,7 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "plugin",
   "name": "board_raspberry_pi",
   "operations": {
@@ -61,6 +61,6 @@
     "uart"
   ],
   "requires": {
-    "hardware": ">=1.0,<2"
+    "hardware": ">=1.2,<2"
   }
 }

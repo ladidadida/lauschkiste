@@ -19,6 +19,7 @@ import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import TuneIcon from '@mui/icons-material/Tune';
 
 import Header from '../../Header';
+import SetupNotice from '../../general/setup-notice';
 import { RestartBanner } from '../restart';
 
 const SECTIONS = [
@@ -39,6 +40,7 @@ const SettingsOverview = () => {
       <Header title={t('navigation.settings')} />
       <Stack spacing={1} sx={{ padding: '10px', width: '100%' }}>
         <RestartBanner />
+        <SetupNotice dismissible={false} />
         <List>
           {SECTIONS.map(([id, Icon]) => (
             <ListItem disablePadding key={id}>

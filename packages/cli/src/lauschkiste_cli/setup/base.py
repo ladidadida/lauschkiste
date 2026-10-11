@@ -26,7 +26,8 @@ class Question:
     when: Optional[Callable[[Dict[str, Any]], Any]] = None
     #: Returns an error message for an invalid text answer
     validate: Optional[Callable[[str], Optional[str]]] = None
-    help: str = ''
+    #: Text shown above the question, or ``callable(ctx)`` returning it
+    help: Any = ''
 
     def default_for(self, ctx: 'Context') -> Any:
         return self.default(ctx) if callable(self.default) else self.default
@@ -93,8 +94,9 @@ def ask(question: Question, ctx: Context, stored: Dict[str, Any], assume_yes: bo
     default = stored.get(question.key, question.default_for(ctx))
     if assume_yes:
         return default
-    if question.help:
-        typer.echo(typer.style(question.help, dim=True))
+    help_text = question.help(ctx) if callable(question.help) else question.help
+    if help_text:
+        typer.echo(typer.style(help_text, dim=True))
     if question.kind == 'bool':
         return typer.confirm(question.text, default=bool(default))
     if question.kind == 'choice':

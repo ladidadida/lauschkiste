@@ -461,3 +461,17 @@ def test_kiosk_step_repairs_an_outdated_chromium_command(tmp_path, home, extras)
     assert system.read('~/.bashrc').count('startx') == 1
     failed, _ = setup_run(system, home, names=['kiosk'], answers=answers, check_only=True)
     assert failed == 0
+
+
+def test_hardware_step_offers_the_detected_sound_card(tmp_path, home, extras):
+    from lauschkiste_cli.setup.steps.hardware import HardwareStep
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml')
+    question = {q.key: q for q in HardwareStep.questions}['hw_sound_card']
+    assert question.default_for(ctx) == 'none' and question.help(ctx) == ''
+    system.write('/proc/device-tree/hat/vendor', 'HiFiBerry\x00')
+    system.write('/proc/device-tree/hat/product', 'DAC+\x00')
+    assert question.default_for(ctx) == 'hifiberry-dacplus'
+    assert 'HiFiBerry DAC+' in question.help(ctx)
+    system.write('/proc/device-tree/hat/product', 'Something else\x00')
+    assert question.default_for(ctx) == 'none' and 'not a sound card' in question.help(ctx)

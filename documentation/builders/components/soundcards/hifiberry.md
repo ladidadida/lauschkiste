@@ -5,6 +5,12 @@
 
 The setup works for the most common set of HiFiBerry boards but also other "DAC" related sound cards like `I2S PCM5102A DAC`.
 
+## Detection
+
+Most HiFiBerry boards identify themselves (HAT EEPROM). `lauschctl setup hardware` then says which board it found and
+preselects the sound card, and the web app points out a board that is attached but not set up. Boards without an
+EEPROM, such as the Amp+, are chosen by hand.
+
 ## Automatic setup
 
 Choose the board in the web app (Settings → Plugins → Raspberry Pi → Sound card, e.g. `hifiberry-dac`), then

@@ -6,7 +6,7 @@ documentation/developers/hardware.md.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Protocol, Tuple
+from typing import Any, Dict, List, Literal, Optional, Protocol, Tuple
 
 from pydantic import BaseModel
 
@@ -50,6 +50,14 @@ class DetectedBoard(BaseModel):
     model: str
 
 
+class Note(BaseModel):
+    """Something about the hardware the user may want to know: done, to do or just a fact."""
+    id: str
+    level: Literal['ok', 'todo', 'info']
+    text: str
+    hint: Optional[str] = None
+
+
 class HardwareState(BaseModel):
     board: Optional[str] = None
     model: Optional[str] = None
@@ -59,6 +67,7 @@ class HardwareState(BaseModel):
     unknown: List[Claim] = []
     boot_pending: List[str] = []
     detected: List[DetectedBoard] = []
+    notes: List[Note] = []
 
 
 class Choice(BaseModel):
@@ -98,7 +107,7 @@ class Hardware(CoreModule):
     """The board Lauschkiste runs on, its pins and who uses them; shutdown and reboot."""
 
     name = 'hardware'
-    interface_version = '1.1'
+    interface_version = '1.2'
     concurrency = 'threadsafe'
 
     boards = extension_point('boards', Board)
@@ -114,6 +123,10 @@ class Hardware(CoreModule):
         names = self.boards.names()
         if len(names) > 1:
             logger.error(f"More than one board plugin is enabled ({', '.join(names)}); using '{names[0]}'")
+        board = self._board()
+        for note in self._notes(board) if board is not None else []:
+            if note.level == 'todo':
+                logger.warning(f"{note.text}" + (f" ({note.hint})" if note.hint else ''))
 
     # -- helpers --------------------------------------------------------------------------------
 
@@ -135,6 +148,14 @@ class Hardware(CoreModule):
             except Exception as error:
                 logger.warning(f"Claims of '{name}' are not available: {error}")
         return result
+
+    def _notes(self, board) -> List[Note]:
+        """A board may offer ``notes()``: what is set up and what to check, as ``{'id', 'level', 'text', 'hint'}``."""
+        try:
+            return [Note.model_validate(note) for note in (board.notes() if hasattr(board, 'notes') else [])]
+        except Exception as error:
+            logger.debug(f"Hardware notes are not available: {error}")
+            return []
 
     def state(self) -> HardwareState:
         board = self._board()
@@ -176,7 +197,7 @@ class Hardware(CoreModule):
             pending = []
         return HardwareState(board=description.get('name'), model=description.get('model'),
                              pins=list(pins.values()), interfaces=list(interfaces.values()),
-                             conflicts=conflicts, unknown=unknown, boot_pending=pending)
+                             conflicts=conflicts, unknown=unknown, boot_pending=pending, notes=self._notes(board))
 
     # -- operations -----------------------------------------------------------------------------
 

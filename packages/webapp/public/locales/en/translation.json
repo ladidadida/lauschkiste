@@ -833,5 +833,10 @@
         "subtitle": "No sound, a card does nothing, logs"
       }
     }
+  },
+  "setup-notice": {
+    "details": "Details",
+    "dismiss": "Hide",
+    "hint": "run"
   }
 }

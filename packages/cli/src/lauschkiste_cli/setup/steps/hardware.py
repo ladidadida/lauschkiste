@@ -22,6 +22,30 @@ def _sound_cards(ctx: Context) -> Tuple[Tuple[str, str], ...]:
     return (NO_CARD, *bootconfig.describe_cards().items())
 
 
+def _detected_hat(ctx: Context):
+    """The attached HAT that names itself (HAT EEPROM), None without one."""
+    try:
+        from lauschkiste_plugin_board_raspberry_pi import hat
+    except ImportError:
+        return None
+    return hat.read_hat(ctx.system.read)
+
+
+def _sound_card_default(ctx: Context) -> str:
+    current = _current(ctx, BOARD, 'sound_card', 'none')
+    detected = _detected_hat(ctx)
+    return current if current != 'none' or detected is None or detected.sound_card is None else detected.sound_card
+
+
+def _sound_card_help(ctx: Context) -> str:
+    detected = _detected_hat(ctx)
+    if detected is None:
+        return ''
+    if detected.sound_card is None:
+        return f'A board on the header reports itself as {detected.label}; it is not a sound card Lauschkiste knows.'
+    return f'Detected: {detected.label}.'
+
+
 def _current(ctx: Context, plugin: str, key: str, default: str) -> str:
     settings = ctx.enabled_plugins().get(plugin)
     return str(settings.get(key, default)) if isinstance(settings, dict) else default
@@ -37,7 +61,7 @@ class HardwareStep(Step):
                  default=lambda ctx: 'phat_beat' in ctx.enabled_plugins(),
                  help='Its sound card, buttons and LEDs are set up with it.'),
         Question('hw_sound_card', 'Which sound card sits on the header?', kind='choice', choices=_sound_cards,
-                 default=lambda ctx: _current(ctx, BOARD, 'sound_card', 'none'),
+                 default=_sound_card_default, help=_sound_card_help,
                  when=lambda answers: not answers.get('hw_phat_beat')),
         Question('hw_power_button', 'Is a power button attached (Pimoroni OnOff SHIM)?',
                  default=lambda ctx: 'power_button' in ctx.enabled_plugins()),

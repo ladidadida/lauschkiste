@@ -14,7 +14,7 @@ import lauschkiste.cfghandler
 from lauschkiste.contract import OperationError, Plugin, query
 from lauschkiste.hardware import Claim
 
-from lauschkiste_plugin_board_raspberry_pi import bootconfig, health, pins
+from lauschkiste_plugin_board_raspberry_pi import bootconfig, hat, health, pins
 from lauschkiste_plugin_board_raspberry_pi.settings import BoardSettings
 
 logger = logging.getLogger('lauschkiste.board_raspberry_pi')
@@ -49,6 +49,9 @@ class RaspberryPiBoard:
     def boot_pending(self) -> List[str]:
         return self._plugin.boot_pending()
 
+    def notes(self) -> List[dict]:
+        return self._plugin.notes()
+
 
 class BoardClaims:
     def __init__(self, plugin: 'BoardRaspberryPi'):
@@ -65,8 +68,8 @@ class BoardRaspberryPi(Plugin):
 
     name = 'board_raspberry_pi'
     title = 'Raspberry Pi'
-    interface_version = '1.0'
-    requires = {'hardware': '>=1.0,<2'}
+    interface_version = '1.1'
+    requires = {'hardware': '>=1.2,<2'}
     provides = ('board', 'gpio', 'i2c', 'spi', 'i2s', 'uart', 'poweroff')
     settings = BoardSettings
 
@@ -113,6 +116,32 @@ class BoardRaspberryPi(Plugin):
         want = bootconfig.wanted({'plugins': main.getn('plugins', default=None) or {}},
                                  {'rfid': rfid.getn('rfid', default=None) or {}})
         return bootconfig.pending(path.read_text(), want)
+
+    def notes(self, read=hat.read_text) -> List[dict]:
+        """What is set up and what the user may want to check, for the hardware overview."""
+        found = hat.read_hat(read)
+        main = lauschkiste.cfghandler.get_handler('lauschkiste')
+        configured = bootconfig.wanted({'plugins': main.getn('plugins', default=None) or {}}, {}).sound_card
+        notes: List[dict] = []
+        if found is not None and found.sound_card is not None:
+            if configured == found.sound_card:
+                notes.append({'id': 'sound_card', 'level': 'ok', 'text': f'Sound card {found.label} is set up'})
+            elif configured == 'none':
+                notes.append({'id': 'sound_card', 'level': 'todo', 'hint': 'lauschctl setup hardware',
+                              'text': f'{found.label} was found, but no sound card is set up: the sound of the Pi '
+                                      'itself is used'})
+            else:
+                notes.append({'id': 'sound_card', 'level': 'info',
+                              'text': f'{found.label} was found, the sound card setting is {configured}'})
+        elif found is not None:
+            notes.append({'id': 'hat', 'level': 'info', 'text': f'A board on the header reports itself as {found.label}'})
+        elif configured != 'none':
+            notes.append({'id': 'sound_card', 'level': 'ok', 'text': f'Sound card {configured} is set up'})
+        pending = self.boot_pending()
+        if pending:
+            notes.append({'id': 'boot', 'level': 'todo', 'hint': 'lauschctl setup raspi, then reboot',
+                          'text': 'The boot configuration lacks: ' + ', '.join(pending)})
+        return notes
 
     @query(path='/throttled')
     def get_throttled(self) -> health.Throttled:

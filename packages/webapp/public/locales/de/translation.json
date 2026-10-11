@@ -969,5 +969,10 @@
         "subtitle": "Kein Ton, Karte reagiert nicht, Protokolle"
       }
     }
+  },
+  "setup-notice": {
+    "details": "Details",
+    "dismiss": "Ausblenden",
+    "hint": "führe aus"
   }
 }

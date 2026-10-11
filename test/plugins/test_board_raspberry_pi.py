@@ -110,3 +110,38 @@ def test_detects_raspberry_pi_by_its_model():
     files = {'/proc/device-tree/model': 'Raspberry Pi 3 Model B Rev 1.2\x00'}
     assert board_plugin.BoardRaspberryPi.detect(files.get) == 'Raspberry Pi 3 Model B Rev 1.2'
     assert board_plugin.BoardRaspberryPi.detect({}.get) is None
+
+
+def test_notes_tell_what_is_set_up_and_what_to_check(monkeypatch):
+    from lauschkiste_plugin_board_raspberry_pi import hat
+    plugin = board_plugin.BoardRaspberryPi()
+    monkeypatch.setattr(plugin, 'boot_pending', lambda: [])
+    files = {hat.HAT_DIR + 'vendor': 'HiFiBerry\x00', hat.HAT_DIR + 'product': 'DAC+\x00'}
+    handler = lauschkiste.cfghandler.get_handler('lauschkiste')
+
+    handler.config_dict({'plugins': {'board_raspberry_pi': {}}})
+    (note,) = plugin.notes(files.get)
+    assert note['level'] == 'todo' and 'HiFiBerry DAC+' in note['text'] and note['hint'] == 'lauschctl setup hardware'
+
+    handler.config_dict({'plugins': {'board_raspberry_pi': {'sound_card': 'hifiberry-dacplus'}}})
+    assert [n['level'] for n in plugin.notes(files.get)] == ['ok']
+
+    handler.config_dict({'plugins': {'board_raspberry_pi': {'sound_card': 'max98357a'}}})
+    assert [n['level'] for n in plugin.notes(files.get)] == ['info']
+
+    handler.config_dict({'plugins': {'board_raspberry_pi': {}}})
+    assert plugin.notes(lambda path: None) == []
+
+    monkeypatch.setattr(plugin, 'boot_pending', lambda: ['sound card hifiberry-dacplus'])
+    (pending,) = plugin.notes(lambda path: None)
+    assert pending['level'] == 'todo' and 'reboot' in pending['hint']
+
+
+def test_the_hardware_state_carries_the_notes(monkeypatch):
+    manager = start({})
+    hardware = manager.handle('hardware')
+    monkeypatch.setattr(board_plugin.RaspberryPiBoard, 'notes',
+                        lambda self: [{'id': 'x', 'level': 'todo', 'text': 'Check x', 'hint': 'do y'}])
+    state = hardware.invoke('get_state')
+    assert [(n.id, n.level, n.hint) for n in state.notes] == [('x', 'todo', 'do y')]
+    manager.stop()

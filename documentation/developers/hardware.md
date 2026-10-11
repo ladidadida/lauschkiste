@@ -65,6 +65,19 @@ Switching interfaces and overlays on needs root and a reboot: the board's settin
 wanted (sound card, I²C, SPI, power-off pin), `lauschctl setup` writes the boot configuration, and
 the board plugin reports whether the running boot configuration matches.
 
+## What is set up, and what to check
+
+A board can offer `notes()`: a list of `{id, level, text, hint}` with the level `ok`, `todo` or `info`. The hardware
+module returns them as `notes` in `GET /api/v1/hardware` and logs the `todo` ones when Lauschkiste starts. The web
+app shows the `todo` notes as a small notice on the start page and the settings overview (the user can hide one;
+the choice is kept in the browser) and all notes at the top of Settings → Hardware.
+
+The Raspberry Pi plugin reads the HAT EEPROM (`/proc/device-tree/hat/vendor` and `product`): a known HiFiBerry board
+(DAC+, DAC2 HD, ADC variants, Digi+, Amp2) that is attached but not set up gives a `todo` note
+("lauschctl setup hardware"), and `lauschctl setup hardware` preselects its sound card. Boards without an EEPROM (for
+example the MAX98357A or a HiFiBerry Amp+) cannot be detected and are chosen by hand. A pending boot configuration is
+reported as a `todo` note as well.
+
 ## Devices
 
 Device plugins name what they need, not which board: a battery gauge needs an I²C bus, a power
