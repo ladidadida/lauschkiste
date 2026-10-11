@@ -66,7 +66,7 @@ Opens its own WiFi when no known one is in range, e.g. when travelling.
 | --- | --- |
 | `extra_plugins` | install plugins from PyPI, GitHub (`github:owner/repo@tag`) or a URL and enable them |
 | `hardware` | choose the connected hardware: sound card, pHAT BEAT, power button, battery monitor |
-| `boot` | faster start (Bluetooth, IPv6, boot messages off) |
+| `boot` | quiet boot (no boot messages or logo, a few first-boot services off; Bluetooth optionally) |
 | `kiosk` | the web app on an attached screen |
 | `mpd` | mpd for playback instead of the built-in player |
 | `port` | the web app on port 80, so its address needs no `:5556` (a systemd socket forwards it) |

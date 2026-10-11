@@ -25,7 +25,7 @@ lauschctl setup
 ```
 
 `lauschctl setup` leads you through setting up this machine (RFID reader, Samba share, WiFi hotspot, kiosk mode,
-boot optimisation, ...). Run it in `screen` or `tmux` if your SSH connection is unreliable. It can be run again at
+quiet boot, ...). Run it in `screen` or `tmux` if your SSH connection is unreliable. It can be run again at
 any time to change something, see [Changing the setup](#changing-the-setup-and-updating).
 
 ### Where Lauschkiste comes from

@@ -128,14 +128,16 @@ def test_second_run_changes_nothing(tmp_path, home, extras):
 def test_pi_setup(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
     system.outputs[('pdbedit', '-L')] = 'pi:1000:'
-    failed, ctx = setup_run(system, home, answers={'samba': True, 'static_ip': True})
+    failed, ctx = setup_run(system, home, answers={'samba': True, 'optimize_boot': True, 'disable_bluetooth': True})
     assert failed == 0
     assert {'board_raspberry_pi', 'samba'} <= set(ctx.enabled_plugins())
     assert system.exists('/var/lib/systemd/linger/pi')
     assert 'disable_splash=1' in system.read('/boot/firmware/config.txt')
     cmdline = system.read('/boot/firmware/cmdline.txt')
     assert cmdline.startswith('console=tty1 root=PARTUUID=1234 rootwait ')
-    assert 'ipv6.disable=1' in cmdline and cmdline.count('quiet') == 1
+    assert 'ipv6.disable' not in cmdline and cmdline.count('quiet') == 1
+    assert any('command line changed' in note for note in ctx.notes)
+    assert 'apt-daily.timer' in system.enabled
     assert 'bluetooth.service' not in system.enabled
     assert 'ListenStream=80' in system.read('/etc/systemd/system/lauschkiste-http.socket')
     forwarding = system.read('/etc/systemd/system/lauschkiste-http.service')
@@ -145,7 +147,7 @@ def test_pi_setup(tmp_path, home, extras):
     assert not system.exists('/etc/sysctl.d/60-lauschkiste-port.conf')
     welcome = system.read('/etc/update-motd.d/99-lauschkiste-welcome')
     assert 'port=":80"' in welcome and '5556' not in welcome
-    assert 'static ip_address=192.168.1.50/24' in system.read('/etc/dhcpcd.conf')
+    assert not system.exists('/etc/dhcpcd.conf')
     smb = system.read('/etc/samba/smb.conf')
     assert f'path={home / "library"}\n' in smb and smb.count('## Lauschkiste Samba Config') == 1
     assert 'force user=pi' in smb and '0777' not in smb
@@ -157,7 +159,7 @@ def test_answers_are_stored_without_secrets(tmp_path, home, extras):
     setup_run(system, home, answers={'samba': True})
     stored = Answers(home / 'settings' / 'setup.yaml').load()
     assert stored['samba'] is True
-    assert stored['optimize_boot'] is True
+    assert stored['optimize_boot'] is False and 'static_ip' not in stored
 
 
 def test_check_changes_nothing(tmp_path, home, extras):
@@ -431,3 +433,13 @@ def test_chromium_package_follows_the_debian_release(tmp_path, home, extras, cod
     assert step._chromium(ctx) == expected
     assert expected in step.packages(ctx)
     assert step._update_check_file(ctx).startswith('/etc/chromium.d/' if expected == 'chromium' else '/etc/chromium-browser')
+
+
+def test_a_quiet_boot_is_an_explicit_choice_and_never_touches_the_network(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    failed, ctx = setup_run(system, home, names=['boot'], answers={'optimize_boot': True})
+    assert failed == 0
+    cmdline = system.read('/boot/firmware/cmdline.txt')
+    assert 'quiet' in cmdline and 'ipv6' not in cmdline and 'noatime' not in cmdline
+    assert 'bluetooth.service' in system.enabled and 'apt-daily.timer' in system.enabled
+    assert not any('nmcli' in command or 'dhcpcd' in str(command) for command in system.commands)

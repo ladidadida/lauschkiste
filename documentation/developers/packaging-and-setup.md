@@ -74,8 +74,8 @@ Answers are stored in `$LAUSCHKISTE_HOME/settings/setup.yaml` so unattended re-r
 (`lauschctl setup --yes`) reuse them.
 
 The steps: system packages, Raspberry Pi boot settings, the systemd user service, mpd (only when the `mpd`
-plugin is chosen), plugins, Samba, port 80, autohotspot, kiosk mode, RFID readers, audio output, boot-time
-optimisation and the login message. Steps needing root run their commands through `sudo`.
+plugin is chosen), plugins, Samba, port 80, autohotspot, kiosk mode, RFID readers, audio output, quiet
+boot and the login message. Steps needing root run their commands through `sudo`.
 
 ## Uninstalling
 

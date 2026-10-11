@@ -191,7 +191,8 @@ class AutohotspotStep(Step):
     title = 'WiFi hotspot when no known WiFi is in range'
     questions = (
         Question('autohotspot', 'Open a WiFi hotspot when no known WiFi is in range?', default=False,
-                 help='Lets you reach Lauschkiste without a network. Replaces the static IP option.'),
+                 help='This changes how the box uses the network: if no known WiFi is found (also after a reboot, or when '
+                      'the WiFi is away) it opens its own network and is reachable only there.'),
         Question('autohotspot_ssid', 'Hotspot name (SSID)', kind='text', validate=_validate_ssid,
                  default=lambda ctx: f"Lauschkiste_{ctx.system.output('hostname')}"[:32],
                  when=lambda a: a.get('autohotspot')),

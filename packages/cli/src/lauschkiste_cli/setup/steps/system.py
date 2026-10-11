@@ -87,25 +87,24 @@ class RaspberryPiStep(Step):
 
 
 class BootStep(Step):
+    """A quieter boot for a box with a screen: no boot messages or logo, a few first-boot services off.
+    Nothing here touches the network."""
     name = 'boot'
-    title = 'Boot time optimisation'
+    title = 'Quiet boot'
     questions = (
-        Question('optimize_boot', 'Optimise the boot time (quiet boot, unneeded services off)?', default=True),
-        Question('disable_bluetooth', 'Disable Bluetooth (saves power and boot time)?', default=True,
-                 when=lambda a: a.get('optimize_boot')),
-        Question('disable_ipv6', 'Disable IPv6?', default=True, when=lambda a: a.get('optimize_boot')),
-        Question('static_ip', 'Use the current IP address as static address (faster network start)?',
-                 default=False, when=lambda a: a.get('optimize_boot') and not a.get('autohotspot')),
+        Question('optimize_boot', 'Make the boot quiet (no boot messages or logo, a few first-boot services off)?',
+                 default=False,
+                 help='Only cosmetic and a little faster; it changes the kernel command line. A box without a screen '
+                      'does not need it.'),
+        Question('disable_bluetooth', 'Also switch Bluetooth off (saves a little power)?', default=False,
+                 when=lambda a: a.get('optimize_boot'),
+                 help='Leave it on if you want to use Bluetooth speakers or headphones.'),
     )
     MARKER = '## Lauschkiste Boot Config'
-    DHCP_MARKER = '## Lauschkiste DHCP Config'
-    SERVICES = ['keyboard-setup.service', 'triggerhappy.service', 'triggerhappy.socket', 'raspi-config.service',
-                'apt-daily.service', 'apt-daily-upgrade.service', 'apt-daily.timer', 'apt-daily-upgrade.timer']
+    SERVICES = ['keyboard-setup.service', 'triggerhappy.service', 'triggerhappy.socket', 'raspi-config.service']
     BLUETOOTH = ['hciuart.service', 'bluetooth.service']
     CMDLINE = ['consoleblank=1', 'logo.nologo', 'quiet', 'loglevel=0', 'plymouth.enable=0',
-               'vt.global_cursor_default=0', 'plymouth.ignore-serial-consoles', 'splash', 'fastboot',
-               'noatime', 'nodiratime', 'noram']
-    IPV6 = 'ipv6.disable=1'
+               'vt.global_cursor_default=0', 'plymouth.ignore-serial-consoles', 'splash']
 
     def relevant(self, ctx):
         return ctx.system.is_raspberry_pi()
@@ -116,20 +115,15 @@ class BootStep(Step):
     def _services(self, ctx):
         return self.SERVICES + (self.BLUETOOTH if ctx.answer('disable_bluetooth') else [])
 
-    def _cmdline_options(self, ctx):
-        return self.CMDLINE + ([self.IPV6] if ctx.answer('disable_ipv6') else [])
-
     def check(self, ctx):
         system = ctx.system
         problems = [f'{unit} is enabled' for unit in self._services(ctx) if system.unit_enabled(unit)]
         if self.MARKER not in (system.read(system.boot_file('config.txt')) or ''):
             problems.append('boot splash screen is enabled')
         cmdline = (system.read(system.boot_file('cmdline.txt')) or '').split()
-        missing = [option for option in self._cmdline_options(ctx) if option not in cmdline]
+        missing = [option for option in self.CMDLINE if option not in cmdline]
         if missing:
             problems.append(f"cmdline.txt lacks {' '.join(missing)}")
-        if ctx.answer('static_ip') and not static_ip_configured(ctx):
-            problems.append('no static IP address configured')
         return problems
 
     def apply(self, ctx):
@@ -140,50 +134,11 @@ class BootStep(Step):
         system.append_block(system.boot_file('config.txt'), self.MARKER, 'disable_splash=1', root=True)
         path = system.boot_file('cmdline.txt')
         cmdline = (system.read(path) or '').split()
-        missing = [option for option in self._cmdline_options(ctx) if option not in cmdline]
+        missing = [option for option in self.CMDLINE if option not in cmdline]
         if missing:
             system.write(path, ' '.join(cmdline + missing) + '\n', root=True)
-        if ctx.answer('static_ip') and not static_ip_configured(ctx):
-            configure_static_ip(ctx)
-
-
-def current_route(ctx: Context) -> dict:
-    """Interface, address and gateway of the default route."""
-    words = ctx.system.output('ip', 'route', 'get', '8.8.8.8').split()
-    keys = {'dev': 'interface', 'src': 'address', 'via': 'gateway'}
-    return {keys[word]: words[i + 1] for i, word in enumerate(words[:-1]) if word in keys}
-
-
-def _nm_profile(ctx: Context, interface: str) -> str:
-    for line in ctx.system.output('nmcli', '-g', 'DEVICE,CONNECTION', 'device', 'status').splitlines():
-        device, _, connection = line.partition(':')
-        if device == interface:
-            return connection
-    return ''
-
-
-def static_ip_configured(ctx: Context) -> bool:
-    system = ctx.system
-    if system.unit_enabled('NetworkManager.service'):
-        profile = _nm_profile(ctx, current_route(ctx).get('interface', ''))
-        return bool(profile) and system.output('nmcli', '-g', 'ipv4.method', 'connection', 'show', profile) == 'manual'
-    return BootStep.DHCP_MARKER in (system.read('/etc/dhcpcd.conf') or '')
-
-
-def configure_static_ip(ctx: Context) -> None:
-    system = ctx.system
-    route = current_route(ctx)
-    if not {'interface', 'address', 'gateway'} <= set(route):
-        raise SetupError(f'Could not determine the current network route: {route}')
-    address, gateway = f"{route['address']}/24", route['gateway']
-    if system.unit_enabled('NetworkManager.service'):
-        profile = _nm_profile(ctx, route['interface'])
-        system.run('nmcli', 'connection', 'modify', profile, 'ipv4.method', 'manual', 'ipv4.address', address,
-                   'ipv4.gateway', gateway, 'ipv4.dns', gateway, root=True)
-    else:
-        system.append_block('/etc/dhcpcd.conf', BootStep.DHCP_MARKER,
-                            f"interface {route['interface']}\nstatic ip_address={address}\n"
-                            f"static routers={gateway}\nstatic domain_name_servers={gateway}\nnoarp", root=True)
+            ctx.notes.append('The kernel command line changed: if the box does not come back after the reboot, '
+                             'remove the options from cmdline.txt on the boot partition of the SD card.')
 
 
 class WelcomeStep(Step):

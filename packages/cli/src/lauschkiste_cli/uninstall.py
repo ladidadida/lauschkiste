@@ -186,8 +186,9 @@ def _stays(system: System, remove_data: bool) -> List[str]:
         'system packages installed for Lauschkiste (ffmpeg, pipewire, samba, openbox, chromium, ...): '
         'sudo apt remove <package> and sudo apt autoremove',
         'boot settings: the sound card, I2C/SPI and power-off lines in config.txt (a backup is config.txt.backup), '
-        'quiet boot in cmdline.txt, switched-off Bluetooth and IPv6',
-        'network settings: the WiFi hotspot, a static IP address, the console autologin of the kiosk mode',
+        'quiet boot in cmdline.txt, switched-off Bluetooth (an older setup also switched off IPv6 and the apt timers)',
+        'network settings: the WiFi hotspot, a static IP address (set by an older setup), the console autologin '
+        'of the kiosk mode',
         'the Samba user and its password: sudo smbpasswd -x <user>',
         'lingering of the user service: sudo loginctl disable-linger <user>',
         'uv and its cache (if it was installed for Lauschkiste), and the piwheels entry in ~/.config/uv/uv.toml',
