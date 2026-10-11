@@ -100,12 +100,12 @@ optimisation and the login message. Steps needing root run their commands throug
 `install.sh` (in the repository's `main` branch, run via `curl ... | bash`):
 
 1. Checks the OS, installs base packages (`python3`, `curl`, build tools).
-2. Installs `uv`.
-3. Installs Lauschkiste, either
-   - **package** (default): `uv tool install <wheel URL of the latest GitHub release>`, or
+2. Installs Lauschkiste, either
+   - **package** (default): from PyPI (or the wheels of a GitHub release) with pip into a venv, or with `uv tool
+     install` when uv is there (`uv` is installed only for the cases that need it), or
    - **source** (`--source`): `git clone`, `uv sync` in the checkout, with `LAUSCHKISTE_HOME`
      (`--home`, default `<checkout>/shared`) in the shell profile and the service.
-4. Runs `lauschctl setup`.
+3. Tells you to run `lauschctl setup`. Everything that configures the machine is done there, not by the script.
 
 ## Details
 
@@ -145,7 +145,7 @@ optimisation and the login message. Steps needing root run their commands throug
    `uv sync --no-dev --frozen`, web app built with npm if available, else taken from the latest
    release wheel; `~/.local/bin/lauschctl` links to the checkout's venv. `LAUSCHKISTE_HOME` (Pi:
    `~/lauschkiste`, source: `<checkout>/shared`) and `~/.local/bin` on `PATH` go into `~/.profile` and
-   `~/.bashrc`. `ci/test_install.sh` runs it in a fresh `debian:<codename>-slim` container and
+   `~/.bashrc`. `ci/test_install.sh` runs it and then `lauschctl setup --yes` in a fresh `debian:<codename>-slim` container and
    starts Lauschkiste; the wheels workflow does that for the wheels (trixie, bookworm) and the
    checkout (trixie). No systemd in those containers, so the `service` step is not covered there.
 6. **`lauschctl update`** -- *done* (`packages/cli/src/lauschkiste_cli/update.py`). Source checkout:

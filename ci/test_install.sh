@@ -26,11 +26,12 @@ if [[ "$INSTALL_ARGS" == --index\ * ]]; then
     su - pi -c "nohup python3 -m http.server 8099 -d /home/pi/index >/tmp/index.log 2>&1 &"
     args="--from http://localhost:8099/simple/"
 fi
-su - pi -c "bash ~/checkout/install.sh --yes ${args}"
+su - pi -c "bash ~/checkout/install.sh ${args}"
 su - pi -c "
     set -e
     cd /tmp && source ~/.profile
     lauschctl home
+    lauschctl setup --yes
     lauschctl setup --check --yes
     (lauschkiste > /tmp/run.log 2>&1 &)
     for i in \$(seq 1 120); do curl -fsS localhost:5556/api/v1/health 2>/dev/null && break; sleep 1; done

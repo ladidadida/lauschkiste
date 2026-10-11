@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs Lauschkiste and runs `lauschctl setup`.
+# Installs Lauschkiste. The machine is set up afterwards with `lauschctl setup`.
 #
 #   curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash
 #   curl -fsSL .../install.sh | bash -s -- --from source
@@ -20,10 +20,7 @@
 #   --repo OWNER/NAME  GitHub repository (default: ladidadida/lauschkiste)
 #   --home DIR         LAUSCHKISTE_HOME (default: ~/lauschkiste on a Raspberry Pi,
 #                      ~/.local/share/lauschkiste elsewhere, DIR/shared with --source)
-#   --library DIR      the library (music, audiobooks) in DIR instead of <home>/library
-#   --yes              don't ask, use defaults (also passed to `lauschctl setup`)
 #   --no-dev           with --from source: leave out the development tools (pytest, ruff, bam, ...)
-#   --no-setup         only install, don't run `lauschctl setup`
 
 set -euo pipefail
 
@@ -40,9 +37,6 @@ BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-device
                  lauschkiste-plugin-rfid-readers lauschkiste-plugin-samba lauschkiste-plugin-audiobookshelf
                  lauschkiste-plugin-directories)
 HOME_DIR=""
-LIBRARY_DIR=""
-ASSUME_YES=false
-RUN_SETUP=true
 DEV_TOOLS=true
 MARKER="# lauschkiste (added by install.sh)"
 
@@ -64,10 +58,7 @@ parse_args() {
             --wheels) WHEELS="$(cd "$2" && pwd)"; shift ;;
             --repo) REPO="$2"; shift ;;
             --home) HOME_DIR="$2"; shift ;;
-            --library) LIBRARY_DIR="$2"; shift ;;
-            --yes|-y) ASSUME_YES=true ;;
             --no-dev) DEV_TOOLS=false ;;
-            --no-setup) RUN_SETUP=false ;;
             -h|--help) echo "See the comment at the top of install.sh for the options."; exit 0 ;;
             *) die "unknown option $1 (see --help)" ;;
         esac
@@ -366,25 +357,7 @@ main() {
     choose_home
 
     "$CTL" home
-    if [[ -n "$LIBRARY_DIR" ]]; then
-        LIBRARY_DIR="$(mkdir -p "$LIBRARY_DIR" && cd "$LIBRARY_DIR" && pwd)"
-        "$CTL" config set library.path "$LIBRARY_DIR"
-    fi
-
-    if [[ "$RUN_SETUP" == true ]]; then
-        log "Setting up this machine"
-        if [[ "$ASSUME_YES" == true ]]; then
-            "$CTL" setup --yes
-        elif [[ -t 0 ]]; then
-            "$CTL" setup
-        elif (: < /dev/tty) 2>/dev/null; then
-            "$CTL" setup < /dev/tty
-        else
-            "$CTL" setup --yes
-        fi
-    fi
-
-    log "Done. Open a new shell (or 'source ~/.profile') to use the 'lauschctl' command."
+    log "Lauschkiste is installed. Open a new shell (or 'source ~/.profile'), then run 'lauschctl setup' to set up this machine."
 }
 
 main "$@"
