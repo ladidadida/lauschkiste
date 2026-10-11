@@ -131,7 +131,11 @@ class KioskStep(Step):
         return bool(ctx.answer('kiosk'))
 
     def _chromium(self, ctx):
-        return 'chromium' if ctx.system.architecture() == 'x86_64' else 'chromium-browser'
+        """Debian 13 (Trixie) and newer call the package ``chromium``; Raspberry Pi OS up to Bookworm ``chromium-browser``."""
+        text = ctx.system.read('/etc/os-release') or ''
+        codename = re.search(r'^VERSION_CODENAME=(\S+)', text, re.MULTILINE)
+        old = codename is not None and codename.group(1) in ('bullseye', 'bookworm')
+        return 'chromium-browser' if old and ctx.system.architecture() != 'x86_64' else 'chromium'
 
     def _update_check_file(self, ctx):
         if self._chromium(ctx) == 'chromium':

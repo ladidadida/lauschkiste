@@ -414,3 +414,20 @@ def test_extra_plugins_are_installed_enabled_and_remembered(tmp_path, home, extr
 def test_without_extra_plugins_nothing_happens(tmp_path, home, extras):
     failed, ctx = setup_run(FakeSystem(tmp_path / 'root'), home, names=['extra_plugins'])
     assert failed == 0 and not (home / 'settings' / 'extra_plugins.json').exists()
+
+
+@pytest.mark.parametrize('codename, architecture, expected', [
+    ('trixie', 'arm64', 'chromium'), ('bookworm', 'arm64', 'chromium-browser'), ('bookworm', 'x86_64', 'chromium'),
+    (None, 'arm64', 'chromium'),
+])
+def test_chromium_package_follows_the_debian_release(tmp_path, home, extras, codename, architecture, expected):
+    from lauschkiste_cli.setup.steps.extras import KioskStep
+    system = FakeSystem(tmp_path / 'root')
+    system.architecture = lambda: architecture
+    if codename:
+        system.write('/etc/os-release', f'VERSION_CODENAME={codename}\n')
+    ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml')
+    step = KioskStep()
+    assert step._chromium(ctx) == expected
+    assert expected in step.packages(ctx)
+    assert step._update_check_file(ctx).startswith('/etc/chromium.d/' if expected == 'chromium' else '/etc/chromium-browser')
