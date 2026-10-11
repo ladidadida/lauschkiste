@@ -291,6 +291,12 @@ plugins:
 - Listed but not installed: logged as an error, everything else starts.
 - Bundled plugins live under `packages/plugins/<name>/` as uv workspace members, each with its own
   dependencies. The installer installs them and pre-fills `plugins:` for the ones the user selected.
+- Plugins of other authors are installed with `lauschctl plugin install <spec> --enable` or in the setup step
+  `extra_plugins` (`lauschctl setup extra_plugins`): a package name (`name==1.2`), `github:owner/repo@tag` or a URL.
+  The setup installs the package, enables the plugins it provides and remembers what it installed in
+  `settings/extra_plugins.json`; the entries are kept in `setup.yaml`, so a fresh machine can be set up again with
+  `lauschctl setup --yes`. A plugin runs with the rights of the user, so install only plugins you trust and pin a
+  version or tag. Installing is deliberately not offered in the web app, which anyone in the network can open.
 - `lauschctl plugin list|enable|disable|install` manages this from the command line. A plugin whose
   dependencies are optional extras of its package names them in `extras` (e.g.
   `extras = ('gpio',)`); `lauschctl plugin enable <name> --with-extras` installs them.

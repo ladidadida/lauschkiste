@@ -63,6 +63,7 @@ Opens its own WiFi when no known one is in range, e.g. when travelling.
 
 | Step | For |
 | --- | --- |
+| `extra_plugins` | install plugins from PyPI, GitHub (`github:owner/repo@tag`) or a URL and enable them |
 | `hardware` | choose the connected hardware: sound card, pHAT BEAT, power button, battery monitor |
 | `boot` | faster start (Bluetooth, IPv6, boot messages off) |
 | `kiosk` | the web app on an attached screen |

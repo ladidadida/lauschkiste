@@ -364,3 +364,53 @@ def test_a_choice_is_picked_by_number_or_value(monkeypatch):
         assert ask(question, ctx, {}, assume_yes=False) == expected
     monkeypatch.setattr('typer.prompt', lambda *a, **k: k['default'])
     assert ask(question, ctx, {'card': 'b'}, assume_yes=False) == 'b'
+
+
+@pytest.mark.parametrize('text, expected', [
+    ('lauschkiste-plugin-foo', 'lauschkiste-plugin-foo'),
+    ('lauschkiste-plugin-foo==1.2', 'lauschkiste-plugin-foo==1.2'),
+    ('github:someone/the-plugin', 'git+https://github.com/someone/the-plugin'),
+    ('github:someone/the-plugin@v1.2', 'git+https://github.com/someone/the-plugin@v1.2'),
+    ('https://example.org/foo-1.0-py3-none-any.whl', 'https://example.org/foo-1.0-py3-none-any.whl'),
+])
+def test_plugin_sources_are_translated(text, expected):
+    from lauschkiste_cli.setup.steps.extra_plugins import parse_spec
+    assert parse_spec(text) == expected
+
+
+@pytest.mark.parametrize('text', ['--index-url=https://evil.example', '-r', 'not a requirement!', 'github:only-owner'])
+def test_plugin_sources_reject_options_and_nonsense(text):
+    from lauschkiste_cli.setup.steps.extra_plugins import parse_spec
+    with pytest.raises(ValueError):
+        parse_spec(text)
+
+
+def test_extra_plugins_are_installed_enabled_and_remembered(tmp_path, home, extras, monkeypatch):
+    import lauschkiste.contract.plugins as contract_plugins
+    system = FakeSystem(tmp_path / 'root')
+    available = dict(contract_plugins.installed())
+    calls = []
+
+    def install(requirements):
+        calls.extend(requirements)
+        if requirements == ['git+https://github.com/someone/clock']:
+            available['clock'] = object()
+
+    monkeypatch.setattr(plugin, 'install_requirements', install)
+    monkeypatch.setattr(contract_plugins, 'installed', lambda: dict(available))
+    monkeypatch.setattr(contract_plugins, 'why_not_enable', lambda cfg, name: None)
+    monkeypatch.setattr(plugin, 'plugin_extras', lambda name: [])
+    answers = {'extra_plugins': 'github:someone/clock'}
+    failed, ctx = setup_run(system, home, names=['extra_plugins'], answers=answers)
+    assert failed == 0
+    assert calls == ['git+https://github.com/someone/clock']
+    assert 'clock' in ctx.enabled_plugins()
+    assert (home / 'settings' / 'extra_plugins.json').exists()
+    assert 'git' in system.installed
+    failed, _ = setup_run(system, home, names=['extra_plugins'], answers=answers)
+    assert failed == 0 and calls == ['git+https://github.com/someone/clock']
+
+
+def test_without_extra_plugins_nothing_happens(tmp_path, home, extras):
+    failed, ctx = setup_run(FakeSystem(tmp_path / 'root'), home, names=['extra_plugins'])
+    assert failed == 0 and not (home / 'settings' / 'extra_plugins.json').exists()
