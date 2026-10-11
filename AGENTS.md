@@ -124,7 +124,7 @@ Package manager is **uv**; the dev/CI workflow is driven by **[bam](https://gitl
 (`bam.yaml`), a content-addressed task runner — cached, so re-running an unchanged task is instant.
 
 ```bash
-export LAUSCHKISTE_HOME=$PWD/shared   # data directory of this checkout (default: ~/.local/share/lauschkiste)
+export LAUSCHKISTE_HOME=$PWD/shared   # data directory of this checkout (default: ~/lauschkiste on a Pi, else ~/.local/share/lauschkiste)
 uv sync --group dev             # install/update the .venv (runtime + dev dependencies, core and
                                  # bundled plugins); reader drivers with extra dependencies need
                                  # --extra <driver-extra> (see "Bundled plugins" above)

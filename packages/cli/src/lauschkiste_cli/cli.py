@@ -7,7 +7,7 @@ import lauschkiste.paths
 from lauschkiste_cli.run import run
 
 HOME_HELP = ("Directory with all data (settings, music, logs). "
-             "Default: $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).")
+             "Default: ~/lauschkiste on a Raspberry Pi, else $XDG_DATA_HOME/lauschkiste (~/.local/share/lauschkiste).")
 
 
 def main(home: Optional[Path] = typer.Option(

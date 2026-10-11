@@ -324,8 +324,6 @@ choose_home() {
     if [[ -z "$HOME_DIR" ]]; then
         if [[ "$MODE" == source ]]; then
             HOME_DIR="${SOURCE_DIR}/shared"
-        elif is_raspberry_pi; then
-            HOME_DIR="${HOME}/lauschkiste"
         else
             return 0
         fi

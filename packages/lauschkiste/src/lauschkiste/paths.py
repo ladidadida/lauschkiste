@@ -32,14 +32,24 @@ def getenv(name: str) -> Optional[str]:
     return os.environ.get(env_name(name)) or None
 
 
+def is_raspberry_pi() -> bool:
+    try:
+        return 'Raspberry Pi' in Path('/proc/device-tree/model').read_text(errors='replace')
+    except OSError:
+        return False
+
+
 def default_home() -> Path:
+    """``~/lauschkiste`` on a Raspberry Pi (visible, easy to reach), else ``$XDG_DATA_HOME/lauschkiste``."""
+    if is_raspberry_pi():
+        return Path.home() / 'lauschkiste'
     xdg_data_home = os.environ.get('XDG_DATA_HOME')
     base = Path(xdg_data_home) if xdg_data_home else Path.home() / '.local' / 'share'
     return base / 'lauschkiste'
 
 
 def home() -> Path:
-    """The home: set explicitly, else ``$LAUSCHKISTE_HOME``, else ``$XDG_DATA_HOME/lauschkiste``."""
+    """The home: set explicitly, else ``$LAUSCHKISTE_HOME``, else the default home."""
     global _home
     if _home is None:
         configured = getenv('HOME')

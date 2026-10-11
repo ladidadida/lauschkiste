@@ -33,6 +33,7 @@ def test_packaged_sounds(home):
 def clean_env(monkeypatch, tmp_path):
     monkeypatch.delenv(lauschkiste.paths.HOME_ENV, raising=False)
     monkeypatch.setenv('XDG_DATA_HOME', str(tmp_path / 'xdg'))
+    monkeypatch.setattr(lauschkiste.paths, 'is_raspberry_pi', lambda: False)
     lauschkiste.paths.set_home(None)
     yield tmp_path
     lauschkiste.paths.set_home(None)
@@ -47,3 +48,9 @@ def test_home_from_variable_or_xdg(clean_env, monkeypatch):
 
 def test_config_file(home):
     assert lauschkiste.paths.config_file() == home / 'settings' / 'lauschkiste.yaml'
+
+
+def test_home_on_a_raspberry_pi_is_visible_in_the_user_home(clean_env, monkeypatch):
+    monkeypatch.setattr(lauschkiste.paths, 'is_raspberry_pi', lambda: True)
+    monkeypatch.setenv('HOME', str(clean_env / 'user'))
+    assert lauschkiste.paths.home() == clean_env / 'user' / 'lauschkiste'

@@ -25,6 +25,9 @@ the [roadmap](roadmap-core-architecture.md).
 
 ## Planned
 
+- **Tidy up** (before further features): the code is spread over a dozen modules in few subdirectories and needs a
+  clearer structure; the documentation grew by adapting and should be rebuilt from how the system is used, for users
+  and developers alike.
 - Playing from a phone over Bluetooth, for apps that cannot be integrated, such as the Onleihe
   ([plan](phone-audio.md)).
 - A handover to other rooms through Music Assistant (needs the same Audiobookshelf user; see the

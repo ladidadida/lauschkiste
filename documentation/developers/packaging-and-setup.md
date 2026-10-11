@@ -28,10 +28,11 @@ $LAUSCHKISTE_HOME/
   cache/        cover art, ...
 ```
 
-- Default: `$XDG_DATA_HOME/lauschkiste` (usually `~/.local/share/lauschkiste`); override with the
+- Default: `~/lauschkiste` on a Raspberry Pi (visible, easy to reach via Samba), else `$XDG_DATA_HOME/lauschkiste`
+  (usually `~/.local/share/lauschkiste`); override with the
   `LAUSCHKISTE_HOME` environment variable or `lauschctl --home`.
 - The home cannot be a setting (it says where the settings are), so it is the environment variable or
-  `--home`. `install.sh` puts the variable into the shell profile and the systemd unit; for development in
+  `--home`. `install.sh --home DIR` (and `--from source`) puts the variable into the shell profile and the systemd unit; for development in
   a checkout use `export LAUSCHKISTE_HOME=$PWD/shared`. A `.env` file is not read by Lauschkiste; the
   git-ignored `.env`/`.env.local` only hold local test credentials for scripts.
 - Relative paths in the configuration are resolved against `LAUSCHKISTE_HOME`, not against the working
