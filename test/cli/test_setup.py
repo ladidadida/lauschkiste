@@ -443,3 +443,21 @@ def test_a_quiet_boot_is_an_explicit_choice_and_never_touches_the_network(tmp_pa
     assert 'quiet' in cmdline and 'ipv6' not in cmdline and 'noatime' not in cmdline
     assert 'bluetooth.service' in system.enabled and 'apt-daily.timer' in system.enabled
     assert not any('nmcli' in command or 'dhcpcd' in str(command) for command in system.commands)
+
+
+def test_kiosk_step_repairs_an_outdated_chromium_command(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    system.write('/etc/os-release', 'VERSION_CODENAME=trixie\n')
+    system.write('/etc/xdg/openbox/autostart', 'keep\n\n## Lauschkiste Kiosk Mode\nxset s off\n'
+                 'chromium-browser http://localhost:5556 --kiosk\n\nother\n')
+    system.write('~/.bashrc', 'before\n')
+    system.write('/etc/systemd/system/getty@tty1.service.d/autologin.conf', '')
+    answers = {'kiosk': True}
+    failed, _ = setup_run(system, home, names=['kiosk'], answers=answers)
+    assert failed == 0
+    autostart = system.read('/etc/xdg/openbox/autostart')
+    assert 'chromium http://localhost:5556' in autostart and 'chromium-browser' not in autostart
+    assert autostart.count('## Lauschkiste Kiosk Mode') == 1 and autostart.startswith('keep\n') and 'other' in autostart
+    assert system.read('~/.bashrc').count('startx') == 1
+    failed, _ = setup_run(system, home, names=['kiosk'], answers=answers, check_only=True)
+    assert failed == 0

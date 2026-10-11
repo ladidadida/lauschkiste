@@ -108,6 +108,39 @@ class System:
         self.write(path, '\n'.join(lines), root=root)
         return True
 
+    def read_marked(self, path: PathLike, marker: str) -> Optional[str]:
+        """The block ``append_block`` wrote (the lines after the marker up to the next blank line); None if absent."""
+        lines = (self.read(path) or '').split('\n')
+        for start, line in enumerate(lines):
+            if line.strip() == marker:
+                end = start + 1
+                while end < len(lines) and lines[end].strip():
+                    end += 1
+                return '\n'.join(lines[start + 1:end])
+        return None
+
+    def remove_marked(self, path: PathLike, marker: str, root: bool = False) -> bool:
+        """Remove the block ``append_block`` wrote (marker through the next blank line) and the blank line before it;
+        False if there is none."""
+        lines = (self.read(path) or '').split('\n')
+        for start, line in enumerate(lines):
+            if line.strip() == marker:
+                end = start + 1
+                while end < len(lines) and lines[end].strip():
+                    end += 1
+                first = start - 1 if start > 0 and not lines[start - 1].strip() else start
+                del lines[first:end]
+                self.write(path, '\n'.join(lines), root=root)
+                return True
+        return False
+
+    def replace_marked(self, path: PathLike, marker: str, block: str, root: bool = False) -> None:
+        """Write ``block`` under ``marker``, replacing what an earlier run wrote there."""
+        if self.read_marked(path, marker) == block.rstrip():
+            return
+        self.remove_marked(path, marker, root=root)
+        self.append_block(path, marker, block, root=root)
+
     def remove(self, path: PathLike, root: bool = False) -> None:
         target = self.path(path)
         if not target.exists():

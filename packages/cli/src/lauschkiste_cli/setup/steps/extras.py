@@ -145,20 +145,11 @@ class KioskStep(Step):
     def packages(self, ctx):
         return ['xserver-xorg', 'x11-xserver-utils', 'xinit', 'openbox', self._chromium(ctx)]
 
-    def check(self, ctx):
-        system = ctx.system
-        problems = [f'{path} is not set up' for path in (self.BASHRC, self.AUTOSTART, self._update_check_file(ctx))
-                    if self.MARKER not in (system.read(path) or '')]
-        if system.is_raspberry_pi() and not system.exists(self.AUTOLOGIN):
-            problems.append('console autologin is not enabled')
-        return problems
+    STARTX = '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor'
 
-    def apply(self, ctx):
-        system = ctx.system
+    def _autostart(self, ctx) -> str:
         port = ctx.load_config().getn('api', 'port', default=5556)
-        system.append_block(self.BASHRC, self.MARKER,
-                            '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor')
-        system.append_block(self.AUTOSTART, self.MARKER, (
+        return (
             'xset s off\n'
             'xset s noblank\n'
             'xset -dpms\n'
@@ -166,7 +157,24 @@ class KioskStep(Step):
             "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; "
             "s/\"exit_type\":\"[^\"]\\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences\n"
             f'{self._chromium(ctx)} http://localhost:{port} --disable-infobars --disable-pinch --disable-translate '
-            '--kiosk --noerrdialogs --no-first-run'), root=True)
+            '--kiosk --noerrdialogs --no-first-run')
+
+    def check(self, ctx):
+        system = ctx.system
+        expected = {self.BASHRC: self.STARTX, self.AUTOSTART: self._autostart(ctx)}
+        problems = [f'{path} is not set up' if system.read_marked(path, self.MARKER) is None
+                    else f'{path} is outdated' for path, block in expected.items()
+                    if system.read_marked(path, self.MARKER) != block]
+        if self.MARKER not in (system.read(self._update_check_file(ctx)) or ''):
+            problems.append(f'{self._update_check_file(ctx)} is not set up')
+        if system.is_raspberry_pi() and not system.exists(self.AUTOLOGIN):
+            problems.append('console autologin is not enabled')
+        return problems
+
+    def apply(self, ctx):
+        system = ctx.system
+        system.replace_marked(self.BASHRC, self.MARKER, self.STARTX)
+        system.replace_marked(self.AUTOSTART, self.MARKER, self._autostart(ctx), root=True)
         system.write(self._update_check_file(ctx),
                      f'{self.MARKER}\nCHROMIUM_FLAGS="${{CHROMIUM_FLAGS}} --check-for-update-interval=31536000"\n',
                      root=True)

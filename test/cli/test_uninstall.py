@@ -4,7 +4,7 @@ from typer.testing import CliRunner
 import lauschkiste.paths
 from lauschkiste_cli import uninstall as uninstall_module
 from lauschkiste_cli.setup.system import System
-from lauschkiste_cli.uninstall import PROFILE_MARKER, _profile_lines, plan, remove_marked
+from lauschkiste_cli.uninstall import PROFILE_MARKER, _profile_lines, plan
 
 
 class RecordingSystem(System):
@@ -28,9 +28,9 @@ def system(tmp_path, monkeypatch):
 
 def test_a_marked_block_is_removed_with_its_blank_line_and_nothing_else(system):
     system.write('/etc/x.conf', 'keep1\n\n## Lauschkiste Boot Config\ndisable_splash=1\n\nkeep2\n')
-    assert remove_marked(system, '/etc/x.conf', '## Lauschkiste Boot Config')
+    assert system.remove_marked('/etc/x.conf', '## Lauschkiste Boot Config')
     assert system.read('/etc/x.conf') == 'keep1\n\nkeep2\n'
-    assert not remove_marked(system, '/etc/x.conf', '## Lauschkiste Boot Config')
+    assert not system.remove_marked('/etc/x.conf', '## Lauschkiste Boot Config')
 
 
 def test_profile_lines_of_the_installer_are_removed(system):

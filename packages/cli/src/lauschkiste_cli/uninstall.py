@@ -31,22 +31,6 @@ class Action:
     run: Callable[[], None]
 
 
-def remove_marked(system: System, path: str, marker: str, root: bool = False) -> bool:
-    """Remove the block ``append_block`` wrote: the marker line up to the next blank line, and the blank line
-    before it. False if the file has no such block."""
-    lines = (system.read(path) or '').split('\n')
-    for start, line in enumerate(lines):
-        if line.strip() == marker:
-            end = start + 1
-            while end < len(lines) and lines[end].strip():
-                end += 1
-            first = start - 1 if start > 0 and not lines[start - 1].strip() else start
-            del lines[first:end]
-            system.write(path, '\n'.join(lines), root=root)
-            return True
-    return False
-
-
 def has_marker(system: System, path: str, marker: str) -> bool:
     return marker in (system.read(path) or '')
 
@@ -140,11 +124,11 @@ def _block_actions(system: System) -> List[Action]:
     blocks = [(kiosk.BASHRC, kiosk.MARKER, False, f'remove the kiosk mode from {kiosk.BASHRC}'),
               (kiosk.AUTOSTART, kiosk.MARKER, True, f'remove the kiosk mode from {kiosk.AUTOSTART}'),
               (boot_config, system_steps.BootStep.MARKER, True, 'remove the splash setting from config.txt')]
-    actions = [Action(text, lambda p=path, m=marker, r=root: remove_marked(system, p, m, root=r))
+    actions = [Action(text, lambda p=path, m=marker, r=root: system.remove_marked(p, m, root=r))
                for path, marker, root, text in blocks if has_marker(system, path, marker)]
     if has_marker(system, samba.CONF, samba.MARKER):
         def share() -> None:
-            remove_marked(system, samba.CONF, samba.MARKER, root=True)
+            system.remove_marked(samba.CONF, samba.MARKER, root=True)
             system.run('systemctl', 'restart', 'smbd', root=True, check=False)
         actions.append(Action('remove the Samba share of the library', share))
     for profile in ('~/.profile', '~/.bashrc'):
