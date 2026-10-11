@@ -15,6 +15,8 @@ import {
 
 import request from '../../../utils/request';
 
+const GIVE_UP_MS = 5 * 60 * 1000;
+
 export default function RebootDialog() {
   const { t } = useTranslation();
 
@@ -22,20 +24,27 @@ export default function RebootDialog() {
   const [waitingForReboot, setWaitingForReboot] = useState(false);
   const [showError, setShowError] = useState(false);
 
-  const checkIfBackendIsAvailable = () => {
-    const checkingInterval = setInterval(async () => {
-      try {
-        await request('playerstatus');
-        setDialogOpen(false);
+  const waitForBackend = () => {
+    let wentDown = false;
+    const started = Date.now();
+    const interval = setInterval(async () => {
+      const { error } = await request('playerstatus');
+      if (error) {
+        wentDown = true;
+      }
+      else if (wentDown) {
+        clearInterval(interval);
+        window.location.reload();
+        return;
+      }
+      if (Date.now() - started > GIVE_UP_MS) {
+        clearInterval(interval);
         setWaitingForReboot(false);
-        clearInterval(checkingInterval);
+        setDialogOpen(false);
+        setShowError(true);
       }
-      catch {
-        setWaitingForReboot(true);
-        console.log('waiting for reboot');
-      }
-    }, 15000);
-  }
+    }, 5000);
+  };
 
   const handleClickOpen = () => {
     setDialogOpen(true);
@@ -46,16 +55,15 @@ export default function RebootDialog() {
   };
 
   const doReboot = async () => {
-    try {
-      setWaitingForReboot(true);
-      checkIfBackendIsAvailable();
-      request('reboot');
-    }
-    catch {
+    setWaitingForReboot(true);
+    const { error } = await request('reboot');
+    if (error) {
       setWaitingForReboot(false);
       setDialogOpen(false);
       setShowError(true);
+      return;
     }
+    waitForBackend();
   };
 
   const handleCloseError = () => {

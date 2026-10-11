@@ -27,11 +27,9 @@ export default function ShutDownDialog() {
   };
 
   const doShutdown = async () => {
-    try {
-      setShuttingDown(true);
-      request('shutdown');
-    }
-    catch {
+    setShuttingDown(true);
+    const { error } = await request('shutdown');
+    if (error) {
       setShuttingDown(false);
       setDialogOpen(false);
       setShowError(true);
