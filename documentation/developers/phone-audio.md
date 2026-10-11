@@ -110,5 +110,5 @@ would be a Zero 2 W or a Pi 3 for a box that is also used as a Bluetooth speaker
 
 ## Recommendation
 
-Not part of `0.1.0-alpha.4`. Release that first, and take this as the next feature. **Phase 0 can be done today, with
+Not part of `0.1.0-alpha.5`. Release that first, and take this as the next feature. **Phase 0 can be done today, with
 no code**: the PipeWire stack of the test Zero should accept a phone as it is. If that works, the idea is proven.
