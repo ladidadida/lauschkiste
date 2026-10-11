@@ -63,6 +63,7 @@ lauschctl setup autohotspot
 
 | Schritt | Wofür |
 | --- | --- |
+| `hardware` | angeschlossene Hardware wählen: Soundkarte, pHAT BEAT, Power-Taster, Batteriemonitor |
 | `boot` | schnellerer Start (Bluetooth, IPv6, Startmeldungen aus) |
 | `kiosk` | Web-App auf einem angeschlossenen Bildschirm |
 | `mpd` | mpd als Wiedergabe statt der eingebauten |

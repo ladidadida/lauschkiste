@@ -8,6 +8,7 @@ import typer
 import lauschkiste.paths
 from lauschkiste_cli.setup.base import Answers, Context, Step, ask
 from lauschkiste_cli.setup.steps import all_steps
+from lauschkiste_cli.setup.steps.lauschkiste import public_port
 from lauschkiste_cli.setup.system import SetupError, StepSkipped, System
 
 
@@ -99,6 +100,15 @@ def run_setup(names: Optional[List[str]], ctx: Context, answers: Answers, check_
     return sum(not _run_step(step, ctx, check_only, force) for step in wanted)
 
 
+def _summary(ctx: Context) -> None:
+    """What is left to do and where to go next."""
+    for note in ctx.notes:
+        typer.echo(f"  - {note}")
+    port = public_port(ctx)
+    host = ctx.system.output('hostname').strip() or 'localhost'
+    typer.echo(f"The web app is at http://{host}{'' if port == 80 else f':{port}'}")
+
+
 def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (default: all)"),
           check: bool = typer.Option(False, "--check", help="Only report what is missing, change nothing"),
           yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask; reuse earlier answers or defaults"),
@@ -117,8 +127,12 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
         return
     ctx = Context(system=System(), config_path=conf or lauschkiste.paths.config_file(),
                   assume_yes=yes)
+    if not steps and not check and not yes:
+        typer.echo("This sets up the machine step by step: hardware, system packages, the service and the "
+                   "extras you choose. Every question has a default; run it again at any time to change something.")
     failed = run_setup(steps, ctx, Answers(), check_only=check, force=force)
     if failed:
         raise typer.Exit(1)
     if not check:
         typer.echo(typer.style("Setup complete.", fg='green'))
+        _summary(ctx)

@@ -63,6 +63,7 @@ Opens its own WiFi when no known one is in range, e.g. when travelling.
 
 | Step | For |
 | --- | --- |
+| `hardware` | choose the connected hardware: sound card, pHAT BEAT, power button, battery monitor |
 | `boot` | faster start (Bluetooth, IPv6, boot messages off) |
 | `kiosk` | the web app on an attached screen |
 | `mpd` | mpd for playback instead of the built-in player |

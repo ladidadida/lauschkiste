@@ -18,8 +18,10 @@ class Question:
     text: str
     #: Value or ``callable(ctx)``
     default: Any = None
-    #: 'bool', 'text' or 'secret' (secrets are not stored)
+    #: 'bool', 'text', 'secret' (secrets are not stored) or 'choice'
     kind: str = 'bool'
+    #: For 'choice': ``((value, label), ...)`` or ``callable(ctx)`` returning it
+    choices: Any = ()
     #: Only asked if ``when(answers)`` is true
     when: Optional[Callable[[Dict[str, Any]], Any]] = None
     #: Returns an error message for an invalid text answer
@@ -29,6 +31,9 @@ class Question:
     def default_for(self, ctx: 'Context') -> Any:
         return self.default(ctx) if callable(self.default) else self.default
 
+    def choices_for(self, ctx: 'Context') -> Sequence[Tuple[str, str]]:
+        return tuple(self.choices(ctx) if callable(self.choices) else self.choices)
+
 
 @dataclass
 class Context:
@@ -36,6 +41,8 @@ class Context:
     config_path: Path
     answers: Dict[str, Any] = field(default_factory=dict)
     assume_yes: bool = False
+    #: Things to tell the user at the end (a reboot is needed, ...)
+    notes: List[str] = field(default_factory=list)
 
     def answer(self, key: str, default: Any = None) -> Any:
         return self.answers.get(key, default)
@@ -90,6 +97,8 @@ def ask(question: Question, ctx: Context, stored: Dict[str, Any], assume_yes: bo
         typer.echo(typer.style(question.help, dim=True))
     if question.kind == 'bool':
         return typer.confirm(question.text, default=bool(default))
+    if question.kind == 'choice':
+        return _choose(question, ctx, default)
     while True:
         value = typer.prompt(question.text, default=default, hide_input=question.kind == 'secret',
                              show_default=question.kind != 'secret')
@@ -97,6 +106,22 @@ def ask(question: Question, ctx: Context, stored: Dict[str, Any], assume_yes: bo
         if not problem:
             return value
         typer.echo(problem)
+
+
+def _choose(question: Question, ctx: Context, default: Any) -> str:
+    choices = question.choices_for(ctx)
+    values = [value for value, _ in choices]
+    typer.echo(question.text)
+    for number, (_, label) in enumerate(choices, 1):
+        typer.echo(f"  {number}) {label}")
+    preset = str(values.index(default) + 1) if default in values else '1'
+    while True:
+        answer = str(typer.prompt('Number', default=preset)).strip()
+        if answer in values:
+            return answer
+        if answer.isdigit() and 1 <= int(answer) <= len(values):
+            return values[int(answer) - 1]
+        typer.echo(f"Please enter a number from 1 to {len(values)}.")
 
 
 class Answers:

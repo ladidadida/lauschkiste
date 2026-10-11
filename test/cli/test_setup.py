@@ -318,3 +318,49 @@ def test_port_step_needs_the_socket_proxy(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
     (system.root / 'usr/lib/systemd/systemd-socket-proxyd').unlink()
     assert setup_run(system, home, names=['port'])[0] == 1
+
+
+def test_hardware_step_enables_the_plugins_of_the_chosen_hardware(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    answers = {'hw_phat_beat': False, 'hw_sound_card': 'max98357a', 'hw_power_button': True, 'hw_battery': 'ina219'}
+    failed, ctx = setup_run(system, home, names=['hardware'], answers=answers)
+    assert failed == 0
+    plugins = ctx.enabled_plugins()
+    assert plugins['board_raspberry_pi']['sound_card'] == 'max98357a'
+    assert plugins['battery']['driver'] == 'ina219'
+    assert 'power_button' in plugins and 'phat_beat' not in plugins
+    failed, _ = setup_run(system, home, names=['hardware'], answers=answers, check_only=True)
+    assert failed == 0
+
+
+def test_hardware_step_with_a_phat_beat_needs_no_sound_card_answer(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    failed, ctx = setup_run(system, home, names=['hardware'], answers={'hw_phat_beat': True})
+    assert failed == 0
+    assert 'phat_beat' in ctx.enabled_plugins()
+    failed, ctx = setup_run(system, home, names=['hardware'], answers={'hw_phat_beat': False, 'hw_battery': 'none'})
+    assert failed == 0
+    assert 'phat_beat' not in ctx.enabled_plugins()
+
+
+def test_hardware_step_is_skipped_off_the_raspberry_pi(tmp_path, home, extras):
+    failed, ctx = setup_run(FakeSystem(tmp_path / 'root'), home, names=['hardware'])
+    assert failed == 0 and 'board_raspberry_pi' not in ctx.enabled_plugins()
+
+
+def test_reboot_note_after_a_changed_boot_configuration(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    _board_settings(home, {'sound_card': 'max98357a'}, {})
+    _, ctx = setup_run(system, home, names=['raspi'])
+    assert any('Reboot' in note for note in ctx.notes)
+
+
+def test_a_choice_is_picked_by_number_or_value(monkeypatch):
+    from lauschkiste_cli.setup.base import Question, ask
+    question = Question('card', 'Which?', kind='choice', choices=(('none', 'Nothing'), ('a', 'A'), ('b', 'B')))
+    ctx = Context(system=None, config_path=None)
+    for typed, expected in (('3', 'b'), ('a', 'a'), ('', 'none')):
+        monkeypatch.setattr('typer.prompt', lambda *a, _t=typed, **k: _t or k['default'])
+        assert ask(question, ctx, {}, assume_yes=False) == expected
+    monkeypatch.setattr('typer.prompt', lambda *a, **k: k['default'])
+    assert ask(question, ctx, {'card': 'b'}, assume_yes=False) == 'b'

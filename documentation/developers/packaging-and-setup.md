@@ -125,7 +125,7 @@ optimisation and the login message. Steps needing root run their commands throug
    Lauschkiste's own environment, `pip` as fallback.
 4. **Setup framework and steps**: `packages/cli/src/lauschkiste_cli/setup/`. `System` wraps
    commands, files and machine facts (tests swap in a fake with a temporary root); steps:
-   `packages`, `raspi`, `mpd`, `plugins`, `service`, `samba`, `rfid`, `kiosk`, `autohotspot`,
+   `packages`, `hardware`, `raspi`, `mpd`, `plugins`, `service`, `samba`, `rfid`, `kiosk`, `autohotspot`,
    `boot`, `welcome` (`lauschctl setup --list`). Missing Debian packages of all chosen steps are
    installed in one `apt-get` call before the steps run. Notes:
    - The service is a user unit in `~/.config/systemd/user/`, generated with the actual

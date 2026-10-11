@@ -83,6 +83,7 @@ class RaspberryPiStep(Step):
             system.write(f'{path}.backup', config, root=True)
             system.write(path, wanted, root=True)
             typer.echo('    config.txt changed: reboot for it to take effect.')
+            ctx.notes.append('Reboot the box (sudo reboot) so that the changed boot configuration takes effect.')
 
 
 class BootStep(Step):
