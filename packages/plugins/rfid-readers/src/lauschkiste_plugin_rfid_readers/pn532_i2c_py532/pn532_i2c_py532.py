@@ -4,13 +4,13 @@ from py532lib.mifare import Mifare
 from py532lib.mifare import (MIFARE_WAIT_FOR_ENTRY, MIFARE_SAFE_RETRIES)  # noqa: F401
 
 from lauschkiste.rfid import ReaderBaseClass
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 
 
 from .description import DESCRIPTION
 
 
-cfg = lauschkiste.cfghandler.get_handler('rfid')
+cfg = lauschkiste.common.cfghandler.get_handler('rfid')
 
 
 def query_customization() -> dict:

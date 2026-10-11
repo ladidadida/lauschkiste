@@ -1,4 +1,4 @@
-from lauschkiste.system import own_unit
+from lauschkiste.box.system import own_unit
 
 
 def test_own_unit_is_read_from_the_cgroup(tmp_path):

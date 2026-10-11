@@ -5,9 +5,9 @@ import shutil
 import subprocess
 import sys
 
-import lauschkiste.cfghandler
-from lauschkiste.misc.simplecolors import Colors
-import lauschkiste.misc.inputminus as pyil
+import lauschkiste.common.cfghandler
+from lauschkiste.common.misc.simplecolors import Colors
+import lauschkiste.common.misc.inputminus as pyil
 
 
 logger = logging.getLogger()
@@ -284,8 +284,8 @@ def write_config(config_file: str, config_dict: dict, force_overwrite=False) -> 
                 print("Aborting...")
                 return
 
-    cfg_rfid = lauschkiste.cfghandler.get_handler('rfid')
+    cfg_rfid = lauschkiste.common.cfghandler.get_handler('rfid')
     cfg_rfid.config_dict(config_dict)
-    lauschkiste.cfghandler.write_yaml(cfg_rfid, config_file, only_if_changed=False)
+    lauschkiste.common.cfghandler.write_yaml(cfg_rfid, config_file, only_if_changed=False)
 
     logger.info(f"Writing config file: '{config_file}'.")

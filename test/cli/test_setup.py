@@ -1,6 +1,6 @@
 import pytest
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli import plugin
 from lauschkiste_cli.setup import run_setup
 from lauschkiste_cli.setup.base import Answers, Context
@@ -73,9 +73,9 @@ class FakeSystem(System):
 
 @pytest.fixture
 def home(tmp_path):
-    lauschkiste.paths.set_home(tmp_path / 'home')
+    lauschkiste.common.paths.set_home(tmp_path / 'home')
     yield tmp_path / 'home'
-    lauschkiste.paths.set_home(None)
+    lauschkiste.common.paths.set_home(None)
 
 
 @pytest.fixture
@@ -213,7 +213,7 @@ def test_audio_is_skipped_unattended_and_writes_outputs_interactively(tmp_path, 
 
 
 def _board_settings(home, settings, rfid=None):
-    import lauschkiste.statefile as statefile
+    import lauschkiste.common.statefile as statefile
     path = home / 'settings' / 'lauschkiste.yaml'
     config = statefile.read_yaml(path) if path.exists() else {}
     config['plugins'] = {'board_raspberry_pi': settings}

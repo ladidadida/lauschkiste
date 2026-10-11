@@ -2,7 +2,7 @@
   "events": {},
   "extension_points": {
     "providers": {
-      "plan": "(self, item: str) -> lauschkiste.cache.CachePlan",
+      "plan": "(self, item: str) -> lauschkiste.content.cache.CachePlan",
       "removable": "(self, item: str) -> bool",
       "version": "(self, item: str) -> str | None"
     }

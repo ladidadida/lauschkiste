@@ -1,7 +1,7 @@
 import pytest
 
-from lauschkiste.library import LibraryError
-from lauschkiste.playlistgenerator import PlaylistCollector
+from lauschkiste.content.library import LibraryError
+from lauschkiste.content.playlistgenerator import PlaylistCollector
 
 
 def test_pdf_is_excluded_from_folder_content_and_playlist(tmp_path):

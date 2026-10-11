@@ -1,11 +1,11 @@
 import pytest
 
 import lauschkiste.contract.plugins as plugins
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import OperationError, Plugin
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.hardware import Claim, Hardware
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.box.hardware import Claim, Hardware
+from lauschkiste.common.publishing.bus import EventBus
 
 
 class FakeBoard:

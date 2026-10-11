@@ -3,8 +3,8 @@
 from typing import List
 
 import lauschkiste.contract.plugins as plugins
-import lauschkiste.cfghandler
-import lauschkiste.paths
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
 from lauschkiste_cli import plugin
 from lauschkiste_cli.environment import checkout, executable
 from lauschkiste_cli.setup.base import Context, Question, Step
@@ -63,7 +63,7 @@ class ServiceStep(Step):
         if 'mpd' in ctx.enabled_plugins():
             after.append('mpd.service')
         wants = [unit for unit in after if unit.endswith('.service')]
-        workdir = checkout() or lauschkiste.paths.home()
+        workdir = checkout() or lauschkiste.common.paths.home()
         return (
             "[Unit]\n"
             "Description=Lauschkiste\n"
@@ -72,7 +72,7 @@ class ServiceStep(Step):
             f"Wants={' '.join(wants)}\n"
             "\n"
             "[Service]\n"
-            f"Environment={lauschkiste.paths.HOME_ENV}={lauschkiste.paths.home()}\n"
+            f"Environment={lauschkiste.common.paths.HOME_ENV}={lauschkiste.common.paths.home()}\n"
             f"WorkingDirectory={workdir}\n"
             f"ExecStart={executable('lauschkiste')}\n"
             "Restart=always\n"
@@ -215,7 +215,7 @@ class WebPortStep(Step):
         if web_port(ctx) == PUBLIC_PORT:
             cfg = ctx.load_config()
             cfg.setn('api', 'port', value=DEFAULT_PORT)
-            lauschkiste.cfghandler.write_yaml(cfg, str(ctx.config_path))
+            lauschkiste.common.cfghandler.write_yaml(cfg, str(ctx.config_path))
             if system.unit_active(SERVICE, user=True):
                 system.run('systemctl', '--user', 'restart', SERVICE)
         if system.exists(self.OLD_SYSCTL):
@@ -244,7 +244,7 @@ class RfidStep(Step):
 
     def check(self, ctx):
         problems = []
-        if not (lauschkiste.paths.settings_dir() / 'rfid.yaml').exists():
+        if not (lauschkiste.common.paths.settings_dir() / 'rfid.yaml').exists():
             problems.append('no reader configuration (settings/rfid.yaml)')
         if not any(name.startswith('rfid_') for name in ctx.enabled_plugins()):
             problems.append('no reader driver plugin enabled')
@@ -258,6 +258,6 @@ class RfidStep(Step):
         except ImportError as error:
             raise SetupError(f'the rfid-readers plugin package is not installed: {error}') from None
         config = configure.query_user_for_reader(dependency_install='query')
-        configure.write_config(str(lauschkiste.paths.settings_dir() / 'rfid.yaml'), config, force_overwrite=True)
+        configure.write_config(str(lauschkiste.common.paths.settings_dir() / 'rfid.yaml'), config, force_overwrite=True)
         drivers = sorted({f"rfid_{reader['module']}" for reader in config['rfid']['readers'].values()})
         plugin.add_to_config(ctx.config_path, drivers)

@@ -35,14 +35,14 @@ handlers:
     mode: w
   publisher:
     # Publishes logging messages via the PublishServer
-    "()": lauschkiste.misc.loggingext.PubStreamHandler
+    "()": lauschkiste.common.misc.loggingext.PubStreamHandler
     level: WARNING
     formatter: base
 filters:
   colorize:
     # This filter adds all colors from simplecolors by using %(colorname)c or {colorname} in formatter string
     # It also adds the keyword {levelnameColored} which auto-colors the levelname depending on severity
-    "()": lauschkiste.misc.loggingext.ColorFilter
+    "()": lauschkiste.common.misc.loggingext.ColorFilter
     enable: True
     color_levelname: True
 loggers:

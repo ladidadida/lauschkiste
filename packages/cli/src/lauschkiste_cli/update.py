@@ -17,7 +17,7 @@ import typer
 from packaging.utils import canonicalize_name
 from packaging.version import Version
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli import plugin
 from lauschkiste_cli.environment import DEFAULT_REPO, checkout, executable
 from lauschkiste_cli.setup.base import Context
@@ -213,15 +213,15 @@ def restart_service() -> None:
 
 
 def update(release: str = typer.Option('latest', "--version", help="Version or release tag to install (package installs)"),
-           repo: str = typer.Option(DEFAULT_REPO, "--repo", envvar=lauschkiste.paths.env_name("REPO"),
+           repo: str = typer.Option(DEFAULT_REPO, "--repo", envvar=lauschkiste.common.paths.env_name("REPO"),
                                     help="GitHub repository"),
            check: bool = typer.Option(False, "--check", help="Only report whether an update is available"),
            setup: bool = typer.Option(True, "--setup/--no-setup",
                                       help="Re-apply `lauschctl setup` with the stored answers afterwards"),
-           conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_name("CONF"),
+           conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.common.paths.env_name("CONF"),
                                                help="Configuration file")) -> None:
     """Update Lauschkiste: newer release, or `git pull` + `uv sync` in a source checkout."""
-    config_path = conf or lauschkiste.paths.config_file()
+    config_path = conf or lauschkiste.common.paths.config_file()
     root = checkout()
     try:
         if root:

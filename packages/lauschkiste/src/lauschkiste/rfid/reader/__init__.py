@@ -11,14 +11,14 @@ from typing import Any, Callable, Dict, List, Optional, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field
 
-import lauschkiste.cfghandler
-import lauschkiste.paths
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
 from lauschkiste.contract import ActionEntry, CoreModule, action, event, extension_point, query
-from lauschkiste.hardware import Claim
+from lauschkiste.box.hardware import Claim
 
 log = logging.getLogger('lauschkiste.rfid')
 
-cfg_rfid = lauschkiste.cfghandler.get_handler('rfid')
+cfg_rfid = lauschkiste.common.cfghandler.get_handler('rfid')
 
 DEFAULT_READER_CONFIG = 'settings/rfid.yaml'
 
@@ -167,9 +167,9 @@ class Rfid(CoreModule):
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        path = str(lauschkiste.paths.resolve(ctx.config.get('reader_config', default=DEFAULT_READER_CONFIG)))
+        path = str(lauschkiste.common.paths.resolve(ctx.config.get('reader_config', default=DEFAULT_READER_CONFIG)))
         try:
-            lauschkiste.cfghandler.load_yaml(cfg_rfid, path)
+            lauschkiste.common.cfghandler.load_yaml(cfg_rfid, path)
         except FileNotFoundError:
             cfg_rfid.config_dict({'rfid': {'readers': {}}})
             log.warning(f"RFID reader config not found. Creating an empty one: '{path}'")

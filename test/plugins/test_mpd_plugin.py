@@ -4,15 +4,15 @@ import pytest
 
 pytest.importorskip('lauschkiste_plugin_mpd', reason="the mpd plugin package is not installed")
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 import lauschkiste_plugin_mpd
 import lauschkiste_plugin_mpd.backend
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.library.module import Library
+from lauschkiste.content.library.module import Library
 from lauschkiste.player.backend import PlayerBackend
 from lauschkiste.player.module import Player
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 
 
 class PlayerWithoutLocalAudio(Player):
@@ -53,7 +53,7 @@ def test_mpd_plugin_registers_its_backend(monkeypatch, tmp_path, config, expecte
     manager.ready()
 
     assert manager.failed == {}
-    assert created == [(expected_host, str(lauschkiste.paths.resolve('settings/music_player_status.json')))]
+    assert created == [(expected_host, str(lauschkiste.common.paths.resolve('settings/music_player_status.json')))]
     player = manager.instance('player')
     assert player.get_active_backend().name == 'mpd'
     sources = manager.handle('library').invoke('list_sources')

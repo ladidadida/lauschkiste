@@ -7,8 +7,8 @@ import hashlib
 import logging
 from queue import Queue
 from threading import Thread
-import lauschkiste.cfghandler
-import lauschkiste.paths
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
 
 COVER_PREFIX = 'cover'
 NO_COVER_ART_EXTENSION = 'no-art'
@@ -16,13 +16,13 @@ NO_CACHE = ''
 CACHE_PENDING = 'CACHE_PENDING'
 
 logger = logging.getLogger('lauschkiste.CoverartCacheManager')
-cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
+cfg = lauschkiste.common.cfghandler.get_handler('lauschkiste')
 
 
 class CoverartCacheManager:
     def __init__(self):
         coverart_cache_path = cfg.getn('webapp', 'coverart_cache_path', default='cache/mpd-covers')
-        self.cache_folder_path = lauschkiste.paths.resolve(coverart_cache_path)
+        self.cache_folder_path = lauschkiste.common.paths.resolve(coverart_cache_path)
         self.cache_folder_path.mkdir(parents=True, exist_ok=True)
         self.write_queue = Queue()
         self.worker_thread = Thread(target=self.process_write_requests)

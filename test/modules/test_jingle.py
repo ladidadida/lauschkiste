@@ -3,18 +3,19 @@ import signal
 import pytest
 
 import lauschkiste.daemon
-import lauschkiste.paths
-import lauschkiste.jingle
+import lauschkiste.common.paths
+import lauschkiste.player.jingle
 from lauschkiste.contract import OperationError
-from lauschkiste.jingle import Jingle
+from lauschkiste.player.jingle import Jingle
 
 
 @pytest.fixture
 def played(monkeypatch, tmp_path):
-    lauschkiste.paths.set_home(tmp_path)
-    monkeypatch.setattr(lauschkiste.paths, '_home', tmp_path)
+    lauschkiste.common.paths.set_home(tmp_path)
+    monkeypatch.setattr(lauschkiste.common.paths, '_home', tmp_path)
     calls = []
-    monkeypatch.setattr(lauschkiste.jingle, 'play_file', lambda path, volume, should_stop=None: calls.append((path, volume)))
+    monkeypatch.setattr(lauschkiste.player.jingle, 'play_file',
+                        lambda path, volume, should_stop=None: calls.append((path, volume)))
     monkeypatch.setattr(lauschkiste.daemon, '_SHUTDOWN_SIGNAL', None)
     return calls
 

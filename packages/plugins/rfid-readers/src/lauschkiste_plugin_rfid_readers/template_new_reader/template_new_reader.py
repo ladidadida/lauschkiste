@@ -6,7 +6,7 @@ import logging
 
 # Import the ReaderBaseClass for common API. Leave as this line as it is!
 from lauschkiste.rfid import ReaderBaseClass
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 
 # Also import the description string into this module, to make everything available in a single module w/o code duplication
 # Leave this line as is!
@@ -16,7 +16,7 @@ from .description import DESCRIPTION
 # Logging is fully setup. Just replace '.new' with something meaningful and short
 logger = logging.getLogger('lauschkiste.rfid.new')
 # Get the global handler to the RFID config
-cfg = lauschkiste.cfghandler.get_handler('rfid')
+cfg = lauschkiste.common.cfghandler.get_handler('rfid')
 
 
 def query_customization() -> dict:

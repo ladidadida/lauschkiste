@@ -3,7 +3,7 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.library
+import lauschkiste.content.library
 import lauschkiste_plugin_samba
 from lauschkiste.contract import OperationError
 from lauschkiste_cli.setup import samba
@@ -36,7 +36,7 @@ class FakeSystem(System):
 def plugin(tmp_path, monkeypatch):
     (tmp_path / 'etc' / 'samba').mkdir(parents=True)
     (tmp_path / 'etc' / 'samba' / 'smb.conf').write_text(CONF)
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: '/home/pi/lauschkiste/library')
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: '/home/pi/lauschkiste/library')
     instance = lauschkiste_plugin_samba.Samba()
     instance._system = FakeSystem(tmp_path)
     return instance, tmp_path / 'etc' / 'samba' / 'smb.conf'

@@ -1,6 +1,6 @@
 import logging
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 from mfrc522_i2c import MFRC522
 
 from lauschkiste.rfid import ReaderBaseClass
@@ -8,7 +8,7 @@ from lauschkiste.rfid import ReaderBaseClass
 from .description import DESCRIPTION
 
 
-cfg = lauschkiste.cfghandler.get_handler("rfid")
+cfg = lauschkiste.common.cfghandler.get_handler("rfid")
 
 
 def query_customization() -> dict:

@@ -10,7 +10,7 @@
       "shutdown": "(self) -> None"
     },
     "claims": {
-      "claims": "(self) -> List[lauschkiste.hardware.Claim]"
+      "claims": "(self) -> List[lauschkiste.box.hardware.Claim]"
     }
   },
   "interface_version": "1.2",

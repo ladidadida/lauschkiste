@@ -9,20 +9,20 @@ import time
 import atexit
 from typing import (Optional)
 
-import lauschkiste.paths
-import lauschkiste.utils
-import lauschkiste.publishing as publishing
+import lauschkiste.common.paths
+import lauschkiste.common.utils
+import lauschkiste.common.publishing as publishing
 from lauschkiste.api import FastApiServer
-from lauschkiste.nv_manager import nv_manager
+from lauschkiste.common.nv_manager import nv_manager
 
 import lauschkiste
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 
 logger = logging.getLogger('lauschkiste.daemon')
-cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
+cfg = lauschkiste.common.cfghandler.get_handler('lauschkiste')
 
 #: Template a missing configuration_file is created from on first run (see Daemon.__init__).
-DEFAULT_CONFIG_TEMPLATE = str(lauschkiste.paths.resource('default-settings', 'lauschkiste.default.yaml'))
+DEFAULT_CONFIG_TEMPLATE = str(lauschkiste.common.paths.resource('default-settings', 'lauschkiste.default.yaml'))
 
 _SHUTDOWN_SIGNAL: Optional[int] = None
 
@@ -50,15 +50,15 @@ class Daemon:
         self._start_time = time.time()
         logger.info(f"Starting Lauschkiste (version {lauschkiste.version()})")
 
-        self._git_state = lauschkiste.utils.get_git_state()
+        self._git_state = lauschkiste.common.utils.get_git_state()
         logger.info(f"Git state: {self._git_state}")
 
         self.nvm = nv_manager()
         self._signal_cnt = 0
         self.api_server = None
         self.modules = None
-        lauschkiste.cfghandler.ensure_default_config(configuration_file, DEFAULT_CONFIG_TEMPLATE)
-        lauschkiste.cfghandler.load_yaml(cfg, configuration_file)
+        lauschkiste.common.cfghandler.ensure_default_config(configuration_file, DEFAULT_CONFIG_TEMPLATE)
+        lauschkiste.common.cfghandler.load_yaml(cfg, configuration_file)
 
         self.write_artifacts = write_artifacts
 
@@ -162,7 +162,7 @@ class Daemon:
         logger.info(f"Start-up time: {((time.time_ns() - time_start) / 1000000.0):.3f} ms")
 
         if self.write_artifacts:
-            artifacts_dir = lauschkiste.paths.home() / 'artifacts'
+            artifacts_dir = lauschkiste.common.paths.home() / 'artifacts'
             os.makedirs(artifacts_dir, exist_ok=True)
             with open(os.path.join(artifacts_dir, 'card_actions.json'), 'w') as stream:
                 json.dump(self.modules.catalog.describe(), stream, indent=2)

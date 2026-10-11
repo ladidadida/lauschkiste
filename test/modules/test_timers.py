@@ -1,7 +1,7 @@
 import pytest
 
 from lauschkiste.contract import OperationError
-from lauschkiste.timers import Timers
+from lauschkiste.box.timers import Timers
 
 
 @pytest.fixture

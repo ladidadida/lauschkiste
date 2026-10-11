@@ -7,8 +7,8 @@ from typing import Any, Callable, ClassVar, Dict, List, Optional, Sequence, Tupl
 import typer
 from ruamel.yaml import YAML
 
-import lauschkiste.cfghandler
-import lauschkiste.paths
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
 from lauschkiste_cli.setup.system import System
 
 
@@ -48,11 +48,11 @@ class Context:
     def answer(self, key: str, default: Any = None) -> Any:
         return self.answers.get(key, default)
 
-    def load_config(self) -> lauschkiste.cfghandler.ConfigHandler:
-        lauschkiste.cfghandler.ensure_default_config(
-            str(self.config_path), str(lauschkiste.paths.resource('default-settings', 'lauschkiste.default.yaml')))
-        cfg = lauschkiste.cfghandler.ConfigHandler('setup')
-        lauschkiste.cfghandler.load_yaml(cfg, str(self.config_path))
+    def load_config(self) -> lauschkiste.common.cfghandler.ConfigHandler:
+        lauschkiste.common.cfghandler.ensure_default_config(
+            str(self.config_path), str(lauschkiste.common.paths.resource('default-settings', 'lauschkiste.default.yaml')))
+        cfg = lauschkiste.common.cfghandler.ConfigHandler('setup')
+        lauschkiste.common.cfghandler.load_yaml(cfg, str(self.config_path))
         return cfg
 
     def enabled_plugins(self) -> Dict[str, Any]:
@@ -130,7 +130,7 @@ class Answers:
     """``$LAUSCHKISTE_HOME/settings/setup.yaml``: the answers of earlier runs."""
 
     def __init__(self, path: Optional[Path] = None):
-        self.path = path or lauschkiste.paths.settings_dir() / 'setup.yaml'
+        self.path = path or lauschkiste.common.paths.settings_dir() / 'setup.yaml'
 
     def load(self) -> Dict[str, Any]:
         if not self.path.exists():

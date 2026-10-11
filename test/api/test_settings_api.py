@@ -150,7 +150,7 @@ class Elsewhere(CoreModule):
 
 
 def test_settings_kept_in_another_config(api_client):
-    from lauschkiste.cfghandler import ConfigHandler
+    from lauschkiste.common.cfghandler import ConfigHandler
     Elsewhere.store = ConfigHandler('elsewhere-test')
     Elsewhere.store.config_dict({'section': {'level': 5, 'driver': 'kept'}})
     with api_client([Elsewhere], {}) as client:

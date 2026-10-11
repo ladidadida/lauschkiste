@@ -8,8 +8,8 @@ import typer
 from packaging.requirements import InvalidRequirement, Requirement
 
 import lauschkiste.contract.plugins as plugins
-import lauschkiste.paths
-import lauschkiste.statefile
+import lauschkiste.common.paths
+import lauschkiste.common.statefile
 from lauschkiste_cli import plugin
 from lauschkiste_cli.setup.base import Context, Question, Step
 from lauschkiste_cli.setup.system import SetupError
@@ -52,11 +52,11 @@ def _specs(ctx: Context) -> List[str]:
 
 
 def _state_path():
-    return lauschkiste.paths.settings_dir() / STATE_FILE
+    return lauschkiste.common.paths.settings_dir() / STATE_FILE
 
 
 def _state() -> Dict[str, List[str]]:
-    return {key: list(value) for key, value in lauschkiste.statefile.read_json(_state_path()).items()}
+    return {key: list(value) for key, value in lauschkiste.common.statefile.read_json(_state_path()).items()}
 
 
 class ExtraPluginsStep(Step):
@@ -99,7 +99,7 @@ class ExtraPluginsStep(Step):
                     raise SetupError(f"could not install '{spec}': {error}") from None
                 importlib.invalidate_caches()
                 state[spec] = sorted(set(plugins.installed()) - before)
-                lauschkiste.statefile.write_json(_state_path(), state)
+                lauschkiste.common.statefile.write_json(_state_path(), state)
                 if not state[spec]:
                     typer.echo(f"    '{spec}' provides no plugins (or they were installed already).")
             self._enable(ctx, state.get(spec, []))

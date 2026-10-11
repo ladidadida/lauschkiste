@@ -13,7 +13,7 @@ from typing import Any, Optional
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-import lauschkiste.library
+import lauschkiste.content.library
 from lauschkiste.contract import OperationError, Plugin, action, query
 from lauschkiste_cli.setup import samba
 from lauschkiste_cli.setup.system import SetupError, System
@@ -52,7 +52,7 @@ class Samba(Plugin):
 
     def _status(self) -> SambaStatus:
         system = self._system
-        path = lauschkiste.library.root()
+        path = lauschkiste.content.library.root()
         installed = samba.installed(system)
         block = samba.current_block(system) if installed else None
         return SambaStatus(installed=installed, shared=block is not None,
@@ -81,7 +81,7 @@ class Samba(Plugin):
         """Share the library on the network, or stop sharing it."""
         def change():
             if enabled:
-                samba.share(self._system, lauschkiste.library.root())
+                samba.share(self._system, lauschkiste.content.library.root())
             else:
                 samba.unshare(self._system)
         return self._run(change)

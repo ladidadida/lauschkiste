@@ -2,7 +2,7 @@
 
 from typing import Dict, List, Tuple
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 from lauschkiste_cli.setup.base import Context, Question, Step
 
 NO_CARD = ('none', 'No sound card on the header (headphone jack, HDMI, USB or Bluetooth)')
@@ -119,4 +119,4 @@ class HardwareStep(Step):
         for name in disable:
             if isinstance(plugins, dict) and name in plugins:
                 del plugins[name]
-        lauschkiste.cfghandler.write_yaml(cfg, str(ctx.config_path))
+        lauschkiste.common.cfghandler.write_yaml(cfg, str(ctx.config_path))

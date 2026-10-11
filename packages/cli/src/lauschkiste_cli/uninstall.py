@@ -14,7 +14,7 @@ from typing import Callable, List, Optional, Tuple
 
 import typer
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli.environment import checkout
 from lauschkiste_cli.setup import samba
 from lauschkiste_cli.setup.steps import extras, lauschkiste as lauschkiste_steps, system as system_steps
@@ -141,7 +141,7 @@ def _block_actions(system: System) -> List[Action]:
 def plan(system: System, remove_data: bool) -> Tuple[List[Action], List[Action], List[str]]:
     """(actions, the removal of the installation itself, what stays), in the order they run."""
     actions = _service_actions(system) + _file_actions(system) + _block_actions(system)
-    home = lauschkiste.paths.home()
+    home = lauschkiste.common.paths.home()
     if remove_data and home.exists():
         actions.append(Action(f'DELETE the data in {home} (settings, cards, library, logs, cache)',
                               lambda: shutil.rmtree(home)))
@@ -165,7 +165,7 @@ def _removal_of_the_installation() -> List[Action]:
 def _stays(system: System, remove_data: bool) -> List[str]:
     stays = []
     if not remove_data:
-        stays.append(f'the data in {lauschkiste.paths.home()} (music, settings, cards): delete it by hand if wanted')
+        stays.append(f'the data in {lauschkiste.common.paths.home()} (music, settings, cards): delete it by hand if wanted')
     stays += [
         'system packages installed for Lauschkiste (ffmpeg, pipewire, samba, openbox, chromium, ...): '
         'sudo apt remove <package> and sudo apt autoremove',
@@ -186,8 +186,8 @@ def uninstall(check: bool = typer.Option(False, '--check', help='Only list what 
                                                help='Also delete the data (settings, cards, library)')) -> None:
     """Remove what Lauschkiste put on this machine, and Lauschkiste itself at the end."""
     system = System()
-    if not check and not yes and not remove_data and lauschkiste.paths.home().exists():
-        remove_data = typer.confirm(f"Delete the data in {lauschkiste.paths.home()} (settings, cards, library) too?",
+    if not check and not yes and not remove_data and lauschkiste.common.paths.home().exists():
+        remove_data = typer.confirm(f"Delete the data in {lauschkiste.common.paths.home()} (settings, cards, library) too?",
                                     default=False)
     actions, itself, stays = plan(system, remove_data)
     everything = actions + itself

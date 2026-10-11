@@ -12,7 +12,7 @@ from typing import Any, List, Literal, Optional, Tuple
 from pydantic import BaseModel, Field, field_validator
 
 from lauschkiste.contract import Plugin
-from lauschkiste.hardware import Claim
+from lauschkiste.box.hardware import Claim
 
 from lauschkiste_plugin_devices.gpio import Pins, pin_field
 

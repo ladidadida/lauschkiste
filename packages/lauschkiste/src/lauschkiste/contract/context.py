@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel, ValidationError
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste.contract.declarations import EventSpec, ExtensionPointSpec
 from lauschkiste.contract.errors import ContractError
 
@@ -20,7 +20,7 @@ logger = logging.getLogger('lauschkiste.contract')
 
 
 def strict_mode_default() -> bool:
-    return (lauschkiste.paths.getenv('STRICT') or '').lower() in ('1', 'true', 'yes')
+    return (lauschkiste.common.paths.getenv('STRICT') or '').lower() in ('1', 'true', 'yes')
 
 
 class ModuleConfig:

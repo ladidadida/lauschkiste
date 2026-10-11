@@ -3,14 +3,14 @@ import logging
 
 from . import pirc522
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 from lauschkiste.rfid import ReaderBaseClass
-import lauschkiste.misc.inputminus as pyil
-from lauschkiste.misc.simplecolors import Colors
+import lauschkiste.common.misc.inputminus as pyil
+from lauschkiste.common.misc.simplecolors import Colors
 from .description import DESCRIPTION
 
 logger = logging.getLogger('lauschkiste.rfid.rc522')
-cfg = lauschkiste.cfghandler.get_handler('rfid')
+cfg = lauschkiste.common.cfghandler.get_handler('rfid')
 
 
 def query_customization() -> dict:

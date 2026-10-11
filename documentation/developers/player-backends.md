@@ -43,7 +43,7 @@ controls (pause, next, seek, volume) go to the active one. Switching stops the p
 ## Library sources
 
 A catalog (an MPD database, a streaming service) is added to the library at `library.sources`, not through the
-player. A source implements `lauschkiste.library.module.LibrarySource`:
+player. A source implements `lauschkiste.content.library.module.LibrarySource`:
 
 - `describe()` returns `{'id', 'label', 'views': [{'id', 'label', 'kind', 'content_types'}]}`; `kind: items` is a
   catalog list rendered with the shared album and track views.

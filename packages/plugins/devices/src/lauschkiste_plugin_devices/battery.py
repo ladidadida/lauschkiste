@@ -11,7 +11,7 @@ from typing import Any, Callable, List, Literal, Optional, Protocol
 from pydantic import BaseModel, Field
 
 from lauschkiste.contract import ActionEntry, Plugin, event, query
-from lauschkiste.hardware import Claim
+from lauschkiste.box.hardware import Claim
 
 logger = logging.getLogger('lauschkiste.battery')
 

@@ -8,11 +8,11 @@ from starlette.testclient import TestClient
 
 from lauschkiste.api.events import EventBroker
 from lauschkiste.api.fastapi_server import create_app
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.library.module import Library
+from lauschkiste.content.library.module import Library
 from lauschkiste.player.module import Player
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 
 
 def _mocked_player(ctrl):

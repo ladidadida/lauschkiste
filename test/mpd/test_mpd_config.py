@@ -1,10 +1,10 @@
 import re
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 
 
 def test_mpd_uses_native_pulse_output():
-    config_path = lauschkiste.paths.resource('default-settings', 'mpd.default.conf')
+    config_path = lauschkiste.common.paths.resource('default-settings', 'mpd.default.conf')
     config = config_path.read_text()
     output_blocks = re.findall(
         r'^audio_output\s*\{(.*?)^\}',

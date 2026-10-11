@@ -10,9 +10,9 @@ import subprocess
 from pathlib import Path
 from typing import Any, List, Optional
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 from lauschkiste.contract import OperationError, Plugin, query
-from lauschkiste.hardware import Claim
+from lauschkiste.box.hardware import Claim
 
 from lauschkiste_plugin_board_raspberry_pi import bootconfig, hat, health, pins
 from lauschkiste_plugin_board_raspberry_pi.settings import BoardSettings
@@ -111,8 +111,8 @@ class BoardRaspberryPi(Plugin):
         path = next((Path(p) for p in BOOT_CONFIG if Path(p).exists()), None)
         if path is None:
             return []
-        main = lauschkiste.cfghandler.get_handler('lauschkiste')
-        rfid = lauschkiste.cfghandler.get_handler('rfid')
+        main = lauschkiste.common.cfghandler.get_handler('lauschkiste')
+        rfid = lauschkiste.common.cfghandler.get_handler('rfid')
         want = bootconfig.wanted({'plugins': main.getn('plugins', default=None) or {}},
                                  {'rfid': rfid.getn('rfid', default=None) or {}})
         return bootconfig.pending(path.read_text(), want)
@@ -120,7 +120,7 @@ class BoardRaspberryPi(Plugin):
     def notes(self, read=hat.read_text) -> List[dict]:
         """What is set up and what the user may want to check, for the hardware overview."""
         found = hat.read_hat(read)
-        main = lauschkiste.cfghandler.get_handler('lauschkiste')
+        main = lauschkiste.common.cfghandler.get_handler('lauschkiste')
         configured = bootconfig.wanted({'plugins': main.getn('plugins', default=None) or {}}, {}).sound_card
         notes: List[dict] = []
         if found is not None and found.sound_card is not None:

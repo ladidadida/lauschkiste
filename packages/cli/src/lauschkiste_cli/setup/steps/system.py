@@ -4,7 +4,7 @@ from typing import List
 
 import typer
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli.setup.base import Context, Question, Step
 from lauschkiste_cli.setup.steps.lauschkiste import public_port
 from lauschkiste_cli.setup.system import SetupError
@@ -43,11 +43,11 @@ def _boot_wanted(ctx: Context):
         from lauschkiste_plugin_board_raspberry_pi import bootconfig
     except ImportError:
         return None, None
-    import lauschkiste.statefile
+    import lauschkiste.common.statefile
     cfg = ctx.load_config()
-    rfid_path = lauschkiste.paths.resolve(cfg.getn('rfid', 'reader_config', default='settings/rfid.yaml'))
+    rfid_path = lauschkiste.common.paths.resolve(cfg.getn('rfid', 'reader_config', default='settings/rfid.yaml'))
     want = bootconfig.wanted({'plugins': cfg.getn('plugins', default=None) or {}},
-                             lauschkiste.statefile.read_yaml(rfid_path))
+                             lauschkiste.common.statefile.read_yaml(rfid_path))
     return bootconfig, want
 
 
@@ -151,7 +151,7 @@ class WelcomeStep(Step):
 
     def _content(self, ctx) -> str:
         port = public_port(ctx)
-        return lauschkiste.paths.resource('system', '99-lauschkiste-welcome').read_text().replace('@PORT@', str(port))
+        return lauschkiste.common.paths.resource('system', '99-lauschkiste-welcome').read_text().replace('@PORT@', str(port))
 
     def check(self, ctx) -> List[str]:
         return [] if ctx.system.read(self.TARGET) == self._content(ctx) else ['login message not installed or outdated']

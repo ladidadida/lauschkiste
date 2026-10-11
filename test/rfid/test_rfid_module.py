@@ -5,12 +5,12 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.cfghandler
-from lauschkiste.hardware import Hardware
-from lauschkiste.cfghandler import ConfigHandler
+import lauschkiste.common.cfghandler
+from lauschkiste.box.hardware import Hardware
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract.manager import ModuleManager
 from lauschkiste.player.module import Player
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 from lauschkiste.rfid.cards import Cards
 from lauschkiste.rfid.reader import Rfid
 
@@ -56,7 +56,7 @@ MANAGERS = []
 
 @pytest.fixture
 def setup(tmp_path):
-    main = lauschkiste.cfghandler.get_handler('lauschkiste')
+    main = lauschkiste.common.cfghandler.get_handler('lauschkiste')
     main.config_dict({})
     (tmp_path / 'cards.yaml').write_text(
         "'0001':\n  action: player.play_folder\n  args:\n    folder: Rock\n"

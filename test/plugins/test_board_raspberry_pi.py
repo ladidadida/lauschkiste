@@ -3,21 +3,21 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 import lauschkiste_plugin_board_raspberry_pi as board_plugin
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.hardware import Hardware
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.box.hardware import Hardware
+from lauschkiste.common.publishing.bus import EventBus
 from lauschkiste_plugin_board_raspberry_pi import bootconfig, pins
 from lauschkiste_plugin_board_raspberry_pi.health import parse_throttled
 
 
 @pytest.fixture(autouse=True)
 def clean():
-    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
+    lauschkiste.common.cfghandler.get_handler('lauschkiste').config_dict({})
     yield
-    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
+    lauschkiste.common.cfghandler.get_handler('lauschkiste').config_dict({})
 
 
 def start(settings):
@@ -117,7 +117,7 @@ def test_notes_tell_what_is_set_up_and_what_to_check(monkeypatch):
     plugin = board_plugin.BoardRaspberryPi()
     monkeypatch.setattr(plugin, 'boot_pending', lambda: [])
     files = {hat.HAT_DIR + 'vendor': 'HiFiBerry\x00', hat.HAT_DIR + 'product': 'DAC+\x00'}
-    handler = lauschkiste.cfghandler.get_handler('lauschkiste')
+    handler = lauschkiste.common.cfghandler.get_handler('lauschkiste')
 
     handler.config_dict({'plugins': {'board_raspberry_pi': {}}})
     (note,) = plugin.notes(files.get)

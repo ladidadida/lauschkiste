@@ -4,14 +4,14 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 import lauschkiste_plugin_board_raspberry_pi as board_plugin
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import CoreModule, action, extension_point
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.hardware import Hardware
+from lauschkiste.box.hardware import Hardware
 from lauschkiste.player.backend import LevelMeter
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 from lauschkiste_plugin_board_raspberry_pi import bootconfig
 from lauschkiste_plugin_devices import phat_beat
 from lauschkiste_plugin_devices.apa102 import frame
@@ -42,9 +42,9 @@ class Clock:
 def clean(monkeypatch):
     Player.calls = []
     monkeypatch.setattr(subprocess, 'Popen', Mock())
-    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
+    lauschkiste.common.cfghandler.get_handler('lauschkiste').config_dict({})
     yield
-    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
+    lauschkiste.common.cfghandler.get_handler('lauschkiste').config_dict({})
 
 
 class FakeButtons:

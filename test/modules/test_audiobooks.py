@@ -6,15 +6,15 @@ from unittest.mock import Mock
 import av
 import pytest
 
-import lauschkiste.resume
-from lauschkiste.audiobooks import Audiobooks
-from lauschkiste.cache import Cache
-from lauschkiste.cfghandler import ConfigHandler
+import lauschkiste.content.resume
+from lauschkiste.content.audiobooks import Audiobooks
+from lauschkiste.content.cache import Cache
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import OperationError
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.library.module import Library
+from lauschkiste.content.library.module import Library
 from lauschkiste.player.module import Player
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 
 
 def write_flac(path, **tags):
@@ -62,7 +62,7 @@ def library_dir(tmp_path):
 
 @pytest.fixture
 def setup(tmp_path, library_dir, monkeypatch):
-    monkeypatch.setattr(lauschkiste.resume, 'ACTIVATION_GRACE_SEC', 0)
+    monkeypatch.setattr(lauschkiste.content.resume, 'ACTIVATION_GRACE_SEC', 0)
     ctrl = Mock()
     ctrl.get_active_backend.return_value = 'local_audio'
     ctrl.playerstatus.return_value = {'state': 'play', 'file': 'music/Rock/01.flac', 'random': '1', 'repeat': '0'}

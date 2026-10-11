@@ -14,7 +14,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste.contract import Plugin, query
 from lauschkiste_plugin_audiobookshelf.provider import AudiobookshelfProvider
 from lauschkiste_plugin_audiobookshelf.source import COVER_ROUTE, SCHEME, AudiobookshelfSource
@@ -63,8 +63,8 @@ class Audiobookshelf(Plugin):
         cache = ctx.modules.cache
         self._source.local_files = lambda book: cache.files('audiobookshelf', book)
         self._source.cached_books = lambda: cache.cached('audiobookshelf')
-        self._source.attach(lauschkiste.paths.resolve('settings/audiobookshelf_positions.json'),
-                            lauschkiste.paths.resolve('cache/audiobookshelf_books.json'))
+        self._source.attach(lauschkiste.common.paths.resolve('settings/audiobookshelf_positions.json'),
+                            lauschkiste.common.paths.resolve('cache/audiobookshelf_books.json'))
         ctx.modules.audiobooks.sources.register('audiobookshelf', self._source)
         ctx.modules.player.resolvers.register(SCHEME, self._source)
         cache.providers.register('audiobookshelf', AudiobookshelfProvider(self._source))

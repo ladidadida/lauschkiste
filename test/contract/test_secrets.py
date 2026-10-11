@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import CoreModule
 from lauschkiste.contract.context import ModuleConfig
 from lauschkiste.contract.secrets import SecretStore, secrets_path

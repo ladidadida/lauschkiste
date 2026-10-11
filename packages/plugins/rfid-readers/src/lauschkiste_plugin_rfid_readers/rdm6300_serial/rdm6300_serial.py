@@ -1,16 +1,16 @@
 import logging
 import serial
 
-import lauschkiste.misc.inputminus as pyil
-from lauschkiste.misc.simplecolors import Colors
+import lauschkiste.common.misc.inputminus as pyil
+from lauschkiste.common.misc.simplecolors import Colors
 from lauschkiste.rfid import ReaderBaseClass
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 
 from .description import DESCRIPTION
 
 # Create logger
 logger = logging.getLogger('lauschkiste.rfid.rdm6300')
-cfg = lauschkiste.cfghandler.get_handler('rfid')
+cfg = lauschkiste.common.cfghandler.get_handler('rfid')
 
 NUMBER_FORMAT = ['card_id_dec',
                  'card_id_raw',

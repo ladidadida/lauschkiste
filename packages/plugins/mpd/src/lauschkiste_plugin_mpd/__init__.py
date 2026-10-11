@@ -15,10 +15,10 @@ import logging
 
 from pydantic import BaseModel, Field
 
-import lauschkiste.cfghandler
-import lauschkiste.misc as misc
-import lauschkiste.paths
-import lauschkiste.library
+import lauschkiste.common.cfghandler
+import lauschkiste.common.misc as misc
+import lauschkiste.common.paths
+import lauschkiste.content.library
 from lauschkiste.contract import Plugin
 
 logger = logging.getLogger('lauschkiste.mpd')
@@ -97,11 +97,11 @@ class Mpd(Plugin):
         from lauschkiste_plugin_mpd.backend import PlayerMPD
 
         backend = PlayerMPD(host=_setting(ctx, 'host'),
-                            status_file=str(lauschkiste.paths.resolve(_setting(ctx, 'status_file'))))
+                            status_file=str(lauschkiste.common.paths.resolve(_setting(ctx, 'status_file'))))
         if _setting(ctx, 'library', 'update_on_startup'):
             backend.update()
         if _setting(ctx, 'library', 'check_user_rights'):
-            music_library_path = lauschkiste.library.root()
+            music_library_path = lauschkiste.content.library.root()
             if music_library_path is not None:
                 logger.info(f"Change user rights for {music_library_path}")
                 misc.recursive_chmod(music_library_path, mode_files=0o664, mode_dirs=0o775)

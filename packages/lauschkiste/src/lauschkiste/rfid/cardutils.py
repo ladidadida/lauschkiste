@@ -2,9 +2,9 @@
 
 from typing import Any, List, Mapping
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 
-cfg_cards = lauschkiste.cfghandler.get_handler('cards')
+cfg_cards = lauschkiste.common.cfghandler.get_handler('cards')
 
 
 def card_command_to_str(entry: Mapping[str, Any], long: bool = False) -> List[str]:

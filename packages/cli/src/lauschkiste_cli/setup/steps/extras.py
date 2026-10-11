@@ -5,8 +5,8 @@ import re
 import click
 import typer
 
-import lauschkiste.cfghandler
-import lauschkiste.paths
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
 from lauschkiste_cli import plugin
 from lauschkiste_cli.setup import samba
 from lauschkiste_cli.setup.base import Question, Step
@@ -30,12 +30,12 @@ class MpdStep(Step):
 
     @staticmethod
     def library(ctx):
-        return lauschkiste.paths.library_dir(ctx.load_config().getn('library', 'path', default=None))
+        return lauschkiste.common.paths.library_dir(ctx.load_config().getn('library', 'path', default=None))
 
     def conf(self, ctx) -> str:
-        template = lauschkiste.paths.resource('default-settings', 'mpd.default.conf').read_text()
+        template = lauschkiste.common.paths.resource('default-settings', 'mpd.default.conf').read_text()
         return (template.replace('%%LAUSCHKISTE_LIBRARY_PATH%%', str(self.library(ctx)))
-                .replace('%%LAUSCHKISTE_PLAYLISTS_PATH%%', str(lauschkiste.paths.resolve('playlists'))))
+                .replace('%%LAUSCHKISTE_PLAYLISTS_PATH%%', str(lauschkiste.common.paths.resolve('playlists'))))
 
     def check(self, ctx):
         system = ctx.system
@@ -55,7 +55,7 @@ class MpdStep(Step):
         current = system.read(self.CONF)
         if current is not None and current != self.conf(ctx):
             system.write(self.CONF + '.backup', current)
-        for folder in (self.library(ctx), lauschkiste.paths.resolve('playlists')):
+        for folder in (self.library(ctx), lauschkiste.common.paths.resolve('playlists')):
             folder.mkdir(parents=True, exist_ok=True)
         system.write(self.CONF, self.conf(ctx))
         system.run('systemctl', '--user', 'daemon-reload')
@@ -82,7 +82,7 @@ class SambaStep(Step):
                        quiet=True, check=False)
 
     def _library_folder(self, ctx) -> str:
-        return str(lauschkiste.paths.library_dir(ctx.load_config().getn('library', 'path', default=None)))
+        return str(lauschkiste.common.paths.library_dir(ctx.load_config().getn('library', 'path', default=None)))
 
     def check(self, ctx):
         problems = []
@@ -230,7 +230,7 @@ class AutohotspotStep(Step):
 
     def _files(self, ctx) -> dict:
         def template(name):
-            return lauschkiste.paths.resource('autohotspot', 'NetworkManager', name).read_text()
+            return lauschkiste.common.paths.resource('autohotspot', 'NetworkManager', name).read_text()
 
         ip = ctx.answer('autohotspot_ip')
         values = {
@@ -332,4 +332,4 @@ class AudioStep(Step):
                                     'pulse_sink_name': sinks[secondary][0]}
         cfg = ctx.load_config()
         cfg.setn('volume', 'outputs', value=outputs)
-        lauschkiste.cfghandler.write_yaml(cfg, str(ctx.config_path))
+        lauschkiste.common.cfghandler.write_yaml(cfg, str(ctx.config_path))

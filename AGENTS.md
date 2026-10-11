@@ -17,11 +17,18 @@ pyproject.toml     uv workspace root (virtual: no [project] table); shared dev-t
 packages/          uv workspace members
   lauschkiste/     Python core application ("Lauschkiste core") — the daemon that runs on the Pi
     pyproject.toml Real [project] table (package=true), runtime dependencies, hatchling backend
-    src/lauschkiste/   The installable package: the core/plugin contract (contract/), the core
-                   modules (core_modules.py: system, hardware, library, player, audiobooks, cache,
-                   radio, podcasts, volume, timers, time_limits, jingle, input, cards, rfid), FastAPI API
-                   bridge (api/), in-process event bus (publishing/), config handling. What is
-                   platform-specific lives in plugins -- see documentation/developers/core-and-plugins.md.
+    src/lauschkiste/   The installable package, grouped by what the code is for:
+                     contract/  the core/plugin framework (modules, operations, plugins, snapshots)
+                     api/       FastAPI bridge: routes from operations, WebSocket events, web app files
+                     common/    foundations used by everything: cfghandler (settings), paths, statefile,
+                                publishing (event bus), multitimer, misc, utils
+                     player/    the player module and its backends, plus volume, audio_output and jingle
+                     content/   what is played: library, audiobooks, podcasts, radio, directories, cache,
+                                resume (continue lists), playlistgenerator
+                     box/       the box itself: hardware, input_devices, system, timers, time_limits
+                     rfid/      cards and the reader module
+                     daemon.py, core_modules.py (the modules the daemon always starts), startup.py
+                   What is platform-specific lives in plugins -- see documentation/developers/core-and-plugins.md.
     interfaces/    Interface snapshots of the framework contract and every core module, checked
                    by test/contract/test_snapshots.py (see "Core and plugins" below)
   cli/             Distribution `lauschkiste` (the package users install; import package lauschkiste_cli,
@@ -65,7 +72,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `GET /api/v1/actions` (card actions with argument schemas). Card entries, card removal actions
   and the second-swipe action are stored as `action: <module>.<action>` plus named `args`
   (`documentation/builders/actions.md`).
-- **Event bus** (`lauschkiste.publishing.get_bus()`, a `lauschkiste.publishing.bus.EventBus`): thread-safe,
+- **Event bus** (`lauschkiste.common.publishing.get_bus()`, a `lauschkiste.common.publishing.bus.EventBus`): thread-safe,
   in-process, last-value cached. Modules publish typed events through `ctx.publish(event,
   payload)` (validated against the event's model; raises with `LAUSCHKISTE_STRICT=1`, logs and drops
   otherwise), never untyped dicts. The
@@ -76,7 +83,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   PortAudio, no external process); `mpd` (an external mpd server, via `python-mpd2`) is an opt-in
   alternative. Backends implement `lauschkiste.player.backend.PlayerBackend`; the player module turns
   their raw status into the typed `player.status` event (`lauschkiste.player.status.PlayerStatus`).
-- **Library** (`lauschkiste.library`): owns the music library -- file management, a SQLite index of
+- **Library** (`lauschkiste.content.library`): owns the music library -- file management, a SQLite index of
   tags/durations (`$LAUSCHKISTE_HOME/settings/library.sqlite`), cover art (`$LAUSCHKISTE_HOME/cache/covers`), and the
   `library.sources` extension point for further catalogs (mpd, streaming).
 - **Content and downloads**: `audiobooks`, `podcasts` and `radio` are core modules
@@ -84,11 +91,11 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `cache.providers` (`documentation/developers/caching.md`); `time_limits` implements quiet hours and a daily
   limit (off by default). Browsing routes are
   `/api/v1/library/*`; the local source id is `local`.
-- **Paths** (`lauschkiste.paths`): all runtime data lives in `LAUSCHKISTE_HOME` (`--home`, `$LAUSCHKISTE_HOME`,
+- **Paths** (`lauschkiste.common.paths`): all runtime data lives in `LAUSCHKISTE_HOME` (`--home`, `$LAUSCHKISTE_HOME`,
   default `$XDG_DATA_HOME/lauschkiste`; development in this checkout uses `shared/`). Relative paths in
   the configuration resolve against it; never resolve paths
   against the working directory or the checkout. Packaged files (default settings, sounds, service
-  templates) live in `lauschkiste/resources/`, read via `lauschkiste.paths.resource()`. The web app is
+  templates) live in `lauschkiste/resources/`, read via `lauschkiste.common.paths.resource()`. The web app is
   served from `api.webapp_dir` / `$LAUSCHKISTE_WEBAPP_DIR`, else from the package, else (source checkout) from
   `packages/webapp/build`.
   See `documentation/developers/packaging-and-setup.md`.

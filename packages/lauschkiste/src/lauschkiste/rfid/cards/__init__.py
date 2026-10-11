@@ -9,12 +9,12 @@ from typing import Any, Dict, Optional
 
 from pydantic import BaseModel
 
-import lauschkiste.cfghandler
-import lauschkiste.paths
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
 from lauschkiste.contract import ActionError, CoreModule, OperationError, action, event, query
 
 log = logging.getLogger('lauschkiste.cards')
-cfg_cards = lauschkiste.cfghandler.get_handler('cards')
+cfg_cards = lauschkiste.common.cfghandler.get_handler('cards')
 
 DEFAULT_DATABASE = 'settings/cards.yaml'
 
@@ -55,7 +55,7 @@ class Cards(CoreModule):
 
     def start(self, ctx) -> None:
         self._ctx = ctx
-        self._path = str(lauschkiste.paths.resolve(ctx.config.get('database', default=DEFAULT_DATABASE)))
+        self._path = str(lauschkiste.common.paths.resolve(ctx.config.get('database', default=DEFAULT_DATABASE)))
         try:
             cfg_cards.load(self._path)
         except FileNotFoundError:

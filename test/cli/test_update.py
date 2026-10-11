@@ -2,7 +2,7 @@ import subprocess
 
 import pytest
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli import plugin, update
 
 
@@ -92,17 +92,17 @@ def test_package_update(tmp_path, monkeypatch):
                         lambda url, timeout: FakeResponse(release) if 'api.github' in url else FakeResponse(content=b'w'))
     installed = []
     monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
-    lauschkiste.paths.set_home(tmp_path)
+    lauschkiste.common.paths.set_home(tmp_path)
     try:
         assert update.update_package('o/r', 'latest', tmp_path / 'lauschkiste.yaml') is True
     finally:
-        lauschkiste.paths.set_home(None)
+        lauschkiste.common.paths.set_home(None)
     assert len(installed) == 1 and installed[0].startswith('lauschkiste @ file://')
 
 
 def test_package_up_to_date(monkeypatch):
     monkeypatch.setattr('requests.get', lambda url, timeout: FakeResponse({'tag_name': 'v0.0.1'}))
-    assert update.update_package('o/r', 'latest', lauschkiste.paths.settings_dir() / 'x.yaml') is False
+    assert update.update_package('o/r', 'latest', lauschkiste.common.paths.settings_dir() / 'x.yaml') is False
 
 
 def test_latest_falls_back_to_the_newest_pre_release(monkeypatch):

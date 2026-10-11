@@ -24,7 +24,7 @@ from typing import Any, Callable, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
 from lauschkiste.contract import ActionEntry, Plugin
-from lauschkiste.hardware import Claim
+from lauschkiste.box.hardware import Claim
 
 from lauschkiste_plugin_devices.gpio import Pins, pin_field
 

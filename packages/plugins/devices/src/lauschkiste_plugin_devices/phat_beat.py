@@ -22,7 +22,7 @@ from typing import Any, Callable, Deque, Dict, List, Literal, Optional, Tuple
 from pydantic import BaseModel, Field
 
 from lauschkiste.contract import ActionEntry, Plugin
-from lauschkiste.hardware import Claim
+from lauschkiste.box.hardware import Claim
 
 from lauschkiste_plugin_devices.apa102 import Color, frame, writer
 from lauschkiste_plugin_devices.gpio import Pins

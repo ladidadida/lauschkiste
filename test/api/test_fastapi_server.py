@@ -10,8 +10,8 @@ from starlette.testclient import TestClient
 from lauschkiste.contract import CoreModule, query
 from lauschkiste.api.events import EventBroker, MAX_MESSAGE_SIZE
 from lauschkiste.api.fastapi_server import FastApiServer, create_app
-from lauschkiste.library.module import Library
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.content.library.module import Library
+from lauschkiste.common.publishing.bus import EventBus
 
 
 class FakeClient:

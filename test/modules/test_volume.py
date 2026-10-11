@@ -4,7 +4,7 @@ import types
 import pytest
 
 from lauschkiste.contract import OperationError
-from lauschkiste.volume import Volume
+from lauschkiste.player.volume import Volume
 
 
 def levels(events):

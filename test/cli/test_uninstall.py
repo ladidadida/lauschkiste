@@ -1,7 +1,7 @@
 import pytest
 from typer.testing import CliRunner
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli import uninstall as uninstall_module
 from lauschkiste_cli.setup.system import System
 from lauschkiste_cli.uninstall import PROFILE_MARKER, _profile_lines, plan
@@ -20,10 +20,10 @@ class RecordingSystem(System):
 @pytest.fixture
 def system(tmp_path, monkeypatch):
     monkeypatch.setenv('HOME', str(tmp_path / 'root' / 'home' / 'pi'))
-    lauschkiste.paths.set_home(tmp_path / 'root' / 'home' / 'pi' / 'lauschkiste')
+    lauschkiste.common.paths.set_home(tmp_path / 'root' / 'home' / 'pi' / 'lauschkiste')
     monkeypatch.setattr(uninstall_module, '_install_kind', lambda: ('other', None))
     yield RecordingSystem(tmp_path / 'root')
-    lauschkiste.paths.set_home(None)
+    lauschkiste.common.paths.set_home(None)
 
 
 def test_a_marked_block_is_removed_with_its_blank_line_and_nothing_else(system):
@@ -50,7 +50,7 @@ def test_services_files_blocks_and_data_are_removed(system):
     system.write('/etc/systemd/system/lauschkiste-http.socket', '[Socket]\n')
     system.write('/etc/update-motd.d/99-lauschkiste-welcome', '#!/bin/sh\n')
     system.write('/etc/samba/smb.conf', '[global]\n  a=b\n\n## Lauschkiste Samba Config\n[lauschkiste]\n  path=/x\n')
-    (lauschkiste.paths.home() / 'settings').mkdir(parents=True)
+    (lauschkiste.common.paths.home() / 'settings').mkdir(parents=True)
     actions, _, stays = plan(system, remove_data=True)
     texts = [action.text for action in actions]
     assert any('service lauschkiste.service' in text for text in texts)
@@ -63,13 +63,13 @@ def test_services_files_blocks_and_data_are_removed(system):
     assert not system.exists('/etc/systemd/system/lauschkiste-http.socket')
     assert not system.exists('/etc/update-motd.d/99-lauschkiste-welcome')
     assert system.read('/etc/samba/smb.conf') == '[global]\n  a=b\n'
-    assert not lauschkiste.paths.home().exists()
+    assert not lauschkiste.common.paths.home().exists()
     assert ('systemctl', '--user', 'disable', '--now', 'lauschkiste.service') in system.commands
     assert not any('the data in' in text for text in stays)
 
 
 def test_the_data_stays_unless_asked(system):
-    (lauschkiste.paths.home() / 'settings').mkdir(parents=True)
+    (lauschkiste.common.paths.home() / 'settings').mkdir(parents=True)
     actions, _, stays = plan(system, remove_data=False)
     assert not any('DELETE' in action.text for action in actions)
     assert any('the data in' in text for text in stays)

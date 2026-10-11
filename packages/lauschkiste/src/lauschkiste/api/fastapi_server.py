@@ -22,25 +22,25 @@ from urllib.parse import urlsplit
 import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
-import lauschkiste.cfghandler
-import lauschkiste.paths
-import lauschkiste.publishing
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
+import lauschkiste.common.publishing
 from lauschkiste.api.events import EventBroker, MAX_MESSAGE_SIZE, parse_subscription_command
 from lauschkiste.api.webapp_static import register_webapp_routes
 from lauschkiste.contract.routes import add_response_schemas, build_router
 
 logger = logging.getLogger('lauschkiste.api.fastapi_server')
-cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
+cfg = lauschkiste.common.cfghandler.get_handler('lauschkiste')
 
 API_EXECUTOR_WORKERS = 4
 
-WEBAPP_DIR_ENV = lauschkiste.paths.ENV_PREFIX + 'WEBAPP_DIR'
+WEBAPP_DIR_ENV = lauschkiste.common.paths.ENV_PREFIX + 'WEBAPP_DIR'
 
 
 def default_webapp_build_dir() -> Path:
     """``api.webapp_dir``, else ``$LAUSCHKISTE_WEBAPP_DIR``, else the web app shipped in the package,
     else the build directory of a source checkout."""
-    configured = cfg.getn('api', 'webapp_dir', default=None) or lauschkiste.paths.getenv('WEBAPP_DIR')
+    configured = cfg.getn('api', 'webapp_dir', default=None) or lauschkiste.common.paths.getenv('WEBAPP_DIR')
     if configured:
         return Path(configured).expanduser().resolve()
     package = Path(__file__).resolve().parent.parent
@@ -51,7 +51,7 @@ def default_webapp_build_dir() -> Path:
 
 
 def default_logs_dir() -> Path:
-    return lauschkiste.paths.home() / 'logs'
+    return lauschkiste.common.paths.home() / 'logs'
 
 
 class _WebSocketClient:
@@ -212,7 +212,7 @@ class FastApiServer(threading.Thread):
         super().__init__(name='FastApiServer', daemon=True)
         self.bind_address = bind_address or cfg.getn('api', 'bind_address', default='0.0.0.0')
         self.port = port if port is not None else cfg.getn('api', 'port', default=5556)
-        self.bus = bus or lauschkiste.publishing.get_bus()
+        self.bus = bus or lauschkiste.common.publishing.get_bus()
         self.broker = EventBroker(bus=self.bus)
         self.modules = modules
         self._ready = threading.Event()
@@ -251,7 +251,7 @@ class FastApiServer(threading.Thread):
         self._server = _Server(config)
 
         # broker.publish is called synchronously from whatever thread published (see
-        # lauschkiste.publishing.bus.EventBus); it hands off to this server's event loop itself via
+        # lauschkiste.common.publishing.bus.EventBus); it hands off to this server's event loop itself via
         # asyncio.run_coroutine_threadsafe (see _WebSocketClient.write_message).
         self.bus.register(self.broker.publish)
 

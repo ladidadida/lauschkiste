@@ -7,7 +7,7 @@ from typing import Optional
 import typer
 from ruamel.yaml import YAML, YAMLError
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 from lauschkiste.contract.secrets import SecretStore, secrets_path
 from lauschkiste_cli.plugin import ConfOption, _config
 
@@ -85,5 +85,5 @@ def set_setting(key: str = typer.Argument(..., help="e.g. library.path"),
         typer.echo(f"{key} is a section; set one of its settings, e.g. {key}.<name>", err=True)
         raise typer.Exit(1)
     cfg.setn(*keys, value=parsed)
-    lauschkiste.cfghandler.write_yaml(cfg, str(path))
+    lauschkiste.common.cfghandler.write_yaml(cfg, str(path))
     typer.echo(f"{key}: {_dump(parsed)}")

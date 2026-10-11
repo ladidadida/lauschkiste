@@ -5,7 +5,7 @@ from typing import Dict, List, Optional
 
 import typer
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli.setup.base import Answers, Context, Step, ask
 from lauschkiste_cli.setup.steps import all_steps
 from lauschkiste_cli.setup.steps.lauschkiste import public_port
@@ -114,7 +114,7 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
           yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask; reuse earlier answers or defaults"),
           force: bool = typer.Option(False, "--force", help="Apply steps even if they look complete"),
           list_steps: bool = typer.Option(False, "--list", help="List the steps and exit"),
-          conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_name("CONF"),
+          conf: Optional[Path] = typer.Option(None, "-c", "--conf", envvar=lauschkiste.common.paths.env_name("CONF"),
                                               help="Configuration file")) -> None:
     """Set up this machine for Lauschkiste (packages, service, Samba, hotspot, ...).
 
@@ -125,7 +125,7 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
         for step in all_steps():
             typer.echo(f"{step.name:12} {step.title}")
         return
-    ctx = Context(system=System(), config_path=conf or lauschkiste.paths.config_file(),
+    ctx = Context(system=System(), config_path=conf or lauschkiste.common.paths.config_file(),
                   assume_yes=yes)
     if not steps and not check and not yes:
         typer.echo("This sets up the machine step by step: hardware, system packages, the service and the "

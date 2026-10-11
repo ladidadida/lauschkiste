@@ -8,22 +8,22 @@ from typing import List, Optional
 
 import typer
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 import lauschkiste.contract.plugins as plugins
-import lauschkiste.paths
+import lauschkiste.common.paths
 
 app = typer.Typer(help="Manage plugins.", no_args_is_help=True)
 
-ConfOption = typer.Option(None, "-c", "--conf", envvar=lauschkiste.paths.env_name("CONF"),
+ConfOption = typer.Option(None, "-c", "--conf", envvar=lauschkiste.common.paths.env_name("CONF"),
                           help="Configuration file (default: $LAUSCHKISTE_HOME/settings/lauschkiste.yaml)")
 
 
 def _config(conf: Optional[Path]):
-    path = conf or lauschkiste.paths.config_file()
-    lauschkiste.cfghandler.ensure_default_config(
-        str(path), str(lauschkiste.paths.resource('default-settings', 'lauschkiste.default.yaml')))
-    cfg = lauschkiste.cfghandler.ConfigHandler('plugin-cli')
-    lauschkiste.cfghandler.load_yaml(cfg, str(path))
+    path = conf or lauschkiste.common.paths.config_file()
+    lauschkiste.common.cfghandler.ensure_default_config(
+        str(path), str(lauschkiste.common.paths.resource('default-settings', 'lauschkiste.default.yaml')))
+    cfg = lauschkiste.common.cfghandler.ConfigHandler('plugin-cli')
+    lauschkiste.common.cfghandler.load_yaml(cfg, str(path))
     return cfg, path
 
 
@@ -62,7 +62,7 @@ def add_to_config(path: Path, names: List[str]) -> List[str]:
     for name in added:
         cfg.setndefault('plugins', name, value={})
     if added:
-        lauschkiste.cfghandler.write_yaml(cfg, str(path))
+        lauschkiste.common.cfghandler.write_yaml(cfg, str(path))
     return added
 
 
@@ -125,7 +125,7 @@ def disable(name: str, conf: Optional[Path] = ConfOption) -> None:
     del enabled[name]
     if not enabled:
         cfg['plugins'] = {}
-    lauschkiste.cfghandler.write_yaml(cfg, str(path))
+    lauschkiste.common.cfghandler.write_yaml(cfg, str(path))
     typer.echo(f"Disabled '{name}' in {path}. Restart Lauschkiste to unload it.")
 
 

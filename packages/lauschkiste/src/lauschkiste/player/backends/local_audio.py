@@ -4,7 +4,7 @@ Default player backend: decodes audio directly (PyAV) and writes PCM to the mach
 audio output (sounddevice/PortAudio) -- no mpd, no external player process, works on any Linux
 box. See documentation/developers/roadmap-core-architecture.md, "Advanced plugin system".
 
-Folder scanning reuses `lauschkiste.playlistgenerator.PlaylistCollector` (already backend-agnostic --
+Folder scanning reuses `lauschkiste.content.playlistgenerator.PlaylistCollector` (already backend-agnostic --
 `backends/mpd.py` uses the exact same class, just pushes the resulting paths into MPD's queue
 instead of this backend's own in-process one).
 
@@ -23,18 +23,18 @@ import time
 
 from fractions import Fraction
 
-import lauschkiste.paths
-import lauschkiste.library
-import lauschkiste.cfghandler
-import lauschkiste.utils as utils
-import lauschkiste.multitimer as multitimer
-import lauschkiste.playlistgenerator as playlistgenerator
+import lauschkiste.common.paths
+import lauschkiste.content.library
+import lauschkiste.common.cfghandler
+import lauschkiste.common.utils as utils
+import lauschkiste.common.multitimer as multitimer
+import lauschkiste.content.playlistgenerator as playlistgenerator
 
-from lauschkiste.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_gain, volume_gain
-from lauschkiste.nv_manager import nv_manager
+from lauschkiste.player.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_gain, volume_gain
+from lauschkiste.common.nv_manager import nv_manager
 
 logger = logging.getLogger('lauschkiste.PlayerLocalAudio')
-cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
+cfg = lauschkiste.common.cfghandler.get_handler('lauschkiste')
 
 STREAM_TIMEOUT = (10.0, 30.0)
 
@@ -55,7 +55,7 @@ class PlayerLocalAudio:
 
     def __init__(self):
         self.nvm = nv_manager()
-        self._status_store = self.nvm.load(str(lauschkiste.paths.resolve(
+        self._status_store = self.nvm.load(str(lauschkiste.common.paths.resolve(
             cfg.getn('player', 'status_file', default='settings/local_audio_status.json'))))
         if not self._status_store:
             self._status_store['last_played_folder'] = ''
@@ -473,7 +473,7 @@ class PlayerLocalAudio:
         raise NotImplementedError
 
     def _absolute(self, path):
-        root = os.path.expanduser(lauschkiste.library.root() or '')
+        root = os.path.expanduser(lauschkiste.content.library.root() or '')
         return path if os.path.isabs(path) or '://' in path else os.path.join(root, path)
 
     def play_single(self, song_url):
@@ -494,12 +494,12 @@ class PlayerLocalAudio:
             self.second_swipe_action()
 
     def get_folder_content(self, folder: str):
-        plc = playlistgenerator.PlaylistCollector(lauschkiste.library.root())
+        plc = playlistgenerator.PlaylistCollector(lauschkiste.content.library.root())
         plc.get_directory_content(folder)
         return plc.playlist
 
     def play_folder(self, folder: str, recursive: bool = False) -> None:
-        plc = playlistgenerator.PlaylistCollector(lauschkiste.library.root())
+        plc = playlistgenerator.PlaylistCollector(lauschkiste.content.library.root())
         plc.parse(folder, recursive)
         paths = list(plc)
         with self._cv:
@@ -546,7 +546,7 @@ class PlayerLocalAudio:
             return [{'file': path, 'pos': str(i)} for i, path in enumerate(self._queue)]
 
     def list_all_dirs(self):
-        base = os.path.expanduser(lauschkiste.library.root())
+        base = os.path.expanduser(lauschkiste.content.library.root())
         result = []
         for root, _dirs, files in os.walk(base):
             for f in files:

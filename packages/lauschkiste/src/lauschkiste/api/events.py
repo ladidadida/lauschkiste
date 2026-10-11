@@ -5,7 +5,7 @@ MAX_MESSAGE_SIZE = 1024 * 1024
 
 
 class EventBroker:
-    """Maintain browser subscriptions, backed by the shared :class:`lauschkiste.publishing.bus.EventBus`.
+    """Maintain browser subscriptions, backed by the shared :class:`lauschkiste.common.publishing.bus.EventBus`.
 
     Register :meth:`publish` as a bus subscriber callback (``bus.register(broker.publish)``); the
     bus already delivers `payload=None` for revocations and calls this from whatever thread

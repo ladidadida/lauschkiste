@@ -3,8 +3,8 @@ import time
 
 import pytest
 
-import lauschkiste.library.watch as watch
-from lauschkiste.library.watch import FolderWatcher, snapshot
+import lauschkiste.content.library.watch as watch
+from lauschkiste.content.library.watch import FolderWatcher, snapshot
 
 
 def test_snapshot_notices_new_files_folders_and_growing_files(tmp_path):

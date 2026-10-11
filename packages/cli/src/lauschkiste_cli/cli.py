@@ -3,7 +3,7 @@ from typing import Optional
 
 import typer
 
-import lauschkiste.paths
+import lauschkiste.common.paths
 from lauschkiste_cli.run import run
 
 HOME_HELP = ("Directory with all data (settings, music, logs). "
@@ -11,14 +11,14 @@ HOME_HELP = ("Directory with all data (settings, music, logs). "
 
 
 def main(home: Optional[Path] = typer.Option(
-        None, "--home", envvar=lauschkiste.paths.env_name("HOME"), help=HOME_HELP)) -> None:
-    lauschkiste.paths.set_home(home)
+        None, "--home", envvar=lauschkiste.common.paths.env_name("HOME"), help=HOME_HELP)) -> None:
+    lauschkiste.common.paths.set_home(home)
 
 
 def show_home() -> None:
     """Print the home directory and the configuration file in use."""
-    typer.echo(f"home:   {lauschkiste.paths.home()}")
-    typer.echo(f"config: {lauschkiste.paths.config_file()}")
+    typer.echo(f"home:   {lauschkiste.common.paths.home()}")
+    typer.echo(f"config: {lauschkiste.common.paths.config_file()}")
 
 
 def _management_app(name: str, help_text: str) -> typer.Typer:

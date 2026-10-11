@@ -2,7 +2,7 @@
 
 from typing import Optional
 
-from lauschkiste.cache import CacheFile, CachePlan
+from lauschkiste.content.cache import CacheFile, CachePlan
 from lauschkiste.contract import OperationError
 from lauschkiste_plugin_audiobookshelf.client import AudiobookshelfError
 

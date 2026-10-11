@@ -5,14 +5,14 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from lauschkiste.cache import Cache, CacheFile, CachePlan
-from lauschkiste.cache.manager import DownloadManager
-from lauschkiste.cache.store import CacheStore
-from lauschkiste.cache.worker import Download, DownloadError
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.content.cache import Cache, CacheFile, CachePlan
+from lauschkiste.content.cache.manager import DownloadManager
+from lauschkiste.content.cache.store import CacheStore
+from lauschkiste.content.cache.worker import Download, DownloadError
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import OperationError
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 
 CONTENT = {'a.mp3': bytes(range(256)) * 4, 'b.mp3': b'B' * 3000, 'c.mp3': b'C' * 500}
 TOKEN = 'Bearer secret'
@@ -142,9 +142,9 @@ class Provider:
 
 @pytest.fixture
 def cache(server, tmp_path, monkeypatch):
-    import lauschkiste.paths
-    monkeypatch.setenv(lauschkiste.paths.HOME_ENV, str(tmp_path))
-    lauschkiste.paths.set_home(None)
+    import lauschkiste.common.paths
+    monkeypatch.setenv(lauschkiste.common.paths.HOME_ENV, str(tmp_path))
+    lauschkiste.common.paths.set_home(None)
     cfg = ConfigHandler('test')
     cfg.config_dict({'cache': {'limit_gb': 1}})
     manager = ModuleManager([Cache], cfg, EventBus(), plugins={}, strict=True)
@@ -156,7 +156,7 @@ def cache(server, tmp_path, monkeypatch):
     handle.instance.providers.register('demo', handle.provider)
     yield handle
     manager.stop()
-    lauschkiste.paths.set_home(None)
+    lauschkiste.common.paths.set_home(None)
 
 
 def wait_done(handle, source='demo', item='one', timeout=30):

@@ -4,19 +4,19 @@ import pytest
 
 pytest.importorskip('lauschkiste_plugin_rfid_readers', reason="the rfid-readers plugin package is not installed")
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 import lauschkiste_plugin_rfid_readers
-from lauschkiste.hardware import Hardware
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.box.hardware import Hardware
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract.manager import ModuleManager, discover_plugins
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 from lauschkiste.rfid.cards import Cards
 from lauschkiste.rfid.reader import Rfid
 
 
 @pytest.fixture
 def start(tmp_path):
-    main = lauschkiste.cfghandler.get_handler('lauschkiste')
+    main = lauschkiste.common.cfghandler.get_handler('lauschkiste')
     main.config_dict({})
     (tmp_path / 'rfid.yaml').write_text("rfid:\n  readers: {}\n")
     managers = []

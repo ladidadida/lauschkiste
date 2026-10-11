@@ -23,7 +23,7 @@ def test_settings_models_have_valid_defaults_and_schema(module):
 
 
 def test_invalid_entries_fall_back_to_defaults():
-    from lauschkiste.volume import Volume
+    from lauschkiste.player.volume import Volume
     values = current_values(Volume.settings, {'soft_max_volume': 300, 'mixer': 'pulse', 'unknown': 1})
     assert values == {'mixer': 'pulse', 'startup_volume': None, 'soft_max_volume': 100, 'outputs': {}}
 

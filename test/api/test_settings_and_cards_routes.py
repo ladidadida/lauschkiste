@@ -5,9 +5,9 @@ import io
 import pytest
 from ruamel.yaml import YAML
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 from lauschkiste.rfid.cards import Cards
-from lauschkiste.system import System
+from lauschkiste.box.system import System
 
 
 def load_yaml(path):
@@ -27,7 +27,7 @@ class QuietSystem(System):
 
 @pytest.fixture
 def main_cfg():
-    cfg = lauschkiste.cfghandler.get_handler('lauschkiste')
+    cfg = lauschkiste.common.cfghandler.get_handler('lauschkiste')
     cfg.config_dict({})
     yield cfg
     cfg.config_dict({})

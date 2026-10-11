@@ -8,13 +8,13 @@ from fastapi import FastAPI
 from pydantic import BaseModel, ValidationError
 from starlette.testclient import TestClient
 
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import (
     ActionError, ContractError, CoreModule, OperationError, Plugin, action, event, extension_point, query,
 )
 from lauschkiste.contract.manager import ModuleManager
 from lauschkiste.contract.routes import build_router
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.common.publishing.bus import EventBus
 
 
 class Level(BaseModel):

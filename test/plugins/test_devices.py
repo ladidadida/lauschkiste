@@ -4,13 +4,13 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 import lauschkiste_plugin_board_raspberry_pi as board_plugin
-from lauschkiste.cfghandler import ConfigHandler
+from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import CoreModule, action
 from lauschkiste.contract.manager import ModuleManager
-from lauschkiste.hardware import Hardware
-from lauschkiste.publishing.bus import EventBus
+from lauschkiste.box.hardware import Hardware
+from lauschkiste.common.publishing.bus import EventBus
 from lauschkiste_plugin_devices import battery, gpio_controls, power_button
 from lauschkiste_plugin_devices.battery import BatteryMonitor, Max17048Reader, state_of_charge
 
@@ -28,9 +28,9 @@ class Recorder(CoreModule):
 def clean(monkeypatch):
     Recorder.calls = []
     monkeypatch.setattr(subprocess, 'Popen', Mock())
-    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
+    lauschkiste.common.cfghandler.get_handler('lauschkiste').config_dict({})
     yield
-    lauschkiste.cfghandler.get_handler('lauschkiste').config_dict({})
+    lauschkiste.common.cfghandler.get_handler('lauschkiste').config_dict({})
 
 
 PLUGINS = {

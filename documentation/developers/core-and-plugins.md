@@ -61,7 +61,7 @@ module provides what browsing needs:
 - title, artist, album, track and duration for the player status, independent of the active backend.
 
 Backend-independent as well: folder playlists
-(`lauschkiste.playlistgenerator.PlaylistCollector`, including `.m3u`) and file management (upload,
+(`lauschkiste.content.playlistgenerator.PlaylistCollector`, including `.m3u`) and file management (upload,
 folders, delete). Audiobooks, radio and podcasts are separate core modules, see
 [Content types](content-types.md).
 
@@ -394,7 +394,7 @@ A plugin that lets people find podcasts registers an object at `podcasts.directo
 optional `label` attribute for the name shown); for radio stations it is `radio.directories`, the same shape with
 `name` and `url` instead of `title` and `feed_url`. The module merges the answers of all of them for `search` and
 `top`, takes turns between directories, drops duplicates by address and names a directory that failed without
-losing the others (`lauschkiste.directories`):
+losing the others (`lauschkiste.content.directories`):
 
 ```python
 class MyDirectory:

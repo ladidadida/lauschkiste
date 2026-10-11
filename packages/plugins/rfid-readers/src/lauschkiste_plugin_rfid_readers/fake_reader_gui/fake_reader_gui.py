@@ -12,7 +12,7 @@ from tkinter import filedialog
 
 from ttkthemes import ThemedStyle
 
-import lauschkiste.cfghandler
+import lauschkiste.common.cfghandler
 from lauschkiste.rfid import ReaderBaseClass
 from lauschkiste.rfid.cardutils import (card_to_str)
 
@@ -20,8 +20,8 @@ from .description import DESCRIPTION
 
 # Create logger
 logger = logging.getLogger('lauschkiste.rfid.tk')
-cfg = lauschkiste.cfghandler.get_handler('rfid')
-cfg_cards = lauschkiste.cfghandler.get_handler('cards')
+cfg = lauschkiste.common.cfghandler.get_handler('rfid')
+cfg_cards = lauschkiste.common.cfghandler.get_handler('cards')
 
 
 def query_customization() -> dict:

@@ -5,8 +5,8 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.library
-from lauschkiste.audio_output import PortAudioSink, scale_gain, scale_volume, volume_gain
+import lauschkiste.content.library
+from lauschkiste.player.audio_output import PortAudioSink, scale_gain, scale_volume, volume_gain
 from lauschkiste.player.backends.local_audio import PlayerLocalAudio
 
 
@@ -167,7 +167,7 @@ def test_decode_track_corrupt_file_is_skipped_not_raised(tmp_path):
 def test_play_folder_builds_queue_and_starts_playing(tmp_path, monkeypatch):
     (tmp_path / '01.mp3').touch()
     (tmp_path / '02.mp3').touch()
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
 
     backend.play_folder('.')
@@ -179,7 +179,7 @@ def test_play_folder_builds_queue_and_starts_playing(tmp_path, monkeypatch):
 
 
 def test_play_folder_with_no_content_stops(tmp_path, monkeypatch):
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
 
     backend.play_folder('.')
@@ -361,7 +361,7 @@ def test_portaudio_sink_drops_buffered_audio_when_interrupted(monkeypatch):
 
 
 def test_play_files_starts_at_entry_and_position(tmp_path, monkeypatch):
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
 
     backend.play_files(['a/01.mp3', 'a/02.mp3'], 1, 42.5)
@@ -374,7 +374,7 @@ def test_play_files_starts_at_entry_and_position(tmp_path, monkeypatch):
 
 
 def test_ordered_files_ignore_shuffle_and_repeat_until_other_content(tmp_path, monkeypatch):
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
     backend.shuffle('enable')
     backend.repeat('enable_repeat')
@@ -397,7 +397,7 @@ def test_stop_after_current_is_reported_and_cleared_by_stop():
 
 
 def test_play_single_resolves_library_paths(tmp_path, monkeypatch):
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
     backend.play_single('music/a/01.mp3')
     assert backend._queue == [str(tmp_path / 'music' / 'a' / '01.mp3')]
@@ -406,7 +406,7 @@ def test_play_single_resolves_library_paths(tmp_path, monkeypatch):
 
 
 def test_speed_applies_to_ordered_content_only(tmp_path, monkeypatch):
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
     backend.set_speed(1.5)
     backend.play_files(['b/01.mp3'], ordered=True)
@@ -419,7 +419,7 @@ def test_speed_applies_to_ordered_content_only(tmp_path, monkeypatch):
 
 
 def test_jump_within_the_queue(tmp_path, monkeypatch):
-    monkeypatch.setattr(lauschkiste.library, 'root', lambda: str(tmp_path))
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
     backend = local_audio_backend()
     backend.play_files(['a/1.mp3', 'a/2.mp3', 'a/3.mp3'])
     backend.jump(2)

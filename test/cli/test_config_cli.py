@@ -1,8 +1,8 @@
 import pytest
 from typer.testing import CliRunner
 
-import lauschkiste.cfghandler
-import lauschkiste.paths
+import lauschkiste.common.cfghandler
+import lauschkiste.common.paths
 from lauschkiste_cli.cli import ctl as app
 
 runner = CliRunner()
@@ -10,11 +10,11 @@ runner = CliRunner()
 
 @pytest.fixture
 def home(tmp_path, monkeypatch):
-    monkeypatch.delenv(lauschkiste.paths.env_name('CONF'), raising=False)
-    monkeypatch.setenv(lauschkiste.paths.HOME_ENV, str(tmp_path))
-    lauschkiste.paths.set_home(None)
+    monkeypatch.delenv(lauschkiste.common.paths.env_name('CONF'), raising=False)
+    monkeypatch.setenv(lauschkiste.common.paths.HOME_ENV, str(tmp_path))
+    lauschkiste.common.paths.set_home(None)
     yield tmp_path
-    lauschkiste.paths.set_home(None)
+    lauschkiste.common.paths.set_home(None)
 
 
 def test_set_and_get(home):
