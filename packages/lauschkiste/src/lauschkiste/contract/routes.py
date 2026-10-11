@@ -25,14 +25,11 @@ class PluginState(BaseModel):
     enabled: bool
 
 
-_adapters: Dict[int, TypeAdapter] = {}
-
-
 def response_adapter(op: Operation) -> TypeAdapter:
     """Validates and serializes the return value; built on first use, which keeps start-up fast on small boards."""
-    adapter = _adapters.get(id(op))
+    adapter = getattr(op, '_response_adapter', None)
     if adapter is None:
-        adapter = _adapters[id(op)] = TypeAdapter(op.return_type)
+        adapter = op._response_adapter = TypeAdapter(op.return_type)
     return adapter
 
 

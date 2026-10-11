@@ -436,3 +436,19 @@ def test_operation_name_can_differ_from_method_name():
     manager, _, _ = make_manager([Deck])
     manager.catalog.call('deck.stop')
     assert manager.instance('deck').stopped
+
+
+def test_the_response_adapter_belongs_to_its_operation_not_to_an_object_id():
+    from lauschkiste.contract.declarations import Operation, OperationSpec
+    from lauschkiste.contract.routes import response_adapter
+
+    def ints(self) -> int:
+        return 1
+
+    def texts(self) -> str:
+        return 'x'
+
+    spec = OperationSpec('query', 'GET', None, True)
+    for _ in range(300):
+        assert response_adapter(Operation('m', 'ints', ints, spec)).validate_python(5) == 5
+        assert response_adapter(Operation('m', 'texts', texts, spec)).validate_python('x') == 'x'
