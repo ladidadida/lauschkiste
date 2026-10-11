@@ -24,6 +24,7 @@ def show_home() -> None:
 def _management_app(name: str, help_text: str) -> typer.Typer:
     from lauschkiste_cli import config, debug, plugin
     from lauschkiste_cli.setup import setup
+    from lauschkiste_cli.uninstall import uninstall
     from lauschkiste_cli.update import update
 
     app = typer.Typer(name=name, help=help_text, no_args_is_help=True)
@@ -31,6 +32,7 @@ def _management_app(name: str, help_text: str) -> typer.Typer:
     app.command(name="home")(show_home)
     app.command(name="setup")(setup)
     app.command(name="update")(update)
+    app.command(name="uninstall")(uninstall)
     app.add_typer(config.app, name="config")
     app.add_typer(debug.app, name="debug")
     app.add_typer(plugin.app, name="plugin")

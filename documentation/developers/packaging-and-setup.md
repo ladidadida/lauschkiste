@@ -63,6 +63,7 @@ lauschctl setup <step>             run one step (`lauschctl setup --list` lists 
 lauschctl setup --check            report which steps are applied, change nothing
 lauschctl update                   update Lauschkiste (package: newer release; source: git pull +
                                  uv sync) and re-apply the setup
+lauschctl uninstall                remove what Lauschkiste created (--check lists it), and itself at the end
 ```
 
 ## Setup steps
@@ -75,6 +76,15 @@ Answers are stored in `$LAUSCHKISTE_HOME/settings/setup.yaml` so unattended re-r
 The steps: system packages, Raspberry Pi boot settings, the systemd user service, mpd (only when the `mpd`
 plugin is chosen), plugins, Samba, port 80, autohotspot, kiosk mode, RFID readers, audio output, boot-time
 optimisation and the login message. Steps needing root run their commands through `sudo`.
+
+## Uninstalling
+
+`lauschctl uninstall` (`lauschkiste_cli/uninstall.py`) removes what Lauschkiste created and can recognise: its systemd
+units and files by their names, blocks marked with `## Lauschkiste ...` in system files (kiosk, boot, Samba), the
+profile lines of the installer, optionally the data, and the installation (pip venv, `uv tool uninstall`, or only the
+links of a source checkout) as the very last action, after everything that needs the program. What belongs to the system
+stays and is listed. It does not remember the state before the setup, so it cannot restore settings it changed
+(boot, network, packages). `ci/test_install.sh` installs, sets up, runs and uninstalls.
 
 ## Packages and releases
 

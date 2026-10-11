@@ -89,3 +89,19 @@ through the normal sound output, USB RFID readers work, and the web app and all 
 audiobooks, podcasts, radio, time limits) are the same. What needs a board (GPIO buttons, LEDs, sound cards on the
 header, battery, shutdown by a power button) is only available with a board support plugin; shutdown and reboot are
 then not offered. On other distributions, install with `--from source` and set up the system packages yourself. Windows and macOS are not supported.
+
+## Uninstalling
+
+```bash
+lauschctl uninstall --check   # what would be removed, and what stays
+lauschctl uninstall           # remove it (asks before it deletes your data)
+```
+
+`lauschctl uninstall` removes what Lauschkiste itself created: its services and the forwarding of port 80, the login
+message, the kiosk and Samba entries and the lines the installer added to your shell profile, and finally
+Lauschkiste with its commands, itself included. Your data (music, settings, cards) stays unless you answer yes or pass
+`--remove-data`. A source checkout is not deleted; remove the folder yourself.
+
+What belongs to the system stays, and the command lists it together with how to undo it by hand: system packages
+(`apt remove`), boot settings (sound card and other lines in `config.txt`, quiet boot), network settings (hotspot,
+static address, console autologin), the Samba user and the lingering of the user service.

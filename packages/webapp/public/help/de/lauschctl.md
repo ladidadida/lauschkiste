@@ -16,6 +16,7 @@ Jeder Einrichtungsschritt prüft zuerst und ändert nur, was fehlt; erneutes Aus
 | `lauschctl setup <schritt>` | einen Schritt, z. B. `samba` |
 | `lauschctl update` | auf die neueste Version aktualisieren |
 | `lauschctl plugin list` | installierte Plugins |
+| `lauschctl uninstall` | Lauschkiste von der Box entfernen (`--check` zeigt vorher, was passiert) |
 | `lauschctl home` | wo Einstellungen und Bibliothek liegen |
 
 ## Samba {#samba}

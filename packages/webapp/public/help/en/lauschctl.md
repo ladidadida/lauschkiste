@@ -17,6 +17,7 @@ Every setup step checks first and only changes what is missing; running it again
 | `lauschctl update` | update to the newest version |
 | `lauschctl plugin list` | installed plugins |
 | `lauschctl home` | where settings and library are |
+| `lauschctl uninstall` | remove Lauschkiste from the box (`--check` shows what it would do) |
 
 ## Samba {#samba}
 

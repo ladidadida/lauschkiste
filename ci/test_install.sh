@@ -33,11 +33,19 @@ su - pi -c "
     lauschctl home
     lauschctl setup --yes
     lauschctl setup --check --yes
-    (lauschkiste > /tmp/run.log 2>&1 &)
+    lauschkiste > /tmp/run.log 2>&1 &
+    echo \$! > /tmp/run.pid
     for i in \$(seq 1 120); do curl -fsS localhost:5556/api/v1/health 2>/dev/null && break; sleep 1; done
     echo
     curl -fsS localhost:5556/ | grep -q \"<div id=\\\"root\\\">\" || { tail -50 /tmp/run.log; exit 1; }
     curl -fsS localhost:5556/api/v1/modules > /dev/null
     echo \"Lauschkiste runs and serves the web app.\"
+    kill \$(cat /tmp/run.pid) || true
+    lauschctl uninstall --check
+    lauschctl uninstall --yes
+    hash -r
+    if command -v lauschctl; then echo \"lauschctl is still installed\"; exit 1; fi
+    if grep -q \"added by install.sh\" ~/.profile ~/.bashrc; then echo \"profile lines are still there\"; exit 1; fi
+    echo \"Lauschkiste was uninstalled.\"
 "
 '
