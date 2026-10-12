@@ -92,6 +92,7 @@ const SystemSettings = () => {
   return (
     <SettingsPage title={t('settings.sections.system.title')}>
       <ModuleSettings module="system" />
+      <ModuleSettings module="display" />
       <Card>
         <CardHeader title={t('settings.system.service')} />
         <Divider />

@@ -2,6 +2,7 @@
 
 from lauschkiste.content.audiobooks import Audiobooks
 from lauschkiste.content.cache.module import Cache
+from lauschkiste.box.display import Display
 from lauschkiste.box.hardware import Hardware
 from lauschkiste.box.input_devices import InputDevices
 from lauschkiste.player.jingle import Jingle
@@ -19,6 +20,7 @@ from lauschkiste.player.volume import Volume
 CORE_MODULES = [
     System,
     Hardware,
+    Display,
     Library,
     Player,
     Audiobooks,

@@ -17,12 +17,16 @@ Box neu. Ein Raspberry Pi 3 oder besser wird empfohlen; auf einer Zero ist ein B
 
 ## Den Bildschirm ausschalten, wenn ihn niemand benutzt
 
-`lauschctl setup kiosk` fragt, nach wie vielen Minuten ohne Berührung der Bildschirm dunkel werden soll (standardmäßig 10,
-`0` für nie). Eine Berührung schaltet ihn wieder ein. Das spart Strom und schont den Bildschirm bei einer Box, die den
-ganzen Tag läuft. Die Musik spielt weiter; nur der Bildschirm schläft. Um die Zeit später zu ändern, führe
-`lauschctl setup kiosk` noch einmal aus.
+Nach 5 Minuten ohne Berührung wird der Bildschirm dunkel. Eine Berührung schaltet ihn wieder ein, und sie weckt nur den
+Bildschirm: In der Webseite wird dadurch nichts gedrückt. Die Musik spielt weiter; nur der Bildschirm schläft. Das spart
+Strom und schont den Bildschirm bei einer Box, die den ganzen Tag läuft.
 
-Eine Box, die nur mit Karten bedient wird, müsste beim Auflegen einer Karte auch aufwachen. Das ist noch nicht eingebaut.
+Die Zeit änderst du auf der Webseite unter Einstellungen → System → *Switch the screen off after (minutes)*; bei `0`
+bleibt der Bildschirm an. Die Änderung gilt sofort. Das geht bei Bildschirmen, deren Hintergrundbeleuchtung Lauschkiste
+steuern darf, etwa dem offiziellen Raspberry-Pi-Touch-Display. Die meisten HDMI-Bildschirme haben das nicht und bleiben an.
+
+Die Aktionen `display.sleep` und `display.wake` schalten den Bildschirm aus und ein, zum Beispiel von einer Karte oder
+einer Taste aus.
 
 ## Bleibt der Bildschirm schwarz
 

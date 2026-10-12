@@ -17,11 +17,15 @@ or better is advised; a Zero is slow with a browser.
 
 ## Switch the screen off when nobody uses it
 
-`lauschctl setup kiosk` asks after how many minutes without a touch the screen should go dark (10 by default, `0` for never
-off). A touch switches it on again. This saves power and keeps the screen from burning in on a box that runs all day. The
-music keeps playing; only the screen sleeps. To change the time later, run `lauschctl setup kiosk` again.
+After 5 minutes without a touch the screen goes dark. A touch switches it on again, and that touch only wakes the
+screen: it does not press anything in the web app. The music keeps playing; only the screen sleeps. This saves power and
+keeps the screen from burning in on a box that runs all day.
 
-A box that is only used by cards would also need to wake up when a card is put on. That is not built in yet.
+Change the time in the web app under Settings → System → *Switch the screen off after (minutes)*; `0` keeps the screen
+on. It takes effect at once. This works for screens whose backlight Lauschkiste may control, like the official Raspberry
+Pi touch display. Most HDMI monitors have no such backlight and stay on.
+
+The actions `display.sleep` and `display.wake` switch the screen off and on, for example from a card or a button.
 
 ## If the screen stays black
 

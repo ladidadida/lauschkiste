@@ -1,0 +1,61 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "display",
+  "operations": {
+    "get_state": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/display/state",
+      "returns": {
+        "properties": {
+          "asleep": {
+            "type": "boolean"
+          },
+          "available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "available",
+          "asleep"
+        ],
+        "type": "object"
+      }
+    },
+    "sleep": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/display/sleep",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "wake": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/display/wake",
+      "returns": {
+        "type": "null"
+      }
+    }
+  },
+  "requires": {}
+}
