@@ -27,7 +27,7 @@ import lauschkiste.common.paths
 import lauschkiste.content.library
 import lauschkiste.common.cfghandler
 import lauschkiste.common.utils as utils
-import lauschkiste.common.multitimer as multitimer
+from lauschkiste.common.periodic import PeriodicThread
 import lauschkiste.content.playlistgenerator as playlistgenerator
 
 from lauschkiste.player.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_gain, volume_gain
@@ -107,8 +107,7 @@ class PlayerLocalAudio:
         self._worker = threading.Thread(target=self._run, name='LocalAudioPlayback', daemon=True)
         self._worker.start()
 
-        self._status_thread = multitimer.GenericEndlessTimerClass(
-            'local_audio.timer_status', 0.25, self._publish_status)
+        self._status_thread = PeriodicThread('local_audio.timer_status', 0.25, self._publish_status)
         self._status_thread.start()
 
     # -- worker -----------------------------------------------------------------------------

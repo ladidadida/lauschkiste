@@ -4,8 +4,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-import lauschkiste.box.time_limits as module
-from lauschkiste.box.time_limits import TimeLimits
+import lauschkiste.box.time_limits.module as module
+from lauschkiste.box.time_limits.module import TimeLimits
 from lauschkiste.box.time_limits.rules import limit_seconds, quiet_until
 
 FRIDAY_EVENING = datetime(2026, 10, 9, 20, 0)       # a Friday

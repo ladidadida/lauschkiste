@@ -1,9 +1,9 @@
 import pytest
 
-import lauschkiste.content.cache
-import lauschkiste.content.podcasts
-from lauschkiste.content.podcast_opml import normalize_url, parse_opml, render_opml
-from lauschkiste.content.podcasts import parse_feed
+import lauschkiste.content.cache.module
+import lauschkiste.content.podcasts.module
+from lauschkiste.content.podcasts.opml import normalize_url, parse_opml, render_opml
+from lauschkiste.content.podcasts.feed import parse_feed
 
 FEED = b'''<?xml version="1.0"?><rss version="2.0"><channel><title>Kakadu</title>
 <item><title>E</title><guid>1</guid><enclosure url="https://example.org/1.mp3" type="audio/mpeg"/></item></channel></rss>'''
@@ -37,13 +37,13 @@ def row(title, feed):
 @pytest.fixture
 def podcasts(api_client, mocked_player, tmp_path, monkeypatch):
     from unittest.mock import Mock
-    monkeypatch.setattr(lauschkiste.content.podcasts, 'fetch_feed', lambda url: parse_feed(FEED))
+    monkeypatch.setattr(lauschkiste.content.podcasts.module, 'fetch_feed', lambda url: parse_feed(FEED))
     ctrl = Mock()
     ctrl.get_active_backend.return_value = 'local_audio'
     ctrl.playerstatus.return_value = {'state': 'stop'}
     config = {'podcasts': {'podcasts_file': str(tmp_path / 'podcasts.yaml'), 'cache_dir': str(tmp_path / 'feeds'),
                            'state_file': str(tmp_path / 'positions.json')}}
-    modules = [mocked_player(ctrl), lauschkiste.content.podcasts.Podcasts, lauschkiste.content.cache.Cache]
+    modules = [mocked_player(ctrl), lauschkiste.content.podcasts.module.Podcasts, lauschkiste.content.cache.module.Cache]
     with api_client(modules, config) as client:
         yield client, client.modules.instance('podcasts').directories
 

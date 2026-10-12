@@ -21,10 +21,10 @@ packages/          uv workspace members
                      contract/  the core/plugin framework (modules, operations, plugins, snapshots)
                      api/       FastAPI bridge: routes from operations, WebSocket events, web app files
                      common/    foundations used by everything: cfghandler (settings), paths, statefile,
-                                publishing (event bus), multitimer, misc, utils
+                                publishing (event bus), periodic (interval threads), misc, utils
                      player/    the player module and its backends, plus volume, audio_output and jingle
-                     content/   what is played: library, audiobooks, podcasts, radio, directories, cache,
-                                resume (continue lists), playlistgenerator
+                     content/   what is played: library, audiobooks, podcasts/ and radio/ (module, models, feed or
+                                playlist, OPML), directories, cache, resume (continue lists), playlistgenerator
                      box/       the box itself: hardware, input_devices, system, timers, time_limits
                      rfid/      cards and the reader module
                      daemon.py, core_modules.py (the modules the daemon always starts), startup.py

@@ -7,7 +7,7 @@ import pytest
 pytest.importorskip('lauschkiste_plugin_audiobookshelf', reason="the audiobookshelf plugin package is not installed")
 
 from lauschkiste.contract import OperationError
-from lauschkiste.content.cache import CachedFile, CachedItem
+from lauschkiste.content.cache.module import CachedFile, CachedItem
 from lauschkiste_plugin_audiobookshelf.provider import AudiobookshelfProvider
 from lauschkiste_plugin_audiobookshelf.source import AudiobookshelfSource
 

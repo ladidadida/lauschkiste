@@ -8,7 +8,7 @@ import pytest
 
 import lauschkiste.content.resume
 from lauschkiste.content.audiobooks import Audiobooks
-from lauschkiste.content.cache import Cache
+from lauschkiste.content.cache.module import Cache
 from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import OperationError
 from lauschkiste.contract.manager import ModuleManager

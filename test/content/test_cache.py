@@ -5,7 +5,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import pytest
 
-from lauschkiste.content.cache import Cache, CacheFile, CachePlan
+from lauschkiste.content.cache import CacheFile, CachePlan
+from lauschkiste.content.cache.module import Cache
 from lauschkiste.content.cache.manager import DownloadManager
 from lauschkiste.content.cache.store import CacheStore
 from lauschkiste.content.cache.worker import Download, DownloadError

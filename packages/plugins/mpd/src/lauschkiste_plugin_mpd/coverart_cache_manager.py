@@ -102,10 +102,3 @@ class CoverartCacheManager:
             except Exception as e:
                 logger.error(f"Error processing write request: {e}")
             self.write_queue.task_done()
-
-    def flush_cache(self):
-        for path in self.cache_folder_path.iterdir():
-            if path.is_file():
-                path.unlink()
-                logger.debug(f"Deleted cached file: {path.name}")
-        logger.info("Cache flushed successfully.")

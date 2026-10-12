@@ -2,10 +2,10 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.content.cache
-import lauschkiste.content.podcasts
+import lauschkiste.content.cache.module
+import lauschkiste.content.podcasts.module
 import lauschkiste.content.resume
-from lauschkiste.content.podcasts import FeedError, parse_feed
+from lauschkiste.content.podcasts.feed import FeedError, parse_feed
 
 RSS = b'''<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
@@ -60,13 +60,13 @@ def test_parse_rejects_non_feeds(content):
 def podcasts(api_client, mocked_player, tmp_path, monkeypatch):
     monkeypatch.setattr(lauschkiste.content.resume, 'ACTIVATION_GRACE_SEC', 0)
     fetch = Mock(side_effect=lambda url: parse_feed(RSS))
-    monkeypatch.setattr(lauschkiste.content.podcasts, 'fetch_feed', fetch)
+    monkeypatch.setattr(lauschkiste.content.podcasts.module, 'fetch_feed', fetch)
     ctrl = Mock()
     ctrl.get_active_backend.return_value = 'local_audio'
     ctrl.playerstatus.return_value = {'state': 'stop'}
     config = {'podcasts': {'podcasts_file': str(tmp_path / 'podcasts.yaml'), 'cache_dir': str(tmp_path / 'cache'),
                            'state_file': str(tmp_path / 'positions.json'), 'save_interval_sec': 0}}
-    modules = [mocked_player(ctrl), lauschkiste.content.podcasts.Podcasts, lauschkiste.content.cache.Cache]
+    modules = [mocked_player(ctrl), lauschkiste.content.podcasts.module.Podcasts, lauschkiste.content.cache.module.Cache]
     with api_client(modules, config) as client:
         yield client, ctrl, fetch, tmp_path
 

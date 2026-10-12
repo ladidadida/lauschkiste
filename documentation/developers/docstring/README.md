@@ -47,6 +47,7 @@
 * [lauschkiste.common.utils](#lauschkiste.common.utils)
   * [get\_config\_action](#lauschkiste.common.utils.get_config_action)
   * [get\_git\_state](#lauschkiste.common.utils.get_git_state)
+* [lauschkiste.common.periodic](#lauschkiste.common.periodic)
 * [lauschkiste.common.publishing.bus](#lauschkiste.common.publishing.bus)
   * [EventBus](#lauschkiste.common.publishing.bus.EventBus)
     * [publish](#lauschkiste.common.publishing.bus.EventBus.publish)
@@ -75,22 +76,6 @@
 * [lauschkiste.common.statefile](#lauschkiste.common.statefile)
   * [write\_text](#lauschkiste.common.statefile.write_text)
   * [StateDict](#lauschkiste.common.statefile.StateDict)
-* [lauschkiste.common.multitimer](#lauschkiste.common.multitimer)
-  * [MultiTimer](#lauschkiste.common.multitimer.MultiTimer)
-    * [cancel](#lauschkiste.common.multitimer.MultiTimer.cancel)
-    * [trigger](#lauschkiste.common.multitimer.MultiTimer.trigger)
-    * [run](#lauschkiste.common.multitimer.MultiTimer.run)
-  * [GenericTimerClass](#lauschkiste.common.multitimer.GenericTimerClass)
-    * [start](#lauschkiste.common.multitimer.GenericTimerClass.start)
-    * [cancel](#lauschkiste.common.multitimer.GenericTimerClass.cancel)
-    * [toggle](#lauschkiste.common.multitimer.GenericTimerClass.toggle)
-    * [trigger](#lauschkiste.common.multitimer.GenericTimerClass.trigger)
-    * [is\_alive](#lauschkiste.common.multitimer.GenericTimerClass.is_alive)
-    * [publish](#lauschkiste.common.multitimer.GenericTimerClass.publish)
-    * [get\_state](#lauschkiste.common.multitimer.GenericTimerClass.get_state)
-    * [close](#lauschkiste.common.multitimer.GenericTimerClass.close)
-  * [GenericEndlessTimerClass](#lauschkiste.common.multitimer.GenericEndlessTimerClass)
-    * [get\_state](#lauschkiste.common.multitimer.GenericEndlessTimerClass.get_state)
 * [lauschkiste.common.paths](#lauschkiste.common.paths)
   * [default\_home](#lauschkiste.common.paths.default_home)
   * [home](#lauschkiste.common.paths.home)
@@ -132,19 +117,20 @@
   * [InputDevices](#lauschkiste.box.input_devices.InputDevices)
     * [available\_devices](#lauschkiste.box.input_devices.InputDevices.available_devices)
     * [list\_devices](#lauschkiste.box.input_devices.InputDevices.list_devices)
+* [lauschkiste.box.time\_limits.module](#lauschkiste.box.time_limits.module)
+  * [SETTLE\_SEC](#lauschkiste.box.time_limits.module.SETTLE_SEC)
+  * [TimeLimitStatus](#lauschkiste.box.time_limits.module.TimeLimitStatus)
+    * [enabled](#lauschkiste.box.time_limits.module.TimeLimitStatus.enabled)
+    * [clock\_ok](#lauschkiste.box.time_limits.module.TimeLimitStatus.clock_ok)
+    * [reason](#lauschkiste.box.time_limits.module.TimeLimitStatus.reason)
+    * [until](#lauschkiste.box.time_limits.module.TimeLimitStatus.until)
+  * [clock\_synchronized](#lauschkiste.box.time_limits.module.clock_synchronized)
+  * [TimeLimits](#lauschkiste.box.time_limits.module.TimeLimits)
+    * [evaluate](#lauschkiste.box.time_limits.module.TimeLimits.evaluate)
+    * [status](#lauschkiste.box.time_limits.module.TimeLimits.status)
+    * [allow](#lauschkiste.box.time_limits.module.TimeLimits.allow)
+    * [reset\_today](#lauschkiste.box.time_limits.module.TimeLimits.reset_today)
 * [lauschkiste.box.time\_limits](#lauschkiste.box.time_limits)
-  * [SETTLE\_SEC](#lauschkiste.box.time_limits.SETTLE_SEC)
-  * [TimeLimitStatus](#lauschkiste.box.time_limits.TimeLimitStatus)
-    * [enabled](#lauschkiste.box.time_limits.TimeLimitStatus.enabled)
-    * [clock\_ok](#lauschkiste.box.time_limits.TimeLimitStatus.clock_ok)
-    * [reason](#lauschkiste.box.time_limits.TimeLimitStatus.reason)
-    * [until](#lauschkiste.box.time_limits.TimeLimitStatus.until)
-  * [clock\_synchronized](#lauschkiste.box.time_limits.clock_synchronized)
-  * [TimeLimits](#lauschkiste.box.time_limits.TimeLimits)
-    * [evaluate](#lauschkiste.box.time_limits.TimeLimits.evaluate)
-    * [status](#lauschkiste.box.time_limits.TimeLimits.status)
-    * [allow](#lauschkiste.box.time_limits.TimeLimits.allow)
-    * [reset\_today](#lauschkiste.box.time_limits.TimeLimits.reset_today)
 * [lauschkiste.box.time\_limits.rules](#lauschkiste.box.time_limits.rules)
   * [quiet\_until](#lauschkiste.box.time_limits.rules.quiet_until)
   * [limit\_seconds](#lauschkiste.box.time_limits.rules.limit_seconds)
@@ -302,41 +288,9 @@
     * [cover\_for](#lauschkiste.content.library.covers.CoverCache.cover_for)
 * [lauschkiste.content.library](#lauschkiste.content.library)
   * [root](#lauschkiste.content.library.root)
-* [lauschkiste.content.podcasts](#lauschkiste.content.podcasts)
-  * [Podcast](#lauschkiste.content.podcasts.Podcast)
-    * [hidden](#lauschkiste.content.podcasts.Podcast.hidden)
-  * [Episode](#lauschkiste.content.podcasts.Episode)
-    * [item](#lauschkiste.content.podcasts.Episode.item)
-    * [availability](#lauschkiste.content.podcasts.Episode.availability)
-  * [PodcastHit](#lauschkiste.content.podcasts.PodcastHit)
-  * [SearchResult](#lauschkiste.content.podcasts.SearchResult)
-    * [errors](#lauschkiste.content.podcasts.SearchResult.errors)
-  * [PodcastDirectory](#lauschkiste.content.podcasts.PodcastDirectory)
-    * [search](#lauschkiste.content.podcasts.PodcastDirectory.search)
-    * [top](#lauschkiste.content.podcasts.PodcastDirectory.top)
-  * [EpisodeProvider](#lauschkiste.content.podcasts.EpisodeProvider)
-  * [parse\_feed](#lauschkiste.content.podcasts.parse_feed)
-  * [Podcasts](#lauschkiste.content.podcasts.Podcasts)
-    * [list\_podcasts](#lauschkiste.content.podcasts.Podcasts.list_podcasts)
-    * [list\_episodes](#lauschkiste.content.podcasts.Podcasts.list_episodes)
-    * [add\_podcast](#lauschkiste.content.podcasts.Podcasts.add_podcast)
-    * [update\_podcast](#lauschkiste.content.podcasts.Podcasts.update_podcast)
-    * [delete\_podcast](#lauschkiste.content.podcasts.Podcasts.delete_podcast)
-    * [refresh](#lauschkiste.content.podcasts.Podcasts.refresh)
-    * [list\_directories](#lauschkiste.content.podcasts.Podcasts.list_directories)
-    * [search](#lauschkiste.content.podcasts.Podcasts.search)
-    * [top](#lauschkiste.content.podcasts.Podcasts.top)
-    * [import\_opml](#lauschkiste.content.podcasts.Podcasts.import_opml)
-    * [export\_opml](#lauschkiste.content.podcasts.Podcasts.export_opml)
-    * [hide\_from\_continue](#lauschkiste.content.podcasts.Podcasts.hide_from_continue)
-    * [play](#lauschkiste.content.podcasts.Podcasts.play)
-    * [set\_heard](#lauschkiste.content.podcasts.Podcasts.set_heard)
 * [lauschkiste.content.directories](#lauschkiste.content.directories)
   * [ask](#lauschkiste.content.directories.ask)
   * [interleave](#lauschkiste.content.directories.interleave)
-* [lauschkiste.content.radio\_playlist](#lauschkiste.content.radio_playlist)
-  * [parse\_stations](#lauschkiste.content.radio_playlist.parse_stations)
-  * [render\_m3u](#lauschkiste.content.radio_playlist.render_m3u)
 * [lauschkiste.content.audiobooks](#lauschkiste.content.audiobooks)
   * [AudiobookSource](#lauschkiste.content.audiobooks.AudiobookSource)
     * [list\_books](#lauschkiste.content.audiobooks.AudiobookSource.list_books)
@@ -355,33 +309,18 @@
     * [set\_finished](#lauschkiste.content.audiobooks.Audiobooks.set_finished)
 * [lauschkiste.content.dismissed](#lauschkiste.content.dismissed)
   * [Dismissed](#lauschkiste.content.dismissed.Dismissed)
-* [lauschkiste.content.radio](#lauschkiste.content.radio)
-  * [Station](#lauschkiste.content.radio.Station)
-    * [last\_played](#lauschkiste.content.radio.Station.last_played)
-  * [StationHit](#lauschkiste.content.radio.StationHit)
-    * [added](#lauschkiste.content.radio.StationHit.added)
-  * [SearchResult](#lauschkiste.content.radio.SearchResult)
-    * [errors](#lauschkiste.content.radio.SearchResult.errors)
-  * [RadioDirectory](#lauschkiste.content.radio.RadioDirectory)
-    * [search](#lauschkiste.content.radio.RadioDirectory.search)
-    * [top](#lauschkiste.content.radio.RadioDirectory.top)
-  * [streams\_in\_playlist](#lauschkiste.content.radio.streams_in_playlist)
-  * [Radio](#lauschkiste.content.radio.Radio)
-    * [list\_stations](#lauschkiste.content.radio.Radio.list_stations)
-    * [add\_station](#lauschkiste.content.radio.Radio.add_station)
-    * [update\_station](#lauschkiste.content.radio.Radio.update_station)
-    * [delete\_station](#lauschkiste.content.radio.Radio.delete_station)
-    * [list\_directories](#lauschkiste.content.radio.Radio.list_directories)
-    * [search](#lauschkiste.content.radio.Radio.search)
-    * [top](#lauschkiste.content.radio.Radio.top)
-    * [import\_playlist](#lauschkiste.content.radio.Radio.import_playlist)
-    * [export\_playlist](#lauschkiste.content.radio.Radio.export_playlist)
-    * [play](#lauschkiste.content.radio.Radio.play)
-    * [forget\_recent](#lauschkiste.content.radio.Radio.forget_recent)
 * [lauschkiste.content.cache.worker](#lauschkiste.content.cache.worker)
   * [Download](#lauschkiste.content.cache.worker.Download)
     * [fetch](#lauschkiste.content.cache.worker.Download.fetch)
 * [lauschkiste.content.cache.manager](#lauschkiste.content.cache.manager)
+* [lauschkiste.content.cache.module](#lauschkiste.content.cache.module)
+  * [Cache](#lauschkiste.content.cache.module.Cache)
+    * [downloads](#lauschkiste.content.cache.module.Cache.downloads)
+    * [files](#lauschkiste.content.cache.module.Cache.files)
+    * [cached](#lauschkiste.content.cache.module.Cache.cached)
+    * [download](#lauschkiste.content.cache.module.Cache.download)
+    * [cancel](#lauschkiste.content.cache.module.Cache.cancel)
+    * [remove](#lauschkiste.content.cache.module.Cache.remove)
 * [lauschkiste.content.cache](#lauschkiste.content.cache)
   * [CacheFile](#lauschkiste.content.cache.CacheFile)
     * [size](#lauschkiste.content.cache.CacheFile.size)
@@ -389,13 +328,6 @@
     * [plan](#lauschkiste.content.cache.CacheProvider.plan)
     * [version](#lauschkiste.content.cache.CacheProvider.version)
     * [removable](#lauschkiste.content.cache.CacheProvider.removable)
-  * [Cache](#lauschkiste.content.cache.Cache)
-    * [downloads](#lauschkiste.content.cache.Cache.downloads)
-    * [files](#lauschkiste.content.cache.Cache.files)
-    * [cached](#lauschkiste.content.cache.Cache.cached)
-    * [download](#lauschkiste.content.cache.Cache.download)
-    * [cancel](#lauschkiste.content.cache.Cache.cancel)
-    * [remove](#lauschkiste.content.cache.Cache.remove)
 * [lauschkiste.content.cache.store](#lauschkiste.content.cache.store)
   * [INTERNAL](#lauschkiste.content.cache.store.INTERNAL)
   * [CacheStore](#lauschkiste.content.cache.store.CacheStore)
@@ -409,11 +341,71 @@
     * [set\_exclusion\_endings](#lauschkiste.content.playlistgenerator.PlaylistCollector.set_exclusion_endings)
     * [get\_directory\_content](#lauschkiste.content.playlistgenerator.PlaylistCollector.get_directory_content)
     * [parse](#lauschkiste.content.playlistgenerator.PlaylistCollector.parse)
-* [lauschkiste.content.podcast\_opml](#lauschkiste.content.podcast_opml)
-  * [normalize\_url](#lauschkiste.content.podcast_opml.normalize_url)
-  * [parse\_opml](#lauschkiste.content.podcast_opml.parse_opml)
-  * [render\_opml](#lauschkiste.content.podcast_opml.render_opml)
 * [lauschkiste.content](#lauschkiste.content)
+* [lauschkiste.content.radio.models](#lauschkiste.content.radio.models)
+  * [Station](#lauschkiste.content.radio.models.Station)
+    * [last\_played](#lauschkiste.content.radio.models.Station.last_played)
+  * [StationHit](#lauschkiste.content.radio.models.StationHit)
+    * [added](#lauschkiste.content.radio.models.StationHit.added)
+  * [SearchResult](#lauschkiste.content.radio.models.SearchResult)
+    * [errors](#lauschkiste.content.radio.models.SearchResult.errors)
+  * [RadioDirectory](#lauschkiste.content.radio.models.RadioDirectory)
+    * [search](#lauschkiste.content.radio.models.RadioDirectory.search)
+    * [top](#lauschkiste.content.radio.models.RadioDirectory.top)
+* [lauschkiste.content.radio.module](#lauschkiste.content.radio.module)
+  * [Radio](#lauschkiste.content.radio.module.Radio)
+    * [list\_stations](#lauschkiste.content.radio.module.Radio.list_stations)
+    * [add\_station](#lauschkiste.content.radio.module.Radio.add_station)
+    * [update\_station](#lauschkiste.content.radio.module.Radio.update_station)
+    * [delete\_station](#lauschkiste.content.radio.module.Radio.delete_station)
+    * [list\_directories](#lauschkiste.content.radio.module.Radio.list_directories)
+    * [search](#lauschkiste.content.radio.module.Radio.search)
+    * [top](#lauschkiste.content.radio.module.Radio.top)
+    * [import\_playlist](#lauschkiste.content.radio.module.Radio.import_playlist)
+    * [export\_playlist](#lauschkiste.content.radio.module.Radio.export_playlist)
+    * [play](#lauschkiste.content.radio.module.Radio.play)
+    * [forget\_recent](#lauschkiste.content.radio.module.Radio.forget_recent)
+* [lauschkiste.content.radio](#lauschkiste.content.radio)
+* [lauschkiste.content.radio.playlist](#lauschkiste.content.radio.playlist)
+  * [parse\_stations](#lauschkiste.content.radio.playlist.parse_stations)
+  * [render\_m3u](#lauschkiste.content.radio.playlist.render_m3u)
+  * [streams\_in\_playlist](#lauschkiste.content.radio.playlist.streams_in_playlist)
+* [lauschkiste.content.podcasts.feed](#lauschkiste.content.podcasts.feed)
+  * [parse\_feed](#lauschkiste.content.podcasts.feed.parse_feed)
+* [lauschkiste.content.podcasts.models](#lauschkiste.content.podcasts.models)
+  * [Podcast](#lauschkiste.content.podcasts.models.Podcast)
+    * [hidden](#lauschkiste.content.podcasts.models.Podcast.hidden)
+  * [Episode](#lauschkiste.content.podcasts.models.Episode)
+    * [item](#lauschkiste.content.podcasts.models.Episode.item)
+    * [availability](#lauschkiste.content.podcasts.models.Episode.availability)
+  * [PodcastHit](#lauschkiste.content.podcasts.models.PodcastHit)
+  * [SearchResult](#lauschkiste.content.podcasts.models.SearchResult)
+    * [errors](#lauschkiste.content.podcasts.models.SearchResult.errors)
+  * [PodcastDirectory](#lauschkiste.content.podcasts.models.PodcastDirectory)
+    * [search](#lauschkiste.content.podcasts.models.PodcastDirectory.search)
+    * [top](#lauschkiste.content.podcasts.models.PodcastDirectory.top)
+* [lauschkiste.content.podcasts.module](#lauschkiste.content.podcasts.module)
+  * [EpisodeProvider](#lauschkiste.content.podcasts.module.EpisodeProvider)
+  * [Podcasts](#lauschkiste.content.podcasts.module.Podcasts)
+    * [list\_podcasts](#lauschkiste.content.podcasts.module.Podcasts.list_podcasts)
+    * [list\_episodes](#lauschkiste.content.podcasts.module.Podcasts.list_episodes)
+    * [add\_podcast](#lauschkiste.content.podcasts.module.Podcasts.add_podcast)
+    * [update\_podcast](#lauschkiste.content.podcasts.module.Podcasts.update_podcast)
+    * [delete\_podcast](#lauschkiste.content.podcasts.module.Podcasts.delete_podcast)
+    * [refresh](#lauschkiste.content.podcasts.module.Podcasts.refresh)
+    * [list\_directories](#lauschkiste.content.podcasts.module.Podcasts.list_directories)
+    * [search](#lauschkiste.content.podcasts.module.Podcasts.search)
+    * [top](#lauschkiste.content.podcasts.module.Podcasts.top)
+    * [import\_opml](#lauschkiste.content.podcasts.module.Podcasts.import_opml)
+    * [export\_opml](#lauschkiste.content.podcasts.module.Podcasts.export_opml)
+    * [hide\_from\_continue](#lauschkiste.content.podcasts.module.Podcasts.hide_from_continue)
+    * [play](#lauschkiste.content.podcasts.module.Podcasts.play)
+    * [set\_heard](#lauschkiste.content.podcasts.module.Podcasts.set_heard)
+* [lauschkiste.content.podcasts](#lauschkiste.content.podcasts)
+* [lauschkiste.content.podcasts.opml](#lauschkiste.content.podcasts.opml)
+  * [normalize\_url](#lauschkiste.content.podcasts.opml.normalize_url)
+  * [parse\_opml](#lauschkiste.content.podcasts.opml.parse_opml)
+  * [render\_opml](#lauschkiste.content.podcasts.opml.render_opml)
 * [lauschkiste.content.resume](#lauschkiste.content.resume)
   * [relative](#lauschkiste.content.resume.relative)
   * [PositionStore](#lauschkiste.content.resume.PositionStore)
@@ -1013,6 +1005,13 @@ def get_git_state()
 Git state of the checkout Lauschkiste runs from, or a note that it isn't one (package install).
 
 
+<a id="lauschkiste.common.periodic"></a>
+
+# lauschkiste.common.periodic
+
+A function called at a fixed interval from a thread of its own.
+
+
 <a id="lauschkiste.common.publishing.bus"></a>
 
 # lauschkiste.common.publishing.bus
@@ -1412,181 +1411,6 @@ class StateDict(dict)
 ```
 
 A mapping kept in a JSON file: read on creation, written by ``save()`` when it changed.
-
-
-<a id="lauschkiste.common.multitimer"></a>
-
-# lauschkiste.common.multitimer
-
-Threaded one-shot and fixed-delay periodic timers.
-
-
-<a id="lauschkiste.common.multitimer.MultiTimer"></a>
-
-## MultiTimer Objects
-
-```python
-class MultiTimer(threading.Thread)
-```
-
-Execute a callback after each fixed-delay interval.
-
-Limited timers count iterations down from ``iterations - 1`` to zero.
-Negative iteration counts repeat until cancellation.
-
-
-<a id="lauschkiste.common.multitimer.MultiTimer.cancel"></a>
-
-#### cancel
-
-```python
-def cancel()
-```
-
-Stop the timer and wake its worker.
-
-
-<a id="lauschkiste.common.multitimer.MultiTimer.trigger"></a>
-
-#### trigger
-
-```python
-def trigger()
-```
-
-Trigger the next callback immediately.
-
-
-<a id="lauschkiste.common.multitimer.MultiTimer.run"></a>
-
-#### run
-
-```python
-def run()
-```
-
-Run until all iterations complete, cancellation, or callback failure.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass"></a>
-
-## GenericTimerClass Objects
-
-```python
-class GenericTimerClass()
-```
-
-A race-safe, single-execution timer. ``on_change(state)`` is called on every state change.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.start"></a>
-
-#### start
-
-```python
-def start(wait_seconds: Optional[float] = None, restart: bool = True)
-```
-
-Start the timer, atomically replacing an active generation by default.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.cancel"></a>
-
-#### cancel
-
-```python
-def cancel()
-```
-
-Cancel the active generation.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.toggle"></a>
-
-#### toggle
-
-```python
-def toggle()
-```
-
-Toggle between active and disabled states.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.trigger"></a>
-
-#### trigger
-
-```python
-def trigger()
-```
-
-Trigger the active generation immediately.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.is_alive"></a>
-
-#### is\_alive
-
-```python
-def is_alive() -> bool
-```
-
-Return whether a timer generation is logically active.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.publish"></a>
-
-#### publish
-
-```python
-def publish()
-```
-
-Publish the current timer state.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.get_state"></a>
-
-#### get\_state
-
-```python
-def get_state() -> Dict[str, Any]
-```
-
-Return the timer state.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.close"></a>
-
-#### close
-
-```python
-def close()
-```
-
-Permanently close this timer and join all active workers.
-
-
-<a id="lauschkiste.common.multitimer.GenericEndlessTimerClass"></a>
-
-## GenericEndlessTimerClass Objects
-
-```python
-class GenericEndlessTimerClass(GenericTimerClass)
-```
-
-A fixed-delay timer that repeats until cancellation.
-
-
-<a id="lauschkiste.common.multitimer.GenericEndlessTimerClass.get_state"></a>
-
-#### get\_state
-
-```python
-def get_state() -> Dict[str, Any]
-```
-
-Return the periodic timer state.
 
 
 <a id="lauschkiste.common.paths"></a>
@@ -2139,9 +1963,9 @@ def list_devices() -> List[DeviceState]
 Configured input devices and whether they are connected.
 
 
-<a id="lauschkiste.box.time_limits"></a>
+<a id="lauschkiste.box.time_limits.module"></a>
 
-# lauschkiste.box.time\_limits
+# lauschkiste.box.time\_limits.module
 
 The time_limits core module: quiet hours and a daily listening limit.
 
@@ -2159,14 +1983,14 @@ The action ``time_limits.allow`` adds time for today (and lifts quiet hours for 
 for the parents.
 
 
-<a id="lauschkiste.box.time_limits.SETTLE_SEC"></a>
+<a id="lauschkiste.box.time_limits.module.SETTLE_SEC"></a>
 
 #### SETTLE\_SEC
 
 after stopping the player the rules are not applied again for this long (the status needs a moment to follow)
 
 
-<a id="lauschkiste.box.time_limits.TimeLimitStatus"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimitStatus"></a>
 
 ## TimeLimitStatus Objects
 
@@ -2174,35 +1998,35 @@ after stopping the player the rules are not applied again for this long (the sta
 class TimeLimitStatus(BaseModel)
 ```
 
-<a id="lauschkiste.box.time_limits.TimeLimitStatus.enabled"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimitStatus.enabled"></a>
 
 #### enabled
 
 false while the time limits are switched off; nothing is blocked or counted then
 
 
-<a id="lauschkiste.box.time_limits.TimeLimitStatus.clock_ok"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimitStatus.clock_ok"></a>
 
 #### clock\_ok
 
 false when the system clock is not synchronized: quiet hours are not enforced then
 
 
-<a id="lauschkiste.box.time_limits.TimeLimitStatus.reason"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimitStatus.reason"></a>
 
 #### reason
 
 'quiet' (quiet hours) or 'limit' (the day's time is used up)
 
 
-<a id="lauschkiste.box.time_limits.TimeLimitStatus.until"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimitStatus.until"></a>
 
 #### until
 
 for quiet hours, when they end ("07:00")
 
 
-<a id="lauschkiste.box.time_limits.clock_synchronized"></a>
+<a id="lauschkiste.box.time_limits.module.clock_synchronized"></a>
 
 #### clock\_synchronized
 
@@ -2213,7 +2037,7 @@ def clock_synchronized() -> Optional[bool]
 Whether the clock is synchronized (None if the system cannot tell).
 
 
-<a id="lauschkiste.box.time_limits.TimeLimits"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimits"></a>
 
 ## TimeLimits Objects
 
@@ -2224,7 +2048,7 @@ class TimeLimits(CoreModule)
 Quiet hours and a daily listening limit (off until switched on).
 
 
-<a id="lauschkiste.box.time_limits.TimeLimits.evaluate"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimits.evaluate"></a>
 
 #### evaluate
 
@@ -2235,7 +2059,7 @@ def evaluate() -> TimeLimitStatus
 Where the day stands (called by the tick, the status query and the actions).
 
 
-<a id="lauschkiste.box.time_limits.TimeLimits.status"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimits.status"></a>
 
 #### status
 
@@ -2247,7 +2071,7 @@ def status() -> TimeLimitStatus
 Quiet hours, the time used today and what is left.
 
 
-<a id="lauschkiste.box.time_limits.TimeLimits.allow"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimits.allow"></a>
 
 #### allow
 
@@ -2259,7 +2083,7 @@ def allow(minutes: int = 30) -> TimeLimitStatus
 Add listening time for today; quiet hours are lifted for that long as well. Meant for parents (put it on a card).
 
 
-<a id="lauschkiste.box.time_limits.TimeLimits.reset_today"></a>
+<a id="lauschkiste.box.time_limits.module.TimeLimits.reset_today"></a>
 
 #### reset\_today
 
@@ -2270,6 +2094,10 @@ def reset_today() -> TimeLimitStatus
 
 Count today's listening time from zero again.
 
+
+<a id="lauschkiste.box.time_limits"></a>
+
+# lauschkiste.box.time\_limits
 
 <a id="lauschkiste.box.time_limits.rules"></a>
 
@@ -3957,322 +3785,6 @@ def root() -> str
 The library directory, from ``library.path``.
 
 
-<a id="lauschkiste.content.podcasts"></a>
-
-# lauschkiste.content.podcasts
-
-The podcasts core module: podcast feeds, episodes streamed and continued where they stopped.
-
-Subscribed podcasts are kept in ``podcasts.podcasts_file``, the episodes of each feed are cached in
-``podcasts.cache_dir`` and fetched again when older than ``refresh_minutes``. The position is kept
-per episode; an episode played to the end counts as heard.
-
-
-<a id="lauschkiste.content.podcasts.Podcast"></a>
-
-## Podcast Objects
-
-```python
-class Podcast(BaseModel)
-```
-
-<a id="lauschkiste.content.podcasts.Podcast.hidden"></a>
-
-#### hidden
-
-taken off the "continue" list; it comes back with a new episode or when one is heard
-
-
-<a id="lauschkiste.content.podcasts.Episode"></a>
-
-## Episode Objects
-
-```python
-class Episode(BaseModel)
-```
-
-<a id="lauschkiste.content.podcasts.Episode.item"></a>
-
-#### item
-
-the item id at ``cache`` (the episode can be downloaded)
-
-
-<a id="lauschkiste.content.podcasts.Episode.availability"></a>
-
-#### availability
-
-'stream' (played over the network) or 'cached' (downloaded to the box)
-
-
-<a id="lauschkiste.content.podcasts.PodcastHit"></a>
-
-## PodcastHit Objects
-
-```python
-class PodcastHit(BaseModel)
-```
-
-A podcast found in a directory.
-
-
-<a id="lauschkiste.content.podcasts.SearchResult"></a>
-
-## SearchResult Objects
-
-```python
-class SearchResult(BaseModel)
-```
-
-<a id="lauschkiste.content.podcasts.SearchResult.errors"></a>
-
-#### errors
-
-directory id -> why it gave no answer
-
-
-<a id="lauschkiste.content.podcasts.PodcastDirectory"></a>
-
-## PodcastDirectory Objects
-
-```python
-class PodcastDirectory(Protocol)
-```
-
-A place to find podcasts, registered at ``podcasts.directories`` by a plugin.
-
-
-<a id="lauschkiste.content.podcasts.PodcastDirectory.search"></a>
-
-#### search
-
-```python
-def search(term: str, limit: int) -> List[Dict[str, Any]]
-```
-
-Podcasts matching ``term`` as mappings with ``title``, ``feed_url`` and optionally ``author``, ``image``.
-
-
-<a id="lauschkiste.content.podcasts.PodcastDirectory.top"></a>
-
-#### top
-
-```python
-def top(limit: int) -> List[Dict[str, Any]]
-```
-
-Popular podcasts, same mappings.
-
-
-<a id="lauschkiste.content.podcasts.EpisodeProvider"></a>
-
-## EpisodeProvider Objects
-
-```python
-class EpisodeProvider()
-```
-
-``cache.providers`` entry ``podcasts``: an episode is the file of its feed entry.
-
-
-<a id="lauschkiste.content.podcasts.parse_feed"></a>
-
-#### parse\_feed
-
-```python
-def parse_feed(content: bytes) -> Dict[str, Any]
-```
-
-``{'title', 'image', 'episodes': [{'id', 'title', 'url', 'published', 'duration', 'image'}]}``,
-
-newest episode first. Raises FeedError if ``content`` is not an RSS or Atom feed with audio.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts"></a>
-
-## Podcasts Objects
-
-```python
-class Podcasts(CoreModule)
-```
-
-Podcasts: subscribe to feeds, play episodes and continue them.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.list_podcasts"></a>
-
-#### list\_podcasts
-
-```python
-@query(path='/')
-def list_podcasts() -> List[Podcast]
-```
-
-All podcasts, by name, with the number of (unheard) episodes.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.list_episodes"></a>
-
-#### list\_episodes
-
-```python
-@query(path='/{podcast}/episodes')
-def list_episodes(podcast: str) -> List[Episode]
-```
-
-Episodes of a podcast, newest first (the feed is fetched again when stale).
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.add_podcast"></a>
-
-#### add\_podcast
-
-```python
-@action(path='/', status_code=201)
-def add_podcast(url: str, name: Optional[str] = None) -> Podcast
-```
-
-Subscribe to a feed; the name defaults to the feed's title.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.update_podcast"></a>
-
-#### update\_podcast
-
-```python
-@action(method='PUT', path='/{podcast}')
-def update_podcast(podcast: str, name: str) -> Podcast
-```
-
-Rename a podcast.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.delete_podcast"></a>
-
-#### delete\_podcast
-
-```python
-@action(method='DELETE', path='/{podcast}')
-def delete_podcast(podcast: str) -> None
-```
-
-Unsubscribe from a podcast. Cards playing it stop working.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.refresh"></a>
-
-#### refresh
-
-```python
-@action(path='/refresh')
-def refresh(podcast: Optional[str] = None) -> None
-```
-
-Fetch the episodes of one podcast, or of all.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.list_directories"></a>
-
-#### list\_directories
-
-```python
-@query(path='/directories')
-def list_directories() -> List[DirectoryInfo]
-```
-
-The places podcasts can be searched in (added by plugins).
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.search"></a>
-
-#### search
-
-```python
-@query(path='/search')
-def search(term: str,
-           directory: Optional[str] = None,
-           limit: int = 20) -> SearchResult
-```
-
-Search the directories for podcasts.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.top"></a>
-
-#### top
-
-```python
-@query(path='/top')
-def top(directory: Optional[str] = None, limit: int = 20) -> SearchResult
-```
-
-Popular podcasts of the directories.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.import_opml"></a>
-
-#### import\_opml
-
-```python
-@action(path='/import_opml')
-def import_opml(content: str) -> ImportResult
-```
-
-Subscribe to all feeds of an OPML file (for example exported by AntennaPod). The episodes
-
-are fetched in the background.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.export_opml"></a>
-
-#### export\_opml
-
-```python
-@query(path='/export_opml')
-def export_opml() -> Opml
-```
-
-The subscriptions as an OPML file.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.hide_from_continue"></a>
-
-#### hide\_from\_continue
-
-```python
-@action()
-def hide_from_continue(podcast: str) -> None
-```
-
-Take a podcast off the "continue" list until a new episode comes or one is heard.
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.play"></a>
-
-#### play
-
-```python
-@action()
-def play(podcast: str, episode: Optional[str] = None) -> None
-```
-
-Play an episode where it stopped; without ``episode`` the newest unheard one (or the
-
-newest, when all are heard).
-
-
-<a id="lauschkiste.content.podcasts.Podcasts.set_heard"></a>
-
-#### set\_heard
-
-```python
-@action()
-def set_heard(podcast: str, episode: str, heard: bool = True) -> None
-```
-
-Mark an episode as heard (or not); either way it starts from the beginning next time.
-
-
 <a id="lauschkiste.content.directories"></a>
 
 # lauschkiste.content.directories
@@ -4309,37 +3821,6 @@ def interleave(answers: List[Tuple[str, List[Row]]],
 One list from the answers: the directories take turns (so that none fills it), duplicates (same ``key_of``)
 
 are dropped, and every row gets the id of the directory it came from as ``directory``.
-
-
-<a id="lauschkiste.content.radio_playlist"></a>
-
-# lauschkiste.content.radio\_playlist
-
-Station lists as ``.m3u`` and ``.pls`` files, which radio apps and players import and export.
-
-
-<a id="lauschkiste.content.radio_playlist.parse_stations"></a>
-
-#### parse\_stations
-
-```python
-def parse_stations(content: str) -> List[Dict[str, str]]
-```
-
-``[{"name", "url"}]`` of every stream in an M3U (with names from its EXTINF lines) or PLS playlist.
-
-Raises ValueError if ``content`` has no stream or is too big.
-
-
-<a id="lauschkiste.content.radio_playlist.render_m3u"></a>
-
-#### render\_m3u
-
-```python
-def render_m3u(stations: Iterable[Dict[str, str]]) -> str
-```
-
-An extended M3U for ``{'name', 'url'}`` pairs.
 
 
 <a id="lauschkiste.content.audiobooks"></a>
@@ -4536,258 +4017,6 @@ class Dismissed()
 marker differs from the saved one (it was played on, a new episode came) is back on the list.
 
 
-<a id="lauschkiste.content.radio"></a>
-
-# lauschkiste.content.radio
-
-The radio core module: internet radio stations, one per card.
-
-Stations are kept in ``radio.stations_file``. A station URL may point to the stream itself or to an
-``.m3u``/``.pls`` playlist, which is resolved to its first stream when the station is played.
-
-
-<a id="lauschkiste.content.radio.Station"></a>
-
-## Station Objects
-
-```python
-class Station(BaseModel)
-```
-
-<a id="lauschkiste.content.radio.Station.last_played"></a>
-
-#### last\_played
-
-when it was last played (UTC); empty for a station never played here or taken off the "continue" list
-
-
-<a id="lauschkiste.content.radio.StationHit"></a>
-
-## StationHit Objects
-
-```python
-class StationHit(BaseModel)
-```
-
-A station found in a directory.
-
-
-<a id="lauschkiste.content.radio.StationHit.added"></a>
-
-#### added
-
-already one of the stations
-
-
-<a id="lauschkiste.content.radio.SearchResult"></a>
-
-## SearchResult Objects
-
-```python
-class SearchResult(BaseModel)
-```
-
-<a id="lauschkiste.content.radio.SearchResult.errors"></a>
-
-#### errors
-
-directory id -> why it gave no answer
-
-
-<a id="lauschkiste.content.radio.RadioDirectory"></a>
-
-## RadioDirectory Objects
-
-```python
-class RadioDirectory(Protocol)
-```
-
-A place to find stations, registered at ``radio.directories`` by a plugin.
-
-
-<a id="lauschkiste.content.radio.RadioDirectory.search"></a>
-
-#### search
-
-```python
-def search(term: str, limit: int) -> List[Dict[str, Any]]
-```
-
-Stations matching ``term`` as mappings with ``name`` and ``url``, optionally ``logo``, ``country``, ``tags``,
-
-``codec`` and ``bitrate``.
-
-
-<a id="lauschkiste.content.radio.RadioDirectory.top"></a>
-
-#### top
-
-```python
-def top(limit: int) -> List[Dict[str, Any]]
-```
-
-Popular stations, same mappings.
-
-
-<a id="lauschkiste.content.radio.streams_in_playlist"></a>
-
-#### streams\_in\_playlist
-
-```python
-def streams_in_playlist(text: str) -> List[str]
-```
-
-Stream URLs of an ``.m3u`` or ``.pls`` playlist, in order.
-
-
-<a id="lauschkiste.content.radio.Radio"></a>
-
-## Radio Objects
-
-```python
-class Radio(CoreModule)
-```
-
-Internet radio stations.
-
-
-<a id="lauschkiste.content.radio.Radio.list_stations"></a>
-
-#### list\_stations
-
-```python
-@query(path='/stations')
-def list_stations() -> List[Station]
-```
-
-All stations, by name.
-
-
-<a id="lauschkiste.content.radio.Radio.add_station"></a>
-
-#### add\_station
-
-```python
-@action(path='/stations', status_code=201)
-def add_station(name: str, url: str, logo: Optional[str] = None) -> Station
-```
-
-Add a station; its id is derived from the name.
-
-
-<a id="lauschkiste.content.radio.Radio.update_station"></a>
-
-#### update\_station
-
-```python
-@action(method='PUT', path='/stations/{station}')
-def update_station(station: str,
-                   name: Optional[str] = None,
-                   url: Optional[str] = None,
-                   logo: Optional[str] = None) -> Station
-```
-
-Change a station; fields left out stay unchanged, an empty ``logo`` removes the logo.
-
-
-<a id="lauschkiste.content.radio.Radio.delete_station"></a>
-
-#### delete\_station
-
-```python
-@action(method='DELETE', path='/stations/{station}')
-def delete_station(station: str) -> None
-```
-
-Delete a station. Cards playing it stop working.
-
-
-<a id="lauschkiste.content.radio.Radio.list_directories"></a>
-
-#### list\_directories
-
-```python
-@query(path='/directories')
-def list_directories() -> List[DirectoryInfo]
-```
-
-The places stations can be searched in (added by plugins).
-
-
-<a id="lauschkiste.content.radio.Radio.search"></a>
-
-#### search
-
-```python
-@query(path='/search')
-def search(term: str,
-           directory: Optional[str] = None,
-           limit: int = 20) -> SearchResult
-```
-
-Search the directories for stations.
-
-
-<a id="lauschkiste.content.radio.Radio.top"></a>
-
-#### top
-
-```python
-@query(path='/top')
-def top(directory: Optional[str] = None, limit: int = 20) -> SearchResult
-```
-
-Popular stations of the directories.
-
-
-<a id="lauschkiste.content.radio.Radio.import_playlist"></a>
-
-#### import\_playlist
-
-```python
-@action(path='/import_playlist')
-def import_playlist(content: str) -> ImportResult
-```
-
-Add all streams of an M3U or PLS file as stations; known addresses are skipped.
-
-
-<a id="lauschkiste.content.radio.Radio.export_playlist"></a>
-
-#### export\_playlist
-
-```python
-@query(path='/export_playlist')
-def export_playlist() -> Playlist
-```
-
-The stations as an M3U file.
-
-
-<a id="lauschkiste.content.radio.Radio.play"></a>
-
-#### play
-
-```python
-@action()
-def play(station: str) -> None
-```
-
-Play a station.
-
-
-<a id="lauschkiste.content.radio.Radio.forget_recent"></a>
-
-#### forget\_recent
-
-```python
-@action()
-def forget_recent(station: str) -> None
-```
-
-Take a station off the "continue" list (it stays a station).
-
-
 <a id="lauschkiste.content.cache.worker"></a>
 
 # lauschkiste.content.cache.worker
@@ -4830,15 +4059,105 @@ Download one file; returns its size. Without a known ``size`` the file is loaded
 Runs the worker process for one item after the other.
 
 
-<a id="lauschkiste.content.cache"></a>
+<a id="lauschkiste.content.cache.module"></a>
 
-# lauschkiste.content.cache
+# lauschkiste.content.cache.module
 
 The cache core module: items of a source (an audiobook, an episode, ...) downloaded to the box.
 
 A plugin or module that can provide content for download registers a provider at ``cache.providers`` under
 its source id. The module fetches what the provider's plan lists, in a process of its own with the lowest
 priority, keeps the space limit and shows the state.
+
+
+<a id="lauschkiste.content.cache.module.Cache"></a>
+
+## Cache Objects
+
+```python
+class Cache(CoreModule)
+```
+
+Downloads items of a source to the box, so that they play without the network.
+
+
+<a id="lauschkiste.content.cache.module.Cache.downloads"></a>
+
+#### downloads
+
+```python
+@query(path='/downloads')
+def downloads(source: Optional[str] = None) -> Downloads
+```
+
+Downloaded and downloading items and the space they use.
+
+
+<a id="lauschkiste.content.cache.module.Cache.files"></a>
+
+#### files
+
+```python
+@query(path='/files')
+def files(source: str, item: str) -> Optional[CachedItem]
+```
+
+The files of a complete download (in order), or nothing.
+
+
+<a id="lauschkiste.content.cache.module.Cache.cached"></a>
+
+#### cached
+
+```python
+@query(path='/cached')
+def cached(source: str) -> List[CachedItem]
+```
+
+All complete downloads of a source.
+
+
+<a id="lauschkiste.content.cache.module.Cache.download"></a>
+
+#### download
+
+```python
+@action()
+def download(source: str, item: str) -> None
+```
+
+Download an item so that it plays without the network.
+
+
+<a id="lauschkiste.content.cache.module.Cache.cancel"></a>
+
+#### cancel
+
+```python
+@action()
+def cancel(source: str, item: str) -> None
+```
+
+Stop a download; what was loaded is kept and continued next time.
+
+
+<a id="lauschkiste.content.cache.module.Cache.remove"></a>
+
+#### remove
+
+```python
+@action()
+def remove(source: str, item: str) -> None
+```
+
+Delete the downloaded files of an item.
+
+
+<a id="lauschkiste.content.cache"></a>
+
+# lauschkiste.content.cache
+
+What a content provider tells the cache: the files of an item (``CachePlan``) and how to ask about it.
 
 
 <a id="lauschkiste.content.cache.CacheFile"></a>
@@ -4895,89 +4214,6 @@ def removable(item: str) -> bool
 ```
 
 Whether the item may be removed to make room (for example finished or heard). Never for one in progress.
-
-
-<a id="lauschkiste.content.cache.Cache"></a>
-
-## Cache Objects
-
-```python
-class Cache(CoreModule)
-```
-
-Downloads items of a source to the box, so that they play without the network.
-
-
-<a id="lauschkiste.content.cache.Cache.downloads"></a>
-
-#### downloads
-
-```python
-@query(path='/downloads')
-def downloads(source: Optional[str] = None) -> Downloads
-```
-
-Downloaded and downloading items and the space they use.
-
-
-<a id="lauschkiste.content.cache.Cache.files"></a>
-
-#### files
-
-```python
-@query(path='/files')
-def files(source: str, item: str) -> Optional[CachedItem]
-```
-
-The files of a complete download (in order), or nothing.
-
-
-<a id="lauschkiste.content.cache.Cache.cached"></a>
-
-#### cached
-
-```python
-@query(path='/cached')
-def cached(source: str) -> List[CachedItem]
-```
-
-All complete downloads of a source.
-
-
-<a id="lauschkiste.content.cache.Cache.download"></a>
-
-#### download
-
-```python
-@action()
-def download(source: str, item: str) -> None
-```
-
-Download an item so that it plays without the network.
-
-
-<a id="lauschkiste.content.cache.Cache.cancel"></a>
-
-#### cancel
-
-```python
-@action()
-def cancel(source: str, item: str) -> None
-```
-
-Stop a download; what was loaded is kept and continued next time.
-
-
-<a id="lauschkiste.content.cache.Cache.remove"></a>
-
-#### remove
-
-```python
-@action()
-def remove(source: str, item: str) -> None
-```
-
-Delete the downloaded files of an item.
 
 
 <a id="lauschkiste.content.cache.store"></a>
@@ -5158,14 +4394,646 @@ Parse the folder ``path`` and create a playlist from its content
 - `path`: Path to folder **relative** to ``music_library_base_path``
 - `recursive`: Parse folder recursivley, or stay in top-level folder
 
-<a id="lauschkiste.content.podcast_opml"></a>
+<a id="lauschkiste.content"></a>
 
-# lauschkiste.content.podcast\_opml
+# lauschkiste.content
+
+<a id="lauschkiste.content.radio.models"></a>
+
+# lauschkiste.content.radio.models
+
+The data of the radio module: stations, search results, playlists and events.
+
+
+<a id="lauschkiste.content.radio.models.Station"></a>
+
+## Station Objects
+
+```python
+class Station(BaseModel)
+```
+
+<a id="lauschkiste.content.radio.models.Station.last_played"></a>
+
+#### last\_played
+
+when it was last played (UTC); empty for a station never played here or taken off the "continue" list
+
+
+<a id="lauschkiste.content.radio.models.StationHit"></a>
+
+## StationHit Objects
+
+```python
+class StationHit(BaseModel)
+```
+
+A station found in a directory.
+
+
+<a id="lauschkiste.content.radio.models.StationHit.added"></a>
+
+#### added
+
+already one of the stations
+
+
+<a id="lauschkiste.content.radio.models.SearchResult"></a>
+
+## SearchResult Objects
+
+```python
+class SearchResult(BaseModel)
+```
+
+<a id="lauschkiste.content.radio.models.SearchResult.errors"></a>
+
+#### errors
+
+directory id -> why it gave no answer
+
+
+<a id="lauschkiste.content.radio.models.RadioDirectory"></a>
+
+## RadioDirectory Objects
+
+```python
+class RadioDirectory(Protocol)
+```
+
+A place to find stations, registered at ``radio.directories`` by a plugin.
+
+
+<a id="lauschkiste.content.radio.models.RadioDirectory.search"></a>
+
+#### search
+
+```python
+def search(term: str, limit: int) -> List[Dict[str, Any]]
+```
+
+Stations matching ``term`` as mappings with ``name`` and ``url``, optionally ``logo``, ``country``, ``tags``,
+
+``codec`` and ``bitrate``.
+
+
+<a id="lauschkiste.content.radio.models.RadioDirectory.top"></a>
+
+#### top
+
+```python
+def top(limit: int) -> List[Dict[str, Any]]
+```
+
+Popular stations, same mappings.
+
+
+<a id="lauschkiste.content.radio.module"></a>
+
+# lauschkiste.content.radio.module
+
+The radio core module: internet radio stations, one per card.
+
+Stations are kept in ``radio.stations_file``. A station URL may point to the stream itself or to an
+``.m3u``/``.pls`` playlist, which is resolved to its first stream when the station is played.
+
+
+<a id="lauschkiste.content.radio.module.Radio"></a>
+
+## Radio Objects
+
+```python
+class Radio(CoreModule)
+```
+
+Internet radio stations.
+
+
+<a id="lauschkiste.content.radio.module.Radio.list_stations"></a>
+
+#### list\_stations
+
+```python
+@query(path='/stations')
+def list_stations() -> List[Station]
+```
+
+All stations, by name.
+
+
+<a id="lauschkiste.content.radio.module.Radio.add_station"></a>
+
+#### add\_station
+
+```python
+@action(path='/stations', status_code=201)
+def add_station(name: str, url: str, logo: Optional[str] = None) -> Station
+```
+
+Add a station; its id is derived from the name.
+
+
+<a id="lauschkiste.content.radio.module.Radio.update_station"></a>
+
+#### update\_station
+
+```python
+@action(method='PUT', path='/stations/{station}')
+def update_station(station: str,
+                   name: Optional[str] = None,
+                   url: Optional[str] = None,
+                   logo: Optional[str] = None) -> Station
+```
+
+Change a station; fields left out stay unchanged, an empty ``logo`` removes the logo.
+
+
+<a id="lauschkiste.content.radio.module.Radio.delete_station"></a>
+
+#### delete\_station
+
+```python
+@action(method='DELETE', path='/stations/{station}')
+def delete_station(station: str) -> None
+```
+
+Delete a station. Cards playing it stop working.
+
+
+<a id="lauschkiste.content.radio.module.Radio.list_directories"></a>
+
+#### list\_directories
+
+```python
+@query(path='/directories')
+def list_directories() -> List[DirectoryInfo]
+```
+
+The places stations can be searched in (added by plugins).
+
+
+<a id="lauschkiste.content.radio.module.Radio.search"></a>
+
+#### search
+
+```python
+@query(path='/search')
+def search(term: str,
+           directory: Optional[str] = None,
+           limit: int = 20) -> SearchResult
+```
+
+Search the directories for stations.
+
+
+<a id="lauschkiste.content.radio.module.Radio.top"></a>
+
+#### top
+
+```python
+@query(path='/top')
+def top(directory: Optional[str] = None, limit: int = 20) -> SearchResult
+```
+
+Popular stations of the directories.
+
+
+<a id="lauschkiste.content.radio.module.Radio.import_playlist"></a>
+
+#### import\_playlist
+
+```python
+@action(path='/import_playlist')
+def import_playlist(content: str) -> ImportResult
+```
+
+Add all streams of an M3U or PLS file as stations; known addresses are skipped.
+
+
+<a id="lauschkiste.content.radio.module.Radio.export_playlist"></a>
+
+#### export\_playlist
+
+```python
+@query(path='/export_playlist')
+def export_playlist() -> Playlist
+```
+
+The stations as an M3U file.
+
+
+<a id="lauschkiste.content.radio.module.Radio.play"></a>
+
+#### play
+
+```python
+@action()
+def play(station: str) -> None
+```
+
+Play a station.
+
+
+<a id="lauschkiste.content.radio.module.Radio.forget_recent"></a>
+
+#### forget\_recent
+
+```python
+@action()
+def forget_recent(station: str) -> None
+```
+
+Take a station off the "continue" list (it stays a station).
+
+
+<a id="lauschkiste.content.radio"></a>
+
+# lauschkiste.content.radio
+
+<a id="lauschkiste.content.radio.playlist"></a>
+
+# lauschkiste.content.radio.playlist
+
+Station lists as ``.m3u`` and ``.pls`` files, which radio apps and players import and export.
+
+
+<a id="lauschkiste.content.radio.playlist.parse_stations"></a>
+
+#### parse\_stations
+
+```python
+def parse_stations(content: str) -> List[Dict[str, str]]
+```
+
+``[{"name", "url"}]`` of every stream in an M3U (with names from its EXTINF lines) or PLS playlist.
+
+Raises ValueError if ``content`` has no stream or is too big.
+
+
+<a id="lauschkiste.content.radio.playlist.render_m3u"></a>
+
+#### render\_m3u
+
+```python
+def render_m3u(stations: Iterable[Dict[str, str]]) -> str
+```
+
+An extended M3U for ``{'name', 'url'}`` pairs.
+
+
+<a id="lauschkiste.content.radio.playlist.streams_in_playlist"></a>
+
+#### streams\_in\_playlist
+
+```python
+def streams_in_playlist(text: str) -> List[str]
+```
+
+Stream URLs of an ``.m3u`` or ``.pls`` playlist, in order.
+
+
+<a id="lauschkiste.content.podcasts.feed"></a>
+
+# lauschkiste.content.podcasts.feed
+
+Reading podcast feeds (RSS with the iTunes extensions).
+
+
+<a id="lauschkiste.content.podcasts.feed.parse_feed"></a>
+
+#### parse\_feed
+
+```python
+def parse_feed(content: bytes) -> Dict[str, Any]
+```
+
+``{'title', 'image', 'episodes': [{'id', 'title', 'url', 'published', 'duration', 'image'}]}``,
+
+newest episode first. Raises FeedError if ``content`` is not an RSS or Atom feed with audio.
+
+
+<a id="lauschkiste.content.podcasts.models"></a>
+
+# lauschkiste.content.podcasts.models
+
+The data of the podcasts module: settings, podcasts, episodes, search results and events.
+
+
+<a id="lauschkiste.content.podcasts.models.Podcast"></a>
+
+## Podcast Objects
+
+```python
+class Podcast(BaseModel)
+```
+
+<a id="lauschkiste.content.podcasts.models.Podcast.hidden"></a>
+
+#### hidden
+
+taken off the "continue" list; it comes back with a new episode or when one is heard
+
+
+<a id="lauschkiste.content.podcasts.models.Episode"></a>
+
+## Episode Objects
+
+```python
+class Episode(BaseModel)
+```
+
+<a id="lauschkiste.content.podcasts.models.Episode.item"></a>
+
+#### item
+
+the item id at ``cache`` (the episode can be downloaded)
+
+
+<a id="lauschkiste.content.podcasts.models.Episode.availability"></a>
+
+#### availability
+
+'stream' (played over the network) or 'cached' (downloaded to the box)
+
+
+<a id="lauschkiste.content.podcasts.models.PodcastHit"></a>
+
+## PodcastHit Objects
+
+```python
+class PodcastHit(BaseModel)
+```
+
+A podcast found in a directory.
+
+
+<a id="lauschkiste.content.podcasts.models.SearchResult"></a>
+
+## SearchResult Objects
+
+```python
+class SearchResult(BaseModel)
+```
+
+<a id="lauschkiste.content.podcasts.models.SearchResult.errors"></a>
+
+#### errors
+
+directory id -> why it gave no answer
+
+
+<a id="lauschkiste.content.podcasts.models.PodcastDirectory"></a>
+
+## PodcastDirectory Objects
+
+```python
+class PodcastDirectory(Protocol)
+```
+
+A place to find podcasts, registered at ``podcasts.directories`` by a plugin.
+
+
+<a id="lauschkiste.content.podcasts.models.PodcastDirectory.search"></a>
+
+#### search
+
+```python
+def search(term: str, limit: int) -> List[Dict[str, Any]]
+```
+
+Podcasts matching ``term`` as mappings with ``title``, ``feed_url`` and optionally ``author``, ``image``.
+
+
+<a id="lauschkiste.content.podcasts.models.PodcastDirectory.top"></a>
+
+#### top
+
+```python
+def top(limit: int) -> List[Dict[str, Any]]
+```
+
+Popular podcasts, same mappings.
+
+
+<a id="lauschkiste.content.podcasts.module"></a>
+
+# lauschkiste.content.podcasts.module
+
+The podcasts core module: podcast feeds, episodes streamed and continued where they stopped.
+
+Subscribed podcasts are kept in ``podcasts.podcasts_file``, the episodes of each feed are cached in
+``podcasts.cache_dir`` and fetched again when older than ``refresh_minutes``. The position is kept
+per episode; an episode played to the end counts as heard.
+
+
+<a id="lauschkiste.content.podcasts.module.EpisodeProvider"></a>
+
+## EpisodeProvider Objects
+
+```python
+class EpisodeProvider()
+```
+
+``cache.providers`` entry ``podcasts``: an episode is the file of its feed entry.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts"></a>
+
+## Podcasts Objects
+
+```python
+class Podcasts(CoreModule)
+```
+
+Podcasts: subscribe to feeds, play episodes and continue them.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.list_podcasts"></a>
+
+#### list\_podcasts
+
+```python
+@query(path='/')
+def list_podcasts() -> List[Podcast]
+```
+
+All podcasts, by name, with the number of (unheard) episodes.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.list_episodes"></a>
+
+#### list\_episodes
+
+```python
+@query(path='/{podcast}/episodes')
+def list_episodes(podcast: str) -> List[Episode]
+```
+
+Episodes of a podcast, newest first (the feed is fetched again when stale).
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.add_podcast"></a>
+
+#### add\_podcast
+
+```python
+@action(path='/', status_code=201)
+def add_podcast(url: str, name: Optional[str] = None) -> Podcast
+```
+
+Subscribe to a feed; the name defaults to the feed's title.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.update_podcast"></a>
+
+#### update\_podcast
+
+```python
+@action(method='PUT', path='/{podcast}')
+def update_podcast(podcast: str, name: str) -> Podcast
+```
+
+Rename a podcast.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.delete_podcast"></a>
+
+#### delete\_podcast
+
+```python
+@action(method='DELETE', path='/{podcast}')
+def delete_podcast(podcast: str) -> None
+```
+
+Unsubscribe from a podcast. Cards playing it stop working.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.refresh"></a>
+
+#### refresh
+
+```python
+@action(path='/refresh')
+def refresh(podcast: Optional[str] = None) -> None
+```
+
+Fetch the episodes of one podcast, or of all.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.list_directories"></a>
+
+#### list\_directories
+
+```python
+@query(path='/directories')
+def list_directories() -> List[DirectoryInfo]
+```
+
+The places podcasts can be searched in (added by plugins).
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.search"></a>
+
+#### search
+
+```python
+@query(path='/search')
+def search(term: str,
+           directory: Optional[str] = None,
+           limit: int = 20) -> SearchResult
+```
+
+Search the directories for podcasts.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.top"></a>
+
+#### top
+
+```python
+@query(path='/top')
+def top(directory: Optional[str] = None, limit: int = 20) -> SearchResult
+```
+
+Popular podcasts of the directories.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.import_opml"></a>
+
+#### import\_opml
+
+```python
+@action(path='/import_opml')
+def import_opml(content: str) -> ImportResult
+```
+
+Subscribe to all feeds of an OPML file (for example exported by AntennaPod). The episodes
+
+are fetched in the background.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.export_opml"></a>
+
+#### export\_opml
+
+```python
+@query(path='/export_opml')
+def export_opml() -> Opml
+```
+
+The subscriptions as an OPML file.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.hide_from_continue"></a>
+
+#### hide\_from\_continue
+
+```python
+@action()
+def hide_from_continue(podcast: str) -> None
+```
+
+Take a podcast off the "continue" list until a new episode comes or one is heard.
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.play"></a>
+
+#### play
+
+```python
+@action()
+def play(podcast: str, episode: Optional[str] = None) -> None
+```
+
+Play an episode where it stopped; without ``episode`` the newest unheard one (or the
+
+newest, when all are heard).
+
+
+<a id="lauschkiste.content.podcasts.module.Podcasts.set_heard"></a>
+
+#### set\_heard
+
+```python
+@action()
+def set_heard(podcast: str, episode: str, heard: bool = True) -> None
+```
+
+Mark an episode as heard (or not); either way it starts from the beginning next time.
+
+
+<a id="lauschkiste.content.podcasts"></a>
+
+# lauschkiste.content.podcasts
+
+<a id="lauschkiste.content.podcasts.opml"></a>
+
+# lauschkiste.content.podcasts.opml
 
 OPML, the list format podcast apps (AntennaPod and others) import and export their subscriptions with.
 
 
-<a id="lauschkiste.content.podcast_opml.normalize_url"></a>
+<a id="lauschkiste.content.podcasts.opml.normalize_url"></a>
 
 #### normalize\_url
 
@@ -5176,7 +5044,7 @@ def normalize_url(url: str) -> str
 A feed address for comparing: scheme and host in lower case, no fragment, no trailing slash.
 
 
-<a id="lauschkiste.content.podcast_opml.parse_opml"></a>
+<a id="lauschkiste.content.podcasts.opml.parse_opml"></a>
 
 #### parse\_opml
 
@@ -5189,7 +5057,7 @@ def parse_opml(content: str) -> List[Dict[str, str]]
 Raises ValueError if ``content`` is not OPML.
 
 
-<a id="lauschkiste.content.podcast_opml.render_opml"></a>
+<a id="lauschkiste.content.podcasts.opml.render_opml"></a>
 
 #### render\_opml
 
@@ -5200,10 +5068,6 @@ def render_opml(podcasts: Iterable[Tuple[str, str]],
 
 OPML 2.0 for ``(name, feed address)`` pairs.
 
-
-<a id="lauschkiste.content"></a>
-
-# lauschkiste.content
 
 <a id="lauschkiste.content.resume"></a>
 

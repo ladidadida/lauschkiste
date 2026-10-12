@@ -11,17 +11,19 @@ import threading
 import unicodedata
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any, Dict, List, Optional
 from urllib.parse import urlparse
 
-from pydantic import BaseModel
 
 import lauschkiste.content.directories as directories
 import lauschkiste.common.paths
 import lauschkiste.common.statefile as statefile
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
-from lauschkiste.content.podcast_opml import normalize_url
-from lauschkiste.content.radio_playlist import parse_stations, render_m3u
+from lauschkiste.content.podcasts.opml import normalize_url
+from lauschkiste.content.radio.models import (
+    DirectoryInfo, ImportResult, Playlist, RadioDirectory, SearchResult, Station, StationHit, StationsChanged,
+)
+from lauschkiste.content.radio.playlist import parse_stations, render_m3u, streams_in_playlist
 
 logger = logging.getLogger('lauschkiste.content.radio')
 
@@ -31,64 +33,6 @@ PLAYLIST_SUFFIXES = ('.m3u', '.pls')
 PLAYLIST_TIMEOUT_SEC = 10
 PLAYLIST_MAX_BYTES = 64 * 1024
 
-
-class Station(BaseModel):
-    id: str
-    name: str
-    url: str
-    logo: Optional[str] = None
-    #: when it was last played (UTC); empty for a station never played here or taken off the "continue" list
-    last_played: Optional[str] = None
-
-
-class StationHit(BaseModel):
-    """A station found in a directory."""
-    name: str
-    url: str
-    logo: Optional[str] = None
-    country: Optional[str] = None
-    tags: Optional[str] = None
-    codec: Optional[str] = None
-    bitrate: Optional[int] = None
-    directory: str = ''
-    #: already one of the stations
-    added: bool = False
-
-
-class SearchResult(BaseModel):
-    hits: List[StationHit]
-    #: directory id -> why it gave no answer
-    errors: Dict[str, str] = {}
-
-
-class DirectoryInfo(BaseModel):
-    id: str
-    label: str
-
-
-class ImportResult(BaseModel):
-    added: List[str]
-    already_there: int = 0
-    invalid: int = 0
-
-
-class Playlist(BaseModel):
-    content: str
-
-
-class RadioDirectory(Protocol):
-    """A place to find stations, registered at ``radio.directories`` by a plugin."""
-
-    def search(self, term: str, limit: int) -> List[Dict[str, Any]]:
-        """Stations matching ``term`` as mappings with ``name`` and ``url``, optionally ``logo``, ``country``, ``tags``,
-        ``codec`` and ``bitrate``."""
-
-    def top(self, limit: int) -> List[Dict[str, Any]]:
-        """Popular stations, same mappings."""
-
-
-class StationsChanged(BaseModel):
-    stations: List[Station]
 
 
 def _check_url(url: str, what: str) -> str:
@@ -103,17 +47,6 @@ def _slug(name: str) -> str:
     text = unicodedata.normalize('NFKD', name.replace('ß', 'ss')).encode('ascii', 'ignore').decode()
     return re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-') or 'station'
 
-
-def streams_in_playlist(text: str) -> List[str]:
-    """Stream URLs of an ``.m3u`` or ``.pls`` playlist, in order."""
-    urls = []
-    for line in text.splitlines():
-        line = line.strip()
-        if line.lower().startswith('file') and '=' in line:
-            line = line.split('=', 1)[1].strip()
-        if line.startswith(('http://', 'https://')):
-            urls.append(line)
-    return urls
 
 
 class Radio(CoreModule):

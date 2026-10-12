@@ -49,3 +49,15 @@ def render_m3u(stations: Iterable[Dict[str, str]]) -> str:
         lines.append(f"#EXTINF:-1,{station['name']}")
         lines.append(station['url'])
     return '\n'.join(lines) + '\n'
+
+
+def streams_in_playlist(text: str) -> List[str]:
+    """Stream URLs of an ``.m3u`` or ``.pls`` playlist, in order."""
+    urls = []
+    for line in text.splitlines():
+        line = line.strip()
+        if line.lower().startswith('file') and '=' in line:
+            line = line.split('=', 1)[1].strip()
+        if line.startswith(('http://', 'https://')):
+            urls.append(line)
+    return urls

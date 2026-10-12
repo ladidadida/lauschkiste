@@ -2,15 +2,15 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.content.radio
-from lauschkiste.content.radio import streams_in_playlist
+import lauschkiste.content.radio.module
+from lauschkiste.content.radio.playlist import streams_in_playlist
 
 
 @pytest.fixture
 def radio(api_client, mocked_player, tmp_path):
     ctrl = Mock()
     config = {'radio': {'stations_file': str(tmp_path / 'radio.yaml')}}
-    with api_client([mocked_player(ctrl), lauschkiste.content.radio.Radio], config) as client:
+    with api_client([mocked_player(ctrl), lauschkiste.content.radio.module.Radio], config) as client:
         yield client, ctrl, tmp_path / 'radio.yaml'
 
 
@@ -43,7 +43,7 @@ def test_stations_are_loaded_on_start(api_client, mocked_player, tmp_path):
     (tmp_path / 'radio.yaml').write_text("stations:\n  wdr:\n    name: WDR 5\n    url: https://example.org/wdr5\n"
                                          "  broken: nothing\n")
     config = {'radio': {'stations_file': str(tmp_path / 'radio.yaml')}}
-    with api_client([mocked_player(Mock()), lauschkiste.content.radio.Radio], config) as client:
+    with api_client([mocked_player(Mock()), lauschkiste.content.radio.module.Radio], config) as client:
         assert client.get('/api/v1/radio/stations').json() == [
             {'id': 'wdr', 'name': 'WDR 5', 'url': 'https://example.org/wdr5', 'logo': None,
              'last_played': None}]

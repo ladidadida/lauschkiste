@@ -89,7 +89,7 @@ from pathlib import Path
 import lauschkiste.content.library
 import lauschkiste.common.cfghandler
 import lauschkiste.common.utils as utils
-import lauschkiste.common.multitimer as multitimer
+from lauschkiste.common.periodic import PeriodicThread
 import lauschkiste.content.playlistgenerator as playlistgenerator
 
 from lauschkiste.common.statefile import StateDict
@@ -219,10 +219,7 @@ class PlayerMPD:
         self._saved_modes = None
         self.status_is_closing = False
         self._active = False
-        # self.status_thread = threading.Timer(self.mpd_status_poll_interval, self._mpd_status_poll).start()
-
-        self.status_thread = multitimer.GenericEndlessTimerClass('mpd.timer_status',
-                                                                 self.mpd_status_poll_interval, self._mpd_status_poll)
+        self.status_thread = PeriodicThread('mpd.timer_status', self.mpd_status_poll_interval, self._mpd_status_poll)
         self.status_thread.start()
 
     def exit(self):

@@ -2,8 +2,8 @@ from unittest.mock import Mock
 
 import pytest
 
-import lauschkiste.content.radio
-from lauschkiste.content.radio_playlist import parse_stations, render_m3u
+import lauschkiste.content.radio.module
+from lauschkiste.content.radio.playlist import parse_stations, render_m3u
 
 M3U = '''#EXTM3U
 #EXTINF:-1,Kinderradio
@@ -43,7 +43,7 @@ def row(name, url, **more):
 @pytest.fixture
 def radio(api_client, mocked_player, tmp_path):
     config = {'radio': {'stations_file': str(tmp_path / 'radio.yaml')}}
-    with api_client([mocked_player(Mock()), lauschkiste.content.radio.Radio], config) as client:
+    with api_client([mocked_player(Mock()), lauschkiste.content.radio.module.Radio], config) as client:
         yield client, client.modules.instance('radio').directories
 
 
