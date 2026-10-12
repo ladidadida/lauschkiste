@@ -276,8 +276,10 @@ test('playback settings switch audio outputs and save module settings', async ({
   const { apiCalls } = await mockBackend(page);
   await page.goto('/#/settings/playback');
 
-  const rewind = page.getByLabel('Go back when continuing (seconds)');
-  await rewind.fill('25');
+  const rewind = page.getByRole('slider', { name: 'Go back when continuing (seconds)' });
+  await rewind.focus();
+  await rewind.press('Home');
+  for (let i = 0; i < 25; i += 1) await rewind.press('ArrowRight');
   await page.getByRole('button', { name: 'Save' }).first().click();
   await expect.poll(() => (
     apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/settings/modules/audiobooks')?.body

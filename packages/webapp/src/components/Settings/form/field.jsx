@@ -64,9 +64,9 @@ const SliderField = ({ label, help, nullable, onChange, schema, step, value }) =
   const current = unset ? (schema.default ?? schema.minimum) : value;
   return (
     <Box>
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
         <Typography id={`${id}-label`} variant="body2">{label}</Typography>
-        <Stack alignItems="center" direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
           <Typography color="text.secondary" variant="body2">{unset && nullable ? t('settings.form.default') : current}</Typography>
           {nullable && !unset && (
             <Button onClick={() => onChange(null)} size="small">{t('settings.form.default')}</Button>
