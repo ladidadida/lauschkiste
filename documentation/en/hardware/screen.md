@@ -15,9 +15,18 @@ minimal graphics system (X server, the openbox window manager and the Chromium b
 the first console by itself and starts the browser in full screen after the start. Restart the box. A Raspberry Pi 3
 or better is advised; a Zero is slow with a browser.
 
+## Switch the screen off when nobody uses it
+
+`lauschctl setup kiosk` asks after how many minutes without a touch the screen should go dark (10 by default, `0` for never
+off). A touch switches it on again. This saves power and keeps the screen from burning in on a box that runs all day. The
+music keeps playing; only the screen sleeps. To change the time later, run `lauschctl setup kiosk` again.
+
+A box that is only used by cards would also need to wake up when a card is put on. That is not built in yet.
+
 ## If the screen stays black
 
 - Check that the web page itself works from another device.
+- A screen that is switched off by the timer above looks black too: touch it.
 - The browser is called `chromium-browser` on Raspberry Pi OS up to Bookworm and `chromium` from Trixie on. The step
   chooses the right one; run it again after an update of the system.
 - Run `lauschctl setup --check`: it lists what is wrong with the kiosk.

@@ -63,12 +63,19 @@ class SambaStep(Step):
         plugin.add_to_config(ctx.config_path, ['samba'])
 
 
+def _validate_minutes(value):
+    return None if re.fullmatch(r'\d{1,4}', str(value)) else 'Please enter a number of minutes (0 for never).'
+
+
 class KioskStep(Step):
     name = 'kiosk'
     title = 'Kiosk mode (web app on an attached screen)'
     questions = (
         Question('kiosk', 'Show the web app full-screen on an attached display after boot?', default=False,
                  help='Installs a minimal X server, openbox and Chromium, not a full desktop.'),
+        Question('kiosk_screen_off', 'Switch the screen off after how many minutes without a touch (0: never)?',
+                 kind='text', default='10', validate=_validate_minutes, when=lambda a: a.get('kiosk'),
+                 help='A touch switches it on again.'),
     )
     MARKER = '## Lauschkiste Kiosk Mode'
     BASHRC = '~/.bashrc'
@@ -100,10 +107,12 @@ class KioskStep(Step):
 
     def _autostart(self, ctx) -> str:
         port = ctx.load_config().getn('api', 'port', default=5556)
+        seconds = int(ctx.answer('kiosk_screen_off') or 0) * 60
+        screen = f'xset +dpms\nxset dpms 0 0 {seconds}\n' if seconds else 'xset -dpms\n'
         return (
             'xset s off\n'
             'xset s noblank\n'
-            'xset -dpms\n'
+            f'{screen}'
             "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'\n"
             "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; "
             "s/\"exit_type\":\"[^\"]\\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences\n"

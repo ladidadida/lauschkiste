@@ -455,9 +455,21 @@ def test_kiosk_step_repairs_an_outdated_chromium_command(tmp_path, home, extras)
     autostart = system.read('/etc/xdg/openbox/autostart')
     assert 'chromium http://localhost:5556' in autostart and 'chromium-browser' not in autostart
     assert autostart.count('## Lauschkiste Kiosk Mode') == 1 and autostart.startswith('keep\n') and 'other' in autostart
+    assert 'xset dpms 0 0 600' in autostart
     assert system.read('~/.bashrc').count('startx') == 1
     failed, _ = setup_run(system, home, names=['kiosk'], answers=answers, check_only=True)
     assert failed == 0
+
+
+def test_kiosk_screen_off_is_a_choice(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    system.write('/etc/os-release', 'VERSION_CODENAME=trixie\n')
+    system.write('/etc/systemd/system/getty@tty1.service.d/autologin.conf', '')
+    failed, _ = setup_run(system, home, names=['kiosk'], answers={'kiosk': True, 'kiosk_screen_off': '3'})
+    assert failed == 0 and 'xset dpms 0 0 180' in system.read('/etc/xdg/openbox/autostart')
+    failed, _ = setup_run(system, home, names=['kiosk'], answers={'kiosk': True, 'kiosk_screen_off': '0'})
+    autostart = system.read('/etc/xdg/openbox/autostart')
+    assert 'xset -dpms' in autostart and 'dpms 0 0' not in autostart
 
 
 def test_hardware_step_offers_the_detected_sound_card(tmp_path, home, extras):

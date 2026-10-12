@@ -15,9 +15,19 @@ installiert eine minimale Grafikumgebung (X-Server, den Fenstermanager openbox u
 Desktop), meldet sich auf der ersten Konsole selbst an und startet nach dem Hochfahren den Browser im Vollbild. Starte die
 Box neu. Ein Raspberry Pi 3 oder besser wird empfohlen; auf einer Zero ist ein Browser langsam.
 
+## Den Bildschirm ausschalten, wenn ihn niemand benutzt
+
+`lauschctl setup kiosk` fragt, nach wie vielen Minuten ohne Berührung der Bildschirm dunkel werden soll (standardmäßig 10,
+`0` für nie). Eine Berührung schaltet ihn wieder ein. Das spart Strom und schont den Bildschirm bei einer Box, die den
+ganzen Tag läuft. Die Musik spielt weiter; nur der Bildschirm schläft. Um die Zeit später zu ändern, führe
+`lauschctl setup kiosk` noch einmal aus.
+
+Eine Box, die nur mit Karten bedient wird, müsste beim Auflegen einer Karte auch aufwachen. Das ist noch nicht eingebaut.
+
 ## Bleibt der Bildschirm schwarz
 
 - Prüfe, ob die Webseite selbst von einem anderen Gerät funktioniert.
+- Ein Bildschirm, der durch den Zeitgeber oben ausgeschaltet wurde, sieht auch schwarz aus: Berühre ihn.
 - Der Browser heißt auf Raspberry Pi OS bis Bookworm `chromium-browser`, ab Trixie `chromium`. Der Schritt wählt den
   richtigen; führ ihn nach einem Systemupdate noch einmal aus.
 - Führ `lauschctl setup --check` aus: Es listet auf, was am Kiosk nicht stimmt.
