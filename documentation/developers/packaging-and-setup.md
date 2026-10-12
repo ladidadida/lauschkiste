@@ -42,7 +42,7 @@ $LAUSCHKISTE_HOME/
 
 ## Package data
 
-- Default settings, sounds and the mpd/autohotspot templates are part of the `lauschkiste` package
+- Default settings, sounds and the autohotspot templates are part of the `lauschkiste` package
   (`lauschkiste/resources/`), read with `importlib.resources`. Source and package installs use the same files.
 - The web app build is included in the wheel (`lauschkiste/webapp/`). A source checkout serves
   `packages/webapp/build` instead; `api.webapp_dir` / `LAUSCHKISTE_WEBAPP_DIR` override both.
@@ -73,8 +73,7 @@ asks. Steps are idempotent: running `lauschctl setup` again repairs or updates, 
 Answers are stored in `$LAUSCHKISTE_HOME/settings/setup.yaml` so unattended re-runs
 (`lauschctl setup --yes`) reuse them.
 
-The steps: system packages, Raspberry Pi boot settings, the systemd user service, mpd (only when the `mpd`
-plugin is chosen), plugins, Samba, port 80, autohotspot, kiosk mode, RFID readers, audio output, quiet
+The steps: system packages, Raspberry Pi boot settings, the systemd user service, plugins, Samba, port 80, autohotspot, kiosk mode, RFID readers, audio output, quiet
 boot and the login message. Steps needing root run their commands through `sudo`.
 
 ## Uninstalling
@@ -92,7 +91,7 @@ stays and is listed. It does not remember the state before the setup, so it cann
 | --- | --- | --- | --- |
 | `lauschkiste` | `packages/cli` | `lauschkiste_cli` | what users install: `lauschkiste`, `lauschctl` |
 | `lauschkiste-core` | `packages/lauschkiste` | `lauschkiste` | player, library, cards, API, web app |
-| `lauschkiste-plugin-board-raspberry-pi`, `-devices`, `-mpd`, `-rfid-readers`, `-samba`, `-audiobookshelf`, `-directories` | `packages/plugins/*` | `lauschkiste_plugin_*` | bundled plugins |
+| `lauschkiste-plugin-board-raspberry-pi`, `-devices`, `-rfid-readers`, `-samba`, `-audiobookshelf`, `-directories` | `packages/plugins/*` | `lauschkiste_plugin_*` | bundled plugins |
 
 - **One version for all.** The packages are released together and depend on each other with exact
   pins (`lauschkiste-core==0.1.0a4`), so a plugin never meets a different core. Change the version with
@@ -135,7 +134,7 @@ stays and is listed. It does not remember the state before the setup, so it cann
    Lauschkiste's own environment, `pip` as fallback.
 4. **Setup framework and steps**: `packages/cli/src/lauschkiste_cli/setup/`. `System` wraps
    commands, files and machine facts (tests swap in a fake with a temporary root); steps:
-   `packages`, `hardware`, `raspi`, `mpd`, `plugins`, `service`, `samba`, `rfid`, `kiosk`, `autohotspot`,
+   `packages`, `hardware`, `raspi`, `plugins`, `service`, `samba`, `rfid`, `kiosk`, `autohotspot`,
    `boot`, `welcome` (`lauschctl setup --list`). Missing Debian packages of all chosen steps are
    installed in one `apt-get` call before the steps run. Notes:
    - The service is a user unit in `~/.config/systemd/user/`, generated with the actual

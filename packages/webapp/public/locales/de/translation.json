@@ -170,7 +170,6 @@
       "sections-label": "Bereiche der Bibliothek"
     },
     "sources": {
-      "mpd": "Lokal",
       "local": "Lokal",
       "audiobookshelf": "Audiobookshelf"
     },
@@ -231,7 +230,6 @@
           "invalid_file_name": "Der Dateiname ist ungültig.",
           "invalid_folder_name": "Der Ordnername ist ungültig.",
           "invalid_path": "Der ausgewählte Pfad liegt außerhalb der Musikbibliothek.",
-          "mpd_update_failed": "Die Dateien wurden geändert, aber die MPD-Bibliothek konnte nicht aktualisiert werden.",
           "network_error": "Die Verbindung zur Lauschkiste ist fehlgeschlagen.",
           "permission_denied": "Die Lauschkiste hat keine Berechtigung für diesen Vorgang.",
           "request_failed": "Der Bibliotheksvorgang ist fehlgeschlagen.",
@@ -548,7 +546,7 @@
       },
       "plugins": {
         "title": "Plugins",
-        "subtitle": "Erweiterungen an- und ausschalten, GPIO, Akku, mpd"
+        "subtitle": "Erweiterungen an- und ausschalten, GPIO, Akku"
       },
       "system": {
         "title": "System",
@@ -644,8 +642,6 @@
       "toggle": "Pause/Weiter",
       "play": "Weiterspielen",
       "skip": "Nächster Titel",
-      "replay": "Ordner neu starten",
-      "replay_if_stopped": "Neu starten, wenn gestoppt",
       "ina219": "INA219",
       "simulator": "Simulator",
       "onoff_shim": "Pimoroni OnOff SHIM",
@@ -697,7 +693,7 @@
       "player": {
         "backend": {
           "label": "Wiedergabe über",
-          "help": "„local_audio“ spielt direkt, „mpd“ braucht das mpd-Plugin"
+          "help": "„local_audio“ spielt direkt"
         },
         "volume": {
           "label": "Player-Lautstärke",
@@ -709,15 +705,6 @@
             "label": "Was passiert",
             "help": "Gilt für Ordner-Karten, solange ihr Ordner läuft. Hörbuch-Karten setzen immer fort."
           }
-        },
-        "end_of_playlist_next_action": {
-          "label": "Am Ende der Wiedergabeliste"
-        },
-        "stopped_prev_action": {
-          "label": "„Zurück“ im gestoppten Zustand"
-        },
-        "stopped_next_action": {
-          "label": "„Vor“ im gestoppten Zustand"
         }
       },
       "audiobooks": {

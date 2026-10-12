@@ -26,7 +26,6 @@ from fractions import Fraction
 import lauschkiste.common.paths
 import lauschkiste.content.library
 import lauschkiste.common.cfghandler
-import lauschkiste.common.utils as utils
 from lauschkiste.common.periodic import PeriodicThread
 import lauschkiste.content.playlistgenerator as playlistgenerator
 
@@ -82,27 +81,6 @@ class PlayerLocalAudio:
         self._volume = int(cfg.getn('player', 'volume', default=100))
         self._last_played_folder = self._status_store.get('last_played_folder', '')
 
-        self._second_swipe_action_dict = {
-            'toggle': self.toggle,
-            'play': self.play,
-            'skip': self.next,
-            'rewind': self.rewind,
-            'replay': self.replay,
-            'replay_if_stopped': self.replay_if_stopped,
-        }
-        self.second_swipe_action = None
-        self._decode_2nd_swipe_option()
-
-        self._end_of_playlist_next_action = utils.get_config_action(
-            cfg, 'player', 'end_of_playlist_next_action', 'none',
-            {'rewind': self.rewind, 'stop': self.stop, 'none': lambda: None}, logger)
-        self._stopped_prev_action = utils.get_config_action(
-            cfg, 'player', 'stopped_prev_action', 'prev',
-            {'rewind': self.rewind, 'prev': self._prev_in_stopped_state, 'none': lambda: None}, logger)
-        self._stopped_next_action = utils.get_config_action(
-            cfg, 'player', 'stopped_next_action', 'next',
-            {'rewind': self.rewind, 'next': self._next_in_stopped_state, 'none': lambda: None}, logger)
-
         self._sink = PortAudioSink()
         self._worker = threading.Thread(target=self._run, name='LocalAudioPlayback', daemon=True)
         self._worker.start()
@@ -153,7 +131,6 @@ class PlayerLocalAudio:
                 else:
                     self._state = 'stop'
                     self._position = 0.0
-                    self._end_of_playlist_next_action()
 
     def _decode_track(self, path: str, start_position: float) -> bool:
         """Decode+play `path` from `start_position`. Returns True if it ran to completion (or
@@ -263,24 +240,7 @@ class PlayerLocalAudio:
             self._abort.set()
             self._cv.notify_all()
 
-    def _prev_in_stopped_state(self):
-        self._jump_to(max(0, self._index - 1))
-
-    def _next_in_stopped_state(self):
-        pos = self._index + 1
-        if pos > len(self._queue) - 1:
-            return self._end_of_playlist_next_action()
-        self._jump_to(pos)
-
     # -- second-swipe / config ---------------------------------------------------------------
-
-    def _decode_2nd_swipe_option(self):
-        # A custom action ('action: <module>.<action>') is run by the player module itself.
-        action = str(cfg.getn('player', 'second_swipe_action', 'alias', default='none')).lower()
-        if action not in [*self._second_swipe_action_dict, 'none', 'custom']:
-            logger.error(f"Config player.second_swipe_action must be one of "
-                         f"{[*self._second_swipe_action_dict, 'none']}. Ignore setting.")
-        self.second_swipe_action = self._second_swipe_action_dict.get(action)
 
     # -- coordinator-facing surface -----------------------------------------------------------
 
@@ -344,11 +304,6 @@ class PlayerLocalAudio:
             status['description'] = metadata['icy-description']
         return status
 
-    def get_player_type_and_version(self):
-        import av
-        import sounddevice as sd
-        return f"lauschkiste-local-audio (pyav {av.__version__}, sounddevice {sd.__version__})"
-
     def play(self):
         with self._cv:
             if not self._queue:
@@ -375,17 +330,13 @@ class PlayerLocalAudio:
 
     def prev(self):
         with self._cv:
-            if self._state == 'stop':
-                return self._stopped_prev_action()
             new_index = max(0, self._index - 1)
         self._jump_to(new_index)
 
     def next(self):
         with self._cv:
-            if self._state == 'stop':
-                return self._stopped_next_action()
             if self._index >= len(self._queue) - 1:
-                return self._end_of_playlist_next_action()
+                return
             new_index = self._index + 1
         self._jump_to(new_index)
 
@@ -398,20 +349,11 @@ class PlayerLocalAudio:
         """Re-start current playlist from the first track."""
         self._jump_to(0)
 
-    def replay(self):
-        """Re-start playing the last-played folder."""
-        self.play_folder(self._last_played_folder)
-
     def toggle(self):
         with self._cv:
             if self._state == 'play':
                 return self.pause(1)
             return self.pause(0)
-
-    def replay_if_stopped(self):
-        with self._cv:
-            if self._state == 'stop':
-                self.replay()
 
     def shuffle(self, option='toggle'):
         with self._cv:
@@ -458,18 +400,6 @@ class PlayerLocalAudio:
         with self._cv:
             self._stop_after_current = bool(enabled)
 
-    def get_current_song(self, param):
-        return self._status_dict()
-
-    def map_filename_to_playlist_pos(self, filename):
-        raise NotImplementedError
-
-    def remove(self):
-        raise NotImplementedError
-
-    def move(self):
-        raise NotImplementedError
-
     def _absolute(self, path):
         root = os.path.expanduser(lauschkiste.content.library.root() or '')
         return path if os.path.isabs(path) or '://' in path else os.path.join(root, path)
@@ -485,16 +415,7 @@ class PlayerLocalAudio:
             self._cv.notify_all()
 
     def is_second_swipe(self, folder: str) -> bool:
-        return self.second_swipe_action is not None and self._last_played_folder == folder
-
-    def play_second_swipe(self):
-        if self.second_swipe_action is not None:
-            self.second_swipe_action()
-
-    def get_folder_content(self, folder: str):
-        plc = playlistgenerator.PlaylistCollector(lauschkiste.content.library.root())
-        plc.get_directory_content(folder)
-        return plc.playlist
+        return self._last_played_folder == folder
 
     def play_folder(self, folder: str, recursive: bool = False) -> None:
         plc = playlistgenerator.PlaylistCollector(lauschkiste.content.library.root())
@@ -533,23 +454,12 @@ class PlayerLocalAudio:
                 self._index = -1
                 self._state = 'stop'
 
-    def queue_load(self, folder):
-        pass
-
     def playerstatus(self):
         return self._status_dict()
 
     def playlistinfo(self):
         with self._cv:
             return [{'file': path, 'pos': str(i)} for i, path in enumerate(self._queue)]
-
-    def list_all_dirs(self):
-        base = os.path.expanduser(lauschkiste.content.library.root())
-        result = []
-        for root, _dirs, files in os.walk(base):
-            for f in files:
-                result.append({'file': os.path.relpath(os.path.join(root, f), base)})
-        return result
 
     def get_volume(self):
         return self._volume

@@ -16,7 +16,7 @@ Lauschkiste is an RFID audio player for kids. It is made for the Raspberry Pi an
 ## How it is built
 
 * One Python application: core modules (player, library, volume, cards, RFID, timers, ...) and
-  plugins (RFID reader drivers, Raspberry Pi hardware, MPD, ...) on a common contract
+  plugins (RFID reader drivers, Raspberry Pi hardware, Samba, ...) on a common contract
   ([core and plugins](./developers/core-and-plugins.md))
 * A typed REST API and a WebSocket event stream (FastAPI) for the web app; card actions and
   REST routes come from the same declarations

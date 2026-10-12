@@ -1,8 +1,0 @@
-{
-  "plugins": {
-    "mpd": {
-      "name": "mpd",
-      "description": "Lets the box use an external MPD server as player and music database. Only needed to keep an existing MPD setup."
-    }
-  }
-}

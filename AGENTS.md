@@ -21,7 +21,7 @@ packages/          uv workspace members
                      contract/  the core/plugin framework (modules, operations, plugins, snapshots)
                      api/       FastAPI bridge: routes from operations, WebSocket events, web app files
                      common/    foundations used by everything: cfghandler (settings), paths, statefile,
-                                publishing (event bus), periodic (interval threads), loggingext, simplecolors, utils
+                                publishing (event bus), periodic (interval threads), loggingext, simplecolors, gitstate
                      player/    the player module and its backends, plus volume, audio_output and jingle
                      content/   what is played: library, audiobooks, podcasts/ and radio/ (module, models, feed or
                                 playlist, OPML), directories, cache, resume (continue lists), playlistgenerator
@@ -81,12 +81,11 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   connects there too as a plain WebSocket client.
 - **Player backend**: registered at the `player.backends` extension point, selected via
   `player.backend` config. Default is `local_audio` (decodes via PyAV, outputs via sounddevice/
-  PortAudio, no external process); `mpd` (an external mpd server, via `python-mpd2`) is an opt-in
-  alternative. Backends implement `lauschkiste.player.backend.PlayerBackend`; the player module turns
+  PortAudio, no external process); other backends come from plugins. Backends implement `lauschkiste.player.backend.PlayerBackend`; the player module turns
   their raw status into the typed `player.status` event (`lauschkiste.player.status.PlayerStatus`).
 - **Library** (`lauschkiste.content.library`): owns the music library -- file management, a SQLite index of
   tags/durations (`$LAUSCHKISTE_HOME/settings/library.sqlite`), cover art (`$LAUSCHKISTE_HOME/cache/covers`), and the
-  `library.sources` extension point for further catalogs (mpd, streaming).
+  `library.sources` extension point for further catalogs (streaming).
 - **Content and downloads**: `audiobooks`, `podcasts` and `radio` are core modules
   (`documentation/developers/content-types.md`); the `cache` module downloads items of sources that register at
   `cache.providers` (`documentation/developers/caching.md`); `time_limits` implements quiet hours and a daily
@@ -104,7 +103,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   but only loaded when enabled under `plugins:`): `board-raspberry-pi` (board support: pins,
   interfaces, sound cards, power, firmware health; the installer enables it on a Pi), `devices`
   (`gpio_controls`, `battery`, `power_button`, `phat_beat`, board-independent, see
-  `documentation/developers/hardware.md`), `mpd` (player backend) and `rfid-readers`
+  `documentation/developers/hardware.md`) and `rfid-readers`
   (one plugin per reader driver, `rfid_<driver>`; each driver's dependencies are an extra of that
   package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`) and `samba` (the
   library's network share and Samba password from the web app; `lauschctl setup samba` enables it) and
@@ -174,7 +173,7 @@ Webapp (`cd packages/webapp`): `npm run dev`, `npm run build`, `npm test`, `npm 
 
 ## Testing without Raspberry Pi hardware
 
-The default `player.backend: local_audio` + `generic_usb`/`fake_reader_gui` RFID readers need no
+The default `player.backend: local_audio` + `generic_usb` RFID reader need no
 Pi-specific hardware or extra system packages at all -- `uv run lauschkiste` plays through this
 machine's normal audio output directly.
 

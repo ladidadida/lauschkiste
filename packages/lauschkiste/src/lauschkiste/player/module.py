@@ -17,22 +17,22 @@ logger = logging.getLogger('lauschkiste.player')
 DEFAULT_BACKEND = 'local_audio'
 
 
+SECOND_SWIPE_ACTIONS = {'toggle': 'player.toggle', 'play': 'player.play', 'skip': 'player.next',
+                        'rewind': 'player.rewind'}
+
+
 class SecondSwipe(BaseModel):
-    alias: Literal['toggle', 'play', 'skip', 'rewind', 'replay', 'replay_if_stopped', 'none'] = Field(
+    alias: Literal['toggle', 'play', 'skip', 'rewind', 'none'] = Field(
         'none', title='Same card placed again',
         description='What a folder card does when it is placed again while its folder plays')
 
 
 class PlayerSettings(BaseModel):
     backend: str = Field(DEFAULT_BACKEND, title='Player backend',
-                         description="'local_audio' plays directly; 'mpd' needs the mpd plugin")
+                         description="'local_audio' plays directly")
     volume: int = Field(100, ge=0, le=100, title='Player volume',
                         description='Of the local_audio backend, on top of the system volume; cubic like PulseAudio')
     second_swipe_action: SecondSwipe = Field(default_factory=SecondSwipe, title='Second swipe')
-    end_of_playlist_next_action: Literal['none', 'stop', 'rewind'] = Field(
-        'none', title='At the end of the playlist')
-    stopped_prev_action: Literal['none', 'prev', 'rewind'] = Field('prev', title='"Previous" while stopped')
-    stopped_next_action: Literal['none', 'next', 'rewind'] = Field('next', title='"Next" while stopped')
 
 
 class VolumeLevel(BaseModel):
@@ -54,7 +54,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '6.0'
+    interface_version = '7.0'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -163,8 +163,11 @@ class Player(CoreModule):
         entry = self._ctx.config.get('second_swipe_action', default=None)
         if not isinstance(entry, dict):
             return
-        if 'action' not in entry and entry.get('alias', 'custom') != 'custom':
-            return
+        if 'action' not in entry:
+            action_id = SECOND_SWIPE_ACTIONS.get(str(entry.get('alias', 'none')).lower())
+            if action_id is None:
+                return
+            entry = {'action': action_id}
         action = self._ctx.actions.bind(entry, 'player.second_swipe_action', logger)
         if action is not None:
             self._coordinator.set_second_swipe_action(action)
@@ -261,16 +264,6 @@ class Player(CoreModule):
         """Restart the playlist from its first song."""
         self._coordinator.rewind()
 
-    @action(path='/replay')
-    def replay(self) -> None:
-        """Replay the current folder from the start."""
-        self._coordinator.replay()
-
-    @action(path='/replay-if-stopped')
-    def replay_if_stopped(self) -> None:
-        """Replay the current folder if playback has stopped."""
-        self._coordinator.replay_if_stopped()
-
     @action(path='/resume')
     def resume(self) -> None:
         """Resume the last played folder where it stopped."""
@@ -324,21 +317,6 @@ class Player(CoreModule):
             self._context = PlaybackContext.model_validate(context) if context else PlaybackContext(kind='music')
         self._coordinator.play_files(files, start, position, ordered)
 
-    @action(path='/queue')
-    def queue_load(self, folder: str) -> None:
-        """Load a folder into the queue without playing it."""
-        self._coordinator.queue_load(folder)
-
-    @action(path='/update')
-    def update(self) -> Any:
-        """Rescan the music library of the default backend."""
-        return self._coordinator.update()
-
-    @action(path='/update-wait')
-    def update_wait(self) -> Any:
-        """Rescan the music library and wait for it to finish."""
-        return self._coordinator.update_wait()
-
     # -- status and volume ----------------------------------------------------------------------
 
     @query(path='/status')
@@ -356,21 +334,6 @@ class Player(CoreModule):
     def set_volume(self, volume: int) -> VolumeLevel:
         """Set the playback volume of the active backend."""
         return VolumeLevel(volume=int(self._coordinator.set_volume(volume)))
-
-    @query(path='/playlist')
-    def playlistinfo(self) -> List[Dict[str, Any]]:
-        """The current queue."""
-        return self._coordinator.playlistinfo()
-
-    @query(path='/current-song')
-    def get_current_song(self, param: Optional[str] = None) -> Any:
-        """Details of the current song."""
-        return self._coordinator.get_current_song(param)
-
-    @query(path='/type')
-    def get_player_type_and_version(self) -> str:
-        """Type and version of the active backend."""
-        return self._coordinator.get_player_type_and_version()
 
     # -- backends -------------------------------------------------------------------------------
 

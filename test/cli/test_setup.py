@@ -179,15 +179,12 @@ def test_single_step_and_irrelevant_steps(tmp_path, home, extras, capsys):
     assert not any('apt-get' in c for c in system.commands)
 
 
-def test_mpd_and_hotspot(tmp_path, home, extras):
+def test_hotspot(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
     system.enabled.add('NetworkManager.service')
     system.outputs[('iw', 'dev')] = 'phy#0\n\tInterface wlan0\n'
-    failed, ctx = setup_run(system, home, answers={'mpd': True, 'autohotspot': True})
+    failed, ctx = setup_run(system, home, answers={'autohotspot': True})
     assert failed == 0
-    assert 'mpd' in ctx.enabled_plugins()
-    assert 'mpd.service' in system.read('~/.config/systemd/user/lauschkiste.service')
-    assert str(home / 'library') in system.read('~/.config/mpd/mpd.conf')
     script = system.read('/usr/bin/autohotspot')
     assert "ap_ssid='Lauschkiste_jukebox'" in script and "wdev0='wlan0'" in script
     assert 'autohotspot.timer' in system.enabled

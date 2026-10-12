@@ -10,7 +10,7 @@ import atexit
 from typing import (Optional)
 
 import lauschkiste.common.paths
-import lauschkiste.common.utils
+import lauschkiste.common.gitstate
 import lauschkiste.common.publishing as publishing
 from lauschkiste.api import FastApiServer
 
@@ -49,7 +49,7 @@ class Daemon:
         self._start_time = time.time()
         logger.info(f"Starting Lauschkiste (version {lauschkiste.version()})")
 
-        self._git_state = lauschkiste.common.utils.get_git_state()
+        self._git_state = lauschkiste.common.gitstate.get_git_state()
         logger.info(f"Git state: {self._git_state}")
 
         self._signal_cnt = 0

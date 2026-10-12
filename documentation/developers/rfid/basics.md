@@ -48,7 +48,7 @@ manually.
 rfid:
   readers:
     read_00:
-        module: fake_reader_gui
+        module: generic_usb
         config: ....
         same_id_delay: float|integer
         log_ignored_cards: true|false

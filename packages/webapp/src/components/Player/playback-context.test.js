@@ -3,8 +3,8 @@ import { expect, test } from 'vitest';
 import { contentKind, libraryLink } from './playback-context';
 
 test.each([
-  [{ action: 'player.play_album', args: { albumartist: 'A B', album: 'C/D', provider: 'mpd' } },
-    '/library/mpd/albums/A%20B/C%2FD'],
+  [{ action: 'player.play_album', args: { albumartist: 'A B', album: 'C/D', provider: 'local' } },
+    '/library/local/albums/A%20B/C%2FD'],
   [{ action: 'player.play_album', args: { albumartist: 'A', album: 'B' } }, '/library/local/albums/A/B'],
   [{ action: 'player.play_folder', args: { folder: 'music/Rock' } }, '/library/music/folders/music%2FRock'],
   [{ action: 'player.play_folder', args: { folder: 'audiobooks/Pippi/' } },

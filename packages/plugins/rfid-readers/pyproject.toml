@@ -48,11 +48,9 @@ mfrc522-i2c = ["mfrc522_i2c"]
 pn532-i2c-py532 = ["py532lib"]
 rdm6300-serial = ["pyserial"]
 generic-nfcpy = ["nfcpy"]
-fake-reader-gui = ["ttkthemes"]
 
 [project.entry-points."lauschkiste.plugins"]
 rfid_generic_usb = "lauschkiste_plugin_rfid_readers:GenericUsb"
-rfid_fake_reader_gui = "lauschkiste_plugin_rfid_readers:FakeReaderGui"
 rfid_rdm6300_serial = "lauschkiste_plugin_rfid_readers:Rdm6300Serial"
 rfid_rc522_spi = "lauschkiste_plugin_rfid_readers:Rc522Spi"
 rfid_mfrc522_i2c = "lauschkiste_plugin_rfid_readers:Mfrc522I2c"

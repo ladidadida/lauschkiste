@@ -31,7 +31,7 @@ and pins.
 | --- | --- |
 | Player (with the `local_audio` backend) | Board support: `board_raspberry_pi` |
 | Library (index, metadata, cover art, see below) | Devices: `gpio_controls`, `battery`, `power_button`, `phat_beat` |
-| Audiobooks, podcasts, radio ([Content types](content-types.md)) | Player backend `mpd` |
+| Audiobooks, podcasts, radio ([Content types](content-types.md)) | Further player backends |
 | Cache for downloads ([Caching](caching.md)) | RFID reader drivers (one plugin per driver) |
 | Hardware (pins and buses in use, board, shutdown/reboot) | Audiobookshelf server as a source |
 | Card database and card action dispatch | Podcast and radio directories |
@@ -50,8 +50,7 @@ through the core `hardware` module. Details in [Hardware](hardware.md).
 
 ### Library
 
-With `local_audio` as the default backend there is no mpd database behind the player, so the core **Library**
-module provides what browsing needs:
+The core **Library** module provides what browsing needs:
 
 - an index of the music library in SQLite, built from tags read with `mutagen` (MP3, FLAC, MP4/M4A, Ogg/Opus,
   ...). A scan runs on `library.update()` (the refresh endpoint), when files change and after uploads and
@@ -370,18 +369,17 @@ extension point; plugins register against it in `start()`:
 ```python
 # in a plugin
 def start(self, ctx):
-    ctx.modules.player.backends.register("mpd", MpdBackend(ctx.config))
+    ctx.modules.player.backends.register("my_backend", MyBackend(ctx.config))
 ```
 
 The basic extension points:
 
-- **Player backends** (`player.backends`) - `local_audio` is registered by the core, `mpd` is a
-  plugin. The `player.backend` setting selects the active one; the backend surface is an explicit protocol.
+- **Player backends** (`player.backends`) - `local_audio` is registered by the core, others come from
+  plugins. The `player.backend` setting selects the active one; the backend surface is an explicit protocol.
 - **RFID reader drivers** (`rfid.readers`) - every bundled driver is a plugin (`rfid_<driver>`,
   all shipped in the `rfid-readers` package) that registers a reader factory. The reader framework keeps owning threads, timing and
   dispatch.
-- **Library sources** (`library.sources`) - the core index is the local source; the `mpd` plugin can
-  add its own database as a second source, streaming services can be further ones.
+- **Library sources** (`library.sources`) - the core index is the local source; streaming services can be further ones.
 
 More that exist now: `player.level_meters` (VU meters), `player.resolvers` (turn a track address into what
 is opened plus headers, so that credentials never appear in a queue), `audiobooks.sources` (books from

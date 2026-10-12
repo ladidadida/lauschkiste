@@ -134,15 +134,6 @@ class PlayerCoordinator:
             self._select_backend(name)
             return name
 
-    def get_player_type_and_version(self):
-        return self._call_active('get_player_type_and_version')
-
-    def update(self):
-        return self._call_default('update')
-
-    def update_wait(self):
-        return self._call_default('update_wait')
-
     def play(self):
         return self._call_active('play')
 
@@ -164,14 +155,8 @@ class PlayerCoordinator:
     def rewind(self):
         return self._call_active('rewind')
 
-    def replay(self):
-        return self._call_active('replay')
-
     def toggle(self):
         return self._call_active('toggle')
-
-    def replay_if_stopped(self):
-        return self._call_active('replay_if_stopped')
 
     def shuffle(self, option='toggle'):
         return self._call_active('shuffle', option)
@@ -189,18 +174,6 @@ class PlayerCoordinator:
     def stop_after_current(self, enabled=True):
         return self._call_active('stop_after_current', enabled)
 
-    def get_current_song(self, param):
-        return self._call_active('get_current_song', param)
-
-    def map_filename_to_playlist_pos(self, filename):
-        return self._call_active('map_filename_to_playlist_pos', filename)
-
-    def remove(self):
-        return self._call_active('remove')
-
-    def move(self):
-        return self._call_active('move')
-
     def play_single(self, song_url, provider=None):
         with self._lock:
             backend = self._content_backend(provider)
@@ -212,10 +185,8 @@ class PlayerCoordinator:
     def play_card(self, folder: str, recursive: bool = False):
         with self._lock:
             backend = self._content_backend()
-            if self._call_backend(backend, 'is_second_swipe', folder):
-                if self._second_swipe_action is not None:
-                    return self._second_swipe_action()
-                return self._call_backend(backend, 'play_second_swipe')
+            if self._second_swipe_action is not None and self._call_backend(backend, 'is_second_swipe', folder):
+                return self._second_swipe_action()
             return self._call_backend(backend, 'play_folder', folder, recursive)
 
     def play_folder(self, folder: str, recursive: bool = False) -> None:
@@ -239,9 +210,6 @@ class PlayerCoordinator:
             backend = self._content_backend(provider)
             args = (albumartist, album, content_uri) if content_uri else (albumartist, album)
             return self._call_backend(backend, 'play_album', *args)
-
-    def queue_load(self, folder):
-        return self._call_default('queue_load', folder)
 
     def playerstatus(self):
         return self._call_active('playerstatus')

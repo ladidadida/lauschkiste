@@ -262,12 +262,12 @@ def test_the_translations_of_every_plugin_cover_the_same_fields_in_each_language
         for language, bundle in bundles.items():
             assert bundle is not None and keys(bundle) == base, f"plugin '{name}': {language} differs from en.json"
         seen.add(name)
-    assert {'audiobookshelf', 'podcast_directories', 'radio_directories', 'mpd', 'samba', 'gpio_controls',
+    assert {'audiobookshelf', 'podcast_directories', 'radio_directories', 'samba', 'gpio_controls',
             'rfid_rc522_spi'} <= seen
 
 
 def test_the_plugin_list_carries_what_the_package_says_about_itself(client):
-    entry = next(e for e in client.get('/api/v1/plugins').json() if e['name'] == 'mpd')
+    entry = next(e for e in client.get('/api/v1/plugins').json() if e['name'] == 'samba')
     assert entry['author'] == 'the Lauschkiste contributors' and entry['license'] == 'MIT'
     assert entry['homepage'] == 'https://github.com/ladidadida/lauschkiste'
     assert entry['issues'].endswith('/issues') and entry['documentation'].startswith('https://')

@@ -43,7 +43,7 @@ def start(tmp_path):
 
 def test_every_bundled_driver_is_an_installed_plugin():
     installed = discover_plugins()
-    for name in ('generic_usb', 'fake_reader_gui', 'rdm6300_serial', 'rc522_spi', 'mfrc522_i2c',
+    for name in ('generic_usb', 'rdm6300_serial', 'rc522_spi', 'mfrc522_i2c',
                  'pn532_i2c_py532', 'generic_nfcpy'):
         assert f'rfid_{name}' in installed
 

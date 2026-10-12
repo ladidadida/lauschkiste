@@ -44,9 +44,6 @@
 * [lauschkiste.version](#lauschkiste.version)
   * [version](#lauschkiste.version.version)
   * [version\_info](#lauschkiste.version.version_info)
-* [lauschkiste.common.utils](#lauschkiste.common.utils)
-  * [get\_config\_action](#lauschkiste.common.utils.get_config_action)
-  * [get\_git\_state](#lauschkiste.common.utils.get_git_state)
 * [lauschkiste.common.periodic](#lauschkiste.common.periodic)
 * [lauschkiste.common.simplecolors](#lauschkiste.common.simplecolors)
   * [Colors](#lauschkiste.common.simplecolors.Colors)
@@ -59,6 +56,8 @@
     * [cache\_snapshot](#lauschkiste.common.publishing.bus.EventBus.cache_snapshot)
 * [lauschkiste.common.publishing](#lauschkiste.common.publishing)
   * [get\_bus](#lauschkiste.common.publishing.get_bus)
+* [lauschkiste.common.gitstate](#lauschkiste.common.gitstate)
+  * [get\_git\_state](#lauschkiste.common.gitstate.get_git_state)
 * [lauschkiste.common.cfghandler](#lauschkiste.common.cfghandler)
   * [ConfigHandler](#lauschkiste.common.cfghandler.ConfigHandler)
     * [loaded\_from](#lauschkiste.common.cfghandler.ConfigHandler.loaded_from)
@@ -450,23 +449,15 @@
     * [get\_queue](#lauschkiste.player.module.Player.get_queue)
     * [stop\_after\_current](#lauschkiste.player.module.Player.stop_after_current)
     * [rewind](#lauschkiste.player.module.Player.rewind)
-    * [replay](#lauschkiste.player.module.Player.replay)
-    * [replay\_if\_stopped](#lauschkiste.player.module.Player.replay_if_stopped)
     * [resume](#lauschkiste.player.module.Player.resume)
     * [play\_folder](#lauschkiste.player.module.Player.play_folder)
     * [play\_card](#lauschkiste.player.module.Player.play_card)
     * [play\_single](#lauschkiste.player.module.Player.play_single)
     * [play\_album](#lauschkiste.player.module.Player.play_album)
     * [play\_files](#lauschkiste.player.module.Player.play_files)
-    * [queue\_load](#lauschkiste.player.module.Player.queue_load)
-    * [update](#lauschkiste.player.module.Player.update)
-    * [update\_wait](#lauschkiste.player.module.Player.update_wait)
     * [playerstatus](#lauschkiste.player.module.Player.playerstatus)
     * [get\_volume](#lauschkiste.player.module.Player.get_volume)
     * [set\_volume](#lauschkiste.player.module.Player.set_volume)
-    * [playlistinfo](#lauschkiste.player.module.Player.playlistinfo)
-    * [get\_current\_song](#lauschkiste.player.module.Player.get_current_song)
-    * [get\_player\_type\_and\_version](#lauschkiste.player.module.Player.get_player_type_and_version)
     * [list\_backends](#lauschkiste.player.module.Player.list_backends)
     * [get\_active\_backend](#lauschkiste.player.module.Player.get_active_backend)
     * [get\_default\_backend](#lauschkiste.player.module.Player.get_default_backend)
@@ -505,7 +496,6 @@
   * [PlayerLocalAudio](#lauschkiste.player.backends.local_audio.PlayerLocalAudio)
     * [set\_level\_callback](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.set_level_callback)
     * [rewind](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.rewind)
-    * [replay](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.replay)
 * [lauschkiste.player.backends](#lauschkiste.player.backends)
 
 <a id="lauschkiste"></a>
@@ -663,7 +653,7 @@ class ReaderBaseClass(ABC)
 
 Abstract Base Class for all Reader Classes to ensure common API
 
-Look at template_new_reader.py for documentation how to integrate a new RFID reader
+How to add a reader: documentation/developers/rfid/README.md
 
 
 <a id="lauschkiste.rfid"></a>
@@ -967,39 +957,6 @@ Return the Lauschkiste version as a tuple of three numbers
 If this is a development version, an identifier string will be appended after the third integer.
 
 
-<a id="lauschkiste.common.utils"></a>
-
-# lauschkiste.common.utils
-
-Common utility functions
-
-
-<a id="lauschkiste.common.utils.get_config_action"></a>
-
-#### get\_config\_action
-
-```python
-def get_config_action(cfg, section, option, default, valid_actions_dict,
-                      logger)
-```
-
-Looks up the given {section}.{option} config option and returns
-
-the associated entry from valid_actions_dict, if valid. Falls back to the given
-default otherwise.
-
-
-<a id="lauschkiste.common.utils.get_git_state"></a>
-
-#### get\_git\_state
-
-```python
-def get_git_state()
-```
-
-Git state of the checkout Lauschkiste runs from, or a note that it isn't one (package install).
-
-
 <a id="lauschkiste.common.periodic"></a>
 
 # lauschkiste.common.periodic
@@ -1133,6 +1090,24 @@ def get_bus() -> EventBus
 ```
 
 The shared, thread-safe event bus.
+
+
+<a id="lauschkiste.common.gitstate"></a>
+
+# lauschkiste.common.gitstate
+
+The git state of a source checkout.
+
+
+<a id="lauschkiste.common.gitstate.get_git_state"></a>
+
+#### get\_git\_state
+
+```python
+def get_git_state()
+```
+
+Git state of the checkout Lauschkiste runs from, or a note that it isn't one (package install).
 
 
 <a id="lauschkiste.common.cfghandler"></a>
@@ -3428,7 +3403,7 @@ The library core module: file management, index, metadata, cover art and library
 class LibrarySource(Protocol)
 ```
 
-Further music a player backend or plugin can play (e.g. an mpd database, a streaming service).
+Further music a player backend or plugin can play (e.g. a streaming service).
 
 
 <a id="lauschkiste.content.library.module.LibrarySource.describe"></a>
@@ -3472,7 +3447,7 @@ URL of the song's cover (absolute or relative to the web app), or None.
 def song_from_source(provider: str, data: Dict[str, Any]) -> Song
 ```
 
-A :class:`Song` from a source's song mapping (mpd style keys are understood).
+A :class:`Song` from a source's song mapping .
 
 
 <a id="lauschkiste.content.library.module.Library"></a>
@@ -5541,30 +5516,6 @@ def rewind() -> None
 Restart the playlist from its first song.
 
 
-<a id="lauschkiste.player.module.Player.replay"></a>
-
-#### replay
-
-```python
-@action(path='/replay')
-def replay() -> None
-```
-
-Replay the current folder from the start.
-
-
-<a id="lauschkiste.player.module.Player.replay_if_stopped"></a>
-
-#### replay\_if\_stopped
-
-```python
-@action(path='/replay-if-stopped')
-def replay_if_stopped() -> None
-```
-
-Replay the current folder if playback has stopped.
-
-
 <a id="lauschkiste.player.module.Player.resume"></a>
 
 #### resume
@@ -5647,42 +5598,6 @@ Play files of the library (or URLs), from ``position`` seconds into the file at 
 (shown by the web app; without it, music).
 
 
-<a id="lauschkiste.player.module.Player.queue_load"></a>
-
-#### queue\_load
-
-```python
-@action(path='/queue')
-def queue_load(folder: str) -> None
-```
-
-Load a folder into the queue without playing it.
-
-
-<a id="lauschkiste.player.module.Player.update"></a>
-
-#### update
-
-```python
-@action(path='/update')
-def update() -> Any
-```
-
-Rescan the music library of the default backend.
-
-
-<a id="lauschkiste.player.module.Player.update_wait"></a>
-
-#### update\_wait
-
-```python
-@action(path='/update-wait')
-def update_wait() -> Any
-```
-
-Rescan the music library and wait for it to finish.
-
-
 <a id="lauschkiste.player.module.Player.playerstatus"></a>
 
 #### playerstatus
@@ -5717,42 +5632,6 @@ def set_volume(volume: int) -> VolumeLevel
 ```
 
 Set the playback volume of the active backend.
-
-
-<a id="lauschkiste.player.module.Player.playlistinfo"></a>
-
-#### playlistinfo
-
-```python
-@query(path='/playlist')
-def playlistinfo() -> List[Dict[str, Any]]
-```
-
-The current queue.
-
-
-<a id="lauschkiste.player.module.Player.get_current_song"></a>
-
-#### get\_current\_song
-
-```python
-@query(path='/current-song')
-def get_current_song(param: Optional[str] = None) -> Any
-```
-
-Details of the current song.
-
-
-<a id="lauschkiste.player.module.Player.get_player_type_and_version"></a>
-
-#### get\_player\_type\_and\_version
-
-```python
-@query(path='/type')
-def get_player_type_and_version() -> str
-```
-
-Type and version of the active backend.
 
 
 <a id="lauschkiste.player.module.Player.list_backends"></a>
@@ -6158,17 +6037,6 @@ def rewind()
 ```
 
 Re-start current playlist from the first track.
-
-
-<a id="lauschkiste.player.backends.local_audio.PlayerLocalAudio.replay"></a>
-
-#### replay
-
-```python
-def replay()
-```
-
-Re-start playing the last-played folder.
 
 
 <a id="lauschkiste.player.backends"></a>

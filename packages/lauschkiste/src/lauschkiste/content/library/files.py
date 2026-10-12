@@ -208,21 +208,20 @@ class UploadSession:
 class MusicLibrary:
     """Perform validated mutations beneath a lazily resolved library root."""
 
-    def __init__(self, root_provider, update_callback):
+    def __init__(self, root_provider):
         self._root_provider = root_provider
-        self._update_callback = update_callback
 
     @property
     def root(self):
         root_value = self._root_provider()
         if not root_value:
-            raise LibraryError(503, 'library_unavailable', 'The MPD music-library path is unavailable.')
+            raise LibraryError(503, 'library_unavailable', 'The library path is unavailable.')
         try:
             root = Path(root_value).expanduser().resolve(strict=True)
         except (OSError, RuntimeError) as error:
-            raise LibraryError(503, 'library_unavailable', 'The MPD music-library path is unavailable.') from error
+            raise LibraryError(503, 'library_unavailable', 'The library path is unavailable.') from error
         if not root.is_dir():
-            raise LibraryError(503, 'library_unavailable', 'The MPD music-library path is not a directory.')
+            raise LibraryError(503, 'library_unavailable', 'The library path is not a directory.')
         return root
 
     def _directory(self, relative_path):
@@ -366,9 +365,3 @@ class MusicLibrary:
                 raise _operation_error(error, f"delete '{targets[target]}'") from error
             deleted.append(targets[target])
         return deleted
-
-    def update(self):
-        try:
-            return self._update_callback()
-        except Exception as error:
-            raise LibraryError(502, 'mpd_update_failed', f'Could not update the MPD library: {error}') from error

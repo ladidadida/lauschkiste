@@ -61,7 +61,7 @@ offline ledger of Audiobookshelf) and the decision whether to prefer the local c
 
 Items in the library views carry two facts, filled in by the module that lists them:
 
-- `source`: id and label of where the item lives (`local`, `audiobookshelf`, `mpd`, a podcast feed, ...).
+- `source`: id and label of where the item lives (`local`, `audiobookshelf`, a podcast feed, ...).
 - `availability`: `local` (a file of the library), `cached` (downloaded from a source) or `stream`
   (played over the network).
 

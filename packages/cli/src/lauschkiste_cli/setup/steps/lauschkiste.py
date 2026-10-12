@@ -15,8 +15,6 @@ SERVICE = 'lauschkiste.service'
 
 def wanted_plugins(ctx: Context) -> List[str]:
     names = [board['name'] for board in plugins.detected_boards(ctx.system.read)[:1]]
-    if ctx.answer('mpd'):
-        names.append('mpd')
     if ctx.answer('samba'):
         names.append('samba')
     return names
@@ -60,8 +58,6 @@ class ServiceStep(Step):
 
     def unit(self, ctx: Context) -> str:
         after = ['network.target', 'sound.target', 'pipewire-pulse.service']
-        if 'mpd' in ctx.enabled_plugins():
-            after.append('mpd.service')
         wants = [unit for unit in after if unit.endswith('.service')]
         workdir = checkout() or lauschkiste.common.paths.home()
         return (

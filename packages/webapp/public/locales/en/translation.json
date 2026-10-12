@@ -170,7 +170,6 @@
       "sections-label": "Library sections"
     },
     "sources": {
-      "mpd": "Local",
       "local": "Local",
       "audiobookshelf": "Audiobookshelf"
     },
@@ -231,7 +230,6 @@
           "invalid_file_name": "The file name is invalid.",
           "invalid_folder_name": "The folder name is invalid.",
           "invalid_path": "The selected path is outside the music library.",
-          "mpd_update_failed": "The files changed, but the MPD library could not be updated.",
           "network_error": "The connection to Lauschkiste failed.",
           "permission_denied": "Lauschkiste does not have permission for this operation.",
           "request_failed": "The library operation failed.",
@@ -548,7 +546,7 @@
       },
       "plugins": {
         "title": "Plugins",
-        "subtitle": "Switch extensions on and off, GPIO, battery, mpd"
+        "subtitle": "Switch extensions on and off, GPIO, battery"
       },
       "system": {
         "title": "System",
@@ -644,8 +642,6 @@
       "toggle": "Pause/continue",
       "play": "Keep playing",
       "skip": "Next song",
-      "replay": "Restart the folder",
-      "replay_if_stopped": "Restart if stopped",
       "ina219": "INA219",
       "simulator": "Simulator",
       "onoff_shim": "Pimoroni OnOff SHIM",

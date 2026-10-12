@@ -45,7 +45,6 @@ publishing"). What has to be done once, by the owner of the PyPI account:
    | `lauschkiste-core` | `testpypi-lauschkiste-core` | `pypi-lauschkiste-core` |
    | `lauschkiste-plugin-board-raspberry-pi` | `testpypi-lauschkiste-plugin-board-raspberry-pi` | `pypi-lauschkiste-plugin-board-raspberry-pi` |
    | `lauschkiste-plugin-devices` | `testpypi-lauschkiste-plugin-devices` | `pypi-lauschkiste-plugin-devices` |
-   | `lauschkiste-plugin-mpd` | `testpypi-lauschkiste-plugin-mpd` | `pypi-lauschkiste-plugin-mpd` |
    | `lauschkiste-plugin-rfid-readers` | `testpypi-lauschkiste-plugin-rfid-readers` | `pypi-lauschkiste-plugin-rfid-readers` |
    | `lauschkiste-plugin-samba` | `testpypi-lauschkiste-plugin-samba` | `pypi-lauschkiste-plugin-samba` |
    | `lauschkiste-plugin-audiobookshelf` | `testpypi-lauschkiste-plugin-audiobookshelf` | `pypi-lauschkiste-plugin-audiobookshelf` |

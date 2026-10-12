@@ -33,7 +33,7 @@ FROM=
 WHEELS=""
 VENV_DIR="${HOME}/.local/share/lauschkiste-venv"
 INSTALLER=""
-BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-devices lauschkiste-plugin-mpd
+BUNDLED_PLUGINS=(lauschkiste-plugin-board-raspberry-pi lauschkiste-plugin-devices
                  lauschkiste-plugin-rfid-readers lauschkiste-plugin-samba lauschkiste-plugin-audiobookshelf
                  lauschkiste-plugin-directories)
 HOME_DIR=""

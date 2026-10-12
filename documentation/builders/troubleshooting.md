@@ -9,8 +9,7 @@ There are various options to get access to debug information.
 Debugging your setup runs in several steps
 
 1. Check that [audio output works](audio.md#checking-system-sound-output)
-2. If you use the `mpd` plugin: check that [MPD works](system.md#music-player-daemon-mpd)
-3. Checking log messages from the Lauschkiste core App as described below
+2. Checking log messages from the Lauschkiste core App as described below
 
 ## The short answer
 

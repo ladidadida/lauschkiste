@@ -7,7 +7,7 @@ the [roadmap](roadmap-core-architecture.md).
 
 | Area | What |
 | --- | --- |
-| Playback | built-in player (`local_audio`, PyAV and PortAudio), MPD as a plugin; shuffle, repeat, sleep timer, playback speed for audiobooks and podcasts, queue |
+| Playback | built-in player (`local_audio`, PyAV and PortAudio); shuffle, repeat, sleep timer, playback speed for audiobooks and podcasts, queue |
 | Content | music, audiobooks (position per book), podcasts (feeds, position per episode), radio stations; see [Content types](content-types.md) |
 | Sources | audiobooks from an [Audiobookshelf](audiobookshelf.md) server (streaming, shared position, offline use), podcast and radio directories (Apple Podcasts, fyyd, Podcast Index, radio-browser.info), OPML and M3U/PLS import and export |
 | Downloads | a [cache in the core](caching.md) for audiobooks and podcast episodes: low priority, space limit, removal of old items |

@@ -16,7 +16,6 @@ NO_RFID_READER = 'No RFID Reader'
 
 #: Driver name -> extra of this package providing the driver's dependencies.
 BUNDLED_READER_EXTRAS = {
-    'fake_reader_gui': 'fake-reader-gui',
     'rdm6300_serial': 'rdm6300-serial',
     'mfrc522_i2c': 'mfrc522-i2c',
     'rc522_spi': 'rc522-spi',
@@ -177,14 +176,13 @@ def query_user_for_reader(dependency_install='query') -> dict:
     package_dir = os.path.abspath(os.path.dirname(os.path.realpath(__file__)))
     logger.debug(f"Package location: {package_dir}")
     # For known included readers, specify manual order
-    included_readers = [NO_RFID_READER, 'generic_usb', 'rdm6300_serial', 'rc522_spi', 'pn532_i2c_py532', 'fake_reader_gui']
+    included_readers = [NO_RFID_READER, 'generic_usb', 'rdm6300_serial', 'rc522_spi', 'pn532_i2c_py532']
     # Get all local directories (i.e subpackages) that conform to naming/structuring convention (except known readers)
     # Naming convention: modname/modname.py
     additional_readers = [x for x in os.listdir(package_dir)
                    if (os.path.isdir(package_dir + '/' + x)
                        and os.path.exists(package_dir + '/' + x + '/' + x + '.py')
                        and os.path.isfile(package_dir + '/' + x + '/' + x + '.py')
-                       and not x.endswith('template_new_reader')
                        and x not in included_readers)]
     reader_dirs = [*included_readers, *sorted(additional_readers, key=lambda x: x.casefold())]
 

@@ -9,13 +9,11 @@ from lauschkiste.content.library import LibraryError, MusicLibrary
 def music_library(tmp_path):
     root = tmp_path / 'music'
     root.mkdir()
-    updates = []
-    library = MusicLibrary(lambda: str(root), lambda: updates.append('update') or 'job-1')
-    return library, root, updates
+    return MusicLibrary(lambda: str(root)), root
 
 
 def test_upload_is_published_atomically_and_rejects_duplicates(music_library):
-    library, root, _ = music_library
+    library, root = music_library
     album = root / 'Album'
     album.mkdir()
 
@@ -35,7 +33,7 @@ def test_upload_is_published_atomically_and_rejects_duplicates(music_library):
 
 
 def test_cancelled_upload_removes_temporary_and_reserved_files(music_library):
-    library, root, _ = music_library
+    library, root = music_library
 
     upload = library.start_upload('.', 'cancelled.flac')
     upload.write(b'partial')
@@ -51,7 +49,7 @@ def test_cancelled_upload_removes_temporary_and_reserved_files(music_library):
     'cover.webp',
 ])
 def test_supported_library_file_types_are_accepted(music_library, name):
-    library, root, _ = music_library
+    library, root = music_library
 
     upload = library.start_upload('.', name)
     upload.abort()
@@ -61,7 +59,7 @@ def test_supported_library_file_types_are_accepted(music_library, name):
 
 @pytest.mark.parametrize('name', ['notes.txt', 'station.livestream.txt', 'archive.zip', '.hidden.mp3', '../track.mp3'])
 def test_unsupported_or_invalid_file_names_are_rejected(music_library, name):
-    library, _, _ = music_library
+    library, _ = music_library
 
     with pytest.raises(LibraryError) as error:
         library.start_upload('.', name)
@@ -70,7 +68,7 @@ def test_unsupported_or_invalid_file_names_are_rejected(music_library, name):
 
 
 def test_create_folder_and_delete_non_empty_folder(music_library):
-    library, root, _ = music_library
+    library, root = music_library
 
     path = library.create_folder('.', 'New Album')
     (root / path / 'track.mp3').write_bytes(b'audio')
@@ -84,7 +82,7 @@ def test_create_folder_and_delete_non_empty_folder(music_library):
 
 
 def test_list_entries_includes_manageable_files_and_skips_external_symlinks(music_library, tmp_path):
-    library, root, _ = music_library
+    library, root = music_library
     (root / 'Album').mkdir()
     (root / 'track.mp3').touch()
     (root / 'cover.jpg').touch()
@@ -103,7 +101,7 @@ def test_list_entries_includes_manageable_files_and_skips_external_symlinks(musi
 
 
 def test_delete_validates_all_paths_before_removing_anything(music_library):
-    library, root, _ = music_library
+    library, root = music_library
     existing = root / 'keep.mp3'
     existing.write_bytes(b'audio')
 
@@ -115,7 +113,7 @@ def test_delete_validates_all_paths_before_removing_anything(music_library):
 
 
 def test_root_and_symlink_escape_are_rejected(music_library, tmp_path):
-    library, root, _ = music_library
+    library, root = music_library
     outside = tmp_path / 'outside'
     outside.mkdir()
     (outside / 'track.mp3').write_bytes(b'outside')
@@ -136,7 +134,7 @@ def test_root_and_symlink_escape_are_rejected(music_library, tmp_path):
 
 
 def test_upload_does_not_replace_file_created_during_transfer(music_library):
-    library, root, _ = music_library
+    library, root = music_library
     upload = library.start_upload('.', 'race.mp3')
     upload.write(b'upload')
 
@@ -152,15 +150,8 @@ def test_upload_does_not_replace_file_created_during_transfer(music_library):
     assert not list(root.glob('.lauschkiste-upload-*'))
 
 
-def test_update_returns_mpd_job_identifier(music_library):
-    library, _, updates = music_library
-
-    assert library.update() == 'job-1'
-    assert updates == ['update']
-
-
 def test_uploaded_files_and_folders_are_group_writable_only(music_library):
-    library, root, _ = music_library
+    library, root = music_library
     upload = library.start_upload('.', 'track.wav')
     upload.write(b'audio')
     upload.finish()

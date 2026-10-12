@@ -81,7 +81,7 @@ describe('activeTabAndView', () => {
   test.each([
     ['/library/music/albums', ['music', 'albums']],
     ['/library/music/folders/music%2FRock', ['music', 'folders']],
-    ['/library/mpd/albums/Artist/Album', ['music', 'albums']],
+    ['/library/local/albums/Artist/Album', ['music', 'albums']],
     ['/library/audiobooks', ['audiobooks', 'books']],
     ['/library/audiobooks/folders/audiobooks', ['audiobooks', 'folders']],
     ['/library/podcasts/kakadu', ['podcasts', undefined]],

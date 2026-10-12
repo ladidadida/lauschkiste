@@ -44,7 +44,7 @@ Starlette's `request.stream()`) without buffering the complete file in
 memory. Browser folder selections retain their relative paths; the Web App
 creates the selected folder trees through the `folders` endpoint before
 uploading their files sequentially. Raw directory listing, batch deletion,
-and MPD refresh use the corresponding `entries` and `refresh` endpoints.
+and refresh use the corresponding `entries` and `refresh` endpoints.
 Uploads are exempt from the 1 MiB body-size cap that applies to other
 JSON requests.
 

@@ -50,7 +50,6 @@ def _driver_plugin(class_name: str, driver: str, extras=(), needs=()) -> type:
 
 
 GenericUsb = _driver_plugin('GenericUsb', 'generic_usb')
-FakeReaderGui = _driver_plugin('FakeReaderGui', 'fake_reader_gui', ['fake-reader-gui'])
 Rdm6300Serial = _driver_plugin('Rdm6300Serial', 'rdm6300_serial', ['rdm6300-serial'])
 Rc522Spi = _driver_plugin('Rc522Spi', 'rc522_spi', ['rc522-spi'], ['spi', 'gpio'])
 Mfrc522I2c = _driver_plugin('Mfrc522I2c', 'mfrc522_i2c', ['mfrc522-i2c'], ['i2c'])

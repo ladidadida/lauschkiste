@@ -32,13 +32,13 @@ describe('request', () => {
 
     const response = await request('libraryItems', {
       content_types: ['album', 'playlist'],
-      provider: 'mpd',
+      provider: 'local',
       query: undefined,
     });
 
     expect(response).toEqual({ result: [{ album: 'Mezzanine' }] });
     expect(global.fetch.mock.calls[0][0]).toBe(
-      '/api/v1/library/items?content_types=album&content_types=playlist&provider=mpd',
+      '/api/v1/library/items?content_types=album&content_types=playlist&provider=local',
     );
     expect(global.fetch.mock.calls[0][1].method).toBe('GET');
   });

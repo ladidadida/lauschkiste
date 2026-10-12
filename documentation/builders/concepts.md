@@ -10,7 +10,7 @@ computer): the player, the music library, the card database and RFID reader hand
 It is always there.
 
 **Plugins** add platform-specific functionality (e.g. Raspberry Pi hardware: shutdown, GPIO
-buttons, battery HATs), other player backends such as `mpd`, RFID reader drivers, or integrations
+buttons, battery HATs), other player backends, RFID reader drivers, or integrations
 such as MQTT. A plugin only runs when it is listed under `plugins:` in `lauschkiste.yaml`, even if it is
 installed. If a plugin fails to start, the rest of Lauschkiste keeps running; check the logs (see
 [Troubleshooting](troubleshooting.md)) or `GET /api/v1/modules`, which also lists skipped plugins

@@ -1,4 +1,4 @@
-"""Optional features: MPD, Samba, kiosk mode, WiFi hotspot, audio outputs."""
+"""Optional features: Samba, kiosk mode, WiFi hotspot, audio outputs."""
 
 import re
 
@@ -11,55 +11,6 @@ from lauschkiste_cli import plugin
 from lauschkiste_cli.setup import samba
 from lauschkiste_cli.setup.base import Question, Step
 from lauschkiste_cli.setup.system import SetupError, StepSkipped
-
-
-class MpdStep(Step):
-    name = 'mpd'
-    title = 'MPD (Music Player Daemon) as user service'
-    questions = (
-        Question('mpd', 'Use MPD as player backend instead of the built-in player?', default=False,
-                 help='Only needed to keep an existing MPD setup; the built-in player needs no extra service.'),
-    )
-    CONF = '~/.config/mpd/mpd.conf'
-
-    def wanted(self, ctx):
-        return bool(ctx.answer('mpd'))
-
-    def packages(self, ctx):
-        return ['mpd', 'mpc']
-
-    @staticmethod
-    def library(ctx):
-        return lauschkiste.common.paths.library_dir(ctx.load_config().getn('library', 'path', default=None))
-
-    def conf(self, ctx) -> str:
-        template = lauschkiste.common.paths.resource('default-settings', 'mpd.default.conf').read_text()
-        return (template.replace('%%LAUSCHKISTE_LIBRARY_PATH%%', str(self.library(ctx)))
-                .replace('%%LAUSCHKISTE_PLAYLISTS_PATH%%', str(lauschkiste.common.paths.resolve('playlists'))))
-
-    def check(self, ctx):
-        system = ctx.system
-        problems = []
-        if system.read(self.CONF) != self.conf(ctx):
-            problems.append(f'{self.CONF} is missing or differs from the Lauschkiste template')
-        problems += [f'system-wide {unit} is enabled' for unit in ('mpd.socket', 'mpd.service')
-                     if system.unit_enabled(unit)]
-        problems += [f'user {unit} is not enabled' for unit in ('mpd.socket', 'mpd.service')
-                     if not system.unit_enabled(unit, user=True)]
-        return problems
-
-    def apply(self, ctx):
-        system = ctx.system
-        for unit in ('mpd.socket', 'mpd.service'):
-            system.run('systemctl', 'disable', '--now', unit, root=True, check=False)
-        current = system.read(self.CONF)
-        if current is not None and current != self.conf(ctx):
-            system.write(self.CONF + '.backup', current)
-        for folder in (self.library(ctx), lauschkiste.common.paths.resolve('playlists')):
-            folder.mkdir(parents=True, exist_ok=True)
-        system.write(self.CONF, self.conf(ctx))
-        system.run('systemctl', '--user', 'daemon-reload')
-        system.run('systemctl', '--user', 'enable', 'mpd.socket', 'mpd.service')
 
 
 class SambaStep(Step):

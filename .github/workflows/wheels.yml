@@ -150,7 +150,6 @@ jobs:
           - lauschkiste-core
           - lauschkiste-plugin-board-raspberry-pi
           - lauschkiste-plugin-devices
-          - lauschkiste-plugin-mpd
           - lauschkiste-plugin-rfid-readers
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf
@@ -199,7 +198,6 @@ jobs:
           - lauschkiste-core
           - lauschkiste-plugin-board-raspberry-pi
           - lauschkiste-plugin-devices
-          - lauschkiste-plugin-mpd
           - lauschkiste-plugin-rfid-readers
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf

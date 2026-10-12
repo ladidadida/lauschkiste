@@ -24,7 +24,7 @@ Say it like "LOWSH-kiss-tuh".
   offline use), podcasts (search, subscribe, import from other apps) and internet radio (search, M3U/PLS)
 - Quiet hours and a daily listening time
 - Web app for the library, cards, settings and playback, in German and English
-- Built-in player, no extra audio daemon needed; MPD as a plugin
+- Built-in player, no extra audio daemon needed
 - Plugins for RFID readers, Raspberry Pi hardware (buttons, encoders, LED, battery), podcast and radio directories
   and more; plugins bring their own translations
 - Runs on a Raspberry Pi (from the Zero up) and on any Linux computer; Raspberry Pi hardware support is a plugin

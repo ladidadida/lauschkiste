@@ -19,7 +19,7 @@ def project(directory: Path) -> dict:
 def test_distribution_names():
     names = {project(directory)['name'] for directory in PACKAGES}
     assert names == {'lauschkiste', 'lauschkiste-core', 'lauschkiste-plugin-board-raspberry-pi',
-                     'lauschkiste-plugin-devices', 'lauschkiste-plugin-mpd', 'lauschkiste-plugin-rfid-readers',
+                     'lauschkiste-plugin-devices', 'lauschkiste-plugin-rfid-readers',
                      'lauschkiste-plugin-samba', 'lauschkiste-plugin-audiobookshelf',
                      'lauschkiste-plugin-directories'}
 

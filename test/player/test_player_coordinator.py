@@ -17,34 +17,31 @@ def backend_with(**methods):
 
 def test_registers_and_selects_first_backend():
     coordinator = PlayerCoordinator()
-    mpd_backend = backend_with()
+    main_backend = backend_with()
     other_backend = backend_with()
 
-    coordinator.register_backend('mpd', mpd_backend)
+    coordinator.register_backend('main', main_backend)
     coordinator.register_backend('other', other_backend)
 
-    assert coordinator.list_backends() == ['mpd', 'other']
-    assert coordinator.get_active_backend() == 'mpd'
-    assert coordinator.get_default_backend() == 'mpd'
-    mpd_backend.stop.assert_not_called()
+    assert coordinator.list_backends() == ['main', 'other']
+    assert coordinator.get_active_backend() == 'main'
+    assert coordinator.get_default_backend() == 'main'
+    main_backend.stop.assert_not_called()
 
 
 def test_rejects_invalid_backend_registrations():
     coordinator = PlayerCoordinator()
-    coordinator.register_backend('mpd', backend_with())
+    coordinator.register_backend('main', backend_with())
 
     with pytest.raises(ValueError, match="must not be empty"):
         coordinator.register_backend('', backend_with())
     with pytest.raises(ValueError, match="already registered"):
-        coordinator.register_backend('mpd', backend_with())
+        coordinator.register_backend('main', backend_with())
 
 
 @pytest.mark.parametrize(
     ('coordinator_method', 'call_args', 'backend_args'),
     [
-        ('get_player_type_and_version', (), ()),
-        ('update', (), ()),
-        ('update_wait', (), ()),
         ('play', (), ()),
         ('stop', (), ()),
         ('pause', (), (1,)),
@@ -53,9 +50,7 @@ def test_rejects_invalid_backend_registrations():
         ('next', (), ()),
         ('seek', (23,), (23,)),
         ('rewind', (), ()),
-        ('replay', (), ()),
         ('toggle', (), ()),
-        ('replay_if_stopped', (), ()),
         ('shuffle', (), ('toggle',)),
         ('shuffle', ('enable',), ('enable',)),
         ('repeat', (), ('toggle',)),
@@ -64,10 +59,6 @@ def test_rejects_invalid_backend_registrations():
         ('jump', (3,), (3,)),
         ('set_speed', (1.25,), (1.25,)),
         ('stop_after_current', (False,), (False,)),
-        ('get_current_song', ('title',), ('title',)),
-        ('map_filename_to_playlist_pos', ('song.mp3',), ('song.mp3',)),
-        ('remove', (), ()),
-        ('move', (), ()),
         ('play_single', ('album/song.mp3',), ('album/song.mp3',)),
         ('resume', (), ()),
         ('play_folder', ('album',), ('album', False)),
@@ -75,7 +66,6 @@ def test_rejects_invalid_backend_registrations():
         ('play_album', ('Artist', 'Album'), ('Artist', 'Album')),
         ('play_files', (['a.mp3', 'b.mp3'],), (['a.mp3', 'b.mp3'], 0, 0.0, False)),
         ('play_files', (['a.mp3', 'b.mp3'], 1, 12.5, True), (['a.mp3', 'b.mp3'], 1, 12.5, True)),
-        ('queue_load', ('album',), ('album',)),
         ('playerstatus', (), ()),
         ('playlistinfo', (), ()),
         ('get_volume', (), ()),
@@ -87,7 +77,7 @@ def test_delegates_existing_player_contract(
     backend_method = Mock(return_value=sentinel.result)
     backend = backend_with(**{coordinator_method: backend_method})
     coordinator = PlayerCoordinator()
-    coordinator.register_backend('mpd', backend)
+    coordinator.register_backend('main', backend)
 
     result = getattr(coordinator, coordinator_method)(*call_args)
 
@@ -97,17 +87,17 @@ def test_delegates_existing_player_contract(
 
 def test_switch_stops_old_backend_before_new_content_starts():
     events = []
-    mpd_backend = backend_with(stop=Mock(side_effect=lambda: events.append('mpd.stop')))
+    main_backend = backend_with(stop=Mock(side_effect=lambda: events.append('main.stop')))
     streaming_backend = backend_with(
         play_single=Mock(side_effect=lambda content: events.append(f'play:{content}'))
     )
     coordinator = PlayerCoordinator()
-    coordinator.register_backend('mpd', mpd_backend)
+    coordinator.register_backend('main', main_backend)
     coordinator.register_backend('streaming', streaming_backend)
 
     coordinator.play_single('service:track:123', provider='streaming')
 
-    assert events == ['mpd.stop', 'play:service:track:123']
+    assert events == ['main.stop', 'play:service:track:123']
     assert coordinator.get_active_backend() == 'streaming'
 
 
@@ -169,16 +159,16 @@ def test_unqualified_content_switches_back_to_default_backend():
 def test_selecting_active_backend_does_not_stop_it():
     backend = backend_with()
     coordinator = PlayerCoordinator()
-    coordinator.register_backend('mpd', backend)
+    coordinator.register_backend('main', backend)
 
-    assert coordinator.select_backend('mpd') == 'mpd'
+    assert coordinator.select_backend('main') == 'main'
 
     backend.stop.assert_not_called()
 
 
 def test_unknown_backend_and_unsupported_operation_errors_are_clear():
     coordinator = PlayerCoordinator()
-    coordinator.register_backend('mpd', backend_with())
+    coordinator.register_backend('main', backend_with())
 
     with pytest.raises(KeyError, match="Unknown player backend 'missing'"):
         coordinator.select_backend('missing')
@@ -186,10 +176,10 @@ def test_unknown_backend_and_unsupported_operation_errors_are_clear():
         coordinator.play()
 
 
-def test_plain_folder_content_routes_to_mpd_backend():
+def test_plain_folder_content_routes_to_main_backend():
     play_folder = Mock(return_value=sentinel.playback)
     coordinator = PlayerCoordinator()
-    coordinator.register_backend('mpd', backend_with(play_folder=play_folder))
+    coordinator.register_backend('main', backend_with(play_folder=play_folder))
 
     result = coordinator.play_folder('stories/chapter-one')
 
@@ -213,47 +203,30 @@ def test_folder_content_switches_back_to_default_backend():
 
 
 @pytest.mark.parametrize('is_second_swipe', [False, True])
-def test_play_card_runs_folder_or_second_swipe(is_second_swipe):
-    backend = backend_with(is_second_swipe=Mock(return_value=is_second_swipe), play_folder=Mock(),
-                           play_second_swipe=Mock())
-    coordinator = PlayerCoordinator()
-    coordinator.register_backend('mpd', backend)
+def test_play_card_runs_folder_or_second_swipe_action(is_second_swipe):
+    backend = backend_with(is_second_swipe=Mock(return_value=is_second_swipe), play_folder=Mock())
+    action = Mock()
+    coordinator = PlayerCoordinator(second_swipe_action=action)
+    coordinator.register_backend('main', backend)
 
     coordinator.play_card('stories', recursive=True)
 
-    backend.is_second_swipe.assert_called_once_with('stories')
     if is_second_swipe:
         backend.play_folder.assert_not_called()
-        backend.play_second_swipe.assert_called_once_with()
+        action.assert_called_once_with()
     else:
         backend.play_folder.assert_called_once_with('stories', True)
-        backend.play_second_swipe.assert_not_called()
+        action.assert_not_called()
 
 
-def test_configured_second_swipe_action_replaces_the_backend_behavior():
-    override = Mock()
-    backend = backend_with(is_second_swipe=Mock(return_value=True), play_second_swipe=Mock())
-    coordinator = PlayerCoordinator(second_swipe_action=override)
-    coordinator.register_backend('mpd', backend)
+def test_without_second_swipe_action_a_card_always_plays_its_folder():
+    backend = backend_with(is_second_swipe=Mock(return_value=True), play_folder=Mock())
+    coordinator = PlayerCoordinator()
+    coordinator.register_backend('main', backend)
 
     coordinator.play_card('stories')
 
-    override.assert_called_once_with()
-    backend.play_second_swipe.assert_not_called()
-
-
-def test_play_second_swipe_ignores_action_return_value():
-    # play_second_swipe() is shared shape across backends (see e.g. PlayerMPD/PlayerLocalAudio):
-    # it always returns None, regardless of what the configured second_swipe_action returns.
-    class FakeBackend:
-        def play_second_swipe(self):
-            self.second_swipe_action()
-
-    backend = FakeBackend()
-    backend.second_swipe_action = Mock(return_value=sentinel.result)
-
-    assert backend.play_second_swipe() is None
-    backend.second_swipe_action.assert_called_once_with()
+    backend.play_folder.assert_called_once_with('stories', False)
 
 
 def test_playerstatus_is_returned_without_translation():
@@ -272,7 +245,7 @@ def test_playerstatus_is_returned_without_translation():
     }
     coordinator = PlayerCoordinator()
     coordinator.register_backend(
-        'mpd', backend_with(playerstatus=Mock(return_value=player_status))
+        'main', backend_with(playerstatus=Mock(return_value=player_status))
     )
 
     assert coordinator.playerstatus() is player_status

@@ -1,9 +1,5 @@
 {
   "plugins": {
-    "rfid_fake_reader_gui": {
-      "name": "RFID: Test-Leser",
-      "description": "Ein Testleser: ein kleines Fenster, in dem man Karten anklickt. Für die Entwicklung."
-    },
     "rfid_generic_nfcpy": {
       "name": "RFID: nfcpy",
       "description": "NFC-Leser, die mit der Bibliothek nfcpy arbeiten (viele USB-NFC-Leser)."

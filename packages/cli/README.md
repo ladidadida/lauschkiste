@@ -13,7 +13,7 @@ starts. Made for the Raspberry Pi (from the Zero up), runs on any Linux computer
 - Audiobooks also from an Audiobookshelf server (with downloads for offline use); podcast and radio search
 - Quiet hours and a daily listening time
 - Web app for the library, cards, settings and playback
-- Built-in player, no extra audio daemon needed; MPD as a plugin
+- Built-in player, no extra audio daemon needed
 - Plugins for RFID readers, Raspberry Pi hardware (buttons, encoders, LEDs, battery) and more
 - Setup steps you can re-run safely, updates from the command line
 
@@ -51,7 +51,6 @@ lauschctl update           # newer version
 | `lauschkiste-plugin-board-raspberry-pi` | Raspberry Pi board support (pins, boot configuration, power) |
 | `lauschkiste-plugin-devices` | GPIO buttons, rotary encoders, LEDs, battery monitor, power button, pHAT BEAT |
 | `lauschkiste-plugin-rfid-readers` | RFID reader drivers |
-| `lauschkiste-plugin-mpd` | MPD as a player backend |
 | `lauschkiste-plugin-samba` | share the library on the network |
 | `lauschkiste-plugin-audiobookshelf` | audiobooks from an Audiobookshelf server |
 | `lauschkiste-plugin-directories` | find podcasts and radio stations (Apple, fyyd, Podcast Index, radio-browser) |

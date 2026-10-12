@@ -1,7 +1,6 @@
 import array
 import threading
 import wave
-from unittest.mock import Mock
 
 import pytest
 
@@ -192,19 +191,9 @@ def test_play_folder_with_no_content_stops(tmp_path, monkeypatch):
 # -- second swipe --------------------------------------------------------------------------------
 
 def test_is_second_swipe_true_for_repeated_folder():
-    backend = local_audio_backend(second_swipe_action=Mock(), _last_played_folder='stories')
+    backend = local_audio_backend(_last_played_folder='stories')
     assert backend.is_second_swipe('stories') is True
     assert backend.is_second_swipe('other') is False
-
-
-def test_is_second_swipe_false_without_configured_action():
-    backend = local_audio_backend(second_swipe_action=None, _last_played_folder='stories')
-    assert backend.is_second_swipe('stories') is False
-
-
-def test_play_second_swipe_ignores_action_return_value():
-    backend = local_audio_backend(second_swipe_action=Mock(return_value='ignored'))
-    assert backend.play_second_swipe() is None
 
 
 # -- status/playlist shape -----------------------------------------------------------------------
@@ -229,7 +218,6 @@ def test_playerstatus_shape():
         'speed': '1.00',
         'provider': 'local_audio',
     }
-    assert backend.get_current_song(None) == status
 
 
 def test_playlistinfo_shape():

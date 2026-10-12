@@ -255,7 +255,6 @@
       "play": "(self) -> None",
       "play_files": "(self, paths: List[str], start: int = 0, position: float = 0.0, ordered: bool = False) -> None",
       "play_folder": "(self, folder: str, recursive: bool = False) -> None",
-      "play_second_swipe": "(self) -> None",
       "play_single": "(self, song_url: str) -> None",
       "playerstatus": "(self) -> Mapping[str, Any]",
       "playlistinfo": "(self) -> List[Dict[str, Any]]",
@@ -277,7 +276,7 @@
       "resolve": "(self, url: str) -> Tuple[str, Dict[str, str]]"
     }
   },
-  "interface_version": "6.0",
+  "interface_version": "7.0",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -307,29 +306,6 @@
         "type": "object"
       }
     },
-    "get_current_song": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {
-          "param": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          }
-        },
-        "type": "object"
-      },
-      "kind": "query",
-      "method": "GET",
-      "path": "/api/v1/player/current-song",
-      "returns": {}
-    },
     "get_default_backend": {
       "args": {
         "additionalProperties": false,
@@ -354,19 +330,6 @@
           }
         },
         "type": "object"
-      }
-    },
-    "get_player_type_and_version": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "kind": "query",
-      "method": "GET",
-      "path": "/api/v1/player/type",
-      "returns": {
-        "type": "string"
       }
     },
     "get_queue": {
@@ -996,23 +959,6 @@
         "type": "object"
       }
     },
-    "playlistinfo": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "kind": "query",
-      "method": "GET",
-      "path": "/api/v1/player/playlist",
-      "returns": {
-        "items": {
-          "additionalProperties": true,
-          "type": "object"
-        },
-        "type": "array"
-      }
-    },
     "prev": {
       "args": {
         "additionalProperties": false,
@@ -1022,26 +968,6 @@
       "kind": "action",
       "method": "POST",
       "path": "/api/v1/player/prev",
-      "returns": {
-        "type": "null"
-      }
-    },
-    "queue_load": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {
-          "folder": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "folder"
-        ],
-        "type": "object"
-      },
-      "kind": "action",
-      "method": "POST",
-      "path": "/api/v1/player/queue",
       "returns": {
         "type": "null"
       }
@@ -1060,32 +986,6 @@
       "kind": "action",
       "method": "POST",
       "path": "/api/v1/player/repeat",
-      "returns": {
-        "type": "null"
-      }
-    },
-    "replay": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "kind": "action",
-      "method": "POST",
-      "path": "/api/v1/player/replay",
-      "returns": {
-        "type": "null"
-      }
-    },
-    "replay_if_stopped": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "kind": "action",
-      "method": "POST",
-      "path": "/api/v1/player/replay-if-stopped",
       "returns": {
         "type": "null"
       }
@@ -1278,28 +1178,6 @@
       "returns": {
         "type": "null"
       }
-    },
-    "update": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "kind": "action",
-      "method": "POST",
-      "path": "/api/v1/player/update",
-      "returns": {}
-    },
-    "update_wait": {
-      "args": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "kind": "action",
-      "method": "POST",
-      "path": "/api/v1/player/update-wait",
-      "returns": {}
     }
   },
   "requires": {

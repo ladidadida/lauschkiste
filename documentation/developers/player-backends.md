@@ -1,7 +1,7 @@
 # Player Backends
 
 The `player` core module plays through a **backend**. `local_audio` is built in (PyAV decoding, PortAudio
-output); the `mpd` plugin adds an MPD server as a second one. A further backend is a plugin that registers at the
+output). A further backend is a plugin that registers at the
 extension point `player.backends`.
 
 ## Register a backend
@@ -42,7 +42,7 @@ controls (pause, next, seek, volume) go to the active one. Switching stops the p
 
 ## Library sources
 
-A catalog (an MPD database, a streaming service) is added to the library at `library.sources`, not through the
+A catalog (a streaming service) is added to the library at `library.sources`, not through the
 player. A source implements `lauschkiste.content.library.module.LibrarySource`:
 
 - `describe()` returns `{'id', 'label', 'views': [{'id', 'label', 'kind', 'content_types'}]}`; `kind: items` is a

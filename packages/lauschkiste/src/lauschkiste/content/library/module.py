@@ -26,7 +26,7 @@ DEFAULT_COVER_CACHE = 'cache/covers'
 
 
 class LibrarySource(Protocol):
-    """Further music a player backend or plugin can play (e.g. an mpd database, a streaming service)."""
+    """Further music a player backend or plugin can play (e.g. a streaming service)."""
 
     def describe(self) -> Dict[str, Any]:
         """``{'id', 'label', 'views': [{'id', 'label', 'kind': 'items'|'folders', 'content_types'}]}``"""
@@ -120,7 +120,7 @@ def _duration(value) -> Optional[float]:
 
 
 def song_from_source(provider: str, data: Dict[str, Any]) -> Song:
-    """A :class:`Song` from a source's song mapping (mpd style keys are understood)."""
+    """A :class:`Song` from a source's song mapping ."""
     def text(key):
         value = data.get(key)
         if isinstance(value, list):
@@ -164,7 +164,7 @@ class Library(CoreModule):
                                    root_provider)
         self._covers = CoverCache(str(lauschkiste.common.paths.resolve(ctx.config.get('cover_cache',
                                                                                   default=DEFAULT_COVER_CACHE))))
-        self._files = MusicLibrary(root_provider, self._refresh_all)
+        self._files = MusicLibrary(root_provider)
         self._root_provider = root_provider
         for folder in (lauschkiste.common.paths.MUSIC_DIR, lauschkiste.common.paths.AUDIOBOOKS_DIR):
             (Path(root_provider()) / folder).mkdir(parents=True, exist_ok=True)

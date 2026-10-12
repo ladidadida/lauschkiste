@@ -21,8 +21,7 @@ We recommend to use at least a Pi 3 or Pi Zero 2 for development. While this har
 
 ## Develop on local machine
 
-Lauschkiste also runs on any Linux machine. The Raspberry Pi specific stuff will not work of course. That is no issue depending our your development area. USB RFID Readers, however, will work. The built-in player (`local_audio`) needs no further software; the `mpd` plugin additionally needs a running
-[MPD](https://www.musicpd.org/).
+Lauschkiste also runs on any Linux machine. The Raspberry Pi specific stuff will not work of course. That is no issue depending our your development area. USB RFID Readers, however, will work. The built-in player (`local_audio`) needs no further software.
 
 Install the runtime and development dependencies with [uv](https://docs.astral.sh/uv/) (project
 metadata and tool config live in `pyproject.toml`):

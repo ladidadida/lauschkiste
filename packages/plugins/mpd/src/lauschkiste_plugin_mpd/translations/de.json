@@ -1,8 +1,0 @@
-{
-  "plugins": {
-    "mpd": {
-      "name": "mpd",
-      "description": "Lässt die Box einen externen MPD-Server als Player und Musikdatenbank nutzen. Nur nötig, um ein bestehendes MPD-Setup weiter zu verwenden."
-    }
-  }
-}
