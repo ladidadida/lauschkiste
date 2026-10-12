@@ -25,9 +25,14 @@ the [roadmap](roadmap-core-architecture.md).
 
 ## Planned
 
-- **Tidy up** (before further features): the code is spread over a dozen modules in few subdirectories and needs a
-  clearer structure; the documentation grew by adapting and should be rebuilt from how the system is used, for users
-  and developers alike.
+- **Tidy up** (in progress): the code is grouped by purpose and the oldest legacy is gone; the documentation grew by
+  adapting and should still be rebuilt from how the system is used, for users and developers alike.
+- **Playlists**: create, show and change playlists in the web app (a topic of its own).
+- **Card management**, thought through as a whole: more than one behaviour per card (placed, removed, placed again),
+  perhaps a card that changes what the buttons do, and how second swipe fits in. Part of it: the Toniebox way, where
+  the content plays only as long as the card is on the box. Today a place-capable reader can run one action for all
+  cards when a card is taken off (`place_not_swipe`, e.g. pause); per card, and continuing where it stopped when the
+  card comes back, it does not exist yet.
 - Playing from a phone over Bluetooth, for apps that cannot be integrated, such as the Onleihe
   ([plan](phone-audio.md)).
 - A handover to other rooms through Music Assistant (needs the same Audiobookshelf user; see the
