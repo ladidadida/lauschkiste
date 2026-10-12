@@ -41,7 +41,7 @@ section where MD010 should be ignored
 
 ### References
 
-* <https://github.com/DavidAnson/markdownlint-cli2>
-* Rules:
-  * <https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md>
-  * <https://github.com/DavidAnson/markdownlint/blob/main/README.md#rules--aliases>
+- <https://github.com/DavidAnson/markdownlint-cli2>
+- Rules:
+  - <https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md>
+  - <https://github.com/DavidAnson/markdownlint/blob/main/README.md#rules--aliases>
