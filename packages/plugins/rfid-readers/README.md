@@ -9,4 +9,4 @@ switch it on in the web app (Settings → Plugins) or with:
 lauschctl plugin enable rfid_rc522_spi   # one per driver
 ```
 
-Documentation: [for builders](https://github.com/ladidadida/lauschkiste/blob/main/documentation/builders/README.md). MIT license.
+Documentation: [guide](https://github.com/ladidadida/lauschkiste/blob/main/documentation/en/README.md). MIT license.

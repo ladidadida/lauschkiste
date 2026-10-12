@@ -8,7 +8,7 @@ class ReaderBaseClass(ABC):
     """
     Abstract Base Class for all Reader Classes to ensure common API
 
-    How to add a reader: documentation/developers/rfid/README.md
+    How to add a reader: documentation/developers/rfid-drivers.md
     """
     def __init__(self, reader_cfg_key: str, description: str, logger: logging.Logger):
         super().__init__()

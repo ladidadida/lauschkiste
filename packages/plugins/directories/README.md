@@ -12,4 +12,4 @@ lauschctl plugin enable radio_directories
 
 Every directory can be switched off in the settings. Searches go to the directories you leave on.
 
-Documentation: [for builders](https://github.com/ladidadida/lauschkiste/blob/main/documentation/builders/README.md). MIT license.
+Documentation: [guide](https://github.com/ladidadida/lauschkiste/blob/main/documentation/en/README.md). MIT license.

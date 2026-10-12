@@ -60,7 +60,7 @@ Plugins are installed next to this package and switched on in the web app or wit
 
 ## Documentation
 
-- [For builders](https://github.com/ladidadida/lauschkiste/blob/main/documentation/builders/README.md): installation, configuration, hardware
+- [Guide](https://github.com/ladidadida/lauschkiste/blob/main/documentation/en/README.md) (also in [German](https://github.com/ladidadida/lauschkiste/blob/main/documentation/de/README.md)): installation, use, hardware
 - [For developers](https://github.com/ladidadida/lauschkiste/blob/main/documentation/developers/README.md): architecture, plugins, development setup
 
 ## Origin and license

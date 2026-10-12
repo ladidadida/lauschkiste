@@ -1,3 +1,3 @@
 # RFID reader driver `rdm6300_serial`
 
-For documentation see [documentation/developers/rfid/rdm6300.md](../../../../../../documentation/developers/rfid/rdm6300.md).
+For documentation see [documentation/en/hardware/readers.md](../../../../../../documentation/en/hardware/readers.md#rdm6300-serial).

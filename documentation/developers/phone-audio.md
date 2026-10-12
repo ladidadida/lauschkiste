@@ -60,7 +60,7 @@ decoding takes on the Zero (phase 0 measures it).
 | Phone starts streaming while the box plays | the box pauses its own playback; the phone is in charge |
 | Phone stops (pause, other app, out of range) | the box stays silent; it does **not** resume by itself |
 | A card is placed while the phone streams | the phone is paused over AVRCP, the card's content plays |
-| Quiet hours or the daily limit ([time limits](../builders/time-limits.md)) | the phone is paused and its sound muted, the same rules as for everything else |
+| Quiet hours or the daily limit ([time limits](../en/using/time-limits.md)) | the phone is paused and its sound muted, the same rules as for everything else |
 | Two phones | the one that streams first keeps the box until it stops |
 
 ### In the web app

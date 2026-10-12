@@ -150,7 +150,7 @@ stays and is listed. It does not remember the state before the setup, so it cann
    - Runtime packages only: the default player needs neither ffmpeg nor mpg123; the PipeWire
      stack is installed on a Pi only (desktops bring their own sound server).
 5. **Install script**: `install.sh` (options in its header and in
-   `documentation/builders/installation.md`). Package mode: `uv tool install` of the release
+   `documentation/developers/installer.md`). Package mode: `uv tool install` of the release
    wheels (or `--wheels DIR`) with the system `python3`. Source mode: clone (or reuse) a checkout,
    `uv sync --no-dev --frozen`, web app built with npm if available, else taken from the latest
    release wheel; `~/.local/bin/lauschctl` links to the checkout's venv. `LAUSCHKISTE_HOME` (Pi:

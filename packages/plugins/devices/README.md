@@ -11,4 +11,4 @@ lauschctl plugin enable gpio_controls   # or battery, power_button, phat_beat
 
 The GPIO libraries come with the `gpio` extra: `lauschkiste-plugin-devices[gpio]` (the web app offers to install them).
 
-Documentation: [for builders](https://github.com/ladidadida/lauschkiste/blob/main/documentation/builders/README.md). MIT license.
+Documentation: [guide](https://github.com/ladidadida/lauschkiste/blob/main/documentation/en/README.md). MIT license.

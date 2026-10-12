@@ -43,7 +43,8 @@ install.sh         Installer (curl | bash): base packages, uv, Lauschkiste (rele
                    then `lauschctl setup`
 shared/            LAUSCHKISTE_HOME when running from this checkout (set it to this directory): settings, library,
                    playlists, logs, cache
-documentation/     Project docs: builders/ (end users/installers) and developers/ (contributors)
+documentation/     Project docs: en/ and de/ (the guide for users and builders, English and German, same file names) and
+                   developers/ (contributors, English only)
 test/              Python unit tests (pytest); folders mirror the code: common, box, content, player, rfid, api,
                    contract, cli, plugins
 ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.sh in a Debian
@@ -72,7 +73,7 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `GET /api/v1/modules` (active modules, their operations/events, skipped plugins) and
   `GET /api/v1/actions` (card actions with argument schemas). Card entries, card removal actions
   and the second-swipe action are stored as `action: <module>.<action>` plus named `args`
-  (`documentation/builders/actions.md`).
+  (`documentation/en/using/cards.md`).
 - **Event bus** (`lauschkiste.common.publishing.get_bus()`, a `lauschkiste.common.publishing.bus.EventBus`): thread-safe,
   in-process, last-value cached. Modules publish typed events through `ctx.publish(event,
   payload)` (validated against the event's model; raises with `LAUSCHKISTE_STRICT=1`, logs and drops
@@ -180,8 +181,8 @@ machine's normal audio output directly.
 ## Key docs to read before larger changes
 
 - `documentation/developers/core-and-plugins.md` — core/plugin contract design
-- `documentation/builders/concepts.md` — core, plugins, actions, events in one page
-- `documentation/builders/actions.md` — action format for cards and config
+- `documentation/en/maintenance/how-it-works.md` — core, plugins, actions, events in one page
+- `documentation/en/using/cards.md` — cards and the action format
 - `documentation/developers/commands.md` — the `lauschkiste` and `lauschctl` commands
 - `documentation/developers/webapp.md` — webapp dev notes
 - `documentation/developers/status.md` — what works and what is planned

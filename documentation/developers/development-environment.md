@@ -16,8 +16,8 @@ The full setup is running on the RPi and you access files via SSH.
 
 We recommend to use at least a Pi 3 or Pi Zero 2 for development. While this hardware won\'t be needed in production, it comes in helpful while developing.
 
-1. Follow the [installation preperation](../builders/installation.md#1-prepare-the-raspberry-pi) steps
-1. [Install](../builders/installation.md#where-lauschkiste-comes-from) your feature/fork branch of Lauschkiste (`install.sh --from source --repo <you>/lauschkiste --branch <branch>`).
+1. Follow the [install guide](../en/get-started/install.md) steps
+1. [Install](installer.md#where-lauschkiste-comes-from) your feature/fork branch of Lauschkiste (`install.sh --from source --repo <you>/lauschkiste --branch <branch>`).
 
 ## Develop on local machine
 
@@ -32,7 +32,7 @@ uv sync --group dev
 
 Everything runs in that virtual environment: `uv run lauschkiste` (the server), `uv run lauschctl --help`, `uv run pytest`.
 To work in it directly, `source .venv/bin/activate` (leave with `deactivate`). A box installed with `install.sh --from
-github|pypi` keeps Lauschkiste in its own environment instead (see [Installation](../builders/installation.md#uv-or-pip)).
+github|pypi` keeps Lauschkiste in its own environment instead (see [The installer](installer.md#uv-or-pip)).
 
 You start the Lauschkiste core application and the Web App development server separately (see [Web App](./webapp.md)).
 

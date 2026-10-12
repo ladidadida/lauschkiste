@@ -14,4 +14,4 @@ lauschctl plugin enable audiobookshelf
 
 Enter the server address and an API key (Audiobookshelf: Settings → API Keys) in its settings.
 
-Documentation: [for builders](https://github.com/ladidadida/lauschkiste/blob/main/documentation/builders/README.md). MIT license.
+Documentation: [guide](https://github.com/ladidadida/lauschkiste/blob/main/documentation/en/README.md). MIT license.

@@ -2,6 +2,16 @@
 
 We use markdown for documentation. Please add/update documentation in `documentation`.
 
+## Where what goes
+
+- `documentation/en` and `documentation/de` are the guide for people who build and use a Lauschkiste. It is arranged the
+  way a newcomer meets it: `get-started` (what you need, install, first card), `what-next.md`, `using`, `hardware` and
+  `maintenance`. Both languages have the same files with the same names; **change both when you change one**, and keep
+  the order and the headings parallel so that links work in both. The German text addresses the reader with "du".
+- `documentation/developers` is for contributors and is English only.
+- Use the names the web app shows for its buttons and settings (see `packages/webapp/public/locales`), and keep the
+  steps for beginners free of jargon: say what to type, and what to expect when it worked.
+
 ## Linting
 
 To ensure a consistent documentation we lint markdown files.

@@ -1,28 +1,19 @@
-# Lauschkiste documentation
+# Lauschkiste documentation / Dokumentation
 
 Lauschkiste is an RFID audio player for kids. It is made for the Raspberry Pi and runs on any Linux computer. It grew out of
 [Phoniebox](https://github.com/MiczFlor/RPi-Jukebox-RFID) (see [phoniebox.de](https://phoniebox.de/)).
 
-## Quickstart
+Lauschkiste ist ein RFID-Audioplayer für Kinder. Er ist für den Raspberry Pi gemacht und läuft auf jedem Linux-Computer.
 
-* For builders: building a Lauschkiste
-  * [Installation](./builders/installation.md)
-  * [Builder guides](./builders/README.md)
-  * [Update](./builders/update.md)
-* For developers: add features or fix bugs
-  * [Developer guides](./developers/README.md)
-  * [Feature status](./developers/status.md)
+## Choose your language / Sprache wählen
 
-## How it is built
+* **English**: [the guide](./en/README.md): get started, use, hardware, maintenance
+* **Deutsch**: [die Anleitung](./de/README.md): Einstieg, Benutzen, Hardware, Pflege
 
-* One Python application: core modules (player, library, volume, cards, RFID, timers, ...) and
-  plugins (RFID reader drivers, Raspberry Pi hardware, Samba, ...) on a common contract
-  ([core and plugins](./developers/core-and-plugins.md))
-* A typed REST API and a WebSocket event stream (FastAPI) for the web app; card actions and
-  REST routes come from the same declarations
-* Installable as a package (`install.sh`, `lauschctl setup`, `lauschctl update`) or run from a
-  source checkout ([packaging and setup](./developers/packaging-and-setup.md))
-* How it came about: [design record of the core architecture](./developers/roadmap-core-architecture.md) (historical)
+## For developers
+
+The [developer documentation](./developers/README.md) (English) covers the architecture, plugins, the API, tests and releases.
+The [feature status](./developers/status.md) shows what exists and what is planned.
 
 ## Help wanted
 

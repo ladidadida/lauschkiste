@@ -39,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install
 ```
 
 Then set up the machine with `lauschctl setup` and open `http://<your-pi>` (on other machines `http://<host>:5556`).
-Details: [Installation](documentation/builders/installation.md).
+Details: [Install](documentation/en/get-started/install.md) ([Deutsch](documentation/de/get-started/install.md)).
 
 ```bash
 lauschctl setup --check    # what is set up on this machine
@@ -49,7 +49,7 @@ lauschctl update           # newer version
 
 ## Documentation
 
-- [For builders](documentation/builders/README.md): installation, configuration, hardware
+- [Guide](documentation/en/README.md) ([Deutsch](documentation/de/README.md)): installation, use, hardware, maintenance
 - [For developers](documentation/developers/README.md): architecture, plugins, development setup
 
 ## Origin

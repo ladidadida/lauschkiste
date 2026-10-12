@@ -7,8 +7,8 @@ Lauschkiste has two commands (`packages/cli`). In a source checkout run them wit
 
 Starts the core, the plugins and the web app. On a box it runs as a user service that starts at boot
 (`systemctl --user restart lauschkiste` after a configuration change; not every setting is applied on the fly, see
-[Configuration](../builders/configuration.md)). For debugging, stop the service and start `lauschkiste` in a console:
-the log goes there and `-v`/`-vv` raise the log level ([Troubleshooting](../builders/troubleshooting.md)).
+[Settings and files](../en/maintenance/configuration.md)). For debugging, stop the service and start `lauschkiste` in a console:
+the log goes there and `-v`/`-vv` raise the log level ([Troubleshooting](../en/maintenance/troubleshooting.md)).
 
 `--conf FILE` starts it with a different configuration file, `--home DIR` with another home (see `lauschctl home`).
 
@@ -24,8 +24,8 @@ the log goes there and `-v`/`-vv` raise the log level ([Troubleshooting](../buil
 | `lauschctl home` | prints the home directory and the configuration file in use |
 | `lauschctl debug sniff` | prints the events of the running server (see below) |
 
-Setup steps worth knowing: `audio` chooses the audio outputs ([Audio](../builders/audio.md)), `rfid` configures
-the RFID readers and enables their driver plugins ([RFID readers](./rfid/README.md); it writes a new reader
+Setup steps worth knowing: `audio` chooses the audio outputs ([Sound](../en/using/sound.md)), `rfid` configures
+the RFID readers and enables their driver plugins ([RFID readers](../en/hardware/readers.md); it writes a new reader
 configuration after asking), `hardware` asks for the connected hardware.
 
 ## The API

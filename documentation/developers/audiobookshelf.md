@@ -3,7 +3,7 @@
 The plugin `audiobookshelf` (package `lauschkiste-plugin-audiobookshelf`) shows the books of an
 [Audiobookshelf](https://www.audiobookshelf.org) (ABS) server in the Audiobooks tab next to the local ones and
 shares the listening position with the ABS apps: a book started on the phone continues on the box and the other way
-round. Setup and use for builders: [Audiobooks](../builders/audiobooks.md#audiobookshelf).
+round. Setup and use for builders: [Audiobooks](../en/using/audiobooks.md#audiobookshelf).
 
 Not supported: chapters inside one file (an m4b book is one chapter for next/previous), a "test connection" button,
 several servers, ABS podcasts.
