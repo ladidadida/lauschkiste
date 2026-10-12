@@ -29,6 +29,7 @@ import lauschkiste.common.cfghandler
 from lauschkiste.common.periodic import PeriodicThread
 import lauschkiste.content.playlistgenerator as playlistgenerator
 
+from lauschkiste.player.backends.prefetch import Prefetch
 from lauschkiste.player.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_gain, volume_gain
 from lauschkiste.common.statefile import StateDict
 
@@ -36,6 +37,11 @@ logger = logging.getLogger('lauschkiste.PlayerLocalAudio')
 cfg = lauschkiste.common.cfghandler.get_handler('lauschkiste')
 
 STREAM_TIMEOUT = (10.0, 30.0)
+STREAM_ATTEMPTS = 3
+RETRY_PAUSE = 1.5
+PREFETCH_SECONDS = 8.0
+PREROLL_SECONDS = 2.0
+PREROLL_TIMEOUT = 5.0
 
 
 def ca_file():
@@ -135,12 +141,24 @@ class PlayerLocalAudio:
     def _decode_track(self, path: str, start_position: float) -> bool:
         """Decode+play `path` from `start_position`. Returns True if it ran to completion (or
         failed to decode at all -- either way, the caller should move on), False if `_abort`
-        interrupted it early."""
+        interrupted it early. A network stream that fails to open or breaks is tried again."""
+        attempts = STREAM_ATTEMPTS if '://' in path else 1
+        for attempt in range(attempts):
+            outcome = self._play_once(path, start_position)
+            if outcome != 'failed':
+                return outcome == 'ended'
+            if attempt + 1 < attempts and self._abort.wait(RETRY_PAUSE):
+                return False
+        return True
+
+    def _play_once(self, path: str, start_position: float) -> str:
+        """One try to play `path`: 'ended', 'aborted' or 'failed'."""
         logger.info(f"Playing '{path}' from {start_position:.3f}s")
         self._stream_metadata = {}
+        is_stream = '://' in path
         try:
             import av
-            if '://' in path:
+            if is_stream:
                 url, headers = self._resolve(path)
                 options = dict(STREAM_OPTIONS)
                 if url.startswith('https://'):
@@ -153,18 +171,20 @@ class PlayerLocalAudio:
                 container = av.open(path)
         except Exception as e:
             logger.error(f"Could not open '{path}': {e.__class__.__name__}: {e}")
-            return True
+            return 'failed' if is_stream else 'ended'
         self._duration = container.duration / 1_000_000 if container.duration else None
+        live = is_stream and self._duration is None and not self._ordered
         try:
-            try:
-                return self._decode_loop(container, start_position)
-            except Exception as e:
-                # A single bad/corrupt file must not take down the whole playback worker --
-                # treat it as "ended" so the queue moves on to the next track.
-                logger.error(f"Error decoding '{path}', skipping: {e.__class__.__name__}: {e}")
-                return True
+            completed = self._decode_loop(container, start_position, is_stream)
+        except Exception as e:
+            logger.error(f"Error decoding '{path}', skipping: {e.__class__.__name__}: {e}")
+            return 'failed' if is_stream else 'ended'
         finally:
-            container.close()
+            if not is_stream:
+                container.close()
+        if not completed:
+            return 'aborted'
+        return 'failed' if live else 'ended'
 
     def _effective_speed(self) -> float:
         return self._speed if self._ordered else 1.0
@@ -203,29 +223,55 @@ class PlayerLocalAudio:
                 self._position += oframe.samples / SAMPLE_RATE * speed
         return True
 
-    def _decode_loop(self, container, start_position: float) -> bool:
-        from av.audio.resampler import AudioResampler
-        stream = container.streams.audio[0]
-        resampler = AudioResampler(format='s16', layout='stereo', rate=SAMPLE_RATE)
-        speed = self._effective_speed()
-        graph = self._tempo_filter(speed) if abs(speed - 1.0) > 0.01 else None
-        if start_position:
-            try:
-                container.seek(int(start_position * 1_000_000), backward=True)
-            except Exception as e:
-                logger.warning(f"Seek to {start_position:.3f}s failed, starting from the top: {e}")
-        self._sink.open(SAMPLE_RATE, CHANNELS)
-        is_stream = '://' in (container.name or '')
+    def _frames(self, container, start_position: float, is_stream: bool):
+        """The decoded frames of the container, and the reader thread that fetches them ahead (network streams)."""
         try:
-            for count, frame in enumerate(container.decode(stream)):
+            stream = container.streams.audio[0]
+            if start_position and (self._duration or not is_stream):
+                try:
+                    container.seek(int(start_position * 1_000_000), backward=True)
+                except Exception as e:
+                    logger.warning(f"Seek to {start_position:.3f}s failed, starting from the top: {e}")
+            frames = container.decode(stream)
+        except BaseException:
+            if is_stream:
+                container.close()
+            raise
+        if not is_stream:
+            return frames, None
+
+        def metadata(count):
+            if count % 50 == 0:
+                self._stream_metadata = dict(container.metadata)
+
+        prefetch = Prefetch(frames, PREFETCH_SECONDS, on_close=container.close, on_item=metadata).start()
+        prefetch.wait_ready(PREROLL_SECONDS, PREROLL_TIMEOUT, self._abort.is_set)
+        return prefetch, prefetch
+
+    def _decode_loop(self, container, start_position: float, is_stream: bool = False) -> bool:
+        """True if the track ran to its end, False if aborted. A network stream is read ahead on its own
+        thread, which closes the container when it is done."""
+        from av.audio.resampler import AudioResampler
+        frames, prefetch = self._frames(container, start_position, is_stream)
+        try:
+            resampler = AudioResampler(format='s16', layout='stereo', rate=SAMPLE_RATE)
+            speed = self._effective_speed()
+            graph = self._tempo_filter(speed) if abs(speed - 1.0) > 0.01 else None
+            self._sink.open(SAMPLE_RATE, CHANNELS)
+        except BaseException:
+            if prefetch is not None:
+                prefetch.stop()
+            raise
+        try:
+            for frame in frames:
                 if self._abort.is_set():
                     return False
-                if is_stream and count % 50 == 0:
-                    self._stream_metadata = dict(container.metadata)
                 if not self._output(resampler.resample(frame), speed, graph):
                     return False
             return True
         finally:
+            if prefetch is not None:
+                prefetch.stop()
             dropped = self._sink.close(discard=self._abort.is_set())
             if dropped:
                 with self._cv:
