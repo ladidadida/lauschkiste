@@ -9,6 +9,8 @@ library/
 └── audiobooks/   ein Ordner pro Hörbuch
 ```
 
+<img src="../../assets/screenshots/de/library.png" alt="Die Bibliothek: Alben" width="260">
+
 ## Dateien auf die Box bringen
 
 Egal wie: Jedes Album kommt in einen eigenen Ordner unter `music`, jedes Hörbuch in einen eigenen Ordner unter

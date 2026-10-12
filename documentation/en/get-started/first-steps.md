@@ -11,6 +11,8 @@ The box is running. Now it gets music and a card.
 Audiobooks go the same way: Library → **Audiobooks** → Folders → Upload, one folder per book. The files of a book are
 its chapters and play in the order of their names (`2.mp3` comes before `10.mp3`).
 
+<img src="../../assets/screenshots/en/upload.png" alt="Library, Music, Folders with the Upload button" width="260">
+
 The library notices the new files by itself after a few seconds. More about it in [Music and the library](../using/music.md).
 
 ## 2. Play it
@@ -18,6 +20,8 @@ The library notices the new files by itself after a few seconds. More about it i
 Tap the album or book. The player on the **Start** page shows what plays. Tap play, change the volume with the slider.
 If you hear nothing, check that the speakers are on and the volume is up; then see
 [Sound and Bluetooth](../using/sound.md).
+
+<img src="../../assets/screenshots/en/player.png" alt="The player with the card button" width="260">
 
 ## 3. Put it on a card
 

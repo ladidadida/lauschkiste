@@ -9,6 +9,8 @@ library/
 └── audiobooks/   one folder per audiobook
 ```
 
+<img src="../../assets/screenshots/en/library.png" alt="The library: albums" width="260">
+
 ## Getting files onto the box
 
 Whatever you use, each album goes into its own folder below `music` and each audiobook into its own folder below

@@ -11,6 +11,8 @@ Die Box läuft. Jetzt bekommt sie Musik und eine Karte.
 Hörbücher gehen genauso: Bibliothek → **Hörbücher** → Ordner → Hochladen, ein Ordner pro Buch. Die Dateien eines Buchs sind
 seine Kapitel und werden in der Reihenfolge ihrer Namen gespielt (`2.mp3` kommt vor `10.mp3`).
 
+<img src="../../assets/screenshots/de/upload.png" alt="Bibliothek, Musik, Ordner mit dem Knopf Hochladen" width="260">
+
 Die Bibliothek bemerkt die neuen Dateien nach wenigen Sekunden von selbst. Mehr dazu unter
 [Musik und Bibliothek](../using/music.md).
 
@@ -19,6 +21,8 @@ Die Bibliothek bemerkt die neuen Dateien nach wenigen Sekunden von selbst. Mehr 
 Tippe auf das Album oder Buch. Der Player auf der **Start**-Seite zeigt, was läuft. Tippe auf Play und stell die
 Lautstärke mit dem Regler ein. Hörst du nichts, prüfe, ob die Lautsprecher an sind und die Lautstärke hoch ist; dann
 siehe [Ton und Bluetooth](../using/sound.md).
+
+<img src="../../assets/screenshots/de/player.png" alt="Der Player mit dem Karten-Symbol" width="260">
 
 ## 3. Auf eine Karte legen
 

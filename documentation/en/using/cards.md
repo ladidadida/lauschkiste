@@ -11,6 +11,8 @@ Cards are registered in the web page and need no editing of files.
 
 While you register, a card that is already in use does not start playing.
 
+<img src="../../assets/screenshots/en/cards.png" alt="The card list" width="260">
+
 ## What a card can do
 
 | Action | What happens |

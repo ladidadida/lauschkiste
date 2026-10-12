@@ -11,6 +11,8 @@ Box ausschalten. Karten werden auf der Webseite registriert; du musst keine Date
 
 Während du registrierst, startet eine Karte, die schon belegt ist, nicht.
 
+<img src="../../assets/screenshots/de/cards.png" alt="Die Kartenliste" width="260">
+
 ## Was eine Karte kann
 
 | Aktion | Was passiert |
