@@ -10,7 +10,7 @@ sodass kein Handy nötig ist. Es ist dieselbe Webseite im Vollbild. Eine reduzie
 lauschctl setup kiosk
 ```
 
-(oder in `lauschctl setup` die Frage „Show the web app full-screen on an attached display“ mit *ja* beantworten). Der Schritt
+(oder in `lauschctl setup` die Frage „Show the web app full-screen on an attached display after boot?“ („Die Webseite nach dem Hochfahren im Vollbild auf einem angeschlossenen Bildschirm zeigen?“) mit *ja* beantworten). Der Schritt
 installiert eine minimale Grafikumgebung (X-Server, den Fenstermanager openbox und den Browser Chromium, keinen vollen
 Desktop), meldet sich auf der ersten Konsole selbst an und startet nach dem Hochfahren den Browser im Vollbild. Starte die
 Box neu. Ein Raspberry Pi 3 oder besser wird empfohlen; auf einer Zero ist ein Browser langsam.
@@ -27,9 +27,6 @@ steuern darf, etwa dem offiziellen Raspberry-Pi-Touch-Display. Die meisten HDMI-
 
 Eine aufgelegte Karte, ein Knopf oder eine Taste (siehe [Tasten](buttons.md)) weckt den Bildschirm ebenfalls. Soll er
 nicht dunkel werden, solange Musik spielt, schalte an derselben Stelle *Keep the screen on while music plays* ein.
-
-Eine aufgelegte Karte, ein Knopf oder eine Taste weckt den Bildschirm ebenfalls. Soll er nicht dunkel werden, solange
-Musik spielt, schalte an derselben Stelle *Keep the screen on while music plays* ein.
 
 Die Aktionen `display.sleep` und `display.wake` schalten den Bildschirm aus und ein, zum Beispiel von einer Karte oder
 einer Taste aus.

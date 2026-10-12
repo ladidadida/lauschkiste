@@ -50,20 +50,20 @@ lauschctl setup
 nicht sicher, nimm ihn: Du kannst `lauschctl setup` jederzeit noch einmal starten, um etwas zu ändern. Ist deine
 Verbindung wackelig, starte es in `screen` oder `tmux`.
 
-| Frage | Antwort |
-| --- | --- |
-| Upgrade all operating system packages now | *Nein* reicht für den Anfang. |
-| Which sound card sits on the header | Hast du eine Soundkarte auf den Pi gesteckt, wähle sie (HiFiBerry-Platinen werden erkannt). Sonst *none*. |
-| Is a pHAT BEAT, power button or battery monitor attached | *Nein*, außer du hast sie. |
-| Start Lauschkiste at boot, without anyone logging in | *Ja*. Dann startet die Box von selbst, sobald du den Strom anschließt. |
-| Serve the web app on port 80 | *Ja*. Die Adresse ist dann einfach `http://<name>.local`. |
-| Configure an RFID reader now | *Ja*, und wähle deinen Leser. Ein USB-Leser ist am einfachsten, siehe [RFID-Leser](../hardware/readers.md). |
-| Share the library on the network via Samba | *Nein* fürs Erste. Musik kannst du auch auf der Webseite hochladen, siehe [Musik](../using/music.md). |
-| Show the web app on an attached display | *Nein*, außer du hast einen Bildschirm angeschlossen: [Ein Bildschirm an der Box](../hardware/screen.md). |
-| WiFi hotspot when no known WiFi is in range | *Nein* fürs Erste: [Unterwegs](../using/wifi-hotspot.md). |
-| Quiet boot | *Nein*. Es blendet nur Startmeldungen aus. |
+| Frage | Auf Deutsch | Antwort |
+| --- | --- | --- |
+| Upgrade all operating system packages now (takes a while)? | Alle Pakete des Betriebssystems jetzt aktualisieren (dauert eine Weile)? | *Nein* reicht für den Anfang. |
+| Which sound card sits on the header? | Welche Soundkarte steckt auf der Stiftleiste? | Hast du eine Soundkarte auf den Pi gesteckt, wähle sie (HiFiBerry-Platinen werden erkannt). Sonst *none*. |
+| Is a power button attached (Pimoroni OnOff SHIM)? | Ist ein Ein-/Aus-Knopf angeschlossen (Pimoroni OnOff SHIM)? | *Nein*, außer du hast ihn. Entsprechend bei *Is a battery monitor attached?* („Ist ein Batteriewächter angeschlossen?“) und *Is a Pimoroni pHAT BEAT (Pirate Radio) attached?*. |
+| Start Lauschkiste at boot, without anyone logging in? | Lauschkiste beim Hochfahren starten, ohne dass sich jemand anmeldet? | *Ja*. Dann startet die Box von selbst, sobald du den Strom anschließt. |
+| Serve the web app on port 80, so its address needs no ":5556"? | Die Webseite auf Port 80 anbieten, damit die Adresse kein „:5556“ braucht? | *Ja*. Die Adresse ist dann einfach `http://<name>.local`. |
+| Configure an RFID reader now? | Jetzt einen RFID-Leser einrichten? | *Ja*, und wähle deinen Leser. Ein USB-Leser ist am einfachsten, siehe [RFID-Leser](../hardware/readers.md). |
+| Share the library (music and audiobooks) on the network via Samba (Windows/macOS file sharing)? | Die Bibliothek (Musik und Hörbücher) über Samba im Netzwerk freigeben (Windows-/macOS-Dateifreigabe)? | *Nein* fürs Erste. Musik kannst du auch auf der Webseite hochladen, siehe [Musik](../using/music.md). |
+| Show the web app full-screen on an attached display after boot? | Die Webseite nach dem Hochfahren im Vollbild auf einem angeschlossenen Bildschirm zeigen? | *Nein*, außer du hast einen Bildschirm angeschlossen: [Ein Bildschirm an der Box](../hardware/screen.md). |
+| Open a WiFi hotspot when no known WiFi is in range? | Einen WLAN-Hotspot öffnen, wenn kein bekanntes WLAN in Reichweite ist? | *Nein* fürs Erste: [Unterwegs](../using/wifi-hotspot.md). |
+| Make the boot quiet (no boot messages or logo, a few first-boot services off)? | Den Start leise machen (keine Startmeldungen oder Logo, einige Dienste des ersten Starts aus)? | *Nein*. Es blendet nur Startmeldungen aus. |
 
-Die Fragen erscheinen auf Englisch. Einige Schritte ändern die Startkonfiguration. Am Ende sagt dir `lauschctl setup`, ob
+Die Fragen erscheinen auf Englisch; die deutsche Übersetzung steht daneben. Einige Schritte ändern die Startkonfiguration. Am Ende sagt dir `lauschctl setup`, ob
 ein Neustart nötig ist:
 
 ```bash

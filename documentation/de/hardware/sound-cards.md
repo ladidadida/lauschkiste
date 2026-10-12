@@ -6,7 +6,7 @@ USB-Lautsprecher oder ein Bluetooth-Lautsprecher braucht nichts davon: siehe [To
 
 Alle Soundkarten richtest du gleich ein:
 
-1. Wähle die Karte bei der Frage *Which sound card sits on the header?* in `lauschctl setup` oder später mit
+1. Wähle die Karte bei der Frage *Which sound card sits on the header?* („Welche Soundkarte steckt auf der Stiftleiste?“) in `lauschctl setup` oder später mit
    `lauschctl setup hardware`. HiFiBerry-Platinen, die sich selbst melden (über das HAT-EEPROM), werden erkannt und
    vorgewählt.
 2. `lauschctl setup raspi` schreibt die passende Zeile (`dtoverlay=...`) in `/boot/firmware/config.txt`, schaltet das eigene
