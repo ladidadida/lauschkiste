@@ -8,4 +8,4 @@ This package is a dependency, not something to install on its own. Install
 `lauschctl` commands. The Python module is `lauschkiste`; versions of all Lauschkiste packages
 match exactly.
 
-Documentation: [for developers](https://github.com/ladidadida/lauschkiste/blob/main/documentation/developers/README.md). MIT license.
+Documentation: [guide](https://ladidadida.github.io/lauschkiste/en/) (also in [German](https://ladidadida.github.io/lauschkiste/de/)), [for developers](https://ladidadida.github.io/lauschkiste/en/developers/). MIT license.
