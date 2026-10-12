@@ -48,6 +48,10 @@
   * [get\_config\_action](#lauschkiste.common.utils.get_config_action)
   * [get\_git\_state](#lauschkiste.common.utils.get_git_state)
 * [lauschkiste.common.periodic](#lauschkiste.common.periodic)
+* [lauschkiste.common.simplecolors](#lauschkiste.common.simplecolors)
+  * [Colors](#lauschkiste.common.simplecolors.Colors)
+  * [resolve](#lauschkiste.common.simplecolors.resolve)
+  * [print](#lauschkiste.common.simplecolors.print)
 * [lauschkiste.common.publishing.bus](#lauschkiste.common.publishing.bus)
   * [EventBus](#lauschkiste.common.publishing.bus.EventBus)
     * [publish](#lauschkiste.common.publishing.bus.EventBus.publish)
@@ -83,20 +87,11 @@
   * [resolve](#lauschkiste.common.paths.resolve)
   * [library\_dir](#lauschkiste.common.paths.library_dir)
   * [resource](#lauschkiste.common.paths.resource)
-* [lauschkiste.common.misc.simplecolors](#lauschkiste.common.misc.simplecolors)
-  * [Colors](#lauschkiste.common.misc.simplecolors.Colors)
-  * [resolve](#lauschkiste.common.misc.simplecolors.resolve)
-  * [print](#lauschkiste.common.misc.simplecolors.print)
-* [lauschkiste.common.misc](#lauschkiste.common.misc)
-  * [recursive\_chmod](#lauschkiste.common.misc.recursive_chmod)
-* [lauschkiste.common.misc.inputminus](#lauschkiste.common.misc.inputminus)
-  * [input\_int](#lauschkiste.common.misc.inputminus.input_int)
-  * [input\_yesno](#lauschkiste.common.misc.inputminus.input_yesno)
-* [lauschkiste.common.misc.loggingext](#lauschkiste.common.misc.loggingext)
-  * [ColorFilter](#lauschkiste.common.misc.loggingext.ColorFilter)
-    * [\_\_init\_\_](#lauschkiste.common.misc.loggingext.ColorFilter.__init__)
-  * [PubStream](#lauschkiste.common.misc.loggingext.PubStream)
-  * [PubStreamHandler](#lauschkiste.common.misc.loggingext.PubStreamHandler)
+* [lauschkiste.common.loggingext](#lauschkiste.common.loggingext)
+  * [ColorFilter](#lauschkiste.common.loggingext.ColorFilter)
+    * [\_\_init\_\_](#lauschkiste.common.loggingext.ColorFilter.__init__)
+  * [PubStream](#lauschkiste.common.loggingext.PubStream)
+  * [PubStreamHandler](#lauschkiste.common.loggingext.PubStreamHandler)
 * [lauschkiste.core\_modules](#lauschkiste.core_modules)
 * [lauschkiste.daemon](#lauschkiste.daemon)
   * [DEFAULT\_CONFIG\_TEMPLATE](#lauschkiste.daemon.DEFAULT_CONFIG_TEMPLATE)
@@ -1012,6 +1007,63 @@ Git state of the checkout Lauschkiste runs from, or a note that it isn't one (pa
 A function called at a fixed interval from a thread of its own.
 
 
+<a id="lauschkiste.common.simplecolors"></a>
+
+# lauschkiste.common.simplecolors
+
+Zero 3rd-party dependency module to add colors to unix terminal output
+
+Yes, there are modules out there to do the same and they have more features.
+However, this is low-complexity and has zero dependencies
+
+
+<a id="lauschkiste.common.simplecolors.Colors"></a>
+
+## Colors Objects
+
+```python
+class Colors()
+```
+
+Container class for all the colors as constants
+
+
+<a id="lauschkiste.common.simplecolors.resolve"></a>
+
+#### resolve
+
+```python
+def resolve(color_name: str)
+```
+
+Resolve a color name into the respective color constant
+
+**Arguments**:
+
+- `color_name`: Name of the color
+
+**Returns**:
+
+color constant
+
+<a id="lauschkiste.common.simplecolors.print"></a>
+
+#### print
+
+```python
+def print(color: Colors,
+          *values,
+          sep=' ',
+          end='\n',
+          file=sys.stdout,
+          flush=False)
+```
+
+Drop-in replacement for print with color choice and auto color reset for convenience
+
+Use just as a regular print function, but with first parameter as color
+
+
 <a id="lauschkiste.common.publishing.bus"></a>
 
 # lauschkiste.common.publishing.bus
@@ -1494,150 +1546,9 @@ def resource(*parts: str) -> Path
 A file shipped with the package (default settings, sounds, service templates).
 
 
-<a id="lauschkiste.common.misc.simplecolors"></a>
+<a id="lauschkiste.common.loggingext"></a>
 
-# lauschkiste.common.misc.simplecolors
-
-Zero 3rd-party dependency module to add colors to unix terminal output
-
-Yes, there are modules out there to do the same and they have more features.
-However, this is low-complexity and has zero dependencies
-
-
-<a id="lauschkiste.common.misc.simplecolors.Colors"></a>
-
-## Colors Objects
-
-```python
-class Colors()
-```
-
-Container class for all the colors as constants
-
-
-<a id="lauschkiste.common.misc.simplecolors.resolve"></a>
-
-#### resolve
-
-```python
-def resolve(color_name: str)
-```
-
-Resolve a color name into the respective color constant
-
-**Arguments**:
-
-- `color_name`: Name of the color
-
-**Returns**:
-
-color constant
-
-<a id="lauschkiste.common.misc.simplecolors.print"></a>
-
-#### print
-
-```python
-def print(color: Colors,
-          *values,
-          sep=' ',
-          end='\n',
-          file=sys.stdout,
-          flush=False)
-```
-
-Drop-in replacement for print with color choice and auto color reset for convenience
-
-Use just as a regular print function, but with first parameter as color
-
-
-<a id="lauschkiste.common.misc"></a>
-
-# lauschkiste.common.misc
-
-<a id="lauschkiste.common.misc.recursive_chmod"></a>
-
-#### recursive\_chmod
-
-```python
-def recursive_chmod(path, mode_files, mode_dirs)
-```
-
-Recursively change folder and file permissions
-
-mode_files/mode dirs can be given in octal notation e.g. 0o777
-flags from the stats module.
-
-Reference: https://docs.python.org/3/library/os.html#os.chmod
-
-
-<a id="lauschkiste.common.misc.inputminus"></a>
-
-# lauschkiste.common.misc.inputminus
-
-Zero 3rd-party dependency module for user prompting
-
-Yes, there are modules out there to do the same and they have more features.
-However, this is low-complexity and has zero dependencies
-
-
-<a id="lauschkiste.common.misc.inputminus.input_int"></a>
-
-#### input\_int
-
-```python
-def input_int(prompt,
-              blank=None,
-              min=None,
-              max=None,
-              prompt_color=None,
-              prompt_hint=False) -> int
-```
-
-Request an integer input from user
-
-**Arguments**:
-
-- `prompt`: The prompt to display
-- `blank`: Value to return when user just hits enter. Leave at None, if blank is invalid
-- `min`: Minimum valid integer value (None disables this check)
-- `max`: Maximum valid integer value (None disables this check)
-- `prompt_color`: Color of the prompt. Color will be reset at end of prompt
-- `prompt_hint`: Append a 'hint' with [min...max, default=xx] to end of prompt
-
-**Returns**:
-
-integer value read from user input
-
-<a id="lauschkiste.common.misc.inputminus.input_yesno"></a>
-
-#### input\_yesno
-
-```python
-def input_yesno(prompt,
-                blank=None,
-                prompt_color=None,
-                prompt_hint=False) -> bool
-```
-
-Request a yes / no choice from user
-
-Accepts multiple input for true/false and is case insensitive
-
-**Arguments**:
-
-- `prompt`: The prompt to display
-- `blank`: Value to return when user just hits enter. Leave at None, if blank is invalid
-- `prompt_color`: Color of the prompt. Color will be reset at end of prompt
-- `prompt_hint`: Append a 'hint' with [y/n] to end of prompt. Default choice will be capitalized
-
-**Returns**:
-
-boolean value read from user input
-
-<a id="lauschkiste.common.misc.loggingext"></a>
-
-# lauschkiste.common.misc.loggingext
+# lauschkiste.common.loggingext
 
 ## Logger
 
@@ -1671,7 +1582,7 @@ Example: YAML snippet, setting WARNING as default level everywhere and DEBUG for
 > There can be multiple loggers per module, e.g. for special classes, to further control the amount of log output
 
 
-<a id="lauschkiste.common.misc.loggingext.ColorFilter"></a>
+<a id="lauschkiste.common.loggingext.ColorFilter"></a>
 
 ## ColorFilter Objects
 
@@ -1690,7 +1601,7 @@ for the levelname depending on severity.
 Don't forget to {reset} the color settings at the end of the string.
 
 
-<a id="lauschkiste.common.misc.loggingext.ColorFilter.__init__"></a>
+<a id="lauschkiste.common.loggingext.ColorFilter.__init__"></a>
 
 #### \_\_init\_\_
 
@@ -1703,7 +1614,7 @@ def __init__(enable=True, color_levelname=True)
 - `enable`: Enable the coloring
 - `color_levelname`: Enable auto-coloring when using the levelname keyword
 
-<a id="lauschkiste.common.misc.loggingext.PubStream"></a>
+<a id="lauschkiste.common.loggingext.PubStream"></a>
 
 ## PubStream Objects
 
@@ -1729,7 +1640,7 @@ to the Publisher.
 > functions in the send-function stack!
 
 
-<a id="lauschkiste.common.misc.loggingext.PubStreamHandler"></a>
+<a id="lauschkiste.common.loggingext.PubStreamHandler"></a>
 
 ## PubStreamHandler Objects
 
@@ -2187,7 +2098,7 @@ Version information, log files and web app settings.
 
 #### log
 
-Published by lauschkiste.common.misc.loggingext.PubStreamHandler when configured in logger.yaml
+Published by lauschkiste.common.loggingext.PubStreamHandler when configured in logger.yaml
 
 
 <a id="lauschkiste.box.system.System.get_info"></a>

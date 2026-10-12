@@ -23,7 +23,7 @@ class EventBus:
         self._cache: Dict[str, Any] = {}
         self._subscribers: set = set()
         # Re-entrancy guard: a subscriber callback failing and logging that failure could, if a
-        # log handler routes through this very bus (see misc/loggingext.py's PubStreamHandler),
+        # log handler routes through this very bus (see common/loggingext.py's PubStreamHandler),
         # call publish() again from within publish(). Cap it at one level instead of recursing.
         self._local = threading.local()
 

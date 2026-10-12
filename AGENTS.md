@@ -21,7 +21,7 @@ packages/          uv workspace members
                      contract/  the core/plugin framework (modules, operations, plugins, snapshots)
                      api/       FastAPI bridge: routes from operations, WebSocket events, web app files
                      common/    foundations used by everything: cfghandler (settings), paths, statefile,
-                                publishing (event bus), periodic (interval threads), misc, utils
+                                publishing (event bus), periodic (interval threads), loggingext, simplecolors, utils
                      player/    the player module and its backends, plus volume, audio_output and jingle
                      content/   what is played: library, audiobooks, podcasts/ and radio/ (module, models, feed or
                                 playlist, OPML), directories, cache, resume (continue lists), playlistgenerator

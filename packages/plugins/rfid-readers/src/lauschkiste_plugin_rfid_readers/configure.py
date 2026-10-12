@@ -6,8 +6,8 @@ import subprocess
 import sys
 
 import lauschkiste.common.cfghandler
-from lauschkiste.common.misc.simplecolors import Colors
-import lauschkiste.common.misc.inputminus as pyil
+from lauschkiste.common.simplecolors import Colors
+import lauschkiste_plugin_rfid_readers.inputminus as pyil
 
 
 logger = logging.getLogger()

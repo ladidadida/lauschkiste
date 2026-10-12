@@ -105,7 +105,7 @@ def test_subscriber_error_is_logged_not_raised(caplog):
 
 def test_subscriber_error_via_log_handler_does_not_recurse_forever():
     """Reproduces the real hazard: a log handler that republishes ERROR-level records through
-    this very bus (see misc/loggingext.py's PubStreamHandler), triggered by the bus's own
+    this very bus (see common/loggingext.py's PubStreamHandler), triggered by the bus's own
     "subscriber callback failed" error log. Without the depth guard, this recurses forever:
     subscriber fails -> bus logs it -> handler republishes -> subscriber fails -> ..."""
     bus = EventBus()

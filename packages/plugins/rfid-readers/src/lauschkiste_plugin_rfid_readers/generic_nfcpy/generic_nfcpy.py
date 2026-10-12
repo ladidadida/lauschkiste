@@ -9,8 +9,8 @@ import nfc.clf.device
 # Import the ReaderBaseClass for common API. Leave as this line as it is!
 from lauschkiste.rfid import ReaderBaseClass
 import lauschkiste.common.cfghandler
-import lauschkiste.common.misc.inputminus as pyil
-from lauschkiste.common.misc.simplecolors import Colors
+import lauschkiste_plugin_rfid_readers.inputminus as pyil
+from lauschkiste.common.simplecolors import Colors
 
 # Also import the description string into this module, to make everything available in a single module w/o code duplication
 # Leave this line as is!

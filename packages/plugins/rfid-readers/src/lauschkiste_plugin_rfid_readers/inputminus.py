@@ -4,7 +4,7 @@ Zero 3rd-party dependency module for user prompting
 Yes, there are modules out there to do the same and they have more features.
 However, this is low-complexity and has zero dependencies
 """
-from lauschkiste.common.misc.simplecolors import Colors
+from lauschkiste.common.simplecolors import Colors
 
 
 def input_int(prompt, blank=None, min=None, max=None,

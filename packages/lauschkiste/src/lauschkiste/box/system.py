@@ -138,7 +138,7 @@ class System(CoreModule):
     settings = SystemSettings
     info = event('info', SystemInfo)
     health = event('health', SystemHealth)
-    #: Published by lauschkiste.common.misc.loggingext.PubStreamHandler when configured in logger.yaml
+    #: Published by lauschkiste.common.loggingext.PubStreamHandler when configured in logger.yaml
     log = event('log', LogMessage)
 
     def __init__(self):

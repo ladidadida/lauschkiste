@@ -1,8 +1,8 @@
 import logging
 import serial
 
-import lauschkiste.common.misc.inputminus as pyil
-from lauschkiste.common.misc.simplecolors import Colors
+import lauschkiste_plugin_rfid_readers.inputminus as pyil
+from lauschkiste.common.simplecolors import Colors
 from lauschkiste.rfid import ReaderBaseClass
 import lauschkiste.common.cfghandler
 

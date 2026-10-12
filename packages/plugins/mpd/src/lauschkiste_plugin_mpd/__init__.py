@@ -11,17 +11,32 @@ Enable with ``player.backend: mpd`` and::
           check_user_rights: true
 """
 
+import os
 import logging
 
 from pydantic import BaseModel, Field
 
 import lauschkiste.common.cfghandler
-import lauschkiste.common.misc as misc
 import lauschkiste.common.paths
 import lauschkiste.content.library
 from lauschkiste.contract import Plugin
 
 logger = logging.getLogger('lauschkiste.mpd')
+
+
+def recursive_chmod(path, mode_files, mode_dirs):
+    """Recursively change folder and file permissions
+
+    mode_files/mode dirs can be given in octal notation e.g. 0o777
+    flags from the stats module.
+
+    Reference: https://docs.python.org/3/library/os.html#os.chmod"""
+    # os.walk will loop through all dirs in dirpath (including top-level dir)
+    # filenames are just that: list of filenames for each dir
+    for dirpath, _, filenames in os.walk(path):
+        os.chmod(dirpath, mode_dirs)
+        for filename in filenames:
+            os.chmod(os.path.join(dirpath, filename), mode_files)
 
 DEFAULTS = {
     'host': 'localhost',
@@ -104,7 +119,7 @@ class Mpd(Plugin):
             music_library_path = lauschkiste.content.library.root()
             if music_library_path is not None:
                 logger.info(f"Change user rights for {music_library_path}")
-                misc.recursive_chmod(music_library_path, mode_files=0o664, mode_dirs=0o775)
+                recursive_chmod(music_library_path, mode_files=0o664, mode_dirs=0o775)
         ctx.modules.player.backends.register('mpd', backend)
         ctx.modules.library.sources.register('mpd', MpdLibrarySource(backend))
         self._backend = backend

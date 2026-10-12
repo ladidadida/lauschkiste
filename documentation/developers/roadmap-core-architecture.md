@@ -255,7 +255,7 @@ subscriber) now connects to `/api/v1/events` as a plain WebSocket client (`webso
 added to `[project.dependencies]`) -- verified against a real running `FastApiServer` +
 `components.publishing`, not just unit-tested. New tests: `test/common/test_bus.py`, including
 one that reproduces and verifies the fix for the original code's "log handler republishes through
-the bus it's logging an error for" recursion hazard (see `misc/loggingext.py`'s `PubStreamHandler`)
+the bus it's logging an error for" recursion hazard (see `common/loggingext.py`'s `PubStreamHandler`)
 -- `EventBus.publish()` caps that at one extra level via a thread-local re-entrancy depth guard
 instead of the old code's thread-identity/recursion-counter check.
 

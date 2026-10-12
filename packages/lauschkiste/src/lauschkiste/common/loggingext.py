@@ -36,7 +36,7 @@ import logging.config
 import logging.handlers
 import lauschkiste.common.paths
 import lauschkiste.common.publishing as publishing
-import lauschkiste.common.misc.simplecolors as sc
+import lauschkiste.common.simplecolors as sc
 from ruamel.yaml import YAML
 
 ROOT_LOGGER = 'lauschkiste'

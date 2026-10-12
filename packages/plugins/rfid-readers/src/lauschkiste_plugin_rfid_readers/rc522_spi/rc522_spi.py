@@ -5,8 +5,8 @@ from . import pirc522
 
 import lauschkiste.common.cfghandler
 from lauschkiste.rfid import ReaderBaseClass
-import lauschkiste.common.misc.inputminus as pyil
-from lauschkiste.common.misc.simplecolors import Colors
+import lauschkiste_plugin_rfid_readers.inputminus as pyil
+from lauschkiste.common.simplecolors import Colors
 from .description import DESCRIPTION
 
 logger = logging.getLogger('lauschkiste.rfid.rc522')

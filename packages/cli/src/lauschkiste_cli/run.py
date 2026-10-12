@@ -6,7 +6,7 @@ import typer
 
 import lauschkiste.common.cfghandler
 import lauschkiste.common.paths
-from lauschkiste.common.misc import loggingext
+from lauschkiste.common import loggingext
 
 def run(
     conf: Optional[Path] = typer.Option(
