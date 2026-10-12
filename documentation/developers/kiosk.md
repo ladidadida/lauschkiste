@@ -1,6 +1,8 @@
 # Kiosk app (reduced view on the box's screen)
 
-Status: plan, nothing implemented yet.
+Status: plan, nothing implemented yet. Two parts already exist in the core: the screen switches off after a time
+without a touch (module `display`), and settings with fixed limits are sliders (see
+[Input on a touch screen](#input-on-a-touch-screen)).
 
 A box with a screen should show something a child can use without changing settings. Today `lauschctl setup kiosk`
 starts Chromium full screen on the normal web app, which offers everything. The plan: a **separate, small web app
@@ -36,7 +38,30 @@ without themes or elaborate looks, it only has to work.
 ## Settings of the plugin (first idea)
 
 `theme`, `sections` (which of player, music, audiobooks, radio, podcasts are offered), `text_size`, `show_volume`,
-`screen_off_after_minutes` (dark screen when nothing plays), `start_page`.
+`start_page`. Switching the screen off is not part of it: the core module `display` does that for every box.
+
+## Input on a touch screen
+
+The settings pages of the normal web app are also used on the touch screen, where typing is awkward. Done so far:
+numbers with fixed limits are sliders (steps up to 300; a `step` entry in the field's JSON schema sets the step), and
+choices are selection lists and switches.
+
+Still text fields: free text (names, paths, addresses of podcasts and servers, passwords) and numbers without a
+sensible upper limit (voltages, rates, sizes). The plan:
+
+- **On-screen keyboard** for these fields, only on the kiosk screen (a touch device without a physical keyboard), as a
+  component of the web app that opens when a text field gets the focus and moves the page up so the field stays
+  visible. A library (for example `react-simple-keyboard`) is the first choice over an own implementation. Layouts
+  for German and English, a numeric layout for number fields, a show/hide switch for passwords.
+- **Detecting the kiosk screen:** the kiosk start page gets a marker (a query parameter or a setting of the kiosk
+  plugin), since a browser cannot tell a touch screen with a keyboard from one without.
+- **Less typing:** wherever the backend can offer a list (audio devices, library folders, known actions), the field
+  becomes a selection list; big numbers get a stepper with large buttons instead of the keyboard.
+- **Phone first:** the phone keyboard already works, so nothing may get worse for phones.
+
+Open: whether the keyboard belongs to the kiosk app (phase 2) only. The normal web app on the screen needs it
+at once, since it is the only app there until the kiosk app exists. Phase 0 should include trying the keyboard on the
+real screen.
 
 ## Phases and estimate
 

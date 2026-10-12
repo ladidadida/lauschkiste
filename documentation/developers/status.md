@@ -48,6 +48,7 @@ the [roadmap](roadmap-core-architecture.md).
   the phone sink above.
 - A reduced kiosk app for the screen on the box, so that children cannot change settings, as a plugin with its own
   themes ([plan](kiosk.md)).
+- An on-screen keyboard for the remaining text fields on the box's touch screen ([plan](kiosk.md#input-on-a-touch-screen)).
 
 ## Not carried over from Phoniebox 2.x and the first future3 versions
 
