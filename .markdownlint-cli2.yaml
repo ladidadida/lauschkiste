@@ -31,6 +31,7 @@ globs:
 # Define glob expressions to ignore
 ignores:
   - "documentation/developers/docstring/*"
+  - "site/**"
   - "LICENSE"
   - ".venv/**"
   - "**/node_modules/**"

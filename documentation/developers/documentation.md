@@ -12,6 +12,10 @@ We use markdown for documentation. Please add/update documentation in `documenta
   with made-up content: `cd packages/webapp && npx playwright test e2e/screenshots.spec.js --project=mobile`. Run it again
   when the web app changes in a way the guide shows.
 - `documentation/developers` is for contributors and is English only.
+- The site <https://ladidadida.github.io/lauschkiste/> is built from `documentation` with [Starlight](https://starlight.astro.build)
+  (`site/`, workflow `docs.yml`, deployed to GitHub Pages on every push to `main`). `site/scripts/sync-docs.mjs` copies
+  the pages and adapts titles, links and notes, so keep writing plain Markdown with `# Title` first and `> [!NOTE]` for
+  notes. Try it locally with `cd site && npm install && npm run dev`.
 - Use the names the web app shows for its buttons and settings (see `packages/webapp/public/locales`), and keep the
   steps for beginners free of jargon: say what to type, and what to expect when it worked.
 

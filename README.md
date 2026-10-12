@@ -49,7 +49,7 @@ lauschctl update           # newer version
 
 ## Documentation
 
-- [Guide](documentation/en/README.md) ([Deutsch](documentation/de/README.md)): installation, use, hardware, maintenance
+- [Guide](https://ladidadida.github.io/lauschkiste/en/) ([Deutsch](https://ladidadida.github.io/lauschkiste/de/)): installation, use, hardware, maintenance (the same pages are in [documentation/](documentation/README.md))
 - [For developers](documentation/developers/README.md): architecture, plugins, development setup
 
 ## Origin

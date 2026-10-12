@@ -43,6 +43,7 @@ install.sh         Installer (curl | bash): base packages, uv, Lauschkiste (rele
                    then `lauschctl setup`
 shared/            LAUSCHKISTE_HOME when running from this checkout (set it to this directory): settings, library,
                    playlists, logs, cache
+site/              The documentation site (Starlight), built from documentation/ and published to GitHub Pages
 documentation/     Project docs: en/ and de/ (the guide for users and builders, English and German, same file names) and
                    developers/ (contributors, English only)
 test/              Python unit tests (pytest); folders mirror the code: common, box, content, player, rfid, api,

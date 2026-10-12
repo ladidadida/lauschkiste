@@ -46,3 +46,10 @@ __pycache__/
 # Local secrets for tests and scripts (never committed)
 .env
 .env.local
+
+# Documentation site (generated from documentation/ by site/scripts/sync-docs.mjs)
+/site/node_modules/
+/site/dist/
+/site/.astro/
+/site/src/content/docs/
+/site/public/screenshots/
