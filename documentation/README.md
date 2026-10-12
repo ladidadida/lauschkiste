@@ -12,7 +12,6 @@ Lauschkiste is an RFID audio player for kids. It is made for the Raspberry Pi an
 * For developers: add features or fix bugs
   * [Developer guides](./developers/README.md)
   * [Feature status](./developers/status.md)
-  * [Known issues](./developers/known-issues.md)
 
 ## How it is built
 

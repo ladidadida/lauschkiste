@@ -65,3 +65,21 @@ def write_yaml(path: Path, data: Dict[str, Any]) -> None:
     stream = io.StringIO()
     yaml.dump(data, stream)
     write_text(path, stream.getvalue())
+
+
+class StateDict(dict):
+    """A mapping kept in a JSON file: read on creation, written by ``save()`` when it changed."""
+
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        super().__init__(read_json(self.path))
+        self._saved = self._dump()
+
+    def _dump(self) -> str:
+        return json.dumps(self, indent=2, sort_keys=True)
+
+    def save(self) -> None:
+        text = self._dump()
+        if text != self._saved:
+            write_text(self.path, text)
+            self._saved = text

@@ -47,7 +47,6 @@
 * [lauschkiste.common.utils](#lauschkiste.common.utils)
   * [get\_config\_action](#lauschkiste.common.utils.get_config_action)
   * [get\_git\_state](#lauschkiste.common.utils.get_git_state)
-* [lauschkiste.common.nv\_manager](#lauschkiste.common.nv_manager)
 * [lauschkiste.common.publishing.bus](#lauschkiste.common.publishing.bus)
   * [EventBus](#lauschkiste.common.publishing.bus.EventBus)
     * [publish](#lauschkiste.common.publishing.bus.EventBus.publish)
@@ -75,6 +74,7 @@
 * [lauschkiste.common](#lauschkiste.common)
 * [lauschkiste.common.statefile](#lauschkiste.common.statefile)
   * [write\_text](#lauschkiste.common.statefile.write_text)
+  * [StateDict](#lauschkiste.common.statefile.StateDict)
 * [lauschkiste.common.multitimer](#lauschkiste.common.multitimer)
   * [MultiTimer](#lauschkiste.common.multitimer.MultiTimer)
     * [cancel](#lauschkiste.common.multitimer.MultiTimer.cancel)
@@ -83,12 +83,9 @@
   * [GenericTimerClass](#lauschkiste.common.multitimer.GenericTimerClass)
     * [start](#lauschkiste.common.multitimer.GenericTimerClass.start)
     * [cancel](#lauschkiste.common.multitimer.GenericTimerClass.cancel)
-    * [cancel\_generation](#lauschkiste.common.multitimer.GenericTimerClass.cancel_generation)
     * [toggle](#lauschkiste.common.multitimer.GenericTimerClass.toggle)
     * [trigger](#lauschkiste.common.multitimer.GenericTimerClass.trigger)
     * [is\_alive](#lauschkiste.common.multitimer.GenericTimerClass.is_alive)
-    * [get\_timeout](#lauschkiste.common.multitimer.GenericTimerClass.get_timeout)
-    * [set\_timeout](#lauschkiste.common.multitimer.GenericTimerClass.set_timeout)
     * [publish](#lauschkiste.common.multitimer.GenericTimerClass.publish)
     * [get\_state](#lauschkiste.common.multitimer.GenericTimerClass.get_state)
     * [close](#lauschkiste.common.multitimer.GenericTimerClass.close)
@@ -107,8 +104,6 @@
   * [print](#lauschkiste.common.misc.simplecolors.print)
 * [lauschkiste.common.misc](#lauschkiste.common.misc)
   * [recursive\_chmod](#lauschkiste.common.misc.recursive_chmod)
-  * [flatten](#lauschkiste.common.misc.flatten)
-  * [getattr\_hierarchical](#lauschkiste.common.misc.getattr_hierarchical)
 * [lauschkiste.common.misc.inputminus](#lauschkiste.common.misc.inputminus)
   * [input\_int](#lauschkiste.common.misc.inputminus.input_int)
   * [input\_yesno](#lauschkiste.common.misc.inputminus.input_yesno)
@@ -1018,10 +1013,6 @@ def get_git_state()
 Git state of the checkout Lauschkiste runs from, or a note that it isn't one (package install).
 
 
-<a id="lauschkiste.common.nv_manager"></a>
-
-# lauschkiste.common.nv\_manager
-
 <a id="lauschkiste.common.publishing.bus"></a>
 
 # lauschkiste.common.publishing.bus
@@ -1412,6 +1403,17 @@ def write_text(path: Path, text: str) -> None
 Write ``text`` via a temporary file and rename it, so a crash never leaves a truncated file.
 
 
+<a id="lauschkiste.common.statefile.StateDict"></a>
+
+## StateDict Objects
+
+```python
+class StateDict(dict)
+```
+
+A mapping kept in a JSON file: read on creation, written by ``save()`` when it changed.
+
+
 <a id="lauschkiste.common.multitimer"></a>
 
 # lauschkiste.common.multitimer
@@ -1499,17 +1501,6 @@ def cancel()
 Cancel the active generation.
 
 
-<a id="lauschkiste.common.multitimer.GenericTimerClass.cancel_generation"></a>
-
-#### cancel\_generation
-
-```python
-def cancel_generation(worker)
-```
-
-Cancel one worker without affecting a newer generation.
-
-
 <a id="lauschkiste.common.multitimer.GenericTimerClass.toggle"></a>
 
 #### toggle
@@ -1541,28 +1532,6 @@ def is_alive() -> bool
 ```
 
 Return whether a timer generation is logically active.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.get_timeout"></a>
-
-#### get\_timeout
-
-```python
-def get_timeout() -> float
-```
-
-Return the configured timeout in seconds.
-
-
-<a id="lauschkiste.common.multitimer.GenericTimerClass.set_timeout"></a>
-
-#### set\_timeout
-
-```python
-def set_timeout(wait_seconds: float) -> float
-```
-
-Set the timeout, atomically replacing an active generation.
 
 
 <a id="lauschkiste.common.multitimer.GenericTimerClass.publish"></a>
@@ -1776,28 +1745,6 @@ mode_files/mode dirs can be given in octal notation e.g. 0o777
 flags from the stats module.
 
 Reference: https://docs.python.org/3/library/os.html#os.chmod
-
-
-<a id="lauschkiste.common.misc.flatten"></a>
-
-#### flatten
-
-```python
-def flatten(iterable)
-```
-
-Flatten all levels of hierarchy in nested iterables
-
-
-<a id="lauschkiste.common.misc.getattr_hierarchical"></a>
-
-#### getattr\_hierarchical
-
-```python
-def getattr_hierarchical(obj: Any, name: str) -> Any
-```
-
-Like the builtin getattr, but descends though the hierarchy levels
 
 
 <a id="lauschkiste.common.misc.inputminus"></a>

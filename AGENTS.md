@@ -44,7 +44,8 @@ install.sh         Installer (curl | bash): base packages, uv, Lauschkiste (rele
 shared/            LAUSCHKISTE_HOME when running from this checkout (set it to this directory): settings, library,
                    playlists, logs, cache
 documentation/     Project docs: builders/ (end users/installers) and developers/ (contributors)
-test/              Python unit tests (pytest)
+test/              Python unit tests (pytest); folders mirror the code: common, box, content, player, rfid, api,
+                   contract, cli, plugins
 ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.sh in a Debian
                    container)
 ```
@@ -182,7 +183,6 @@ machine's normal audio output directly.
 - `documentation/developers/core-and-plugins.md` — core/plugin contract design
 - `documentation/builders/concepts.md` — core, plugins, actions, events in one page
 - `documentation/builders/actions.md` — action format for cards and config
-- `documentation/developers/coreapps.md` — what each core entry-point script does
-- `documentation/developers/python.md` — Python dev environment notes
+- `documentation/developers/commands.md` — the `lauschkiste` and `lauschctl` commands
 - `documentation/developers/webapp.md` — webapp dev notes
 - `documentation/developers/status.md` — what works and what is planned

@@ -61,6 +61,3 @@ Connect to the hotspot and open a terminal. Use the [raspi-config](https://www.r
 
 * [Raspberry Connect - Auto WiFi Hotspot Switch](https://www.raspberryconnect.com/projects/65-raspberrypi-hotspot-accesspoints/158-raspberry-pi-auto-wifi-hotspot-switch-direct-connection)
 * [Raspberry Pi - Configuring networking](https://www.raspberrypi.com/documentation/computers/configuration.html#using-the-command-line)
-* dhcpcd / wpa_supplicant
-  * [hostapd](http://w1.fi/hostapd/)
-  * [dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html)

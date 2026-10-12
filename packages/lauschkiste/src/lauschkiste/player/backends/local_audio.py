@@ -31,7 +31,7 @@ import lauschkiste.common.multitimer as multitimer
 import lauschkiste.content.playlistgenerator as playlistgenerator
 
 from lauschkiste.player.audio_output import CHANNELS, SAMPLE_RATE, PortAudioSink, scale_gain, volume_gain
-from lauschkiste.common.nv_manager import nv_manager
+from lauschkiste.common.statefile import StateDict
 
 logger = logging.getLogger('lauschkiste.PlayerLocalAudio')
 cfg = lauschkiste.common.cfghandler.get_handler('lauschkiste')
@@ -54,9 +54,8 @@ class PlayerLocalAudio:
     """Decode-and-output player backend. See module docstring for the state machine."""
 
     def __init__(self):
-        self.nvm = nv_manager()
-        self._status_store = self.nvm.load(str(lauschkiste.common.paths.resolve(
-            cfg.getn('player', 'status_file', default='settings/local_audio_status.json'))))
+        self._status_store = StateDict(lauschkiste.common.paths.resolve(
+            cfg.getn('player', 'status_file', default='settings/local_audio_status.json')))
         if not self._status_store:
             self._status_store['last_played_folder'] = ''
 
@@ -517,7 +516,7 @@ class PlayerLocalAudio:
                 logger.warning(f"Folder '{folder}' has no playable content")
                 self._index = -1
                 self._state = 'stop'
-        self._status_store.save_to_json()
+        self._status_store.save()
 
     def play_files(self, paths, start=0, position=0.0, ordered=False):
         queue = [self._absolute(p) for p in paths]
@@ -568,5 +567,5 @@ class PlayerLocalAudio:
             self._closing = True
             self._abort.set()
             self._cv.notify_all()
-        self._status_store.save_to_json()
+        self._status_store.save()
         return self._worker

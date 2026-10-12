@@ -38,13 +38,13 @@ def plain_sink(monkeypatch):
 
 
 class _FakeStatusStore(dict):
-    def save_to_json(self):
+    def save(self):
         pass
 
 
 def local_audio_backend(**attrs):
     """A PlayerLocalAudio with __init__ skipped (matches the PlayerMPD.__new__ test convention in
-    test_mpd_backend_contract.py) -- avoids touching cfg/nv_manager/starting real threads."""
+    test_mpd_backend_contract.py) -- avoids touching cfg/starting real threads."""
     backend = PlayerLocalAudio.__new__(PlayerLocalAudio)
     backend._cv = threading.Condition(threading.RLock())
     backend._abort = threading.Event()

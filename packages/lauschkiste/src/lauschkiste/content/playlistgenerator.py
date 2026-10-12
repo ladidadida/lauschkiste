@@ -22,18 +22,7 @@ This means, one ``*.m3u`` file per sub-folder is processed (if present).
 In ``*.m3u`` files, all lines starting with ``#`` are ignored.
 
 """
-# Some developers notes:
-# So far this is only for MPD (no spotify)
-#
-# It is not planned to support mopidy (we use something different for spotify). If ever only the
-# self.default_handler would need to be replaced
-# to add add(local:track:filename") and not only add "filename" (with also probably some encoding)
-#
-# Generally speaking, the decode..() functions below do decoding and formatting of file entries
-# The most general solution would be to split that. Use an intermediate format based on a NamedTuple which
-# contains the URI and the type of URI (where it was parsed from). After playlist has been collected, run a formatter
-# that formats the NamedTuple to URI strings according to player
-# This also does not consider a mixed player setup (mpd/spotify)
+# The decode..() functions below decode and format file entries; the default handler adds plain file names.
 import copy
 import os
 import os.path

@@ -13,7 +13,6 @@ import lauschkiste.common.paths
 import lauschkiste.common.utils
 import lauschkiste.common.publishing as publishing
 from lauschkiste.api import FastApiServer
-from lauschkiste.common.nv_manager import nv_manager
 
 import lauschkiste
 import lauschkiste.common.cfghandler
@@ -53,7 +52,6 @@ class Daemon:
         self._git_state = lauschkiste.common.utils.get_git_state()
         logger.info(f"Git state: {self._git_state}")
 
-        self.nvm = nv_manager()
         self._signal_cnt = 0
         self.api_server = None
         self.modules = None
@@ -126,8 +124,7 @@ class Daemon:
         if self.modules is not None:
             self.modules.catalog.call_ignore_errors('player.stop')
             thread_list = self.modules.stop()
-        # (3) Save all nonvolatile data
-        self.nvm.save_all()
+        # (3) Save the configuration
         cfg.save(only_if_changed=True)
         # (4) Wait for the threads the modules handed back from stop()
         logger.debug(f"Waiting {timeout}s for module shutdown threads to complete: {thread_list}")

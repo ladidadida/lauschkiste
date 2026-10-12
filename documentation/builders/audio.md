@@ -10,14 +10,13 @@ Stream transfer happens on user input or automatically on the connection of an a
 This is mainly targeted at Bluetooth Headsets/Speakers.
 
 Audio outputs run via PipeWire (with `wireplumber` as the session manager) and the basic configuration should be
-easy. There is a [configuration tool](../developers/coreapps.md#audio), to setup the configuration for Lauschkiste
-Core App.
+easy. `lauschctl setup audio` sets up the outputs for Lauschkiste.
 
 ### To set up the audio
 
 1. Follow the setup steps according to your sound card
 2. Check that the sound output works [as described below](audio.md#checking-system-sound-output)
-3. Run the [audio configuration tool](../developers/coreapps.md#audio)
+3. Run `lauschctl setup audio`
 
 #### Checking system sound output
 

@@ -27,4 +27,4 @@ second swipe trigger them too. How to configure them is described in [Actions](a
 The core and plugins publish their status as typed events, e.g. `player.status` or
 `rfid.card_detected`. The web app receives them over the WebSocket `/api/v1/events`; so can your
 own application. `lauschctl debug sniff` prints them (see
-[Core apps](../developers/coreapps.md#publicity-sniffer)).
+[Commands](../developers/commands.md#debugging-events)).

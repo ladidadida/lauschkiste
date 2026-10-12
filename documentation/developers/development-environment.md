@@ -31,6 +31,10 @@ metadata and tool config live in `pyproject.toml`):
 uv sync --group dev
 ```
 
+Everything runs in that virtual environment: `uv run lauschkiste` (the server), `uv run lauschctl --help`, `uv run pytest`.
+To work in it directly, `source .venv/bin/activate` (leave with `deactivate`). A box installed with `install.sh --from
+github|pypi` keeps Lauschkiste in its own environment instead (see [Installation](../builders/installation.md#uv-or-pip)).
+
 You start the Lauschkiste core application and the Web App development server separately (see [Web App](./webapp.md)).
 
 ### Using WSL

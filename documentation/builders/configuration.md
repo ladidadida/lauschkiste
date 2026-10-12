@@ -9,13 +9,16 @@ The majority of configuration options are only available by editing the config f
 *when the service is not running!*
 Don't fear (overly), they contain commentaries.
 
-For several aspects, we have [configuration tools](../developers/coreapps.md#configuration-tools) and [detailed guides](./README.md#features).
+For several aspects, we have [configuration tools](../developers/commands.md#lauschctl-manage-the-machine) and [detailed guides](./README.md#features).
 
 Even after using the tools, certain aspects can only be changed by directly modifying the configuration files.
 
 API keys and passwords of plugins are not kept in `lauschkiste.yaml` but in `secrets.yaml` next to it
 (readable for the box's user only). Set them in the web app or with `lauschctl config set <key> --secret`;
 `lauschctl config get` hides them.
+
+Relative paths in `lauschkiste.yaml` and the other configuration files are resolved against the Lauschkiste home
+(`lauschctl home`); absolute paths and paths starting with `~/` are used as given.
 
 ## Best practice procedure
 
@@ -37,8 +40,8 @@ $ systemctl --user start lauschkiste
 To try different configurations, you can start Lauschkiste with a custom config file.
 This could be useful if you want your Lauschkiste to only allow a lower volume when started
 at nighttime, signaling it's time to go to bed. :-)
-The path to the custom config file must be either absolute or relative to the repository root
-(Lauschkiste daemon's working directory).
+The path to the custom config file must be either absolute or relative to the directory you start
+Lauschkiste in.
 
 ```bash
 $ uv run lauschkiste --conf /absolute/path/to/custom/config.yaml

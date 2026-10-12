@@ -28,7 +28,7 @@ i.e. `I would have expected that this command would magically fix itself when it
 ### Further information that might help
 
 <!--
-Please post here the output of 'tail -n 500 /var/log/syslog' or 'journalctl -u mopidy' ( Spotify edition only)
+Please post here the output of 'journalctl --user -u lauschkiste -n 200' or the log files in the logs folder of the Lauschkiste home
 
 i.e. `find logfiles at https://paste.ubuntu.com/p/cRS7qM8ZmP/`
 -->

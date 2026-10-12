@@ -48,5 +48,4 @@
 * [System](./system.md)
 * [Actions](./actions.md)
 * [Feature Status](../developers/status.md)
-* [Known Issues](../developers/known-issues.md)
 * [Developer Reference](../developers/README.md)

@@ -92,7 +92,7 @@ import lauschkiste.common.utils as utils
 import lauschkiste.common.multitimer as multitimer
 import lauschkiste.content.playlistgenerator as playlistgenerator
 
-from lauschkiste.common.nv_manager import nv_manager
+from lauschkiste.common.statefile import StateDict
 from .coverart_cache_manager import CoverartCacheManager
 
 logger = logging.getLogger('lauschkiste.PlayerMPD')
@@ -138,9 +138,8 @@ class PlayerMPD:
 
     def __init__(self, host: str = 'localhost', status_file: str = 'settings/music_player_status.json'):
         self._status_callback = lambda status: None
-        self.nvm = nv_manager()
         self.mpd_host = host
-        self.music_player_status = self.nvm.load(status_file)
+        self.music_player_status = StateDict(status_file)
 
         self.second_swipe_action_dict = {'toggle': self.toggle,
                                          'play': self.play,
@@ -192,7 +191,7 @@ class PlayerMPD:
         if not self.music_player_status:
             self.music_player_status['player_status'] = {}
             self.music_player_status['audio_folder_status'] = {}
-            self.music_player_status.save_to_json()
+            self.music_player_status.save()
             self.current_folder_status = {}
             self.music_player_status['player_status']['last_played_folder'] = ''
         else:
@@ -231,7 +230,7 @@ class PlayerMPD:
         self.status_is_closing = True
         self.status_thread.close()
         self.mpd_client.disconnect()
-        self.nvm.save_all()
+        self.music_player_status.save()
         return self.status_thread.timer_thread
 
     def connect(self):
@@ -558,18 +557,6 @@ class PlayerMPD:
         cache_filename = self.coverart_cache_manager.get_cache_filename(mp3_file_path)
 
         return cache_filename
-
-    def get_album_coverart(self, albumartist: str, album: str):
-        song_list = self.list_songs_by_artist_and_album(albumartist, album)
-
-        return self.get_single_coverart(song_list[0]['file'])
-
-    def flush_coverart_cache(self):
-        """
-        Deletes the Cover Art Cache
-        """
-
-        return self.coverart_cache_manager.flush_cache()
 
     def get_folder_content(self, folder: str):
         """

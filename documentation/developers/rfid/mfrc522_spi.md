@@ -6,7 +6,7 @@ RC522 RFID reader via SPI connection.
 
 ## Installation
 
-Run the [RFID reader configuration tool](../coreapps.md#rfid-reader) for guided installation.
+Run the [RFID reader configuration](../commands.md#lauschctl-manage-the-machine) (`lauschctl setup rfid`) for guided installation.
 
 ## Options
 

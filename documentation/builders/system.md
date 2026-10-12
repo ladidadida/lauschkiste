@@ -8,7 +8,7 @@ The system consists of
 2. [Audio (PipeWire)](system.md#audio-pipewire) for flexible audio output support
 3. [Lauschkiste service](system.md#lauschkiste-service) for playback, the audio outputs and all the features
 4. [Web App](system.md#web-app-ui) as User Interface (UI) for a web browser
-5. A set of [Configuration Tools](../developers/coreapps.md#configuration-tools) and a set of [Developer Tools](../developers/coreapps.md#developer-tools)
+5. The [commands](../developers/commands.md) `lauschkiste` (the server) and `lauschctl` (setup and management)
 
 > [!NOTE]
 > On a Raspberry Pi the install puts everything into the users home folder `~/lauschkiste`.
@@ -82,7 +82,7 @@ Service control and service configuration file location is identical to MPD.
 
 ## Lauschkiste Service
 
-The [Lauschkiste service](../developers/coreapps.md#lauschkiste-core) runs as a *user-local* service with the name `lauschkiste`.
+The [Lauschkiste service](../developers/commands.md#lauschkiste-the-server) runs as a *user-local* service with the name `lauschkiste`.
 Similar to MPD, it's important that it runs as a user service so it can talk to the audio server through the user session.
 
 The service can be controlled with the `systemctl`-command by adding the parameter `--user`

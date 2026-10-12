@@ -256,14 +256,6 @@ class GenericTimerClass:
                 worker.cancel()
             self._publish_core(enabled=False)
 
-    def cancel_generation(self, worker):
-        """Cancel one worker without affecting a newer generation."""
-        with self._lock:
-            if self._enabled and self.timer_thread is worker:
-                self.cancel()
-            else:
-                worker.cancel()
-
     def toggle(self):
         """Toggle between active and disabled states."""
         if self.is_alive():
@@ -281,21 +273,6 @@ class GenericTimerClass:
         """Return whether a timer generation is logically active."""
         with self._lock:
             return self._enabled
-
-    def get_timeout(self) -> float:
-        """Return the configured timeout in seconds."""
-        with self._lock:
-            return self._wait_seconds
-
-    def set_timeout(self, wait_seconds: float) -> float:
-        """Set the timeout, atomically replacing an active generation."""
-        with self._lock:
-            if self._enabled:
-                self.start(wait_seconds, restart=True)
-            else:
-                self._wait_seconds = wait_seconds
-                self._publish_core()
-        return wait_seconds
 
     def publish(self):
         """Publish the current timer state."""
