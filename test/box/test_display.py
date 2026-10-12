@@ -1,3 +1,4 @@
+import logging
 import queue
 import time
 
@@ -127,3 +128,33 @@ def test_backlight_keeps_the_brightness_it_found(tmp_path):
     assert (directory / 'brightness').read_text() == '0'
     light.on()
     assert (directory / 'brightness').read_text() == '120'
+
+
+def test_a_card_wakes_the_screen(start_modules, screen, wait_for):
+    light = FakeBacklight()
+    manager, events = start_modules([display_with(light)], {})
+    display = manager.handle('display')
+    display.invoke('sleep')
+    manager._bus.publish('rfid.card_detected', {'card_id': '1', 'registered': False})
+    assert wait_for(lambda: light.level == 255 and not screen.grabbed)
+
+
+def test_a_configured_button_wakes_the_screen(start_modules, screen):
+    light = FakeBacklight()
+    manager, _ = start_modules([display_with(light)], {})
+    manager.handle('display').invoke('sleep')
+    manager.catalog.bind({'action': 'display.wake'}, 'test', logging.getLogger('test'))()
+    assert light.level == 255
+
+
+def test_stays_on_while_playing_if_asked(start_modules, screen, wait_for):
+    light = FakeBacklight()
+    manager, _ = start_modules([display_with(light)], {'display': {'keep_on_while_playing': True}})
+    display = manager.handle('display').instance
+    manager._bus.publish('player.status', {'state': 'play'})
+    display._last_touch = time.monotonic() - 99999
+    time.sleep(0.2)
+    assert light.level == 255
+    manager._bus.publish('player.status', {'state': 'pause'})
+    display._last_touch = time.monotonic() - 99999
+    assert wait_for(lambda: light.level == 0)

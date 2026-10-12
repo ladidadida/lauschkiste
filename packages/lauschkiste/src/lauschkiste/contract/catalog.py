@@ -19,6 +19,18 @@ class ActionCatalog:
     def __init__(self):
         self._lock = threading.Lock()
         self._actions: Dict[str, Tuple['ModuleHandle', Operation]] = {}
+        self._input_listeners: List[Callable[[], None]] = []
+
+    def on_input(self, listener: Callable[[], None]) -> None:
+        """Call ``listener()`` whenever a button, card removal or similar configured input runs its action."""
+        self._input_listeners.append(listener)
+
+    def _input_received(self) -> None:
+        for listener in list(self._input_listeners):
+            try:
+                listener()
+            except Exception:
+                logger.exception("Input listener failed")
 
     def add_module(self, handle: 'ModuleHandle') -> None:
         with self._lock:
@@ -86,7 +98,12 @@ class ActionCatalog:
         except Exception as error:
             log.error(f"{where}: {error}")
             return None
-        return lambda: self.call_ignore_errors(action_id, args)
+
+        def run():
+            self._input_received()
+            return self.call_ignore_errors(action_id, args)
+
+        return run
 
     def describe(self) -> List[Dict[str, Any]]:
         with self._lock:

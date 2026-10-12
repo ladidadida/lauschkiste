@@ -25,6 +25,12 @@ Die Zeit änderst du auf der Webseite unter Einstellungen → System → *Switch
 bleibt der Bildschirm an. Die Änderung gilt sofort. Das geht bei Bildschirmen, deren Hintergrundbeleuchtung Lauschkiste
 steuern darf, etwa dem offiziellen Raspberry-Pi-Touch-Display. Die meisten HDMI-Bildschirme haben das nicht und bleiben an.
 
+Eine aufgelegte Karte, ein Knopf oder eine Taste (siehe [Tasten](buttons.md)) weckt den Bildschirm ebenfalls. Soll er
+nicht dunkel werden, solange Musik spielt, schalte an derselben Stelle *Keep the screen on while music plays* ein.
+
+Eine aufgelegte Karte, ein Knopf oder eine Taste weckt den Bildschirm ebenfalls. Soll er nicht dunkel werden, solange
+Musik spielt, schalte an derselben Stelle *Keep the screen on while music plays* ein.
+
 Die Aktionen `display.sleep` und `display.wake` schalten den Bildschirm aus und ein, zum Beispiel von einer Karte oder
 einer Taste aus.
 

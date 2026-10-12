@@ -1,7 +1,7 @@
 """The display core module: switches the backlight of the box's screen off after a time without a touch.
 
 While the screen sleeps its touch screen is grabbed, so the touch that wakes it up never reaches the web app.
-Screens without a controllable backlight (most HDMI monitors) are left alone.
+A card, a button or a key wakes it too. Screens without a controllable backlight (most HDMI monitors) are left alone.
 """
 
 import logging
@@ -27,6 +27,7 @@ class DisplaySettings(BaseModel):
     screen_off_minutes: int = Field(5, ge=0, le=1440, title='Switch the screen off after (minutes)',
                                     description='Minutes without a touch until the screen goes dark; a touch wakes '
                                                 'it. 0 keeps it on. Only for screens with a controllable backlight.')
+    keep_on_while_playing: bool = Field(False, title='Keep the screen on while music plays')
 
 
 class DisplayState(BaseModel):
@@ -124,6 +125,7 @@ class Display(CoreModule):
         self._last_touch = time.monotonic()
         self._release_deadline: Optional[float] = None
         self._screens: List[Any] = []
+        self._playing = False
 
     def start(self, ctx) -> None:
         self._ctx = ctx
@@ -137,6 +139,10 @@ class Display(CoreModule):
         except ImportError as error:
             logger.error(f"Switching the screen off needs evdev: {error}")
             return
+        ctx.subscribe('rfid.card_detected', self._input)
+        ctx.subscribe('input.key_pressed', self._input)
+        ctx.subscribe('player.status', self._player_status)
+        ctx.actions.on_input(self._wake)
         self._thread = threading.Thread(target=self._run, name='display', daemon=True)
         self._thread.start()
 
@@ -146,6 +152,13 @@ class Display(CoreModule):
     def stop(self) -> List[threading.Thread]:
         self._stop.set()
         return [self._thread] if self._thread else []
+
+    def _input(self, topic, payload) -> None:
+        if payload is not None and self._thread:
+            self._wake()
+
+    def _player_status(self, topic, payload) -> None:
+        self._playing = bool(payload) and payload.get('state') == 'play'
 
     # -- watching -------------------------------------------------------------------------------
 
@@ -205,7 +218,9 @@ class Display(CoreModule):
                     self._finish_wake()
                 return
             minutes = int(self._ctx.config.get('screen_off_minutes', default=5) or 0)
-            if minutes and now - self._last_touch > minutes * 60:
+            if self._playing and self._ctx.config.get('keep_on_while_playing', default=False):
+                self._last_touch = now
+            elif minutes and now - self._last_touch > minutes * 60:
                 self._sleep()
 
     # -- state ----------------------------------------------------------------------------------

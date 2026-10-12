@@ -25,6 +25,12 @@ Change the time in the web app under Settings → System → *Switch the screen 
 on. It takes effect at once. This works for screens whose backlight Lauschkiste may control, like the official Raspberry
 Pi touch display. Most HDMI monitors have no such backlight and stay on.
 
+A card put on the reader, a button or a key (see [Buttons](buttons.md)) wakes the screen too. If you do not want the
+screen to go dark while music plays, switch on *Keep the screen on while music plays* in the same place.
+
+A card put on the reader, a button or a key also wakes the screen. If you do not want the screen to go dark while
+music plays, switch on *Keep the screen on while music plays* in the same place.
+
 The actions `display.sleep` and `display.wake` switch the screen off and on, for example from a card or a button.
 
 ## If the screen stays black
