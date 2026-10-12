@@ -14,6 +14,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Slider,
   Stack,
   Switch,
   TextField,
@@ -41,6 +42,51 @@ const useLabels = (i18nBase, path, schema) => {
     label: i18nBase ? t(`${key}.label`, { defaultValue: fallback }) : fallback,
     help: i18nBase ? t(`${key}.help`, { defaultValue: schema.description || '' }) : (schema.description || ''),
   };
+};
+
+const MAX_SLIDER_STEPS = 300;
+
+// Step of a slider for a number with fixed limits, or null if the range is too fine for a slider.
+const sliderStep = (schema) => {
+  const { minimum: min, maximum: max } = schema;
+  if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) return null;
+  const range = max - min;
+  const integer = schema.type === 'integer';
+  const step = schema.step ?? schema.multipleOf ?? (integer || range > 20 ? 1 : (range > 1 ? 0.1 : 0.01));
+  return range / step <= MAX_SLIDER_STEPS ? step : null;
+};
+
+// A number with fixed limits is set with a slider: no keyboard needed on a touch screen.
+const SliderField = ({ label, help, nullable, onChange, schema, step, value }) => {
+  const { t } = useTranslation();
+  const id = useId();
+  const unset = !Number.isFinite(value);
+  const current = unset ? (schema.default ?? schema.minimum) : value;
+  return (
+    <Box>
+      <Stack direction="row" justifyContent="space-between">
+        <Typography id={`${id}-label`} variant="body2">{label}</Typography>
+        <Stack alignItems="center" direction="row" spacing={1}>
+          <Typography color="text.secondary" variant="body2">{unset && nullable ? t('settings.form.default') : current}</Typography>
+          {nullable && !unset && (
+            <Button onClick={() => onChange(null)} size="small">{t('settings.form.default')}</Button>
+          )}
+        </Stack>
+      </Stack>
+      <Slider
+        aria-labelledby={`${id}-label`}
+        max={schema.maximum}
+        min={schema.minimum}
+        onChange={(_, next) => onChange(next)}
+        size="medium"
+        step={step}
+        sx={{ marginX: 1, width: 'calc(100% - 16px)', paddingY: 2 }}
+        value={current}
+        valueLabelDisplay="auto"
+      />
+      {help && <FormHelperText sx={{ marginTop: -1 }}>{help}</FormHelperText>}
+    </Box>
+  );
 };
 
 const NumberField = ({ label, help, nullable, onChange, schema, value }) => {
@@ -253,6 +299,11 @@ const Field = ({ i18nBase, onChange, path, root, schema: rawSchema, value, witho
   }
 
   if (kind === 'number') {
+    const step = sliderStep(schema);
+    if (step !== null) {
+      return <SliderField help={help} label={label} nullable={nullable} onChange={onChange} schema={schema}
+        step={step} value={value} />;
+    }
     return <NumberField help={help} label={label} nullable={nullable} onChange={onChange} schema={schema} value={value} />;
   }
 

@@ -53,10 +53,11 @@ class TimeLimitsSettings(BaseModel):
     enabled: bool = Field(False, title='Use time limits',
                           description='Quiet hours and the daily listening time below apply when this is on')
     quiet_hours: Dict[str, QuietHours] = Field(default_factory=default_quiet_hours, title='Quiet hours')
-    daily_limit_minutes: int = Field(120, ge=0, le=1440, title='Listening time per day (minutes)',
-                                     description='0: no limit')
-    weekend_limit_minutes: Optional[int] = Field(None, ge=0, le=1440, title='Listening time on weekends (minutes)',
-                                                 description='Empty: the same as on other days; 0: no limit')
+    daily_limit_minutes: int = Field(120, ge=0, le=1440, json_schema_extra={'step': 5},
+                                     title='Listening time per day (minutes)', description='0: no limit')
+    weekend_limit_minutes: Optional[int] = Field(
+        None, ge=0, le=1440, json_schema_extra={'step': 5}, title='Listening time on weekends (minutes)',
+        description='Empty: the same as on other days; 0: no limit')
     warn_minutes: int = Field(5, ge=0, le=60, title='Warn before the limit (minutes)', description='0: no warning')
     fade_seconds: int = Field(10, ge=1, le=120, title='Fade out over (seconds)')
     warning_sound: str = Field('', title='Sound for the warning', description='A file in the home directory; empty: none')

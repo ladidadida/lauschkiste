@@ -6,8 +6,9 @@ from pydantic import BaseModel, Field
 
 
 class PodcastSettings(BaseModel):
-    refresh_minutes: int = Field(60, ge=5, le=1440, title='Fetch episodes again after (minutes)')
-    max_episodes: int = Field(100, ge=10, le=1000, title='Episodes kept per podcast')
+    refresh_minutes: int = Field(60, ge=5, le=1440, json_schema_extra={'step': 5},
+                                title='Fetch episodes again after (minutes)')
+    max_episodes: int = Field(100, ge=10, le=1000, json_schema_extra={'step': 10}, title='Episodes kept per podcast')
     rewind_sec: float = Field(10, ge=0, le=120, title='Go back when continuing (seconds)')
 
 

@@ -22,6 +22,7 @@ const schema = {
   },
   properties: {
     level: { type: 'integer', minimum: 0, maximum: 10, default: 3, title: 'Level' },
+    delay: { type: 'integer', minimum: 0, maximum: 100000, default: 5, title: 'Delay' },
     mode: { type: 'string', enum: ['auto', 'pulse'], default: 'auto', title: 'Mode' },
     save: { anyOf: [{ type: 'boolean' }, { type: 'null' }], default: null, title: 'Power save' },
     buttons: { type: 'object', additionalProperties: { $ref: '#/$defs/Button' }, title: 'Buttons' },
@@ -29,7 +30,7 @@ const schema = {
 };
 
 const entry = { name: 'demo', title: 'Demo', schema, restart_required: false,
-  values: { level: 3, mode: 'auto', save: null, buttons: {} } };
+  values: { level: 3, delay: 5, mode: 'auto', save: null, buttons: {} } };
 
 beforeEach(() => {
   request.mockReset();
@@ -46,12 +47,12 @@ const renderForm = () => render(<RestartProvider><ModuleSettings module="demo" /
 
 test('renders the fields and saves only what changed', async () => {
   renderForm();
-  const level = await screen.findByLabelText('Level');
+  const level = await screen.findByRole('slider', { name: 'Level' });
   expect(screen.getByRole('combobox', { name: 'Mode' })).toBeInTheDocument();
   expect(screen.getByRole('combobox', { name: 'Power save' })).toBeInTheDocument();
 
-  await userEvent.clear(level);
-  await userEvent.type(level, '7');
+  level.focus();
+  await userEvent.keyboard('{ArrowRight}{ArrowRight}{ArrowRight}{ArrowRight}');
   await userEvent.click(screen.getByRole('button', { name: 'general.buttons.save' }));
   await waitFor(() => expect(request).toHaveBeenCalledWith('updateModuleSettings', { name: 'demo', values: { level: 7 } }));
   expect(await screen.findByText('settings.form.saved')).toBeInTheDocument();
@@ -59,10 +60,10 @@ test('renders the fields and saves only what changed', async () => {
 
 test('rejects numbers out of range', async () => {
   renderForm();
-  const level = await screen.findByLabelText('Level');
-  await userEvent.clear(level);
-  await userEvent.type(level, '12');
-  expect(screen.getByText('0 – 10')).toBeInTheDocument();
+  const delay = await screen.findByLabelText('Delay');
+  await userEvent.clear(delay);
+  await userEvent.type(delay, '120000');
+  expect(screen.getByText('0 – 100000')).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'general.buttons.save' })).toBeDisabled();
 });
 

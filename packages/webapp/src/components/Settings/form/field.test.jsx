@@ -42,3 +42,13 @@ test('fixed entries can be edited but not added or removed', () => {
   expect(screen.queryByLabelText('settings.form.new-entry')).not.toBeInTheDocument();
   expect(screen.queryByText('general.buttons.delete')).not.toBeInTheDocument();
 });
+
+test('a number with fixed limits is a slider, a wide range stays a text field', () => {
+  const { rerender } = render(<Field onChange={vi.fn()} path={['level']} root={{}}
+    schema={{ type: 'integer', minimum: 0, maximum: 100, title: 'Level' }} value={30} />);
+  expect(screen.getByRole('slider', { name: 'Level' })).toHaveValue('30');
+  rerender(<Field onChange={vi.fn()} path={['level']} root={{}}
+    schema={{ type: 'integer', minimum: 0, maximum: 100000, title: 'Level' }} value={30} />);
+  expect(screen.queryByRole('slider')).not.toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: 'Level' })).toBeInTheDocument();
+});

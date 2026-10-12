@@ -24,7 +24,7 @@ RELEASE_TIMEOUT = 2.0
 
 
 class DisplaySettings(BaseModel):
-    screen_off_minutes: int = Field(5, ge=0, le=1440, title='Switch the screen off after (minutes)',
+    screen_off_minutes: int = Field(5, ge=0, le=120, title='Switch the screen off after (minutes)',
                                     description='Minutes without a touch until the screen goes dark; a touch wakes '
                                                 'it. 0 keeps it on. Only for screens with a controllable backlight.')
     keep_on_while_playing: bool = Field(False, title='Keep the screen on while music plays')
