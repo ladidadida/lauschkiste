@@ -1,0 +1,48 @@
+[project]
+name = "lauschkiste-plugin-device-raspberry-pi"
+version = "0.1.0a6"
+description = "Lauschkiste device: Raspberry Pi (pins, interfaces, sound cards, power, firmware health)"
+license = "MIT"
+requires-python = ">=3.11"
+readme = "README.md"
+authors = [{ name = "the Lauschkiste contributors" }]
+keywords = [
+  "lauschkiste",
+  "plugin",
+  "raspberry pi",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: System :: Hardware",
+  "Topic :: Home Automation",
+]
+license-files = ["LICENSE"]
+dependencies = [
+  "lauschkiste-core==0.1.0a6",
+]
+
+[project.urls]
+Homepage = "https://github.com/ladidadida/lauschkiste"
+Documentation = "https://github.com/ladidadida/lauschkiste/tree/main/documentation"
+Issues = "https://github.com/ladidadida/lauschkiste/issues"
+Changelog = "https://github.com/ladidadida/lauschkiste/releases"
+
+[project.entry-points."lauschkiste.plugins"]
+device_raspberry_pi = "lauschkiste_plugin_device_raspberry_pi:DeviceRaspberryPi"
+
+[tool.uv.sources]
+lauschkiste-core = { workspace = true }
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lauschkiste_plugin_device_raspberry_pi"]

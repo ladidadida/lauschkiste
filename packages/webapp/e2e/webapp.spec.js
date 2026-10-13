@@ -298,11 +298,11 @@ test('plugins can be switched on', async ({ page }) => {
   await page.goto('/#/settings/plugins');
 
   await expect(page.getByRole('switch', { name: 'battery on/off' })).toBeDisabled();
-  await expect(page.getByText('Needs I²C. Switch on the board support of your board first.')).toBeVisible();
+  await expect(page.getByText('Needs I²C. Switch on the device plugin of your machine first.')).toBeVisible();
   await expect(page.getByText('Detected: Raspberry Pi 3 Model B')).toBeVisible();
-  await page.getByRole('switch', { name: 'board_raspberry_pi on/off' }).click();
+  await page.getByRole('switch', { name: 'device_raspberry_pi on/off' }).click();
   await expect.poll(() => (
-    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/board_raspberry_pi')?.body
+    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/device_raspberry_pi')?.body
   )).toEqual({ enabled: true });
   expect(consoleErrors).toEqual([]);
 });
@@ -323,12 +323,12 @@ test('hardware page shows used pins, conflicts and pending boot changes', async 
   expect(consoleErrors).toEqual([]);
 });
 
-test('hardware page offers a detected board when none is enabled', async ({ page }) => {
+test('hardware page offers a detected device when none is enabled', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   const { apiCalls } = await mockBackend(page);
   await page.route('**/api/v1/hardware', route => route.fulfill({
-    body: JSON.stringify({ board: null, model: null, pins: [], interfaces: [], conflicts: [], unknown: [],
-      boot_pending: [], detected: [{ name: 'board_raspberry_pi', model: 'Raspberry Pi 3 Model B' }] }),
+    body: JSON.stringify({ device: null, model: null, pins: [], interfaces: [], conflicts: [], unknown: [],
+      boot_pending: [], detected: [{ name: 'device_raspberry_pi', model: 'Raspberry Pi 3 Model B' }] }),
     contentType: 'application/json',
   }));
   await page.goto('/#/settings/hardware');
@@ -336,9 +336,9 @@ test('hardware page offers a detected board when none is enabled', async ({ page
   await expect(page.getByText(/Detected: Raspberry Pi 3 Model B/)).toBeVisible();
   await page.getByRole('button', { name: 'Switch on' }).click();
   await expect.poll(() => (
-    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/board_raspberry_pi')?.body
+    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/device_raspberry_pi')?.body
   )).toEqual({ enabled: true });
-  await expect(page.getByText(/Board support switched on/)).toBeVisible();
+  await expect(page.getByText(/Device plugin switched on/)).toBeVisible();
   expect(consoleErrors).toEqual([]);
 });
 

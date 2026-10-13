@@ -12,7 +12,7 @@ All sound cards are set up the same way:
    Pi's own audio off and keeps a backup (`config.txt.backup`).
 3. Restart the box (`sudo reboot`).
 
-The web page (Settings → Hardware) shows the board, which pins are used, and while a change is still waiting for the
+The web page (Settings → Hardware) shows the device, which pins are used, and while a change is still waiting for the
 restart. If a card is attached but not set up, the player shows a note.
 
 ## HiFiBerry

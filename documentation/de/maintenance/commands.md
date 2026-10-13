@@ -17,15 +17,15 @@ Zwei Befehle erledigen alles auf der Box. Melde dich per SSH an und tippe sie in
 
 ### Die Einrichtungsschritte
 
-Jeder Schritt schaut zuerst nach und ändert nur, was fehlt; einen zu wiederholen ist also unbedenklich.
+`lauschctl setup` geht in zwei Teilen vor: erst das Gerät (welche Art Maschine das ist) und seine Optionen, dann das, was
+angeschlossen ist (die Peripherie), und deren Optionen. Jeder Schritt schaut zuerst nach und ändert nur, was fehlt; einen zu wiederholen ist also unbedenklich.
 
 | Schritt | Wofür |
 | --- | --- |
+| `device` | welche Art Maschine das ist; bestimmt, was die anderen Schritte anbieten |
 | `packages` | die Systempakete, die Lauschkiste braucht (und auf Wunsch ein Systemupgrade) |
-| `hardware` | die angeschlossene Hardware: Soundkarte, pHAT BEAT, Ein-Aus-Taste, Akkuüberwachung |
-| `raspi` | schreibt Soundkarte und Pins in die Startkonfiguration (danach neu starten) |
+| `hardware` | die Soundkarte auf der Stiftleiste (Raspberry Pi) |
 | `plugins` | schaltet die Plugins ein, die die Antworten verlangen |
-| `extra_plugins` | installiert Plugins von PyPI, GitHub (`github:owner/repo@tag`) oder per URL |
 | `service` | Lauschkiste als Dienst, der mit der Box startet |
 | `port` | die Webseite auf Port 80, damit die Adresse kein `:5556` braucht |
 | `audio` | wählt die Audioausgänge ([Ton](../using/sound.md)) |
@@ -35,6 +35,10 @@ Jeder Schritt schaut zuerst nach und ändert nur, was fehlt; einen zu wiederhole
 | `autohotspot` | das eigene WLAN der Box ([Unterwegs](../using/wifi-hotspot.md)) |
 | `boot` | ruhiger Start, Bluetooth optional aus |
 | `welcome` | die Meldung bei der Anmeldung |
+| `extra_plugins` | installiert Plugins von PyPI, GitHub (`github:owner/repo@tag`) oder per URL, auch für eigene Hardware |
+| `peripherals` | was angeschlossen ist: pHAT BEAT, Ein-Aus-Taste, Akkuüberwachung, Tasten und Drehregler, und deine eigene |
+| `peripheral_options` | die Optionen des Angeschlossenen (z. B. der Akku-Sensor) |
+| `raspi` | schreibt Soundkarte und Pins in die Startkonfiguration (danach neu starten) |
 
 ## `lauschkiste`: der Server
 

@@ -12,7 +12,7 @@ du vielleicht schon hast, eine Box:
 Alles, was keine Pi-Hardware braucht: die Webseite, die Bibliothek, Radio, Podcasts, Hörbücher, Zeitlimits, Bluetooth und
 RFID-Leser, die per USB angeschlossen werden. Es fehlen die Teile, die an die Pins und die Startkonfiguration des Pi
 gebunden sind: Leser und Soundkarten, die du an die GPIO-Leiste verdrahtest, das pHAT BEAT, der OnOff SHIM und Ähnliches.
-`lauschctl setup` lässt diese Fragen auf anderen Computern weg.
+`lauschctl setup` fragt zuerst *What kind of machine is this?* („Welche Art Maschine ist das?“) und lässt die Fragen weg, die zur Antwort nicht passen.
 
 Der Ton kommt aus dem, was der Computer hat: seinen Lautsprechern, einer Kopfhörerbuchse, einem USB-Lautsprecher oder
 Bluetooth.
@@ -26,10 +26,19 @@ von [Installieren](install.md), nur ohne SD-Karte:
    in Ordnung).
 2. Öffne dort ein Terminal oder melde dich per `ssh` an und füge die Installationszeile aus
    [Installieren](install.md#3-installieren) ein.
-3. Führ `lauschctl setup` aus. Die Antworten, die sich von einem Pi unterscheiden:
-   - *Start Lauschkiste at boot* ist hier standardmäßig *Nein*. Antworte *Ja*, wenn der Computer eine Box werden soll, die
-     von selbst startet.
-   - *Configure an RFID reader now* ist standardmäßig *Nein*. Antworte *Ja*, wenn du einen USB-Leser hast.
+3. Führ `lauschctl setup` aus. Die erste Frage ist *What kind of machine is this?* („Welche Art Maschine ist das?“). Für einen
+   Computer gibt es zwei Antworten:
+   - *PC or laptop, just trying it out* („PC oder Laptop, nur zum Ausprobieren“): Außerhalb von Lauschkiste wird nichts am
+     System verändert, kein Port 80, kein Samba, keine Änderung an Anmeldung oder Start, kein Kiosk, kein Upgrade. Auf einem
+     Computer, der kein Pi ist, ist das vorgewählt. Das ist die richtige Wahl für deinen Arbeitsrechner.
+   - *PC, laptop or mini PC as a box of its own* („PC, Laptop oder Mini-PC als eigene Box“): für einen Computer, der eine
+     Lauschkiste ist. Das Setup darf dann Port 80, Samba, eine Login-Meldung, ein System-Upgrade, den WLAN-Hotspot und den
+     Kiosk-Bildschirm anbieten (dafür richtet es auch die Konsolen-Anmeldung ein).
+
+   Die übrigen Antworten auf einem Computer:
+   - *Start Lauschkiste at boot* ist bei einem Test standardmäßig *Nein*; für eine Box, die von selbst startet, antworte *Ja*.
+   - Danach kommen die Fragen zu dem, was angeschlossen ist (ein USB-Leser braucht nichts; antworte bei
+     *Configure an RFID reader now* mit *Ja*).
 4. Öffne `http://<name>.local` oder `http://<IP-Adresse>:5556` vom Handy oder vom selben Computer aus.
 
 Bei einem anderen Linux (Fedora, Arch, ...) warnt der Installer nur: Installiere Python 3 mit Header-Dateien, einen

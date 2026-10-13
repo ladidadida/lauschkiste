@@ -9,7 +9,7 @@ Everything that only concerns Lauschkiste itself is set in the web app. Changes 
 | Cards | card list, placing the same card again, readers (delay, place instead of swipe, action when the card is taken off) |
 | Library | covers, scanning, network drive (Samba) |
 | Plugins | switch extensions on and off and set them up, e.g. Raspberry Pi, GPIO buttons and rotary encoders, battery, power button |
-| Hardware | board, pins and interfaces in use, pin conflicts |
+| Hardware | device, pins and interfaces in use, pin conflicts |
 | System | announcements, restart, shut down |
 
 ## Plugins

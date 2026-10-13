@@ -554,7 +554,7 @@
       },
       "hardware": {
         "title": "Hardware",
-        "subtitle": "Board, pin usage, sound card, boot configuration"
+        "subtitle": "Device, pin usage, sound card, boot configuration"
       }
     },
     "form": {
@@ -607,10 +607,14 @@
       "installing": "Installing packages, this can take a few minutes …",
       "install-error": "Installation failed: {{error}}",
       "detected": "Detected: {{model}}",
-      "blocked-board": "Only one board support can be active. Switch off “{{name}}” first.",
-      "blocked-needs": "Needs {{needs}}. Switch on the board support of your board first.",
+      "blocked-device": "Only one device can be active. Switch off “{{name}}” first.",
+      "blocked-needs": "Needs {{needs}}. Switch on the device plugin of your machine first.",
       "capabilities": {
-        "board": "board support",
+        "device": "device",
+        "boot_config": "boot configuration",
+        "system_setup": "changes to the system",
+        "autologin": "console login",
+        "screen": "a controllable screen",
         "gpio": "GPIO pins",
         "i2c": "I²C",
         "spi": "SPI",
@@ -776,8 +780,8 @@
       "pin": "Pin",
       "functions": "Function",
       "used-by": "Used by",
-      "no-board": "No board plugin is enabled. On a Raspberry Pi, switch \"Raspberry Pi\" on under Plugins.",
-      "board-settings": "Board settings",
+      "no-device": "No device plugin is enabled. On a Raspberry Pi, switch \"Raspberry Pi\" on under Plugins.",
+      "device-settings": "Device settings",
       "boot-pending": "The boot configuration doesn't match the settings yet ({{changes}}). Run on the box, then reboot:",
       "conflicts": "Used twice: {{pins}}. A device on these pins won't work.",
       "unknown": "Unknown pins: {{pins}}.",
@@ -786,9 +790,9 @@
       "show-free_one": "Show {{count}} free pin",
       "show-free_other": "Show {{count}} free pins",
       "hide-free": "Hide free pins",
-      "detected": "Detected: {{model}}. Its board support is “{{name}}”.",
-      "enable-board": "Switch on",
-      "board-enabled": "Board support switched on. Restart Lauschkiste to load it."
+      "detected": "Detected: {{model}}. Its device plugin is “{{name}}”.",
+      "enable-device": "Switch on",
+      "device-enabled": "Device plugin switched on. Restart Lauschkiste to load it."
     },
     "cache": {
       "title": "Downloads"

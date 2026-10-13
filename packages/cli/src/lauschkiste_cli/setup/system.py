@@ -184,10 +184,6 @@ class System:
         machine = platform.machine()
         return {'armv7l': 'armv7', 'armv6l': 'armv6', 'aarch64': 'arm64'}.get(machine, machine)
 
-    def is_raspberry_pi(self) -> bool:
-        model = self.read('/proc/device-tree/model') or ''
-        return 'Raspberry Pi' in model
-
     def is_debian(self) -> bool:
         return self.exists('/usr/bin/apt-get') or self.which('apt-get') is not None
 

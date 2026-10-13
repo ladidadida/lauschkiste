@@ -1,6 +1,6 @@
-"""The hardware core module: the active board, which pins and buses are used by whom, and power.
+"""The hardware core module: the active device, which pins and buses are used by whom, and power.
 
-Board-neutral: a board support plugin registers at ``hardware.boards`` and describes its pins and
+Device-neutral: a device plugin registers at ``hardware.devices`` and describes its pins and
 interfaces; modules using pins or buses register at ``hardware.claims``. See
 documentation/developers/hardware.md.
 """
@@ -45,7 +45,7 @@ class InterfaceInfo(BaseModel):
     used_by: List[Usage] = []
 
 
-class DetectedBoard(BaseModel):
+class DetectedDevice(BaseModel):
     name: str
     model: str
 
@@ -59,14 +59,14 @@ class Note(BaseModel):
 
 
 class HardwareState(BaseModel):
-    board: Optional[str] = None
+    device: Optional[str] = None
     model: Optional[str] = None
     pins: List[PinInfo] = []
     interfaces: List[InterfaceInfo] = []
     conflicts: List[str] = []
     unknown: List[Claim] = []
     boot_pending: List[str] = []
-    detected: List[DetectedBoard] = []
+    detected: List[DetectedDevice] = []
     notes: List[Note] = []
 
 
@@ -80,13 +80,13 @@ class GpioLine(BaseModel):
     line: int
 
 
-class Board(Protocol):
+class Device(Protocol):
     def describe(self) -> Dict[str, Any]:
         """``{'name', 'model', 'pins': [{'id', 'label', 'position', 'functions'}],
         'interfaces': [{'id', 'label', 'pins'}]}``"""
 
     def pin_id(self, value: Any) -> Optional[str]:
-        """The board's id of a pin given as the user wrote it (e.g. ``17`` or ``'GPIO17'``), None if unknown."""
+        """The device's id of a pin given as the user wrote it (e.g. ``17`` or ``'GPIO17'``), None if unknown."""
 
     def gpio_line(self, pin: str) -> Tuple[int, int]:
         """(gpiochip number, line) of a GPIO pin."""
@@ -104,13 +104,13 @@ class ClaimProvider(Protocol):
 
 
 class Hardware(CoreModule):
-    """The board Lauschkiste runs on, its pins and who uses them; shutdown and reboot."""
+    """The device Lauschkiste runs on, its pins and who uses them; shutdown and reboot."""
 
     name = 'hardware'
-    interface_version = '1.2'
+    interface_version = '2.0'
     concurrency = 'threadsafe'
 
-    boards = extension_point('boards', Board)
+    devices = extension_point('devices', Device)
     claims = extension_point('claims', ClaimProvider)
 
     def __init__(self):
@@ -120,25 +120,25 @@ class Hardware(CoreModule):
         self._ctx = ctx
 
     def ready(self) -> None:
-        names = self.boards.names()
+        names = self.devices.names()
         if len(names) > 1:
-            logger.error(f"More than one board plugin is enabled ({', '.join(names)}); using '{names[0]}'")
-        board = self._board()
-        for note in self._notes(board) if board is not None else []:
+            logger.error(f"More than one device plugin is enabled ({', '.join(names)}); using '{names[0]}'")
+        device = self._device()
+        for note in self._notes(device) if device is not None else []:
             if note.level == 'todo':
                 logger.warning(f"{note.text}" + (f" ({note.hint})" if note.hint else ''))
 
     # -- helpers --------------------------------------------------------------------------------
 
-    def _board(self) -> Optional[Any]:
-        names = self.boards.names()
-        return self.boards.get(names[0]) if names else None
+    def _device(self) -> Optional[Any]:
+        names = self.devices.names()
+        return self.devices.get(names[0]) if names else None
 
-    def _require_board(self):
-        board = self._board()
-        if board is None:
-            raise OperationError(501, 'no_board', 'No board support plugin is enabled')
-        return board
+    def _require_device(self):
+        device = self._device()
+        if device is None:
+            raise OperationError(501, 'no_device', 'No device plugin is enabled')
+        return device
 
     def _claims(self) -> List[Claim]:
         result = []
@@ -149,19 +149,19 @@ class Hardware(CoreModule):
                 logger.warning(f"Claims of '{name}' are not available: {error}")
         return result
 
-    def _notes(self, board) -> List[Note]:
-        """A board may offer ``notes()``: what is set up and what to check, as ``{'id', 'level', 'text', 'hint'}``."""
+    def _notes(self, device) -> List[Note]:
+        """A device may offer ``notes()``: what is set up and what to check, as ``{'id', 'level', 'text', 'hint'}``."""
         try:
-            return [Note.model_validate(note) for note in (board.notes() if hasattr(board, 'notes') else [])]
+            return [Note.model_validate(note) for note in (device.notes() if hasattr(device, 'notes') else [])]
         except Exception as error:
             logger.debug(f"Hardware notes are not available: {error}")
             return []
 
     def state(self) -> HardwareState:
-        board = self._board()
-        if board is None:
-            return HardwareState(unknown=self._claims(), detected=plugins.detected_boards())
-        description = board.describe()
+        device = self._device()
+        if device is None:
+            return HardwareState(unknown=self._claims(), detected=plugins.detected_devices())
+        description = device.describe()
         pins = {pin['id']: PinInfo.model_validate(pin) for pin in description.get('pins', [])}
         interfaces = {entry['id']: InterfaceInfo.model_validate(entry) for entry in description.get('interfaces', [])}
         shared: Dict[str, List[bool]] = {}
@@ -174,7 +174,7 @@ class Hardware(CoreModule):
                 targets = interface.pins
                 claim_shared = True
             else:
-                pin = board.pin_id(claim.resource)
+                pin = device.pin_id(claim.resource)
                 if pin is None or pin not in pins:
                     unknown.append(claim)
                     continue
@@ -191,24 +191,24 @@ class Hardware(CoreModule):
                 pin.conflict = True
                 conflicts.append(pin_id)
         try:
-            pending = list(board.boot_pending() or [])
+            pending = list(device.boot_pending() or [])
         except Exception as error:
             logger.debug(f"Boot configuration not checked: {error}")
             pending = []
-        return HardwareState(board=description.get('name'), model=description.get('model'),
+        return HardwareState(device=description.get('name'), model=description.get('model'),
                              pins=list(pins.values()), interfaces=list(interfaces.values()),
-                             conflicts=conflicts, unknown=unknown, boot_pending=pending, notes=self._notes(board))
+                             conflicts=conflicts, unknown=unknown, boot_pending=pending, notes=self._notes(device))
 
     # -- operations -----------------------------------------------------------------------------
 
     @query(path='/')
     def get_state(self) -> HardwareState:
-        """The board, its pins and interfaces, who uses them, conflicts and pending boot changes."""
+        """The device, its pins and interfaces, who uses them, conflicts and pending boot changes."""
         return self.state()
 
     @query(path='/pin-options')
     def pin_options(self) -> List[Choice]:
-        """GPIO pins of the board for choosing in settings, with their current users."""
+        """GPIO pins of the device for choosing in settings, with their current users."""
         state = self.state()
         options = []
         for pin in state.pins:
@@ -221,19 +221,19 @@ class Hardware(CoreModule):
     @query(path='/gpio-line')
     def gpio_line(self, pin: str) -> GpioLine:
         """GPIO chip and line of a pin (for device plugins)."""
-        board = self._require_board()
-        pin_id = board.pin_id(pin)
+        device = self._require_device()
+        pin_id = device.pin_id(pin)
         if pin_id is None:
-            raise OperationError(404, 'unknown_pin', f"Pin '{pin}' does not exist on this board")
-        chip, line = board.gpio_line(pin_id)
+            raise OperationError(404, 'unknown_pin', f"Pin '{pin}' does not exist on this device")
+        chip, line = device.gpio_line(pin_id)
         return GpioLine(chip=chip, line=line)
 
     @action()
     def shutdown(self) -> None:
         """Shut the box down."""
-        self._require_board().shutdown()
+        self._require_device().shutdown()
 
     @action()
     def reboot(self) -> None:
         """Reboot the box."""
-        self._require_board().reboot()
+        self._require_device().reboot()

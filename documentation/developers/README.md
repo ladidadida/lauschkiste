@@ -20,7 +20,7 @@ These pages are in English. The guide for builders and users is in [English](../
 * [The installer](./installer.md)
 * [Docstring API Docs (from py files)](./docstring/README.md)
 * [Core and plugins](./core-and-plugins.md)
-* [Device plugins (plan)](./device-plugins.md)
+* [Device plugins](./device-plugins.md)
 * [Feature Status](./status.md)
 
 ## API

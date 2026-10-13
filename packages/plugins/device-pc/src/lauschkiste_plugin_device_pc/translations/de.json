@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "device_pc_test": {
+      "name": "PC oder Laptop, nur zum Ausprobieren",
+      "description": "Ein gewöhnlicher Computer zum Ausprobieren: außerhalb von Lauschkiste wird nichts verändert."
+    },
+    "device_pc_box": {
+      "name": "PC, Laptop oder Mini-PC als eigene Box",
+      "description": "Ein Computer, der eine Lauschkiste ist: Er darf dafür eingerichtet werden (Port 80, Samba, Anmeldung, Kiosk-Bildschirm)."
+    }
+  }
+}

@@ -148,8 +148,9 @@ jobs:
         package:
           - lauschkiste
           - lauschkiste-core
-          - lauschkiste-plugin-board-raspberry-pi
-          - lauschkiste-plugin-devices
+          - lauschkiste-plugin-device-raspberry-pi
+          - lauschkiste-plugin-device-pc
+          - lauschkiste-plugin-peripherals
           - lauschkiste-plugin-rfid-readers
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf
@@ -196,8 +197,9 @@ jobs:
         package:
           - lauschkiste
           - lauschkiste-core
-          - lauschkiste-plugin-board-raspberry-pi
-          - lauschkiste-plugin-devices
+          - lauschkiste-plugin-device-raspberry-pi
+          - lauschkiste-plugin-device-pc
+          - lauschkiste-plugin-peripherals
           - lauschkiste-plugin-rfid-readers
           - lauschkiste-plugin-samba
           - lauschkiste-plugin-audiobookshelf

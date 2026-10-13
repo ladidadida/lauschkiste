@@ -13,9 +13,10 @@ members = [
     "lauschkiste",
     "lauschkiste-core",
     "lauschkiste-plugin-audiobookshelf",
-    "lauschkiste-plugin-board-raspberry-pi",
-    "lauschkiste-plugin-devices",
+    "lauschkiste-plugin-device-pc",
+    "lauschkiste-plugin-device-raspberry-pi",
     "lauschkiste-plugin-directories",
+    "lauschkiste-plugin-peripherals",
     "lauschkiste-plugin-rfid-readers",
     "lauschkiste-plugin-samba",
 ]
@@ -970,9 +971,9 @@ requires-dist = [
 ]
 
 [[package]]
-name = "lauschkiste-plugin-board-raspberry-pi"
+name = "lauschkiste-plugin-device-pc"
 version = "0.1.0a6"
-source = { editable = "packages/plugins/board-raspberry-pi" }
+source = { editable = "packages/plugins/device-pc" }
 dependencies = [
     { name = "lauschkiste-core" },
 ]
@@ -981,9 +982,35 @@ dependencies = [
 requires-dist = [{ name = "lauschkiste-core", editable = "packages/lauschkiste" }]
 
 [[package]]
-name = "lauschkiste-plugin-devices"
+name = "lauschkiste-plugin-device-raspberry-pi"
 version = "0.1.0a6"
-source = { editable = "packages/plugins/devices" }
+source = { editable = "packages/plugins/device-raspberry-pi" }
+dependencies = [
+    { name = "lauschkiste-core" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "lauschkiste-core", editable = "packages/lauschkiste" }]
+
+[[package]]
+name = "lauschkiste-plugin-directories"
+version = "0.1.0a6"
+source = { editable = "packages/plugins/directories" }
+dependencies = [
+    { name = "lauschkiste-core" },
+    { name = "requests" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
+    { name = "requests" },
+]
+
+[[package]]
+name = "lauschkiste-plugin-peripherals"
+version = "0.1.0a6"
+source = { editable = "packages/plugins/peripherals" }
 dependencies = [
     { name = "lauschkiste-core" },
 ]
@@ -1007,21 +1034,6 @@ requires-dist = [
     { name = "smbus2", marker = "extra == 'battery'" },
 ]
 provides-extras = ["gpio", "battery"]
-
-[[package]]
-name = "lauschkiste-plugin-directories"
-version = "0.1.0a6"
-source = { editable = "packages/plugins/directories" }
-dependencies = [
-    { name = "lauschkiste-core" },
-    { name = "requests" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
-    { name = "requests" },
-]
 
 [[package]]
 name = "lauschkiste-plugin-rfid-readers"

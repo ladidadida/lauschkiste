@@ -65,7 +65,9 @@ lauschctl setup autohotspot
 | Schritt | Wofür |
 | --- | --- |
 | `extra_plugins` | Plugins von PyPI, GitHub (`github:besitzer/repo@tag`) oder einer URL installieren und aktivieren |
-| `hardware` | angeschlossene Hardware wählen: Soundkarte, pHAT BEAT, Power-Taster, Batteriemonitor |
+| `device` | welche Art Maschine das ist (bestimmt, was die anderen Schritte anbieten) |
+| `hardware` | die Soundkarte auf der Stiftleiste (Raspberry Pi) |
+| `peripherals` | was angeschlossen ist: pHAT BEAT, Power-Taster, Batteriemonitor, Tasten und Drehregler, eigene Plugins |
 | `boot` | ruhiger Start (keine Startmeldungen oder Logo, einige Erststart-Dienste aus; Bluetooth optional) |
 | `kiosk` | Web-App auf einem angeschlossenen Bildschirm |
 | `port` | Web-App auf Port 80, also ohne `:5556` in der Adresse (ein systemd-Socket leitet weiter) |

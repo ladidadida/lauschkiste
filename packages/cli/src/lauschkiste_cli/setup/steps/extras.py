@@ -16,6 +16,7 @@ from lauschkiste_cli.setup.system import SetupError, StepSkipped
 class SambaStep(Step):
     name = 'samba'
     title = 'Samba share of the library'
+    needs = ('system_setup',)
     questions = (
         Question('samba', 'Share the library (music and audiobooks) on the network via Samba (Windows/macOS file sharing)?',
                  default=False,
@@ -66,6 +67,7 @@ class SambaStep(Step):
 class KioskStep(Step):
     name = 'kiosk'
     title = 'Kiosk mode (web app on an attached screen)'
+    needs = ('system_setup', 'screen')
     questions = (
         Question('kiosk', 'Show the web app full-screen on an attached display after boot?', default=False,
                  help='Installs a minimal X server, openbox and Chromium, not a full desktop.'),
@@ -118,7 +120,7 @@ class KioskStep(Step):
                     if system.read_marked(path, self.MARKER) != block]
         if self.MARKER not in (system.read(self._update_check_file(ctx)) or ''):
             problems.append(f'{self._update_check_file(ctx)} is not set up')
-        if system.is_raspberry_pi() and not system.exists(self.AUTOLOGIN):
+        if ctx.provides('autologin') and not system.exists(self.AUTOLOGIN):
             problems.append('console autologin is not enabled')
         return problems
 
@@ -129,8 +131,13 @@ class KioskStep(Step):
         system.write(self._update_check_file(ctx),
                      f'{self.MARKER}\nCHROMIUM_FLAGS="${{CHROMIUM_FLAGS}} --check-for-update-interval=31536000"\n',
                      root=True)
-        if system.is_raspberry_pi() and not system.exists(self.AUTOLOGIN):
-            system.run('raspi-config', 'nonint', 'do_boot_behaviour', 'B2', root=True)
+        if ctx.provides('autologin') and not system.exists(self.AUTOLOGIN):
+            if system.exists('/usr/bin/raspi-config'):
+                system.run('raspi-config', 'nonint', 'do_boot_behaviour', 'B2', root=True)
+            else:
+                system.write(self.AUTOLOGIN, '[Service]\nExecStart=\n'
+                             f'ExecStart=-/sbin/agetty --autologin {system.user} --noclear %I $TERM\n', root=True)
+                system.run('systemctl', 'daemon-reload', root=True)
 
 
 def _validate_ssid(value):
@@ -148,6 +155,7 @@ def _validate_ip(value):
 class AutohotspotStep(Step):
     name = 'autohotspot'
     title = 'WiFi hotspot when no known WiFi is in range'
+    needs = ('system_setup',)
     questions = (
         Question('autohotspot', 'Open a WiFi hotspot when no known WiFi is in range?', default=False,
                  help='This changes how the box uses the network: if no known WiFi is found (also after a reboot, or when '
@@ -167,7 +175,7 @@ class AutohotspotStep(Step):
     INTERFACES = '/etc/network/interfaces'
 
     def relevant(self, ctx):
-        return ctx.system.unit_enabled('NetworkManager.service') and ctx.system.is_raspberry_pi()
+        return ctx.system.unit_enabled('NetworkManager.service')
 
     def wanted(self, ctx):
         return bool(ctx.answer('autohotspot'))

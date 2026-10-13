@@ -25,6 +25,7 @@ class FakeSystem(System):
         (self.root / 'usr/lib/systemd').mkdir(parents=True)
         (self.root / 'usr/lib/systemd/systemd-socket-proxyd').touch()
         if pi:
+            (self.root / 'usr/bin/raspi-config').touch()
             (self.root / 'proc/device-tree').mkdir(parents=True)
             (self.root / 'proc/device-tree/model').write_text('Raspberry Pi 4 Model B Rev 1.4')
             (self.root / 'boot/firmware').mkdir(parents=True)
@@ -105,7 +106,7 @@ def test_pc_setup_installs_packages_and_service(tmp_path, home, extras):
     assert f'Environment=LAUSCHKISTE_HOME={home}' in unit
     assert 'lauschkiste.service' in system.enabled_user
     assert not system.exists('/var/lib/systemd/linger/pi')
-    assert ctx.enabled_plugins() == {}
+    assert ctx.enabled_plugins() == {'device_pc_test': {}}
     assert extras == []
     assert not system.exists('/etc/systemd/system/lauschkiste-http.socket')
 
@@ -130,7 +131,7 @@ def test_pi_setup(tmp_path, home, extras):
     system.outputs[('pdbedit', '-L')] = 'pi:1000:'
     failed, ctx = setup_run(system, home, answers={'samba': True, 'optimize_boot': True, 'disable_bluetooth': True})
     assert failed == 0
-    assert {'board_raspberry_pi', 'samba'} <= set(ctx.enabled_plugins())
+    assert {'device_raspberry_pi', 'samba'} <= set(ctx.enabled_plugins())
     assert system.exists('/var/lib/systemd/linger/pi')
     assert 'disable_splash=1' in system.read('/boot/firmware/config.txt')
     cmdline = system.read('/boot/firmware/cmdline.txt')
@@ -213,7 +214,7 @@ def _board_settings(home, settings, rfid=None):
     import lauschkiste.common.statefile as statefile
     path = home / 'settings' / 'lauschkiste.yaml'
     config = statefile.read_yaml(path) if path.exists() else {}
-    config['plugins'] = {'board_raspberry_pi': settings}
+    config['plugins'] = {'device_raspberry_pi': settings}
     statefile.write_yaml(path, config)
     if rfid is not None:
         statefile.write_yaml(home / 'settings' / 'rfid.yaml', rfid)
@@ -319,32 +320,50 @@ def test_port_step_needs_the_socket_proxy(tmp_path, home, extras):
     assert setup_run(system, home, names=['port'])[0] == 1
 
 
-def test_hardware_step_enables_the_plugins_of_the_chosen_hardware(tmp_path, home, extras):
+def test_hardware_step_sets_the_sound_card_of_the_device(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
-    answers = {'hw_phat_beat': False, 'hw_sound_card': 'max98357a', 'hw_power_button': True, 'hw_battery': 'ina219'}
-    failed, ctx = setup_run(system, home, names=['hardware'], answers=answers)
+    answers = {'hw_sound_card': 'max98357a'}
+    failed, ctx = setup_run(system, home, names=['device', 'hardware'], answers=answers)
+    assert failed == 0
+    assert ctx.enabled_plugins()['device_raspberry_pi']['sound_card'] == 'max98357a'
+    failed, _ = setup_run(system, home, names=['device', 'hardware'], answers=answers, check_only=True)
+    assert failed == 0
+
+
+def test_peripherals_are_proposed_and_enabled_with_their_options(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    answers = {'peripheral_power_button': True, 'peripheral_battery': True, 'opt_battery_driver': 'ina219',
+               'peripheral_phat_beat': False}
+    names = ['device', 'peripherals', 'peripheral_options']
+    failed, ctx = setup_run(system, home, names=names, answers=answers)
     assert failed == 0
     plugins = ctx.enabled_plugins()
-    assert plugins['board_raspberry_pi']['sound_card'] == 'max98357a'
-    assert plugins['battery']['driver'] == 'ina219'
-    assert 'power_button' in plugins and 'phat_beat' not in plugins
-    failed, _ = setup_run(system, home, names=['hardware'], answers=answers, check_only=True)
+    assert plugins['battery']['driver'] == 'ina219' and 'power_button' in plugins and 'phat_beat' not in plugins
+    failed, _ = setup_run(system, home, names=names, answers=answers, check_only=True)
     assert failed == 0
 
 
-def test_hardware_step_with_a_phat_beat_needs_no_sound_card_answer(tmp_path, home, extras):
+def test_a_peripheral_that_is_no_longer_chosen_is_switched_off(tmp_path, home, extras):
     system = FakeSystem(tmp_path / 'root', pi=True)
-    failed, ctx = setup_run(system, home, names=['hardware'], answers={'hw_phat_beat': True})
-    assert failed == 0
-    assert 'phat_beat' in ctx.enabled_plugins()
-    failed, ctx = setup_run(system, home, names=['hardware'], answers={'hw_phat_beat': False, 'hw_battery': 'none'})
-    assert failed == 0
-    assert 'phat_beat' not in ctx.enabled_plugins()
+    names = ['device', 'peripherals']
+    setup_run(system, home, names=names, answers={'peripheral_phat_beat': True})
+    assert 'phat_beat' in setup_run(system, home, names=names, check_only=True)[1].enabled_plugins()
+    failed, ctx = setup_run(system, home, names=names, answers={'peripheral_phat_beat': False})
+    assert failed == 0 and 'phat_beat' not in ctx.enabled_plugins()
+
+
+def test_peripherals_that_need_what_the_device_lacks_are_not_proposed(tmp_path, home, extras):
+    from lauschkiste_cli.setup.steps.peripherals import PeripheralsStep
+    ctx = Context(system=FakeSystem(tmp_path / 'root'), config_path=home / 'settings' / 'lauschkiste.yaml')
+    assert ctx.device_name() == 'device_pc_test'
+    assert PeripheralsStep().questions_for(ctx) == ()
+    pi = Context(system=FakeSystem(tmp_path / 'pi', pi=True), config_path=home / 'settings' / 'lauschkiste.yaml')
+    assert {q.key for q in PeripheralsStep().questions_for(pi)} >= {'peripheral_battery', 'peripheral_phat_beat'}
 
 
 def test_hardware_step_is_skipped_off_the_raspberry_pi(tmp_path, home, extras):
     failed, ctx = setup_run(FakeSystem(tmp_path / 'root'), home, names=['hardware'])
-    assert failed == 0 and 'board_raspberry_pi' not in ctx.enabled_plugins()
+    assert failed == 0 and 'device_raspberry_pi' not in ctx.enabled_plugins()
 
 
 def test_reboot_note_after_a_changed_boot_configuration(tmp_path, home, extras):
@@ -485,3 +504,97 @@ def test_audio_output_label_names_the_sound_card():
     assert label('Built-in Audio Stereo', 'bcm2835 Headphones', None) == 'bcm2835 Headphones'
     assert label('Built-in Audio Stereo', '', None) == 'Built-in Audio Stereo'
     assert label('Speakers', 'snd_rpi_hifiberry_dacplus', hat) == 'Speakers'
+
+
+def test_a_pc_is_offered_none_of_the_system_changes(tmp_path, home, extras, capsys):
+    system = FakeSystem(tmp_path / 'root')
+    failed, ctx = setup_run(system, home, answers={'port80': True, 'samba': True, 'kiosk': True, 'autohotspot': True,
+                                                   'optimize_boot': True, 'upgrade_os': True})
+    assert failed == 0
+    assert ctx.device_name() == 'device_pc_test' and not ctx.provides('system_setup')
+    assert 'samba' not in ctx.enabled_plugins()
+    assert not system.exists('/etc/systemd/system/lauschkiste-http.socket')
+    assert not system.exists('/etc/xdg/openbox/autostart')
+    assert not system.exists('/etc/update-motd.d/99-lauschkiste-welcome')
+    assert not any('full-upgrade' in command for command in system.commands)
+    assert 'upgrade_os' not in ctx.answers and 'kiosk' not in ctx.answers
+
+
+def test_a_raspberry_pi_gets_the_pi_device_and_its_steps(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    failed, ctx = setup_run(system, home)
+    assert failed == 0
+    assert ctx.device_name() == 'device_raspberry_pi' and ctx.provides('system_setup', 'boot_config', 'screen')
+    assert 'device_raspberry_pi' in ctx.enabled_plugins() and 'device_pc_test' not in ctx.enabled_plugins()
+
+
+def test_choosing_none_changes_nothing_on_a_pi(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    failed, ctx = setup_run(system, home, answers={'device': 'none', 'optimize_boot': True})
+    assert failed == 0
+    assert ctx.device_name() is None and not ctx.provides('system_setup')
+    assert not any(name.startswith('device_') for name in ctx.enabled_plugins())
+    assert 'splash' not in system.read('/boot/firmware/cmdline.txt')
+
+
+def test_another_device_replaces_the_enabled_one(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    setup_run(system, home)
+    failed, ctx = setup_run(system, home, answers={'device': 'device_pc_test'})
+    assert failed == 0
+    assert set(name for name in ctx.enabled_plugins() if name.startswith('device_')) == {'device_pc_test'}
+
+
+def test_a_device_plugin_of_my_own(tmp_path, home, extras, monkeypatch):
+    from lauschkiste.contract import Plugin
+    from lauschkiste_cli.setup.steps import device, extra_plugins
+
+    class Mine(Plugin):
+        name = 'device_mine'
+        provides = ('device', 'system_setup')
+
+    monkeypatch.setattr(device, '_device_classes', lambda: {'device_mine': Mine})
+    monkeypatch.setattr(extra_plugins, '_state', lambda: {'git+https://github.com/me/mine': ['device_mine']})
+    monkeypatch.setattr(extra_plugins, '_state_path', lambda: tmp_path / 'state.json')
+    system = FakeSystem(tmp_path / 'root')
+    failed, ctx = setup_run(system, home, names=['device'],
+                            answers={'device': 'own', 'device_plugin': 'github:me/mine'})
+    assert ctx.device_name() == 'device_mine' and ctx.provides('system_setup')
+
+
+def test_a_pc_as_a_box_of_its_own_may_be_set_up_but_has_no_boot_configuration(tmp_path, home, extras):
+    system = FakeSystem(tmp_path / 'root')
+    system.write('/etc/os-release', 'VERSION_CODENAME=trixie\n')
+    answers = {'device': 'device_pc_box', 'port80': True, 'kiosk': True, 'optimize_boot': True}
+    failed, ctx = setup_run(system, home, answers=answers)
+    assert failed == 0
+    assert ctx.provides('system_setup', 'autologin', 'screen') and not ctx.provides('boot_config')
+    assert system.exists('/etc/systemd/system/lauschkiste-http.socket')
+    assert 'chromium' in system.read('/etc/xdg/openbox/autostart')
+    assert '--autologin pi' in system.read('/etc/systemd/system/getty@tty1.service.d/autologin.conf')
+    assert 'optimize_boot' not in ctx.answers
+    assert 'device_pc_box' in ctx.enabled_plugins()
+
+
+def test_a_peripheral_from_another_source_is_proposed_not_enabled(tmp_path, home, extras, monkeypatch):
+    from lauschkiste.contract import Plugin
+    from lauschkiste_cli.setup.steps import extra_plugins, peripherals
+
+    class Knob(Plugin):
+        """A rotary knob from a third party."""
+        name = 'knob'
+        title = 'Third party knob'
+        setup_kind = 'peripheral'
+
+    class Other(Plugin):
+        name = 'other'
+
+    monkeypatch.setattr(extra_plugins, '_is_peripheral', lambda name: name == 'knob')
+    monkeypatch.setattr(peripherals, 'candidates', lambda ctx: {'knob': Knob})
+    monkeypatch.setattr(extra_plugins, '_state', lambda: {'knob-pkg': ['knob']})
+    monkeypatch.setattr(extra_plugins, '_state_path', lambda: tmp_path / 'state.json')
+    system = FakeSystem(tmp_path / 'root')
+    ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml')
+    questions = peripherals.PeripheralsStep().questions_for(ctx)
+    assert [(q.key, q.default, q.help) for q in questions] == [('peripheral_knob', True, 'A rotary knob from a third party.')]
+    assert 'knob' not in ctx.enabled_plugins()

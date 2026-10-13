@@ -162,11 +162,11 @@ def test_plugins_are_opt_in():
 def test_only_one_board_and_needs_must_be_provided():
     class BoardA(Plugin):
         name = 'board_a'
-        provides = ('board', 'gpio')
+        provides = ('device', 'gpio')
 
     class BoardB(Plugin):
         name = 'board_b'
-        provides = ('board', 'gpio', 'i2c')
+        provides = ('device', 'gpio', 'i2c')
 
     class Button(Plugin):
         name = 'button'
@@ -452,3 +452,38 @@ def test_the_response_adapter_belongs_to_its_operation_not_to_an_object_id():
     for _ in range(300):
         assert response_adapter(Operation('m', 'ints', ints, spec)).validate_python(5) == 5
         assert response_adapter(Operation('m', 'texts', texts, spec)).validate_python('x') == 'x'
+
+
+def test_a_core_module_that_needs_a_missing_capability_is_not_started_and_says_why():
+    class NeedsScreen(CoreModule):
+        name = 'needs_screen'
+        needs = ('screen',)
+
+    class Plain(CoreModule):
+        name = 'plain'
+
+    manager = ModuleManager([NeedsScreen, Plain], ConfigHandler('t'), EventBus(), plugins={})
+    manager.load()
+    manager.handle('plain')
+    with pytest.raises(KeyError):
+        manager.handle('needs_screen')
+    assert manager.skipped == {'needs_screen': 'needs screen, which no enabled plugin provides'}
+
+
+def test_a_module_can_say_it_is_not_compatible():
+    import lauschkiste.contract.plugins as plugins
+
+    class Picky(Plugin):
+        name = 'picky'
+
+        @classmethod
+        def compatible(cls, provided):
+            return None if 'gpio' in provided else 'needs a machine with GPIO pins'
+
+    class Gpio(Plugin):
+        name = 'gp'
+        provides = ('device', 'gpio')
+
+    assert plugins.blocker(Picky, []) == {'incompatible': 'needs a machine with GPIO pins'}
+    assert plugins.blocker_text(plugins.blocker(Picky, [])) == 'needs a machine with GPIO pins'
+    assert plugins.blocker(Picky, [Gpio]) is None

@@ -4,6 +4,9 @@
   "interface_version": "1.0",
   "kind": "core",
   "name": "display",
+  "needs": [
+    "screen"
+  ],
   "operations": {
     "get_state": {
       "args": {

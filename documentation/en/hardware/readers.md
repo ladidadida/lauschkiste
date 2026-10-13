@@ -43,7 +43,7 @@ must be in the group `input` (normally the case; otherwise `sudo usermod -a -G i
 
 ### RC522 / MFRC522 (SPI)
 
-The cheap blue board. It talks over SPI, which the Raspberry Pi board support switches on (`lauschctl setup raspi`,
+The cheap blue board. It talks over SPI, which the Raspberry Pi device plugin switches on (`lauschctl setup raspi`,
 then restart).
 
 | MFRC522 | Function | Raspberry Pi | Pin |

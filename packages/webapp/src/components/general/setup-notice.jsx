@@ -29,7 +29,7 @@ const write = (keys) => {
 
 export const noteKey = ({ id, text }) => `${id}:${text}`;
 
-// What the box says about its own set-up that the user may want to check (hardware notes of the board).
+// What the box says about its own set-up that the user may want to check (hardware notes of the device).
 const SetupNotice = ({ dismissible = true }) => {
   const { t } = useTranslation();
   const [notes, setNotes] = useState([]);

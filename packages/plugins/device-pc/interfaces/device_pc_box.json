@@ -1,0 +1,15 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "plugin",
+  "name": "device_pc_box",
+  "operations": {},
+  "provides": [
+    "autologin",
+    "device",
+    "screen",
+    "system_setup"
+  ],
+  "requires": {}
+}

@@ -164,14 +164,14 @@ def test_index_update_pins_all_installed_packages_and_keeps_extras(tmp_path, mon
     monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0a3': False, '99.0.0': False}))
     monkeypatch.setattr(update, 'installed_version', lambda name: '0.1.0a3')
     monkeypatch.setattr(update, 'distributions', lambda: [FakeDist('lauschkiste'), FakeDist('lauschkiste_core'),
-                                                          FakeDist('lauschkiste-plugin-devices'), FakeDist('typer')])
-    monkeypatch.setattr(update, 'enabled_extras', lambda path: {'lauschkiste-plugin-devices': ['gpio']})
+                                                          FakeDist('lauschkiste-plugin-peripherals'), FakeDist('typer')])
+    monkeypatch.setattr(update, 'enabled_extras', lambda path: {'lauschkiste-plugin-peripherals': ['gpio']})
     installed = []
     monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
     assert update.update_from_index('latest', tmp_path / 'x.yaml', check_only=True) is True
     assert installed == []
     assert update.update_from_index('latest', tmp_path / 'x.yaml') is True
-    assert installed == ['lauschkiste==99.0.0', 'lauschkiste-core==99.0.0', 'lauschkiste-plugin-devices[gpio]==99.0.0']
+    assert installed == ['lauschkiste==99.0.0', 'lauschkiste-core==99.0.0', 'lauschkiste-plugin-peripherals[gpio]==99.0.0']
     installed.clear()
     update.update_from_index('v0.1.0-alpha.4', tmp_path / 'x.yaml')
     assert installed[0] == 'lauschkiste==0.1.0a4'
@@ -196,3 +196,23 @@ def test_update_command_picks_the_source_of_the_installation(tmp_path, monkeypat
     monkeypatch.setattr(update, 'update_source', lambda *args: called.append('source') or False)
     update.update('latest', 'o/r', True, False, tmp_path / 'x.yaml')
     assert called == ['github', 'index', 'source']
+
+
+def test_an_index_update_swaps_obsolete_packages_and_renames_plugins(tmp_path, monkeypatch):
+    monkeypatch.setattr('requests.get', lambda url, timeout: pypi({'0.1.0a3': False, '99.0.0': False}))
+    monkeypatch.setattr(update, 'installed_version', lambda name: '0.1.0a3')
+    old = ['lauschkiste', 'lauschkiste-core', 'lauschkiste-plugin-board-raspberry-pi', 'lauschkiste-plugin-devices',
+           'lauschkiste-plugin-mpd']
+    monkeypatch.setattr(update, 'distributions', lambda: [FakeDist(name) for name in old])
+    monkeypatch.setattr(update, 'enabled_extras', lambda path: {})
+    installed, removed = [], []
+    monkeypatch.setattr(plugin, 'install_requirements', installed.extend)
+    monkeypatch.setattr(plugin, 'uninstall_packages', removed.extend)
+    config = tmp_path / 'lauschkiste.yaml'
+    config.write_text('plugins:\n  board_raspberry_pi:\n    sound_card: max98357a\n  gpio_controls: {}\n')
+    assert update.update_from_index('latest', config) is True
+    assert installed == ['lauschkiste==99.0.0', 'lauschkiste-core==99.0.0',
+                         'lauschkiste-plugin-device-raspberry-pi==99.0.0', 'lauschkiste-plugin-peripherals==99.0.0']
+    assert removed == ['lauschkiste-plugin-board-raspberry-pi', 'lauschkiste-plugin-devices', 'lauschkiste-plugin-mpd']
+    text = config.read_text()
+    assert 'device_raspberry_pi' in text and 'board_raspberry_pi' not in text and 'max98357a' in text

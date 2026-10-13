@@ -1,7 +1,7 @@
 import pytest
 
-from lauschkiste_plugin_board_raspberry_pi import hat
-from lauschkiste_plugin_board_raspberry_pi.hat import read_hat
+from lauschkiste_plugin_device_raspberry_pi import hat
+from lauschkiste_plugin_device_raspberry_pi.hat import read_hat
 
 
 def reader(vendor, product):

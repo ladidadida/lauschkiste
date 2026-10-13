@@ -1,19 +1,19 @@
 {
   "events": {},
   "extension_points": {
-    "boards": {
+    "claims": {
+      "claims": "(self) -> List[lauschkiste.box.hardware.Claim]"
+    },
+    "devices": {
       "boot_pending": "(self) -> List[str]",
       "describe": "(self) -> Dict[str, Any]",
       "gpio_line": "(self, pin: str) -> Tuple[int, int]",
       "pin_id": "(self, value: Any) -> str | None",
       "reboot": "(self) -> None",
       "shutdown": "(self) -> None"
-    },
-    "claims": {
-      "claims": "(self) -> List[lauschkiste.box.hardware.Claim]"
     }
   },
-  "interface_version": "1.2",
+  "interface_version": "2.0",
   "kind": "core",
   "name": "hardware",
   "operations": {
@@ -28,17 +28,6 @@
       "path": "/api/v1/hardware",
       "returns": {
         "properties": {
-          "board": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null
-          },
           "boot_pending": {
             "default": [],
             "items": {
@@ -71,6 +60,17 @@
               "type": "object"
             },
             "type": "array"
+          },
+          "device": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
           },
           "interfaces": {
             "default": [],

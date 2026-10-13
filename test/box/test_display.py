@@ -61,6 +61,8 @@ def screen(monkeypatch):
 
 def display_with(backlight):
     class FakeDisplay(Display):
+        needs = ()
+
         def __init__(self):
             super().__init__(backlight, FakeEvdev)
 
@@ -158,3 +160,19 @@ def test_stays_on_while_playing_if_asked(start_modules, screen, wait_for):
     manager._bus.publish('player.status', {'state': 'pause'})
     display._last_touch = time.monotonic() - 99999
     assert wait_for(lambda: light.level == 0)
+
+
+def test_a_device_without_a_controllable_screen_leaves_the_display_alone():
+    from lauschkiste.contract import Plugin
+    import lauschkiste.contract.plugins as plugins
+
+    class Pc(Plugin):
+        name = 'pc'
+        provides = ('device',)
+
+    class Pi(Plugin):
+        name = 'pi'
+        provides = ('device', 'screen')
+
+    assert plugins.blocker(Display, [Pc]) == {'missing': ['screen']}
+    assert plugins.blocker(Display, [Pi]) is None

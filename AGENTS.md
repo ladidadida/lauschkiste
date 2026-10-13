@@ -102,9 +102,10 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   `packages/webapp/build`.
   See `documentation/developers/packaging-and-setup.md`.
 - **Bundled plugins** live in `packages/plugins/*` (uv workspace members, installed by `uv sync`
-  but only loaded when enabled under `plugins:`): `board-raspberry-pi` (board support: pins,
-  interfaces, sound cards, power, firmware health; the installer enables it on a Pi), `devices`
-  (`gpio_controls`, `battery`, `power_button`, `phat_beat`, board-independent, see
+  but only loaded when enabled under `plugins:`): `device-raspberry-pi` (device plugin: pins,
+  interfaces, sound cards, power, firmware health; `lauschctl setup` enables it on a Pi), `device-pc` (device plugin of an
+  ordinary computer, changes nothing), `peripherals`
+  (`gpio_controls`, `battery`, `power_button`, `phat_beat`, device-independent, see
   `documentation/developers/hardware.md`) and `rfid-readers`
   (one plugin per reader driver, `rfid_<driver>`; each driver's dependencies are an extra of that
   package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`) and `samba` (the

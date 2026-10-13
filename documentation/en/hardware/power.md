@@ -35,7 +35,7 @@ More at [pinout.xyz](https://pinout.xyz/pinout/onoff_shim).
 
 The plugin *Battery* reads a battery sensor on I²C, shows the charge under Settings → Status, runs an action when the
 battery gets low (for example a warning sound) and shuts the box down cleanly before it is empty. Answer the question
-about a battery monitor in `lauschctl setup`; the Pi board switches I²C on (`lauschctl setup raspi`, then restart).
+about a battery monitor in `lauschctl setup`; the Pi device plugin switches I²C on (`lauschctl setup raspi`, then restart).
 
 | Driver | Sensor | Charge from |
 | --- | --- | --- |

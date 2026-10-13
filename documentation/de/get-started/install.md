@@ -53,9 +53,10 @@ Verbindung wackelig, starte es in `screen` oder `tmux`.
 
 | Frage | Auf Deutsch | Antwort |
 | --- | --- | --- |
+| What kind of machine is this? | Welche Art Maschine ist das? | *Raspberry Pi* auf einem Pi. Auf einem Computer: [Auf PC, Laptop oder Mini-PC](other-computers.md). |
 | Upgrade all operating system packages now (takes a while)? | Alle Pakete des Betriebssystems jetzt aktualisieren (dauert eine Weile)? | *Nein* reicht für den Anfang. |
 | Which sound card sits on the header? | Welche Soundkarte steckt auf der Stiftleiste? | Hast du eine Soundkarte auf den Pi gesteckt, wähle sie (HiFiBerry-Platinen werden erkannt). Sonst *none*. |
-| Is a power button attached (Pimoroni OnOff SHIM)? | Ist ein Ein-/Aus-Knopf angeschlossen (Pimoroni OnOff SHIM)? | *Nein*, außer du hast ihn. Entsprechend bei *Is a battery monitor attached?* („Ist ein Batteriewächter angeschlossen?“) und *Is a Pimoroni pHAT BEAT (Pirate Radio) attached?*. |
+| Use 'Pimoroni pHAT BEAT' / 'Power button' / 'Battery' / 'GPIO buttons and knobs'? | Pimoroni pHAT BEAT / Ein-Aus-Taste / Akku / GPIO-Tasten und Drehregler benutzen? | *Nein*, außer du hast sie. Diese Fragen kommen nach denen zur Box selbst, zusammen mit deinen eigenen Hardware-Plugins. |
 | Start Lauschkiste at boot, without anyone logging in? | Lauschkiste beim Hochfahren starten, ohne dass sich jemand anmeldet? | *Ja*. Dann startet die Box von selbst, sobald du den Strom anschließt. |
 | Serve the web app on port 80, so its address needs no ":5556"? | Die Webseite auf Port 80 anbieten, damit die Adresse kein „:5556“ braucht? | *Ja*. Die Adresse ist dann einfach `http://<name>.local`. |
 | Configure an RFID reader now? | Jetzt einen RFID-Leser einrichten? | *Ja*, und wähle deinen Leser. Ein USB-Leser ist am einfachsten, siehe [RFID-Leser](../hardware/readers.md). |

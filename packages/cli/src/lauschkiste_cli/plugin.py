@@ -51,6 +51,30 @@ def install_requirements(requirements: List[str]) -> None:
     subprocess.run(command, check=True)
 
 
+def uninstall_packages(names: List[str]) -> None:
+    """Remove packages from the environment Lauschkiste runs in."""
+    uv = shutil.which('uv')
+    if uv:
+        command = [uv, 'pip', 'uninstall', '--python', sys.executable, *names]
+    else:
+        command = [sys.executable, '-m', 'pip', 'uninstall', '-y', *names]
+    typer.echo(f"$ {' '.join(command)}")
+    subprocess.run(command, check=False)
+
+
+def rename_in_config(path: Path, renamed: dict) -> List[str]:
+    """Rename enabled plugins (``{old: new}``), keeping their settings; returns the old names that were found."""
+    cfg, _ = _config(path)
+    enabled = _enabled(cfg)
+    found = [old for old in renamed if old in enabled]
+    for old in found:
+        settings = enabled.pop(old)
+        enabled.setdefault(renamed[old], settings)
+    if found:
+        lauschkiste.common.cfghandler.write_yaml(cfg, str(path))
+    return found
+
+
 plugin_extras = plugins.plugin_extras
 missing_extras = plugins.missing_extras
 
@@ -64,6 +88,20 @@ def add_to_config(path: Path, names: List[str]) -> List[str]:
     if added:
         lauschkiste.common.cfghandler.write_yaml(cfg, str(path))
     return added
+
+
+def remove_from_config(path: Path, names: List[str]) -> List[str]:
+    """Remove ``names`` (and their settings) from ``plugins:``; returns the ones that were enabled."""
+    cfg, _ = _config(path)
+    enabled = _enabled(cfg)
+    removed = [name for name in names if name in enabled]
+    for name in removed:
+        del enabled[name]
+    if removed:
+        if not enabled:
+            cfg['plugins'] = {}
+        lauschkiste.common.cfghandler.write_yaml(cfg, str(path))
+    return removed
 
 
 @app.command('list')

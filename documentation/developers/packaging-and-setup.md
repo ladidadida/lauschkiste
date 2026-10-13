@@ -91,7 +91,7 @@ stays and is listed. It does not remember the state before the setup, so it cann
 | --- | --- | --- | --- |
 | `lauschkiste` | `packages/cli` | `lauschkiste_cli` | what users install: `lauschkiste`, `lauschctl` |
 | `lauschkiste-core` | `packages/lauschkiste` | `lauschkiste` | player, library, cards, API, web app |
-| `lauschkiste-plugin-board-raspberry-pi`, `-devices`, `-rfid-readers`, `-samba`, `-audiobookshelf`, `-directories` | `packages/plugins/*` | `lauschkiste_plugin_*` | bundled plugins |
+| `lauschkiste-plugin-device-raspberry-pi`, `-device-pc`, `-peripherals`, `-rfid-readers`, `-samba`, `-audiobookshelf`, `-directories` | `packages/plugins/*` | `lauschkiste_plugin_*` | bundled plugins |
 
 - **One version for all.** The packages are released together and depend on each other with exact
   pins (`lauschkiste-core==0.1.0a4`), so a plugin never meets a different core. Change the version with

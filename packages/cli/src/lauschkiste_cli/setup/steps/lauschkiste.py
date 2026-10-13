@@ -2,7 +2,6 @@
 
 from typing import List
 
-import lauschkiste.contract.plugins as plugins
 import lauschkiste.common.cfghandler
 import lauschkiste.common.paths
 from lauschkiste_cli import plugin
@@ -14,7 +13,8 @@ SERVICE = 'lauschkiste.service'
 
 
 def wanted_plugins(ctx: Context) -> List[str]:
-    names = [board['name'] for board in plugins.detected_boards(ctx.system.read)[:1]]
+    device = ctx.device_name()
+    names = [device] if device else []
     if ctx.answer('samba'):
         names.append('samba')
     return names
@@ -49,7 +49,7 @@ class ServiceStep(Step):
     title = 'Lauschkiste service (systemd user unit)'
     questions = (
         Question('start_at_boot', 'Start Lauschkiste at boot, without anyone logging in?',
-                 default=lambda ctx: ctx.system.is_raspberry_pi()),
+                 default=lambda ctx: ctx.provides('system_setup')),
     )
     UNIT_PATH = '~/.config/systemd/user/' + SERVICE
 
@@ -122,9 +122,10 @@ def public_port(ctx: Context) -> int:
 class WebPortStep(Step):
     name = 'port'
     title = 'Web app on port 80'
+    needs = ('system_setup',)
     questions = (
         Question('port80', 'Serve the web app on port 80, so its address needs no ":5556"?',
-                 default=lambda ctx: ctx.system.is_raspberry_pi(),
+                 default=True,
                  help='A systemd socket on port 80 forwards to the web app; Lauschkiste itself needs no extra rights'),
     )
     OLD_SYSCTL = '/etc/sysctl.d/60-lauschkiste-port.conf'
@@ -231,8 +232,9 @@ class WebPortStep(Step):
 class RfidStep(Step):
     name = 'rfid'
     title = 'RFID reader'
+    phase = 'peripherals'
     questions = (
-        Question('rfid', 'Configure an RFID reader now?', default=lambda ctx: ctx.system.is_raspberry_pi()),
+        Question('rfid', 'Configure an RFID reader now?', default=lambda ctx: ctx.provides('system_setup')),
     )
 
     def wanted(self, ctx):

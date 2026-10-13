@@ -54,7 +54,7 @@ def manager_with(board=None, claims=()):
         def start(self, ctx):
             hardware = ctx.modules.hardware
             if board is not None:
-                hardware.boards.register('fake', board)
+                hardware.devices.register('fake', board)
             for index, entry in enumerate(claims):
                 hardware.claims.register(f'c{index}', Claims(entry))
 
@@ -75,7 +75,7 @@ def test_pins_users_and_shared_buses():
     ])
     state = hardware.invoke('get_state')
     pins = {pin.id: pin for pin in state.pins}
-    assert (state.board, state.model, state.boot_pending) == ('fake', 'Fake Board 1', ['i2c'])
+    assert (state.device, state.model, state.boot_pending) == ('fake', 'Fake Board 1', ['i2c'])
     assert [u.owner for u in pins['GPIO2'].used_by] == ['battery', 'clock']
     assert state.conflicts == []
     assert pins['GPIO5'].used_by[0].purpose == 'button next'
@@ -112,12 +112,12 @@ def test_gpio_line_and_power_go_to_the_board():
     assert error.value.status == 404
 
 
-def test_without_a_board(monkeypatch):
-    monkeypatch.setattr(plugins, 'detected_boards', lambda: [{'name': 'board_x', 'model': 'X 1'}])
+def test_without_a_device(monkeypatch):
+    monkeypatch.setattr(plugins, 'detected_devices', lambda: [{'name': 'device_x', 'model': 'X 1'}])
     hardware = manager_with(None, [[Claim(resource='GPIO5', owner='x')]])
     state = hardware.invoke('get_state')
-    assert state.board is None and state.pins == [] and len(state.unknown) == 1
-    assert [(board.name, board.model) for board in state.detected] == [('board_x', 'X 1')]
+    assert state.device is None and state.pins == [] and len(state.unknown) == 1
+    assert [(entry.name, entry.model) for entry in state.detected] == [('device_x', 'X 1')]
     with pytest.raises(OperationError) as error:
         hardware.invoke('shutdown')
     assert error.value.status == 501

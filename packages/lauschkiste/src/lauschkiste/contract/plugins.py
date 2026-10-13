@@ -16,7 +16,7 @@ from packaging.markers import default_environment
 from packaging.requirements import Requirement
 
 ENTRY_POINT_GROUP = 'lauschkiste.plugins'
-EXCLUSIVE = ('board',)
+EXCLUSIVE = ('device',)
 INSTALL_TIMEOUT_SEC = 1800
 
 logger = logging.getLogger('lauschkiste.contract.plugins')
@@ -78,7 +78,7 @@ def _provides(cls) -> Iterable[str]:
 
 
 def taken_by(cls, others: Iterable[type]) -> Optional[str]:
-    """The other plugin already providing an exclusive capability of ``cls`` (e.g. the board)."""
+    """The other plugin already providing an exclusive capability of ``cls`` (e.g. the device)."""
     for capability in EXCLUSIVE:
         if capability in _provides(cls):
             other = next((o for o in others if o.name != cls.name and capability in _provides(o)), None)
@@ -93,19 +93,38 @@ def missing_needs(cls, others: Iterable[type]) -> List[str]:
     return [need for need in getattr(cls, 'needs', ()) if need not in provided]
 
 
+def incompatible(cls, others: Iterable[type]) -> Optional[str]:
+    """The reason ``cls`` says it can't work next to ``others`` (see ``Module.compatible``), None if it can."""
+    check = getattr(cls, 'compatible', None)
+    if check is None:
+        return None
+    provided = frozenset(capability for other in others if other.name != cls.name for capability in _provides(other))
+    try:
+        return check(provided)
+    except Exception as error:
+        logger.debug(f"Checking whether '{cls.name}' is compatible failed: {error}")
+        return None
+
+
 def blocker(cls, others: Iterable[type]) -> Optional[Dict[str, Any]]:
-    """Why ``cls`` can't run next to ``others``: ``{'taken_by': name}`` or ``{'missing': [...]}``."""
+    """Why ``cls`` can't run next to ``others``: ``{'taken_by': name}``, ``{'missing': [...]}`` or
+    ``{'incompatible': reason}``."""
     others = list(others)
     taken = taken_by(cls, others)
     if taken:
         return {'taken_by': taken}
     missing = missing_needs(cls, others)
-    return {'missing': missing} if missing else None
+    if missing:
+        return {'missing': missing}
+    reason = incompatible(cls, others)
+    return {'incompatible': reason} if reason else None
 
 
 def blocker_text(blocked: Dict[str, Any]) -> str:
     if 'taken_by' in blocked:
-        return f"only one board plugin can be enabled, '{blocked['taken_by']}' is"
+        return f"only one device plugin can be enabled, '{blocked['taken_by']}' is"
+    if 'incompatible' in blocked:
+        return str(blocked['incompatible'])
     return f"needs {', '.join(blocked['missing'])}, which no enabled plugin provides"
 
 
@@ -129,12 +148,12 @@ def enabled_classes(cfg) -> List[type]:
     return classes
 
 
-def detected_boards(read=read_text) -> List[Dict[str, str]]:
-    """Installed board plugins whose board this machine is: ``[{'name', 'model'}]``."""
+def detected_devices(read=read_text) -> List[Dict[str, str]]:
+    """Installed device plugins whose device this machine is: ``[{'name', 'model'}]``."""
     found = []
     for name, ep in sorted(installed().items()):
         cls, _ = load(ep)
-        if cls is not None and 'board' in _provides(cls) and hasattr(cls, 'detect'):
+        if cls is not None and 'device' in _provides(cls) and hasattr(cls, 'detect'):
             model = detect(cls, read)
             if model:
                 found.append({'name': name, 'model': model})

@@ -19,7 +19,7 @@ The **core** is everything that makes sense on every machine: the player, the li
 volume, timers, time limits and the web page. It is always there. It works on any Linux computer, not only on a
 Raspberry Pi.
 
-**Plugins** add what depends on hardware or on other services: Raspberry Pi board support, buttons, battery, RFID
+**Plugins** add what depends on hardware or on other services: the device (Raspberry Pi or PC), buttons, battery, RFID
 reader drivers, Samba, the Audiobookshelf connection, podcast and radio directories. A plugin only runs when it is
 switched on (Settings → Plugins). If one fails to start, Lauschkiste keeps running; the web page and
 `lauschctl plugin list` say why.

@@ -21,16 +21,16 @@ class PackagesStep(Step):
     name = 'packages'
     title = 'System packages'
     questions = (
-        Question('upgrade_os', 'Upgrade all operating system packages now (takes a while)?', default=False),
+        Question('upgrade_os', 'Upgrade all operating system packages now (takes a while)?', default=False,
+                 needs=('system_setup',)),
     )
 
     def relevant(self, ctx):
         return ctx.system.is_debian()
 
     def packages(self, ctx):
-        pi = ctx.system.is_raspberry_pi()
-        audio = AUDIO_PACKAGES if pi else []
-        ffmpeg = ['ffmpeg'] if pi and ctx.system.architecture() in PIWHEELS_ARCHITECTURES else []
+        audio = AUDIO_PACKAGES if ctx.provides('system_setup') else []
+        ffmpeg = ['ffmpeg'] if ctx.system.architecture() in PIWHEELS_ARCHITECTURES else []
         return [*BUILD_PACKAGES, *RUNTIME_PACKAGES, *audio, *ffmpeg]
 
     def apply(self, ctx):
@@ -38,9 +38,9 @@ class PackagesStep(Step):
 
 
 def _boot_wanted(ctx: Context):
-    """What config.txt needs, by the rules of the board_raspberry_pi plugin; None without it."""
+    """What config.txt needs, by the rules of the device_raspberry_pi plugin; None without it."""
     try:
-        from lauschkiste_plugin_board_raspberry_pi import bootconfig
+        from lauschkiste_plugin_device_raspberry_pi import bootconfig
     except ImportError:
         return None, None
     import lauschkiste.common.statefile
@@ -56,9 +56,7 @@ class RaspberryPiStep(Step):
     power-off pin, on-chip audio. The settings come from the web app (board and device plugins)."""
     name = 'raspi'
     title = 'Raspberry Pi boot configuration'
-
-    def relevant(self, ctx):
-        return ctx.system.is_raspberry_pi()
+    needs = ('boot_config',)
 
     def packages(self, ctx):
         return ['liblgpio-dev', 'swig']
@@ -66,7 +64,7 @@ class RaspberryPiStep(Step):
     def check(self, ctx):
         bootconfig, want = _boot_wanted(ctx)
         if bootconfig is None:
-            return ['the board_raspberry_pi plugin package is not installed']
+            return ['the device_raspberry_pi plugin package is not installed']
         config = ctx.system.read(ctx.system.boot_file('config.txt')) or ''
         return [f'config.txt: {problem}' for problem in bootconfig.pending(config, want)]
 
@@ -75,7 +73,7 @@ class RaspberryPiStep(Step):
         system.run('iwconfig', 'wlan0', 'power', 'off', root=True, check=False)
         bootconfig, want = _boot_wanted(ctx)
         if bootconfig is None:
-            raise SetupError('the board_raspberry_pi plugin package is not installed')
+            raise SetupError('the device_raspberry_pi plugin package is not installed')
         path = system.boot_file('config.txt')
         config = system.read(path) or ''
         wanted = bootconfig.render(config, want)
@@ -106,8 +104,7 @@ class BootStep(Step):
     CMDLINE = ['consoleblank=1', 'logo.nologo', 'quiet', 'loglevel=0', 'plymouth.enable=0',
                'vt.global_cursor_default=0', 'plymouth.ignore-serial-consoles', 'splash']
 
-    def relevant(self, ctx):
-        return ctx.system.is_raspberry_pi()
+    needs = ('boot_config',)
 
     def wanted(self, ctx):
         return bool(ctx.answer('optimize_boot'))
@@ -144,10 +141,8 @@ class BootStep(Step):
 class WelcomeStep(Step):
     name = 'welcome'
     title = 'Login message'
+    needs = ('system_setup',)
     TARGET = '/etc/update-motd.d/99-lauschkiste-welcome'
-
-    def relevant(self, ctx):
-        return ctx.system.is_raspberry_pi()
 
     def _content(self, ctx) -> str:
         port = public_port(ctx)

@@ -53,7 +53,7 @@ starts Lauschkiste in the console with another file, for example to test a lower
 
 ## Plugins
 
-A plugin adds functions: board support, buttons, readers, directories for podcasts and radio. It only runs when it is
+A plugin adds functions: the device, buttons, readers, directories for podcasts and radio. It only runs when it is
 switched on, under Settings → Plugins or with `lauschctl plugin enable <name>`.
 
 ```bash

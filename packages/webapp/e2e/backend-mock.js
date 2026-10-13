@@ -165,7 +165,7 @@ export async function mockBackend(
       values: { rewind_sec: 10 },
     }),
     '/api/v1/hardware': () => ({
-      board: 'raspberry_pi', model: 'Raspberry Pi 3 Model B',
+      device: 'raspberry_pi', model: 'Raspberry Pi 3 Model B',
       pins: [
         { id: 'GPIO4', label: 'GPIO4 (pin 7)', position: 7, functions: ['gpio'],
           used_by: [{ owner: 'power_button', purpose: 'power off' }], conflict: false },
@@ -178,12 +178,12 @@ export async function mockBackend(
       conflicts: ['GPIO17'], unknown: [], boot_pending: ['i2c on'],
     }),
     '/api/v1/plugins': () => [
-      { name: 'battery', enabled: false, running: false, package: 'lauschkiste-plugin-devices', version: '0.1.0',
+      { name: 'battery', enabled: false, running: false, package: 'lauschkiste-plugin-peripherals', version: '0.1.0',
         summary: 'Battery monitor.', problem: null, missing_extras: [], needs: ['i2c'], provides: [],
         blocked: { missing: ['i2c'] }, detected: null },
-      { name: 'board_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-board-raspberry-pi',
+      { name: 'device_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-device-raspberry-pi',
         version: '0.1.0', summary: 'Raspberry Pi hardware.', problem: null, missing_extras: [], needs: [],
-        provides: ['board', 'gpio', 'i2c'], blocked: null, detected: 'Raspberry Pi 3 Model B' },
+        provides: ['device', 'gpio', 'i2c'], blocked: null, detected: 'Raspberry Pi 3 Model B' },
     ],
     '/api/v1/system/ip-addresses': () => ({ addresses: ['192.168.1.42'] }),
     '/api/v1/timers': () => [

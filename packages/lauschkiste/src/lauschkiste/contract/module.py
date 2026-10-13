@@ -2,7 +2,7 @@
 
 import re
 import threading
-from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, List, Mapping, Optional, Tuple, Type, Union
+from typing import TYPE_CHECKING, Any, Callable, ClassVar, Dict, FrozenSet, List, Mapping, Optional, Tuple, Type, Union
 
 from packaging.specifiers import InvalidSpecifier, SpecifierSet
 from packaging.version import InvalidVersion, Version
@@ -32,6 +32,16 @@ class Module:
     #: The settings of the module's config section, editable through the web app. Field titles and
     #: descriptions are shown; ``Field(json_schema_extra={'widget': 'action'})`` marks an action entry.
     settings: ClassVar[Optional[Type[BaseModel]]] = None
+    #: Capabilities that must be provided by the enabled device plugin or another enabled plugin, e.g. ``('i2c',)``.
+    #: A module that needs one nobody provides is not started and says why.
+    needs: ClassVar[Tuple[str, ...]] = ()
+
+    @classmethod
+    def compatible(cls, provided: FrozenSet[str]) -> Optional[str]:
+        """Whether the module can work here beyond ``needs``: None, or the reason it can't, in plain words.
+
+        ``provided`` holds the capabilities of the enabled plugins, the device plugin's among them."""
+        return None
 
     def start(self, ctx: 'Context') -> None:
         pass
@@ -137,14 +147,14 @@ class Plugin(Module):
     extras: ClassVar[Tuple[str, ...]] = ()
     #: The name shown in the plugin list when no translation exists (default: the plugin's name made readable)
     title: ClassVar[str] = ''
-    #: Capabilities it offers other plugins, e.g. ``('board', 'gpio', 'i2c')``; only one plugin may provide 'board'
+    #: Capabilities it offers other modules, e.g. ``('device', 'gpio', 'i2c')``; only one plugin may provide 'device'
     provides: ClassVar[Tuple[str, ...]] = ()
-    #: Capabilities an enabled plugin must provide, e.g. ``('i2c',)``
-    needs: ClassVar[Tuple[str, ...]] = ()
+    #: 'peripheral': hardware attached to the machine, proposed by `lauschctl setup` once the device is known
+    setup_kind: ClassVar[str] = ''
 
     @classmethod
     def detect(cls, read: Callable[[str], Optional[str]]) -> Optional[str]:
-        """The hardware of this plugin found on this machine (e.g. a board model), or None.
+        """The hardware of this plugin found on this machine (e.g. a device model), or None.
 
         ``read(path)`` returns a file's text or None."""
         return None

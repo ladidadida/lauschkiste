@@ -111,9 +111,9 @@ def _entry_point(cls):
     return ep
 
 
-def test_plugins_need_a_board_and_only_one_board(client, monkeypatch):
+def test_plugins_need_a_device_and_only_one_device(client, monkeypatch):
     def board(name, model):
-        return type(name, (Plugin,), {'name': name, 'provides': ('board', 'i2c'),
+        return type(name, (Plugin,), {'name': name, 'provides': ('device', 'i2c'),
                                       'detect': classmethod(lambda cls, read: model)})
     sensor = type('Sensor', (Plugin,), {'name': 'sensor', 'needs': ('i2c',)})
     found = {cls.name: _entry_point(cls) for cls in (board('board_a', 'Board A'), board('board_b', None), sensor)}

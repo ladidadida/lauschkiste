@@ -14,16 +14,16 @@ import { useEffect, useState } from 'react';
 
 import request from '../../utils/request';
 
-// Only shown with a board support plugin, which can shut the box down and reboot it.
+// Only shown with a device plugin that can power the machine off, which can shut the box down and reboot it.
 const SystemControls = () => {
   const { t } = useTranslation();
-  const [board, setBoard] = useState(null);
+  const [device, setDevice] = useState(null);
 
   useEffect(() => {
-    request('hardwareState').then(({ result }) => setBoard(result?.board || null));
+    request('hardwareState').then(({ result }) => setDevice(result?.device || null));
   }, []);
 
-  if (!board) {
+  if (!device) {
     return null;
   }
 

@@ -113,6 +113,7 @@ class Display(CoreModule):
     interface_version = '1.0'
     concurrency = 'threadsafe'
     settings = DisplaySettings
+    needs = ('screen',)
 
     def __init__(self, backlight: Optional[Backlight] = None, evdev_access=None):
         self._backlight = backlight

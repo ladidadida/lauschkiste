@@ -25,6 +25,15 @@ from lauschkiste_cli.setup.system import System
 
 SERVICE = 'lauschkiste.service'
 
+#: Packages that no longer exist, and what took their place (None: nothing); an update swaps them
+OBSOLETE_PACKAGES: Dict[str, Optional[str]] = {
+    'lauschkiste-plugin-mpd': None,
+    'lauschkiste-plugin-board-raspberry-pi': 'lauschkiste-plugin-device-raspberry-pi',
+    'lauschkiste-plugin-devices': 'lauschkiste-plugin-peripherals',
+}
+#: Plugins that were renamed, as they are called in the configuration
+RENAMED_PLUGINS = {'board_raspberry_pi': 'device_raspberry_pi'}
+
 
 class UpdateError(Exception):
     pass
@@ -149,6 +158,7 @@ def update_package(repo: str, tag: str, config_path: Path, check_only: bool = Fa
             path.write_bytes(response.content)
             wheels.append(path)
         plugin.install_requirements(wheel_requirements(wheels, enabled_extras(config_path)))
+    finish_install(config_path)
     return True
 
 
@@ -180,11 +190,24 @@ def latest_index_version(name: str = 'lauschkiste') -> Version:
     return max(stable or versions)
 
 
+def installed_packages() -> List[str]:
+    return sorted({canonicalize_name(dist.metadata['Name']) for dist in distributions()
+                   if canonicalize_name(dist.metadata['Name']).startswith('lauschkiste')})
+
+
+def finish_install(config_path: Path) -> None:
+    """After new packages are in: the packages they replace go, and renamed plugins are renamed in the configuration."""
+    obsolete = [name for name in installed_packages() if name in OBSOLETE_PACKAGES]
+    if obsolete:
+        plugin.uninstall_packages(obsolete)
+    if config_path.exists():
+        plugin.rename_in_config(config_path, RENAMED_PLUGINS)
+
+
 def index_requirements(config_path: Path, version: Version) -> List[str]:
     """Every installed Lauschkiste package pinned to ``version``, with the extras enabled plugins need."""
     extras = enabled_extras(config_path)
-    names = sorted({canonicalize_name(dist.metadata['Name']) for dist in distributions()
-                    if canonicalize_name(dist.metadata['Name']).startswith('lauschkiste')})
+    names = sorted({OBSOLETE_PACKAGES.get(name, name) for name in installed_packages()} - {None})
     return [f"{name}{f'[{chr(44).join(sorted(extras[name]))}]' if extras.get(name) else ''}=={version}"
             for name in names]
 
@@ -202,6 +225,7 @@ def update_from_index(release: str, config_path: Path, check_only: bool = False)
     if check_only:
         return True
     plugin.install_requirements(index_requirements(config_path, target))
+    finish_install(config_path)
     return True
 
 

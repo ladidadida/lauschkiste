@@ -28,6 +28,8 @@ class Question:
     validate: Optional[Callable[[str], Optional[str]]] = None
     #: Text shown above the question, or ``callable(ctx)`` returning it
     help: Any = ''
+    #: Capabilities the device must provide for the question to be asked
+    needs: Tuple[str, ...] = ()
 
     def default_for(self, ctx: 'Context') -> Any:
         return self.default(ctx) if callable(self.default) else self.default
@@ -55,6 +57,16 @@ class Context:
         lauschkiste.common.cfghandler.load_yaml(cfg, str(self.config_path))
         return cfg
 
+    def device_name(self) -> Optional[str]:
+        """The device plugin chosen for this machine (see steps/device.py), None for none."""
+        from lauschkiste_cli.setup.steps import device
+        return device.resolve(self)
+
+    def provides(self, *capabilities: str) -> bool:
+        """Does the device offer all of these (see ``Module.needs``)? Always true for none."""
+        from lauschkiste_cli.setup.steps import device
+        return set(capabilities) <= device.capabilities(self)
+
     def enabled_plugins(self) -> Dict[str, Any]:
         if not self.config_path.exists():
             return {}
@@ -66,10 +78,21 @@ class Step:
     name: ClassVar[str]
     title: ClassVar[str]
     questions: ClassVar[Tuple[Question, ...]] = ()
+    #: Capabilities the device plugin must provide for the step to be offered
+    needs: ClassVar[Tuple[str, ...]] = ()
+    #: 'device' (the device and its options) or 'peripherals' (what is attached, and its options)
+    phase: ClassVar[str] = 'device'
+
+    def questions_for(self, ctx: Context) -> Sequence[Question]:
+        """The questions to ask; most steps have fixed ones, a few depend on the machine and earlier answers."""
+        return self.questions
 
     def relevant(self, ctx: Context) -> bool:
         """Does the step make sense on this machine at all?"""
         return True
+
+    def applies(self, ctx: Context) -> bool:
+        return ctx.provides(*self.needs) and self.relevant(ctx)
 
     def wanted(self, ctx: Context) -> bool:
         """Did the user choose it (from the answers)?"""

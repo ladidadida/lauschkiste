@@ -1,0 +1,12 @@
+{
+  "plugins": {
+    "device_pc_test": {
+      "name": "PC or laptop, just trying it out",
+      "description": "An ordinary computer used to try Lauschkiste out: nothing is changed outside Lauschkiste."
+    },
+    "device_pc_box": {
+      "name": "PC, laptop or mini PC as a box of its own",
+      "description": "A computer that is a Lauschkiste box: it may be set up for that (port 80, Samba, login, kiosk screen, quiet system changes)."
+    }
+  }
+}

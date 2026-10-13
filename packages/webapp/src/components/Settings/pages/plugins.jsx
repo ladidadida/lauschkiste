@@ -26,11 +26,13 @@ import ModuleSettings from '../form/module-settings';
 import { useRestart } from '../restart';
 import SettingsPage from './page';
 
-const blockedText = (t, blocked) => (blocked.taken_by
-  ? t('settings.plugins.blocked-board', { name: pluginName(t, blocked.taken_by) })
-  : t('settings.plugins.blocked-needs', {
+const blockedText = (t, blocked) => {
+  if (blocked.taken_by) return t('settings.plugins.blocked-device', { name: pluginName(t, blocked.taken_by) });
+  if (blocked.incompatible) return blocked.incompatible;
+  return t('settings.plugins.blocked-needs', {
     needs: blocked.missing.map((need) => t(`settings.plugins.capabilities.${need}`, { defaultValue: need })).join(', '),
-  }));
+  });
+};
 
 const PluginsSettings = () => {
   const { t } = useTranslation();

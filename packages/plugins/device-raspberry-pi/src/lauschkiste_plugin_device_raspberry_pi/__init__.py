@@ -1,0 +1,153 @@
+"""The Raspberry Pi as a device: 40-pin header, I²C/SPI/I²S, sound cards, power, firmware health.
+
+Registers the device at the core ``hardware`` module. Changes of the boot configuration (sound card,
+I²C, SPI, power-off pin) are written by ``lauschctl setup raspi``; the plugin reports them as pending
+until then. See documentation/developers/hardware.md.
+"""
+
+import logging
+import subprocess
+from pathlib import Path
+from typing import Any, List, Optional
+
+import lauschkiste.common.cfghandler
+from lauschkiste.contract import OperationError, Plugin, query
+from lauschkiste.box.hardware import Claim
+
+from lauschkiste_plugin_device_raspberry_pi import bootconfig, hat, health, pins
+from lauschkiste_plugin_device_raspberry_pi.settings import DeviceSettings
+
+logger = logging.getLogger('lauschkiste.device_raspberry_pi')
+
+BOOT_CONFIG = ('/boot/firmware/config.txt', '/boot/config.txt')
+
+
+class RaspberryPiDevice:
+    """What the hardware module asks a device."""
+
+    def __init__(self, plugin: 'DeviceRaspberryPi'):
+        self._plugin = plugin
+        self._model = pins.model()
+        self._chip = pins.gpio_chip(self._model)
+
+    def describe(self):
+        return {'name': 'raspberry_pi', 'model': self._model or 'Raspberry Pi', 'pins': pins.pins(),
+                'interfaces': pins.INTERFACES}
+
+    def pin_id(self, value) -> Optional[str]:
+        return pins.pin_id(value)
+
+    def gpio_line(self, pin: str):
+        return self._chip, int(pin[4:])
+
+    def shutdown(self) -> None:
+        self._plugin.power(['sudo', 'shutdown', '-h', 'now'], 'Shutting down')
+
+    def reboot(self) -> None:
+        self._plugin.power(['sudo', 'reboot'], 'Rebooting')
+
+    def boot_pending(self) -> List[str]:
+        return self._plugin.boot_pending()
+
+    def notes(self) -> List[dict]:
+        return self._plugin.notes()
+
+
+class DeviceClaims:
+    def __init__(self, plugin: 'DeviceRaspberryPi'):
+        self._plugin = plugin
+
+    def claims(self) -> List[Claim]:
+        card = self._plugin.setting('sound_card', 'none')
+        return [Claim(resource='i2s', owner='device_raspberry_pi', purpose=f'sound card {card}')] \
+            if card != 'none' else []
+
+
+class DeviceRaspberryPi(Plugin):
+    """Raspberry Pi: pins, interfaces, sound cards, boot configuration, shutdown/reboot and firmware health."""
+
+    name = 'device_raspberry_pi'
+    title = 'Raspberry Pi'
+    interface_version = '1.2'
+    requires = {'hardware': '>=2.0,<3'}
+    provides = ('device', 'gpio', 'i2c', 'spi', 'i2s', 'uart', 'poweroff', 'boot_config', 'system_setup', 'autologin',
+                'screen')
+    settings = DeviceSettings
+
+    @classmethod
+    def detect(cls, read):
+        model = (read('/proc/device-tree/model') or '').strip('\x00\n ')
+        return model if 'Raspberry Pi' in model else None
+
+    def __init__(self):
+        self._ctx: Any = None
+
+    def setting(self, key, default=None):
+        return self._ctx.config.get(key, default=default)
+
+    def start(self, ctx) -> None:
+        self._ctx = ctx
+        if self.setting('hdmi_power_down', False):
+            health.hdmi_power_down()
+        if self.setting('wlan_power_save', None) is False:
+            health.disable_wlan_power_save(self.setting('wlan_interface', 'wlan0'))
+        hardware = ctx.modules.hardware
+        hardware.devices.register('raspberry_pi', RaspberryPiDevice(self))
+        hardware.claims.register('device_raspberry_pi', DeviceClaims(self))
+
+    def settings_changed(self, changed):
+        return set(changed) <= {'debug_mode', 'sound_card', 'onboard_audio', 'i2c', 'spi'}
+
+    def power(self, command: List[str], what: str) -> None:
+        if self.setting('debug_mode', False):
+            logger.info(f"debug_mode: not running '{' '.join(command)}' ({what})")
+            return
+        logger.info(what)
+        try:
+            subprocess.Popen(command)
+        except OSError as error:
+            raise OperationError(501, 'not_supported', f"{what} failed: {error}") from None
+
+    def boot_pending(self) -> List[str]:
+        path = next((Path(p) for p in BOOT_CONFIG if Path(p).exists()), None)
+        if path is None:
+            return []
+        main = lauschkiste.common.cfghandler.get_handler('lauschkiste')
+        rfid = lauschkiste.common.cfghandler.get_handler('rfid')
+        want = bootconfig.wanted({'plugins': main.getn('plugins', default=None) or {}},
+                                 {'rfid': rfid.getn('rfid', default=None) or {}})
+        return bootconfig.pending(path.read_text(), want)
+
+    def notes(self, read=hat.read_text) -> List[dict]:
+        """What is set up and what the user may want to check, for the hardware overview."""
+        found = hat.read_hat(read)
+        main = lauschkiste.common.cfghandler.get_handler('lauschkiste')
+        configured = bootconfig.wanted({'plugins': main.getn('plugins', default=None) or {}}, {}).sound_card
+        notes: List[dict] = []
+        if found is not None and found.sound_card is not None:
+            if configured == found.sound_card:
+                notes.append({'id': 'sound_card', 'level': 'ok', 'text': f'Sound card {found.label} is set up'})
+            elif configured == 'none':
+                notes.append({'id': 'sound_card', 'level': 'todo', 'hint': 'lauschctl setup hardware',
+                              'text': f'{found.label} was found, but no sound card is set up: the sound of the Pi '
+                                      'itself is used'})
+            else:
+                notes.append({'id': 'sound_card', 'level': 'info',
+                              'text': f'{found.label} was found, the sound card setting is {configured}'})
+        elif found is not None:
+            notes.append({'id': 'hat', 'level': 'info', 'text': f'A board on the header reports itself as {found.label}'})
+        elif configured != 'none':
+            notes.append({'id': 'sound_card', 'level': 'ok', 'text': f'Sound card {configured} is set up'})
+        pending = self.boot_pending()
+        if pending:
+            notes.append({'id': 'boot', 'level': 'todo', 'hint': 'lauschctl setup raspi, then reboot',
+                          'text': 'The boot configuration lacks: ' + ', '.join(pending)})
+        return notes
+
+    @query(path='/throttled')
+    def get_throttled(self) -> health.Throttled:
+        """Under-voltage and throttling flags of the firmware (``vcgencmd get_throttled``)."""
+        state = health.read_throttled()
+        if state is None:
+            raise OperationError(501, 'not_supported', 'vcgencmd is not available')
+        return state

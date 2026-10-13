@@ -5,17 +5,17 @@ from unittest.mock import Mock
 import pytest
 
 import lauschkiste.common.cfghandler
-import lauschkiste_plugin_board_raspberry_pi as board_plugin
+import lauschkiste_plugin_device_raspberry_pi as board_plugin
 from lauschkiste.common.cfghandler import ConfigHandler
 from lauschkiste.contract import CoreModule, action, extension_point
 from lauschkiste.contract.manager import ModuleManager
 from lauschkiste.box.hardware import Hardware
 from lauschkiste.player.backend import LevelMeter
 from lauschkiste.common.publishing.bus import EventBus
-from lauschkiste_plugin_board_raspberry_pi import bootconfig
-from lauschkiste_plugin_devices import phat_beat
-from lauschkiste_plugin_devices.apa102 import frame
-from lauschkiste_plugin_devices.phat_beat import (BAR, OFF, RAINBOW, RED, VOLUME_COLOR, LedState, level_to_leds,
+from lauschkiste_plugin_device_raspberry_pi import bootconfig
+from lauschkiste_plugin_peripherals import phat_beat
+from lauschkiste_plugin_peripherals.apa102 import frame
+from lauschkiste_plugin_peripherals.phat_beat import (BAR, OFF, RAINBOW, RED, VOLUME_COLOR, LedState, level_to_leds,
                                                   shutdown_frames, startup_frames)
 
 
@@ -78,10 +78,10 @@ def start(settings, monkeypatch):
     Writer.frames = []
     monkeypatch.setattr(phat_beat.PhatBeat, 'led_writer', Writer)
     cfg = ConfigHandler('test')
-    cfg.config_dict({'plugins': {'board_raspberry_pi': {'debug_mode': True}, 'phat_beat': settings}})
+    cfg.config_dict({'plugins': {'device_raspberry_pi': {'debug_mode': True}, 'phat_beat': settings}})
     bus = EventBus()
     manager = ModuleManager([Hardware, Player], cfg, bus, strict=True, plugins={
-        'board_raspberry_pi': lambda: board_plugin.BoardRaspberryPi, 'phat_beat': lambda: phat_beat.PhatBeat})
+        'device_raspberry_pi': lambda: board_plugin.DeviceRaspberryPi, 'phat_beat': lambda: phat_beat.PhatBeat})
     manager.load()
     manager.start()
     manager.ready()
@@ -205,7 +205,7 @@ def test_buttons_run_actions_leds_show_volume_and_pins_are_claimed(mock_pins, mo
 def test_power_button_needs_holding(mock_pins, monkeypatch):
     manager, _ = start({'leds': 'off', 'power_hold_time': 0.5}, monkeypatch)
     shutdown = Mock()
-    monkeypatch.setattr(board_plugin.RaspberryPiBoard, 'shutdown', lambda self: shutdown())
+    monkeypatch.setattr(board_plugin.RaspberryPiDevice, 'shutdown', lambda self: shutdown())
     mock_pins.add(12)
     time.sleep(0.2)
     assert not shutdown.called
@@ -240,7 +240,7 @@ def test_buttons_press_hold_and_repeat():
 
 
 def test_boot_configuration_switches_its_dac_on():
-    want = bootconfig.wanted({'plugins': {'board_raspberry_pi': {}, 'phat_beat': {}}})
+    want = bootconfig.wanted({'plugins': {'device_raspberry_pi': {}, 'phat_beat': {}}})
     assert want.sound_card == 'hifiberry-dac' and not want.onboard_audio
-    chosen = bootconfig.wanted({'plugins': {'board_raspberry_pi': {'sound_card': 'max98357a'}, 'phat_beat': {}}})
+    chosen = bootconfig.wanted({'plugins': {'device_raspberry_pi': {'sound_card': 'max98357a'}, 'phat_beat': {}}})
     assert chosen.sound_card == 'max98357a'

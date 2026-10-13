@@ -17,15 +17,15 @@ Two commands do everything on the box. Log in with SSH and type them in a termin
 
 ### The setup steps
 
-Each step looks first and only changes what is missing, so running one again is safe.
+`lauschctl setup` goes in two parts: first the device (what kind of machine this is) and its options, then what is
+attached to it (the peripherals) and their options. Each step looks first and only changes what is missing, so running one again is safe.
 
 | Step | For |
 | --- | --- |
+| `device` | which kind of machine this is; decides what the other steps offer |
 | `packages` | the system packages Lauschkiste needs (and, if you want, an upgrade of the system) |
-| `hardware` | the connected hardware: sound card, pHAT BEAT, power button, battery monitor |
-| `raspi` | writes the sound card and the pins to the boot configuration (restart afterwards) |
+| `hardware` | the sound card on the header (Raspberry Pi) |
 | `plugins` | enables the plugins the answers call for |
-| `extra_plugins` | installs plugins from PyPI, GitHub (`github:owner/repo@tag`) or a URL |
 | `service` | Lauschkiste as a service that starts with the box |
 | `port` | the web page on port 80, so the address needs no `:5556` |
 | `audio` | chooses the audio outputs ([Sound](../using/sound.md)) |
@@ -35,6 +35,10 @@ Each step looks first and only changes what is missing, so running one again is 
 | `autohotspot` | the box's own WiFi ([Away from home](../using/wifi-hotspot.md)) |
 | `boot` | quiet boot, Bluetooth optionally off |
 | `welcome` | the message when you log in |
+| `extra_plugins` | installs plugins from PyPI, GitHub (`github:owner/repo@tag`) or a URL, also for hardware of your own |
+| `peripherals` | what is attached: pHAT BEAT, power button, battery monitor, buttons and knobs, and your own |
+| `peripheral_options` | the options of what is attached (e.g. the battery sensor) |
+| `raspi` | writes the sound card and the pins to the boot configuration (restart afterwards) |
 
 ## `lauschkiste`: the server
 

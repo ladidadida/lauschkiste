@@ -68,6 +68,7 @@ class ModuleManager:
         self._handles: Dict[str, ModuleHandle] = {}
         self._order: List[str] = []
         self.failed: Dict[str, str] = {}
+        self.skipped: Dict[str, str] = {}
         self.secrets = SecretStore(secrets_path(getattr(cfg, 'loaded_from', None)))
         self.settings = SettingsStore(self, cfg)
 
@@ -126,11 +127,23 @@ class ModuleManager:
         while changed:
             changed = False
             for cls in list(kept):
-                missing = plugins.missing_needs(cls, kept)
-                if missing:
-                    self._fail(cls.name, plugins.blocker_text({'missing': missing}))
+                blocked = plugins.blocker(cls, kept)
+                if blocked:
+                    self._fail(cls.name, plugins.blocker_text(blocked))
                     kept.remove(cls)
                     changed = True
+        return kept
+
+    def _check_core_capabilities(self, plugin_classes: List[Type[Plugin]]) -> List[Type[CoreModule]]:
+        """The core modules that can work with the enabled plugins; the others are skipped and listed as not running."""
+        kept = []
+        for cls in self._core_classes:
+            blocked = plugins.blocker(cls, plugin_classes)
+            if blocked:
+                self.skipped[cls.name] = plugins.blocker_text(blocked)
+                logger.info(f"Core module '{cls.name}' is not started: {self.skipped[cls.name]}")
+            else:
+                kept.append(cls)
         return kept
 
     def _fail(self, name: str, reason: str) -> None:
@@ -183,7 +196,8 @@ class ModuleManager:
             if not (isinstance(cls, type) and issubclass(cls, CoreModule)):
                 raise ContractError(f"{cls!r} is not a CoreModule")
             cls.validate_declaration()
-        classes: List[Type[Module]] = [*self._core_classes, *self._check_capabilities(self._load_plugin_classes())]
+        plugin_classes = self._check_capabilities(self._load_plugin_classes())
+        classes: List[Type[Module]] = [*self._check_core_capabilities(plugin_classes), *plugin_classes]
         ordered = self._sort(classes)
         present = {cls.name: cls for cls in ordered}
         for cls in ordered:

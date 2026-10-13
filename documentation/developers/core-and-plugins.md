@@ -22,18 +22,18 @@ They differ only in how they are shipped, loaded and enabled.
 Pi, a container.** Platform- or hardware-specific functionality and integrations with external
 systems are plugins. Shutting down is the typical example: on a Pi-based box it is essential, on a
 desktop PC nobody wants Lauschkiste to power the machine off: the core `hardware` module only
-offers it when a board support plugin is enabled. See [Hardware](hardware.md) for boards, devices
+offers it when a device plugin is enabled. See [Hardware](hardware.md) for devices, peripherals
 and pins.
 
 ## Split
 
 | Core | Plugins |
 | --- | --- |
-| Player (with the `local_audio` backend) | Board support: `board_raspberry_pi` |
+| Player (with the `local_audio` backend) | Device: `device_raspberry_pi`, `device_pc_test` ([Device plugins](device-plugins.md)) |
 | Library (index, metadata, cover art, see below) | Devices: `gpio_controls`, `battery`, `power_button`, `phat_beat` |
 | Audiobooks, podcasts, radio ([Content types](content-types.md)) | Further player backends |
 | Cache for downloads ([Caching](caching.md)) | RFID reader drivers (one plugin per driver) |
-| Hardware (pins and buses in use, board, shutdown/reboot) | Audiobookshelf server as a source |
+| Hardware (pins and buses in use, device, shutdown/reboot) | Audiobookshelf server as a source |
 | Card database and card action dispatch | Podcast and radio directories |
 | Settings / system | Samba share |
 | System info (IP address, disk usage, CPU temperature, restart Lauschkiste service) | |
@@ -42,8 +42,8 @@ and pins.
 | Jingle (startup/shutdown sound) | |
 | Input devices via evdev (USB buttons, media keys, Bluetooth headset buttons) | |
 
-Board support plugins (one per board family) describe the board's pins and interfaces and power it
-off; device plugins (buttons, battery, power button) are board-independent and get their pins
+Device plugins (one per kind of machine) say what the machine provides, describe its pins and interfaces and
+power it off; peripheral plugins (buttons, battery, power button) are device-independent and get their pins
 through the core `hardware` module. Details in [Hardware](hardware.md).
 
 **Autohotspot** is network configuration, not runtime functionality, and is done by `lauschctl setup autohotspot`.
@@ -74,10 +74,10 @@ Core never special-cases a plugin. Where core behavior needs a platform-specific
 *action*, and plugins contribute actions:
 
 - **Timers** run an action when they expire instead of hard-wiring "shutdown". On a PC that is
-  e.g. `player.stop`; with a board plugin `hardware.shutdown` works as well. The same applies to
-  cards: a "shut down" card only works while a board plugin is enabled.
+  e.g. `player.stop`; with a device plugin that can power off `hardware.shutdown` works as well. The same applies to
+  cards: a "shut down" card only works while a device plugin that can power off is enabled.
 - **Webapp:** `GET /api/v1/modules` lists the active modules with their actions and queries. The
-  webapp shows e.g. the shutdown button only if a board is active (`GET /api/v1/hardware`).
+  webapp shows e.g. the shutdown button only if a device is active (`GET /api/v1/hardware`).
 - Shutting down itself stays simple: the plugin calls `poweroff`, systemd sends SIGTERM, and the
   core runs its normal graceful shutdown (jingle, stop playback, save state).
 
@@ -277,7 +277,7 @@ and are enabled by listing them in `lauschkiste.yaml`; their config lives under 
 plugins:
   example:
     host: 192.168.1.10
-  board_raspberry_pi:
+  device_raspberry_pi:
     sound_card: max98357a
   gpio_controls:
     buttons:
@@ -299,9 +299,9 @@ plugins:
 - `lauschctl plugin list|enable|disable|install` manages this from the command line. A plugin whose
   dependencies are optional extras of its package names them in `extras` (e.g.
   `extras = ('gpio',)`); `lauschctl plugin enable <name> --with-extras` installs them.
-- Plugins can declare capabilities they offer (`provides`) and need (`needs`), e.g. a board plugin
-  `provides = ('board', 'gpio', 'i2c')` and a battery gauge `needs = ('i2c',)`. A plugin can only be
-  enabled when the enabled plugins provide all it needs, and only one plugin may provide `board`
+- Plugins can declare capabilities they offer (`provides`) and need (`needs`), e.g. a device plugin
+  `provides = ('device', 'gpio', 'i2c')` and a battery gauge `needs = ('i2c',)`. A plugin can only be
+  enabled when the enabled plugins provide all it needs, and only one plugin may provide `device`
   (web app, `PUT /api/v1/plugins/<name>` and `lauschctl plugin enable` refuse; at startup such a
   plugin is skipped with a problem). See [Hardware](hardware.md).
 

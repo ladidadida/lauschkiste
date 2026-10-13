@@ -15,20 +15,19 @@ the [roadmap](roadmap-core-architecture.md).
 | Library | one folder with `music/` and `audiobooks/`, index with tags and cover art, folder watching, upload and file management in the web app, optional Samba share |
 | Cards | RFID cards with actions (play, volume, timers, shutdown, ...), learning mode, second swipe, card database in the web app |
 | Readers | RC522 (SPI), MFRC522 and PN532 (I²C), USB readers, RDM6300, NFC (nfcpy) as plugins |
-| Hardware | board support for the Raspberry Pi, GPIO buttons and rotary encoders, status LED, battery monitor (MAX17048, INA219), power button (OnOff SHIM), Pimoroni pHAT BEAT with LED level meter, I²S sound cards; see [Hardware](hardware.md) |
+| Hardware | the Raspberry Pi as a device plugin, GPIO buttons and rotary encoders, status LED, battery monitor (MAX17048, INA219), power button (OnOff SHIM), Pimoroni pHAT BEAT with LED level meter, I²S sound cards; see [Hardware](hardware.md) |
 | Volume and timers | volume with soft maximum and outputs, fade-out, named timers (stop, fade, shutdown), startup and shutdown sound |
 | Input | evdev devices (USB buttons, media keys, Bluetooth headset buttons) |
 | Web app | player, library, cards, settings of all modules and plugins, plugin management, hardware and pin overview, help, German and English |
 | API | REST and WebSocket, typed operations and events generated from the modules ([Core and plugins](core-and-plugins.md)) |
-| Platforms | Raspberry Pi (Zero W, 3 tested) and any Linux computer; board hardware only with a board support plugin ([Installation](installer.md#other-linux-computers)) |
+| Platforms | Raspberry Pi (Zero W, 3 tested) and any Linux computer; pin hardware only with a device plugin that has pins ([Installation](installer.md#other-linux-computers)) |
 | Installation | install script, `lauschctl setup` steps (re-runnable), updates, plugins from the command line, port 80, WiFi hotspot, kiosk mode; packages for PyPI ([Releasing](releasing.md)) |
 
 ## Planned
 
 - **Tidy up** (in progress): the code is grouped by purpose and the oldest legacy is gone; the documentation grew by
   adapting and should still be rebuilt from how the system is used, for users and developers alike.
-- **Device plugins** as the foundation of the setup: the machine (Raspberry Pi, PC, a third party's) is chosen first and
-  decides which questions, system changes and plugins apply; plugins check their own compatibility. Plan:
+- **Device plugins**: done except that a device cannot yet add whole setup steps of its own; see
   [Device plugins](device-plugins.md).
 - **Playlists**: create, show and change playlists in the web app (a topic of its own).
 - **Card management**, thought through as a whole: more than one behaviour per card (placed, removed, placed again),
@@ -45,7 +44,7 @@ the [roadmap](roadmap-core-architecture.md).
 - A complete uninstall: the setup would remember the state before it changed anything (installed packages, original
   file contents, service states), so that `lauschctl uninstall` can restore it. Today it only removes what Lauschkiste
   created and lists what stays.
-- A switch for Bluetooth on the Raspberry Pi, more board support plugins, general LED strip control.
+- A switch for Bluetooth on the Raspberry Pi, more device plugins, general LED strip control.
 - An MQTT plugin (Home Assistant and other home automation).
 - Bluetooth headphones paired by holding them against an NFC tag on the box (and a way to unpair again), next to
   the phone sink above.

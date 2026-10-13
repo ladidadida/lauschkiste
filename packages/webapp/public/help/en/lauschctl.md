@@ -65,7 +65,9 @@ Opens its own WiFi when no known one is in range, e.g. when travelling.
 | Step | For |
 | --- | --- |
 | `extra_plugins` | install plugins from PyPI, GitHub (`github:owner/repo@tag`) or a URL and enable them |
-| `hardware` | choose the connected hardware: sound card, pHAT BEAT, power button, battery monitor |
+| `device` | which kind of machine this is (decides what the other steps offer) |
+| `hardware` | the sound card on the header (Raspberry Pi) |
+| `peripherals` | what is attached: pHAT BEAT, power button, battery monitor, buttons and knobs, plugins of your own |
 | `boot` | quiet boot (no boot messages or logo, a few first-boot services off; Bluetooth optionally) |
 | `kiosk` | the web app on an attached screen |
 | `port` | the web app on port 80, so its address needs no `:5556` (a systemd socket forwards it) |

@@ -12,7 +12,7 @@ things you may already have:
 Everything that does not need Pi hardware: the web page, the library, radio, podcasts, audiobooks, time limits, Bluetooth,
 and RFID readers that plug in over USB. What is missing are the parts tied to the Pi's pins and boot configuration:
 readers and sound cards that you wire to the GPIO header, the pHAT BEAT, the OnOff SHIM and the like. `lauschctl setup`
-leaves out those questions on other computers.
+asks first *What kind of machine is this?* and leaves out the questions that do not fit the answer.
 
 Sound comes out of whatever the computer has: its speakers, a headphone jack, a USB speaker or Bluetooth.
 
@@ -23,10 +23,18 @@ ones from [Install](install.md), without the SD card:
 
 1. Install the Linux on the computer as usual (a server or minimal install is enough, a desktop is fine too).
 2. Open a terminal there, or log in with `ssh`, and paste the install line from [Install](install.md#3-install).
-3. Run `lauschctl setup`. The answers that differ from a Pi:
-   - *Start Lauschkiste at boot* is a *no* by default here. Answer *yes* if the computer is to be a box that starts by
-     itself.
-   - *Configure an RFID reader now* is a *no* by default. Answer *yes* if you have a USB reader.
+3. Run `lauschctl setup`. The first question is *What kind of machine is this?*. For a computer there are two answers:
+   - *PC or laptop, just trying it out*: nothing is changed on the system outside Lauschkiste, no port 80, no Samba, no
+     login or boot changes, no kiosk, no system upgrade. Preselected on a computer that is not a Pi. This is the one for
+     your work computer.
+   - *PC, laptop or mini PC as a box of its own*: for a computer that is a Lauschkiste box. The setup may then offer
+     port 80, Samba, a login message, a system upgrade, the WiFi hotspot and the kiosk screen (it sets up the console
+     login for it).
+
+   The other answers on a computer:
+   - *Start Lauschkiste at boot* is a *no* by default for a test; answer *yes* for a box that starts by itself.
+   - Then come the questions about what is attached (a USB reader needs nothing, answer *Configure an RFID reader now*
+     with *yes*).
 4. Open `http://<name>.local` or `http://<ip address>:5556` from a phone or from the same computer.
 
 On another Linux (Fedora, Arch, ...) the installer only warns: install Python 3 with headers, a C compiler, `curl`, the

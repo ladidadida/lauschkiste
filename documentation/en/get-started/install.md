@@ -50,9 +50,10 @@ unreliable, run it in `screen` or `tmux`.
 
 | Question | What to answer |
 | --- | --- |
+| What kind of machine is this? | *Raspberry Pi* on a Pi. On a computer: [On a PC, laptop or mini PC](other-computers.md). |
 | Upgrade all operating system packages now | *No* is fine for a first try. |
 | Which sound card sits on the header | If you plugged a sound card onto the Pi, pick it (HiFiBerry boards are recognised). Otherwise *none*. |
-| Is a pHAT BEAT, power button or battery monitor attached | *No*, unless you have them. |
+| Use 'Pimoroni pHAT BEAT' / 'Power button' / 'Battery' / 'GPIO buttons and knobs'? | *No*, unless you have them. These come after the questions about the box itself, together with your own hardware plugins. |
 | Start Lauschkiste at boot, without anyone logging in | *Yes*. The box then starts by itself when you plug it in. |
 | Serve the web app on port 80 | *Yes*. The address is then just `http://<name>.local`. |
 | Configure an RFID reader now | *Yes*, and choose your reader. A USB reader is the simplest. See [RFID readers](../hardware/readers.md). |

@@ -1,0 +1,16 @@
+{
+  "events": {},
+  "extension_points": {},
+  "interface_version": "1.3",
+  "kind": "plugin",
+  "name": "phat_beat",
+  "needs": [
+    "gpio",
+    "i2s"
+  ],
+  "operations": {},
+  "requires": {
+    "hardware": ">=2.0,<3",
+    "player": ">=7.0,<8"
+  }
+}

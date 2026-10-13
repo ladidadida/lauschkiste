@@ -9,7 +9,7 @@ system:
 # See documentation/developers/core-and-plugins.md
 plugins: {}
 # Plugins and their settings are easiest set in the web app (Settings -> Plugins). The installer
-# enables the board support plugin (board_raspberry_pi on a Raspberry Pi).
+# enables the device plugin of the machine (device_raspberry_pi on a Raspberry Pi, device_pc_test elsewhere).
 volume:
   # 'auto': PulseAudio/PipeWire if a server is reachable, otherwise the player backend's volume.
   # 'pulse' or 'player' force one of them.
@@ -90,7 +90,7 @@ cards:
 timers:
   # Named timers run an action when they expire. Defaults (can be overridden here):
   #   stop_player: player.stop, fade_volume: volume.fade_out, shutdown: hardware.shutdown
-  # (the shutdown timer needs a board support plugin).
+  # (the shutdown timer needs a device plugin that can power the machine off).
   stop_player:
     default_timeout_sec: 3600
   fade_volume:

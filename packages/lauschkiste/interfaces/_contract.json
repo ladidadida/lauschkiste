@@ -20,12 +20,14 @@
     "unregister": "(self, key: str) -> None"
   },
   "Module": {
+    "compatible": "(cls, provided: FrozenSet[str]) -> str | None",
     "concurrency": "attribute",
     "events": "(cls) -> Dict[str, lauschkiste.contract.declarations.EventSpec]",
     "extension_point_specs": "(cls) -> Dict[str, lauschkiste.contract.declarations.ExtensionPointSpec]",
     "extra_routes": "(self, router) -> None",
     "interface_version": "attribute",
     "is_core": "attribute",
+    "needs": "attribute",
     "operations": "(cls) -> Dict[str, lauschkiste.contract.declarations.Operation]",
     "ready": "(self) -> None",
     "required_modules": "(cls) -> Dict[str, str | None]",
@@ -47,12 +49,12 @@
     "contract": "attribute",
     "detect": "(cls, read: Callable[[str], str | None]) -> str | None",
     "extras": "attribute",
-    "needs": "attribute",
     "provides": "attribute",
+    "setup_kind": "attribute",
     "title": "attribute",
     "validate_declaration": "(cls) -> None"
   },
-  "contract_version": "2.3",
+  "contract_version": "3.1",
   "functions": {
     "action": "(func: Callable | None = None, *, method: str = 'POST', path: str | None = None, exclusive: bool = True, name: str | None = None, status_code: int | None = None)",
     "event": "(name: str, model: Type[pydantic.main.BaseModel]) -> lauschkiste.contract.declarations.EventSpec",

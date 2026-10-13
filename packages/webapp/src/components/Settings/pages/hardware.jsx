@@ -53,7 +53,7 @@ const PinTable = ({ pins }) => {
   );
 };
 
-// The board, pending boot changes, conflicts and the pin map.
+// The device, pending boot changes, conflicts and the pin map.
 const HardwareSettings = () => {
   const { t } = useTranslation();
   const [state, setState] = useState(undefined);
@@ -73,21 +73,21 @@ const HardwareSettings = () => {
 
   const body = () => {
     if (state === undefined) return <CircularProgress />;
-    if (!state?.board) {
+    if (!state?.device) {
       return (
         <Card>
           <CardContent>
-            <Typography sx={{ marginBottom: 2 }}>{t('settings.hardware.no-board')}</Typography>
+            <Typography sx={{ marginBottom: 2 }}>{t('settings.hardware.no-device')}</Typography>
             {(state?.detected || []).map(({ name, model }) => (
               <Alert
                 action={enabled !== name &&
-                  <Button color="inherit" onClick={() => enable(name)} size="small">{t('settings.hardware.enable-board')}</Button>
+                  <Button color="inherit" onClick={() => enable(name)} size="small">{t('settings.hardware.enable-device')}</Button>
                 }
                 key={name}
                 severity={enabled === name ? 'success' : 'info'}
                 sx={{ marginBottom: 2 }}
               >
-                {enabled === name ? t('settings.hardware.board-enabled')
+                {enabled === name ? t('settings.hardware.device-enabled')
                   : t('settings.hardware.detected', { model, name: pluginName(t, name) })}
               </Alert>
             ))}
@@ -110,7 +110,7 @@ const HardwareSettings = () => {
           </Alert>
         ))}
         <Card>
-          <CardHeader subheader={state.board} title={state.model} />
+          <CardHeader subheader={state.device} title={state.model} />
           <Divider />
           <CardContent>
             <Stack spacing={1}>
@@ -120,8 +120,8 @@ const HardwareSettings = () => {
                 ))}
               </Stack>
               <Button component={RouterLink} sx={{ alignSelf: 'flex-start' }}
-                to={`/settings/plugins/board_${state.board}`} variant="outlined">
-                {t('settings.hardware.board-settings')}
+                to={`/settings/plugins/device_${state.device}`} variant="outlined">
+                {t('settings.hardware.device-settings')}
               </Button>
             </Stack>
           </CardContent>

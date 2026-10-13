@@ -3,14 +3,14 @@ import pytest
 from lauschkiste.contract.settings import current_values
 from lauschkiste.core_modules import CORE_MODULES
 from lauschkiste_plugin_audiobookshelf import Audiobookshelf
-from lauschkiste_plugin_board_raspberry_pi import BoardRaspberryPi
-from lauschkiste_plugin_devices.battery import Battery
-from lauschkiste_plugin_devices.gpio_controls import GpioControls
-from lauschkiste_plugin_devices.phat_beat import PhatBeat
-from lauschkiste_plugin_devices.power_button import PowerButton
+from lauschkiste_plugin_device_raspberry_pi import DeviceRaspberryPi
+from lauschkiste_plugin_peripherals.battery import Battery
+from lauschkiste_plugin_peripherals.gpio_controls import GpioControls
+from lauschkiste_plugin_peripherals.phat_beat import PhatBeat
+from lauschkiste_plugin_peripherals.power_button import PowerButton
 
 MODULES = [m for m in CORE_MODULES if m.settings is not None] + [
-    Audiobookshelf, BoardRaspberryPi, Battery, GpioControls, PowerButton, PhatBeat]
+    Audiobookshelf, DeviceRaspberryPi, Battery, GpioControls, PowerButton, PhatBeat]
 
 
 @pytest.mark.parametrize('module', MODULES, ids=lambda m: m.name)

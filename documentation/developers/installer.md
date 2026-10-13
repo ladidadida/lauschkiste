@@ -39,6 +39,6 @@ installed; the script never switches it. Whichever way: if an installation fails
 Lauschkiste is not tied to the Raspberry Pi. On a Debian-based computer (Debian, Ubuntu, ...) the install script works
 the same and skips the Raspberry Pi steps; it is tested in Debian 12 and 13 containers. The built-in player plays
 through the normal sound output, USB RFID readers work, and the web app and all content features (library,
-audiobooks, podcasts, radio, time limits) are the same. What needs a board (GPIO buttons, LEDs, sound cards on the
-header, battery, shutdown by a power button) is only available with a board support plugin; shutdown and reboot are
+audiobooks, podcasts, radio, time limits) are the same. What needs a Raspberry Pi (GPIO buttons, LEDs, sound cards on the
+header, battery, shutdown by a power button) is only available with a device plugin that offers it; shutdown and reboot are
 then not offered. On other distributions, install with `--from source` and set up the system packages yourself. Windows and macOS are not supported.

@@ -23,11 +23,17 @@ def _select(names: Optional[List[str]], steps: List[Step]) -> List[Step]:
     return [step for step in steps if step.name in names]
 
 
-def _ask_questions(steps: List[Step], ctx: Context, stored: Dict, assume_yes: bool) -> None:
-    for step in steps:
-        for question in step.questions:
-            if question.when is None or question.when(ctx.answers):
-                ctx.answers[question.key] = ask(question, ctx, stored, assume_yes)
+PHASES = {'device': 'The device and its options', 'peripherals': 'What is attached to it, and its options'}
+
+
+def _ask_questions(step: Step, ctx: Context, stored: Dict, assume_yes: bool, shown: List[str]) -> None:
+    for question in step.questions_for(ctx):
+        if not ctx.provides(*question.needs) or (question.when is not None and not question.when(ctx.answers)):
+            continue
+        if not assume_yes and step.phase not in shown:
+            shown.append(step.phase)
+            typer.echo(typer.style(f"\n== {PHASES.get(step.phase, step.phase)}", bold=True))
+        ctx.answers[question.key] = ask(question, ctx, stored, assume_yes)
 
 
 def _stored_answers(steps: List[Step], answers: Dict, previous: Dict) -> Dict:
@@ -81,15 +87,16 @@ def run_setup(names: Optional[List[str]], ctx: Context, answers: Answers, check_
               force: bool = False, steps: Optional[List[Step]] = None) -> int:
     """Returns the number of steps with remaining problems."""
     selected = _select(names, steps or all_steps())
+    previous = answers.load()
+    shown: List[str] = []
     relevant = []
     for step in selected:
-        if step.relevant(ctx):
+        if step.applies(ctx):
             relevant.append(step)
+            _ask_questions(step, ctx, previous, ctx.assume_yes, shown)
         elif names:
             typer.echo(f"Skipping '{step.name}': not applicable on this machine.")
 
-    previous = answers.load()
-    _ask_questions(relevant, ctx, previous, ctx.assume_yes)
     if not check_only:
         answers.save(_stored_answers(relevant, ctx.answers, previous))
 

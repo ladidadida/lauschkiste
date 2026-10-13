@@ -57,7 +57,7 @@ def test_enable_with_extras_installs_them(home, monkeypatch):
     result = runner.invoke(app, ['plugin', 'enable', 'rfid_rc522_spi', '--with-extras'])
     assert result.exit_code == 1 and 'needs spi, gpio' in result.output
     assert installed == []
-    assert runner.invoke(app, ['plugin', 'enable', 'board_raspberry_pi']).exit_code == 0
+    assert runner.invoke(app, ['plugin', 'enable', 'device_raspberry_pi']).exit_code == 0
     result = runner.invoke(app, ['plugin', 'enable', 'rfid_rc522_spi', '--with-extras'])
     assert result.exit_code == 0, result.output
     assert installed == ['lauschkiste-plugin-rfid-readers[rc522-spi]']
