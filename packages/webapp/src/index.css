@@ -11,3 +11,24 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Wide scrollbars with a long thumb for fingers; thin ones stay for mouse and trackpad. */
+@media (pointer: coarse) {
+  ::-webkit-scrollbar {
+    height: 28px;
+    width: 28px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.4);
+    background-clip: content-box;
+    border: 6px solid transparent;
+    border-radius: 14px;
+    min-height: 72px;
+    min-width: 72px;
+  }
+}

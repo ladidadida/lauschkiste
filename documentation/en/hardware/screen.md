@@ -15,6 +15,14 @@ minimal graphics system (X server, the openbox window manager and the Chromium b
 the first console by itself and starts the browser in full screen after the start. Restart the box. A Raspberry Pi 3
 or better is advised; a Zero is slow with a browser.
 
+## Typing on the screen
+
+Tap a text field (for example the search for radio stations) and a keyboard appears at the bottom of the screen. The
+key with the arrow hides it again. It appears only on the screen on the box, not on your phone or computer. If you
+attach a physical keyboard, switch it off in *Settings → General → On-screen keyboard*.
+
+A box set up with an older version needs `lauschctl setup kiosk` once, so that the screen knows it is the one on the box.
+
 ## Switch the screen off when nobody uses it
 
 After 5 minutes without a touch the screen goes dark. A touch switches it on again, and that touch only wakes the

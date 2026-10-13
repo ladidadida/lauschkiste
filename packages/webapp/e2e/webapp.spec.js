@@ -271,6 +271,25 @@ test('saving a card sends its action id and named arguments', async ({ page }) =
   expect(consoleErrors).toEqual([]);
 });
 
+test('the on-screen keyboard types into a text field on the kiosk display only', async ({ page }) => {
+  await mockBackend(page);
+  await page.goto('/#/library/music/albums');
+  await page.locator('#library').getByRole('button', { name: /search/i }).click();
+  await expect(page.locator('#library-search')).toBeFocused();
+  await expect(page.locator('.on-screen-keyboard')).toHaveCount(0);
+
+  await page.goto('/?kiosk#/library/music/albums');
+  await page.locator('#library').getByRole('button', { name: /search/i }).click();
+  const keyboard = page.locator('.on-screen-keyboard');
+  await expect(keyboard).toBeVisible();
+  await keyboard.locator('[data-skbtn="q"]').click();
+  await keyboard.locator('[data-skbtn="{shift}"]').click();
+  await keyboard.locator('[data-skbtn="A"]').click();
+  await expect(page.locator('#library-search')).toHaveValue('qA');
+  await keyboard.locator('[data-skbtn="{close}"]').click();
+  await expect(keyboard).toHaveCount(0);
+});
+
 test('playback settings switch audio outputs and save module settings', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   const { apiCalls } = await mockBackend(page);

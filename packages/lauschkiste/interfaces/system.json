@@ -62,7 +62,7 @@
     }
   },
   "extension_points": {},
-  "interface_version": "1.0",
+  "interface_version": "1.1",
   "kind": "core",
   "name": "system",
   "operations": {
@@ -77,6 +77,10 @@
       "path": "/api/v1/settings",
       "returns": {
         "properties": {
+          "on_screen_keyboard": {
+            "default": true,
+            "type": "boolean"
+          },
           "show_covers": {
             "default": true,
             "type": "boolean"
@@ -250,6 +254,17 @@
         "properties": {
           "settings": {
             "properties": {
+              "on_screen_keyboard": {
+                "anyOf": [
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
               "show_covers": {
                 "anyOf": [
                   {

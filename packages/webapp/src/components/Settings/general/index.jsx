@@ -9,7 +9,7 @@ import {
   Divider,
   Grid,
 } from '@mui/material';
-import ShowCovers from './show-covers';
+import AppSwitch from './app-switch';
 
 const SettingsGeneral = () => {
   const { t } = useTranslation();
@@ -30,7 +30,8 @@ const SettingsGeneral = () => {
             flexDirection: 'column',
           }}
         >
-          <ShowCovers />
+          <AppSwitch name="show_covers" />
+          <AppSwitch name="on_screen_keyboard" />
         </Grid>
       </CardContent>
     </Card>

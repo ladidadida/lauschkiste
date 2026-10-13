@@ -15,6 +15,15 @@ installiert eine minimale Grafikumgebung (X-Server, den Fenstermanager openbox u
 Desktop), meldet sich auf der ersten Konsole selbst an und startet nach dem Hochfahren den Browser im Vollbild. Starte die
 Box neu. Ein Raspberry Pi 3 oder besser wird empfohlen; auf einer Zero ist ein Browser langsam.
 
+## Auf dem Bildschirm tippen
+
+Tippe auf ein Textfeld (zum Beispiel die Suche nach Radiosendern), und unten erscheint eine Tastatur. Mit der Taste mit
+dem Pfeil unten verschwindet sie wieder. Sie erscheint nur auf dem Bildschirm an der Box, nicht auf Handy oder Computer.
+Schließt du eine echte Tastatur an, schalte sie unter *Einstellungen → Allgemein → Bildschirmtastatur* aus.
+
+Eine Box, die mit einer älteren Version eingerichtet wurde, braucht einmal `lauschctl setup kiosk`, damit der Bildschirm
+weiß, dass er der an der Box ist.
+
 ## Den Bildschirm ausschalten, wenn ihn niemand benutzt
 
 Nach 5 Minuten ohne Berührung wird der Bildschirm dunkel. Eine Berührung schaltet ihn wieder ein, und sie weckt nur den

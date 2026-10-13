@@ -1,0 +1,49 @@
+.on-screen-keyboard {
+  background: #121212;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  bottom: 0;
+  box-sizing: border-box;
+  left: 0;
+  padding: 8px;
+  position: fixed;
+  right: 0;
+  z-index: 1600;
+}
+
+.on-screen-keyboard .hg-theme-default {
+  background: transparent;
+  font-family: inherit;
+}
+
+.on-screen-keyboard .hg-button {
+  background: #2b2b2b;
+  border-bottom: 0;
+  box-shadow: none;
+  color: #fff;
+  font-size: 1.4rem;
+  height: 52px;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.on-screen-keyboard .hg-button:active {
+  background: #00897b;
+}
+
+.on-screen-keyboard .hg-button[data-skbtn='{space}'] {
+  flex-grow: 6;
+}
+
+.keyboard-open {
+  padding-bottom: var(--keyboard-height);
+}
+
+.keyboard-open .MuiDialog-container {
+  height: calc(100% - var(--keyboard-height));
+}
+
+@media (max-height: 520px) {
+  .on-screen-keyboard .hg-button {
+    height: 44px;
+  }
+}

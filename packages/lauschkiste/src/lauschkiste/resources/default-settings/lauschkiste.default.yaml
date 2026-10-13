@@ -115,3 +115,7 @@ webapp:
   # when handling a lot of music
   # Defaults to true
   show_covers: true
+  # Show the on-screen keyboard on the attached display (kiosk mode) when a text field is focused.
+  # Switch off if a physical keyboard is attached.
+  # Defaults to true
+  on_screen_keyboard: true

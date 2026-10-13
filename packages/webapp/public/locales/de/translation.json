@@ -487,6 +487,10 @@
       "title": "Allgmeine Einstellungen",
       "show_covers": {
         "title": "Cover anzeigen"
+      },
+      "on_screen_keyboard": {
+        "title": "Bildschirmtastatur",
+        "hint": "Wird auf dem an der Box angeschlossenen Bildschirm gezeigt, wenn ein Textfeld ausgewählt ist. Schalte sie aus, wenn eine echte Tastatur angeschlossen ist."
       }
     },
     "status": {

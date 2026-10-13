@@ -157,7 +157,7 @@ export async function mockBackend(
     '/api/v1/library/songs': () => backendData.list_songs_by_artist_and_album,
     '/api/v1/player/status': () => socketEvents['player.status'],
     '/api/v1/actions': () => [{ id: 'player.play', description: '', args: {} }],
-    '/api/v1/settings': () => ({ show_covers: showCovers }),
+    '/api/v1/settings': () => ({ show_covers: showCovers, on_screen_keyboard: true }),
     '/api/v1/settings/modules/audiobooks': () => ({
       name: 'audiobooks', kind: 'core', title: 'Audiobooks', restart_required: false,
       schema: { properties: { rewind_sec: { type: 'number', minimum: 0, maximum: 120, default: 10,

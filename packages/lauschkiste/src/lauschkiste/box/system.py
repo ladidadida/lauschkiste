@@ -82,10 +82,12 @@ def ip_addresses() -> List[str]:
 
 class AppSettings(BaseModel):
     show_covers: bool = True
+    on_screen_keyboard: bool = True
 
 
 class AppSettingsUpdate(BaseModel):
     show_covers: Optional[bool] = None
+    on_screen_keyboard: Optional[bool] = None
 
 
 def _read_log(handler_name: str) -> str:
@@ -133,7 +135,7 @@ class System(CoreModule):
     """Version information, log files and web app settings."""
 
     name = 'system'
-    interface_version = '1.0'
+    interface_version = '1.1'
 
     settings = SystemSettings
     info = event('info', SystemInfo)
@@ -221,7 +223,8 @@ class System(CoreModule):
     @query(path='/api/v1/settings')
     def get_app_settings(self) -> AppSettings:
         """Web app settings."""
-        return AppSettings(show_covers=cfg.getn('webapp', 'show_covers', default=True))
+        return AppSettings(show_covers=cfg.getn('webapp', 'show_covers', default=True),
+                           on_screen_keyboard=cfg.getn('webapp', 'on_screen_keyboard', default=True))
 
     @action(method='PUT', path='/api/v1/settings')
     def set_app_settings(self, settings: AppSettingsUpdate) -> None:

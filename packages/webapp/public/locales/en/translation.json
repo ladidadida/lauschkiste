@@ -487,6 +487,10 @@
       "title": "General Settings",
       "show_covers": {
         "title": "Show Cover Art"
+      },
+      "on_screen_keyboard": {
+        "title": "On-screen keyboard",
+        "hint": "Shown on the display attached to the box when a text field is selected. Switch it off if a physical keyboard is attached."
       }
     },
     "status": {

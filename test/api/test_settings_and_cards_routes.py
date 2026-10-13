@@ -57,14 +57,14 @@ def client(api_client, mocked_player, cards_file, main_cfg):
 def test_get_settings(client, main_cfg):
     response = client.get('/api/v1/settings')
     assert response.status_code == 200
-    assert response.json() == {'show_covers': True}
+    assert response.json() == {'show_covers': True, 'on_screen_keyboard': True}
 
 
 def test_set_settings(client, main_cfg):
     response = client.put('/api/v1/settings', json={'settings': {'show_covers': False}})
     assert response.status_code == 204
     assert main_cfg.getn('webapp', 'show_covers') is False
-    assert client.get('/api/v1/settings').json() == {'show_covers': False}
+    assert client.get('/api/v1/settings').json() == {'show_covers': False, 'on_screen_keyboard': True}
 
 
 def test_set_settings_rejects_unknown_keys(client):
