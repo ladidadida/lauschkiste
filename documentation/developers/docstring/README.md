@@ -98,6 +98,14 @@
   * [log\_active\_threads](#lauschkiste.daemon.log_active_threads)
   * [Daemon](#lauschkiste.daemon.Daemon)
     * [signal\_handler](#lauschkiste.daemon.Daemon.signal_handler)
+* [lauschkiste.box.display](#lauschkiste.box.display)
+  * [Backlight](#lauschkiste.box.display.Backlight)
+  * [Evdev](#lauschkiste.box.display.Evdev)
+    * [read](#lauschkiste.box.display.Evdev.read)
+  * [Display](#lauschkiste.box.display.Display)
+    * [get\_state](#lauschkiste.box.display.Display.get_state)
+    * [wake](#lauschkiste.box.display.Display.wake)
+    * [sleep](#lauschkiste.box.display.Display.sleep)
 * [lauschkiste.box.timers](#lauschkiste.box.timers)
   * [Timers](#lauschkiste.box.timers.Timers)
     * [list\_timers](#lauschkiste.box.timers.Timers.list_timers)
@@ -146,11 +154,11 @@
 * [lauschkiste.box.hardware](#lauschkiste.box.hardware)
   * [Claim](#lauschkiste.box.hardware.Claim)
   * [Note](#lauschkiste.box.hardware.Note)
-  * [Board](#lauschkiste.box.hardware.Board)
-    * [describe](#lauschkiste.box.hardware.Board.describe)
-    * [pin\_id](#lauschkiste.box.hardware.Board.pin_id)
-    * [gpio\_line](#lauschkiste.box.hardware.Board.gpio_line)
-    * [boot\_pending](#lauschkiste.box.hardware.Board.boot_pending)
+  * [Device](#lauschkiste.box.hardware.Device)
+    * [describe](#lauschkiste.box.hardware.Device.describe)
+    * [pin\_id](#lauschkiste.box.hardware.Device.pin_id)
+    * [gpio\_line](#lauschkiste.box.hardware.Device.gpio_line)
+    * [boot\_pending](#lauschkiste.box.hardware.Device.boot_pending)
   * [Hardware](#lauschkiste.box.hardware.Hardware)
     * [get\_state](#lauschkiste.box.hardware.Hardware.get_state)
     * [pin\_options](#lauschkiste.box.hardware.Hardware.pin_options)
@@ -175,6 +183,7 @@
     * [validate\_args](#lauschkiste.contract.declarations.Operation.validate_args)
 * [lauschkiste.contract.catalog](#lauschkiste.contract.catalog)
   * [ActionCatalog](#lauschkiste.contract.catalog.ActionCatalog)
+    * [on\_input](#lauschkiste.contract.catalog.ActionCatalog.on_input)
     * [validate](#lauschkiste.contract.catalog.ActionCatalog.validate)
     * [bind](#lauschkiste.contract.catalog.ActionCatalog.bind)
 * [lauschkiste.contract.context](#lauschkiste.contract.context)
@@ -197,6 +206,8 @@
   * [Module](#lauschkiste.contract.module.Module)
     * [concurrency](#lauschkiste.contract.module.Module.concurrency)
     * [settings](#lauschkiste.contract.module.Module.settings)
+    * [needs](#lauschkiste.contract.module.Module.needs)
+    * [compatible](#lauschkiste.contract.module.Module.compatible)
     * [ready](#lauschkiste.contract.module.Module.ready)
     * [settings\_changed](#lauschkiste.contract.module.Module.settings_changed)
     * [extra\_routes](#lauschkiste.contract.module.Module.extra_routes)
@@ -205,7 +216,8 @@
     * [extras](#lauschkiste.contract.module.Plugin.extras)
     * [title](#lauschkiste.contract.module.Plugin.title)
     * [provides](#lauschkiste.contract.module.Plugin.provides)
-    * [needs](#lauschkiste.contract.module.Plugin.needs)
+    * [setup\_kind](#lauschkiste.contract.module.Plugin.setup_kind)
+    * [setup\_steps](#lauschkiste.contract.module.Plugin.setup_steps)
     * [detect](#lauschkiste.contract.module.Plugin.detect)
 * [lauschkiste.contract.version](#lauschkiste.contract.version)
   * [CONTRACT\_VERSION](#lauschkiste.contract.version.CONTRACT_VERSION)
@@ -229,9 +241,10 @@
   * [load](#lauschkiste.contract.plugins.load)
   * [taken\_by](#lauschkiste.contract.plugins.taken_by)
   * [missing\_needs](#lauschkiste.contract.plugins.missing_needs)
+  * [incompatible](#lauschkiste.contract.plugins.incompatible)
   * [blocker](#lauschkiste.contract.plugins.blocker)
   * [why\_not\_enable](#lauschkiste.contract.plugins.why_not_enable)
-  * [detected\_boards](#lauschkiste.contract.plugins.detected_boards)
+  * [detected\_devices](#lauschkiste.contract.plugins.detected_devices)
   * [plugin\_extras](#lauschkiste.contract.plugins.plugin_extras)
   * [missing\_extras](#lauschkiste.contract.plugins.missing_extras)
   * [install\_command](#lauschkiste.contract.plugins.install_command)
@@ -497,6 +510,9 @@
     * [set\_level\_callback](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.set_level_callback)
     * [rewind](#lauschkiste.player.backends.local_audio.PlayerLocalAudio.rewind)
 * [lauschkiste.player.backends](#lauschkiste.player.backends)
+* [lauschkiste.player.backends.prefetch](#lauschkiste.player.backends.prefetch)
+  * [Prefetch](#lauschkiste.player.backends.prefetch.Prefetch)
+    * [wait\_ready](#lauschkiste.player.backends.prefetch.Prefetch.wait_ready)
 
 <a id="lauschkiste"></a>
 
@@ -653,7 +669,7 @@ class ReaderBaseClass(ABC)
 
 Abstract Base Class for all Reader Classes to ensure common API
 
-How to add a reader: documentation/developers/rfid/README.md
+How to add a reader: documentation/developers/rfid-drivers.md
 
 
 <a id="lauschkiste.rfid"></a>
@@ -1698,6 +1714,96 @@ On first Ctrl-C (or SIGTERM) orderly shutdown procedure is embarked upon. It get
 On third Ctrl-C (or SIGTERM), this is interrupted and there will be a hard exit!
 
 
+<a id="lauschkiste.box.display"></a>
+
+# lauschkiste.box.display
+
+The display core module: switches the backlight of the box's screen off after a time without a touch.
+
+While the screen sleeps its touch screen is grabbed, so the touch that wakes it up never reaches the web app.
+A card, a button or a key wakes it too. Screens without a controllable backlight (most HDMI monitors) are left alone.
+
+
+<a id="lauschkiste.box.display.Backlight"></a>
+
+## Backlight Objects
+
+```python
+class Backlight()
+```
+
+The first backlight of the system that this process may write.
+
+
+<a id="lauschkiste.box.display.Evdev"></a>
+
+## Evdev Objects
+
+```python
+class Evdev()
+```
+
+Access to the evdev library; replaced in tests.
+
+
+<a id="lauschkiste.box.display.Evdev.read"></a>
+
+#### read
+
+```python
+def read(devices: List[Any], timeout: float)
+```
+
+Wait for news; returns ``([(is_touch, pressed), ...], [lost devices])``.
+
+
+<a id="lauschkiste.box.display.Display"></a>
+
+## Display Objects
+
+```python
+class Display(CoreModule)
+```
+
+Switches the screen off when nobody touches it.
+
+
+<a id="lauschkiste.box.display.Display.get_state"></a>
+
+#### get\_state
+
+```python
+@query(path='/state')
+def get_state() -> DisplayState
+```
+
+Whether the box has a screen it can switch off, and whether the screen sleeps now.
+
+
+<a id="lauschkiste.box.display.Display.wake"></a>
+
+#### wake
+
+```python
+@action()
+def wake() -> None
+```
+
+Switch the screen on and start the time until it goes dark anew.
+
+
+<a id="lauschkiste.box.display.Display.sleep"></a>
+
+#### sleep
+
+```python
+@action()
+def sleep() -> None
+```
+
+Switch the screen off now.
+
+
 <a id="lauschkiste.box.timers"></a>
 
 # lauschkiste.box.timers
@@ -2188,9 +2294,9 @@ Do nothing (logs ``message`` as a warning if given).
 
 # lauschkiste.box.hardware
 
-The hardware core module: the active board, which pins and buses are used by whom, and power.
+The hardware core module: the active device, which pins and buses are used by whom, and power.
 
-Board-neutral: a board support plugin registers at ``hardware.boards`` and describes its pins and
+Device-neutral: a device plugin registers at ``hardware.devices`` and describes its pins and
 interfaces; modules using pins or buses register at ``hardware.claims``. See
 documentation/developers/hardware.md.
 
@@ -2217,15 +2323,15 @@ class Note(BaseModel)
 Something about the hardware the user may want to know: done, to do or just a fact.
 
 
-<a id="lauschkiste.box.hardware.Board"></a>
+<a id="lauschkiste.box.hardware.Device"></a>
 
-## Board Objects
+## Device Objects
 
 ```python
-class Board(Protocol)
+class Device(Protocol)
 ```
 
-<a id="lauschkiste.box.hardware.Board.describe"></a>
+<a id="lauschkiste.box.hardware.Device.describe"></a>
 
 #### describe
 
@@ -2238,7 +2344,7 @@ def describe() -> Dict[str, Any]
 'interfaces': [{'id', 'label', 'pins'}]}``
 
 
-<a id="lauschkiste.box.hardware.Board.pin_id"></a>
+<a id="lauschkiste.box.hardware.Device.pin_id"></a>
 
 #### pin\_id
 
@@ -2246,10 +2352,10 @@ def describe() -> Dict[str, Any]
 def pin_id(value: Any) -> Optional[str]
 ```
 
-The board's id of a pin given as the user wrote it (e.g. ``17`` or ``'GPIO17'``), None if unknown.
+The device's id of a pin given as the user wrote it (e.g. ``17`` or ``'GPIO17'``), None if unknown.
 
 
-<a id="lauschkiste.box.hardware.Board.gpio_line"></a>
+<a id="lauschkiste.box.hardware.Device.gpio_line"></a>
 
 #### gpio\_line
 
@@ -2260,7 +2366,7 @@ def gpio_line(pin: str) -> Tuple[int, int]
 (gpiochip number, line) of a GPIO pin.
 
 
-<a id="lauschkiste.box.hardware.Board.boot_pending"></a>
+<a id="lauschkiste.box.hardware.Device.boot_pending"></a>
 
 #### boot\_pending
 
@@ -2279,7 +2385,7 @@ Settings that need the boot configuration changed (``lauschctl setup``) and a re
 class Hardware(CoreModule)
 ```
 
-The board Lauschkiste runs on, its pins and who uses them; shutdown and reboot.
+The device Lauschkiste runs on, its pins and who uses them; shutdown and reboot.
 
 
 <a id="lauschkiste.box.hardware.Hardware.get_state"></a>
@@ -2291,7 +2397,7 @@ The board Lauschkiste runs on, its pins and who uses them; shutdown and reboot.
 def get_state() -> HardwareState
 ```
 
-The board, its pins and interfaces, who uses them, conflicts and pending boot changes.
+The device, its pins and interfaces, who uses them, conflicts and pending boot changes.
 
 
 <a id="lauschkiste.box.hardware.Hardware.pin_options"></a>
@@ -2303,7 +2409,7 @@ The board, its pins and interfaces, who uses them, conflicts and pending boot ch
 def pin_options() -> List[Choice]
 ```
 
-GPIO pins of the board for choosing in settings, with their current users.
+GPIO pins of the device for choosing in settings, with their current users.
 
 
 <a id="lauschkiste.box.hardware.Hardware.gpio_line"></a>
@@ -2533,6 +2639,17 @@ Card-triggerable actions of all started modules, addressed by ``<module>.<action
 ```python
 class ActionCatalog()
 ```
+
+<a id="lauschkiste.contract.catalog.ActionCatalog.on_input"></a>
+
+#### on\_input
+
+```python
+def on_input(listener: Callable[[], None]) -> None
+```
+
+Call ``listener()`` whenever a button, card removal or similar configured input runs its action.
+
 
 <a id="lauschkiste.contract.catalog.ActionCatalog.validate"></a>
 
@@ -2767,6 +2884,29 @@ The settings of the module's config section, editable through the web app. Field
 descriptions are shown; ``Field(json_schema_extra={'widget': 'action'})`` marks an action entry.
 
 
+<a id="lauschkiste.contract.module.Module.needs"></a>
+
+#### needs
+
+Capabilities that must be provided by the enabled device plugin or another enabled plugin, e.g. ``('i2c',)``.
+
+A module that needs one nobody provides is not started and says why.
+
+
+<a id="lauschkiste.contract.module.Module.compatible"></a>
+
+#### compatible
+
+```python
+@classmethod
+def compatible(cls, provided: FrozenSet[str]) -> Optional[str]
+```
+
+Whether the module can work here beyond ``needs``: None, or the reason it can't, in plain words.
+
+``provided`` holds the capabilities of the enabled plugins, the device plugin's among them.
+
+
 <a id="lauschkiste.contract.module.Module.ready"></a>
 
 #### ready
@@ -2844,14 +2984,28 @@ The name shown in the plugin list when no translation exists (default: the plugi
 
 #### provides
 
-Capabilities it offers other plugins, e.g. ``('board', 'gpio', 'i2c')``; only one plugin may provide 'board'
+Capabilities it offers other modules, e.g. ``('device', 'gpio', 'i2c')``; only one plugin may provide 'device'
 
 
-<a id="lauschkiste.contract.module.Plugin.needs"></a>
+<a id="lauschkiste.contract.module.Plugin.setup_kind"></a>
 
-#### needs
+#### setup\_kind
 
-Capabilities an enabled plugin must provide, e.g. ``('i2c',)``
+'peripheral': hardware attached to the machine, proposed by `lauschctl setup` once the device is known
+
+
+<a id="lauschkiste.contract.module.Plugin.setup_steps"></a>
+
+#### setup\_steps
+
+```python
+@classmethod
+def setup_steps(cls) -> list
+```
+
+Steps of `lauschctl setup` this plugin brings (``lauschkiste_cli.setup.base.Step`` objects); a device plugin
+
+offers its catalog of options this way. Import the CLI inside the method: the service runs without it.
 
 
 <a id="lauschkiste.contract.module.Plugin.detect"></a>
@@ -2863,7 +3017,7 @@ Capabilities an enabled plugin must provide, e.g. ``('i2c',)``
 def detect(cls, read: Callable[[str], Optional[str]]) -> Optional[str]
 ```
 
-The hardware of this plugin found on this machine (e.g. a board model), or None.
+The hardware of this plugin found on this machine (e.g. a device model), or None.
 
 ``read(path)`` returns a file's text or None.
 
@@ -3069,7 +3223,7 @@ def load(ep)
 def taken_by(cls, others: Iterable[type]) -> Optional[str]
 ```
 
-The other plugin already providing an exclusive capability of ``cls`` (e.g. the board).
+The other plugin already providing an exclusive capability of ``cls`` (e.g. the device).
 
 
 <a id="lauschkiste.contract.plugins.missing_needs"></a>
@@ -3083,6 +3237,17 @@ def missing_needs(cls, others: Iterable[type]) -> List[str]
 Capabilities ``cls`` needs that none of ``others`` provides.
 
 
+<a id="lauschkiste.contract.plugins.incompatible"></a>
+
+#### incompatible
+
+```python
+def incompatible(cls, others: Iterable[type]) -> Optional[str]
+```
+
+The reason ``cls`` says it can't work next to ``others`` (see ``Module.compatible``), None if it can.
+
+
 <a id="lauschkiste.contract.plugins.blocker"></a>
 
 #### blocker
@@ -3091,7 +3256,9 @@ Capabilities ``cls`` needs that none of ``others`` provides.
 def blocker(cls, others: Iterable[type]) -> Optional[Dict[str, Any]]
 ```
 
-Why ``cls`` can't run next to ``others``: ``{'taken_by': name}`` or ``{'missing': [...]}``.
+Why ``cls`` can't run next to ``others``: ``{'taken_by': name}``, ``{'missing': [...]}`` or
+
+``{'incompatible': reason}``.
 
 
 <a id="lauschkiste.contract.plugins.why_not_enable"></a>
@@ -3105,15 +3272,15 @@ def why_not_enable(cfg, name: str) -> Optional[str]
 Why the installed plugin ``name`` can't be enabled next to the enabled ones, None if it can.
 
 
-<a id="lauschkiste.contract.plugins.detected_boards"></a>
+<a id="lauschkiste.contract.plugins.detected_devices"></a>
 
-#### detected\_boards
+#### detected\_devices
 
 ```python
-def detected_boards(read=read_text) -> List[Dict[str, str]]
+def detected_devices(read=read_text) -> List[Dict[str, str]]
 ```
 
-Installed board plugins whose board this machine is: ``[{'name', 'model'}]``.
+Installed device plugins whose device this machine is: ``[{'name', 'model'}]``.
 
 
 <a id="lauschkiste.contract.plugins.plugin_extras"></a>
@@ -6044,5 +6211,38 @@ Re-start current playlist from the first track.
 # lauschkiste.player.backends
 
 Playback backend implementations used by the player coordinator.
+
+
+<a id="lauschkiste.player.backends.prefetch"></a>
+
+# lauschkiste.player.backends.prefetch
+
+Reads decoded audio of a network stream ahead on its own thread.
+
+A stalled network read blocks only the reading thread; the player keeps playing what is buffered. The reading thread
+owns the stream: it closes it when it is done, so stopping never waits for a stalled read.
+
+
+<a id="lauschkiste.player.backends.prefetch.Prefetch"></a>
+
+## Prefetch Objects
+
+```python
+class Prefetch()
+```
+
+Iterates over ``source`` (frames with ``samples`` and ``sample_rate``) buffered up to ``seconds`` of audio.
+
+
+<a id="lauschkiste.player.backends.prefetch.Prefetch.wait_ready"></a>
+
+#### wait\_ready
+
+```python
+def wait_ready(seconds: float, timeout: float,
+               interrupted: Callable[[], bool]) -> None
+```
+
+Wait until ``seconds`` of audio are buffered, the stream ended, ``timeout`` ran out or ``interrupted()``.
 
 

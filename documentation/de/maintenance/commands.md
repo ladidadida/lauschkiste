@@ -24,7 +24,7 @@ angeschlossen ist (die Peripherie), und deren Optionen. Jeder Schritt schaut zue
 | --- | --- |
 | `device` | welche Art Maschine das ist; bestimmt, was die anderen Schritte anbieten |
 | `packages` | die Systempakete, die Lauschkiste braucht (und auf Wunsch ein Systemupgrade) |
-| `hardware` | die Soundkarte auf der Stiftleiste (Raspberry Pi) |
+| `hardware` | die Soundkarte auf der Stiftleiste (Gerät Raspberry Pi) |
 | `plugins` | schaltet die Plugins ein, die die Antworten verlangen |
 | `service` | Lauschkiste als Dienst, der mit der Box startet |
 | `port` | die Webseite auf Port 80, damit die Adresse kein `:5556` braucht |
@@ -33,12 +33,17 @@ angeschlossen ist (die Peripherie), und deren Optionen. Jeder Schritt schaut zue
 | `rfid` | der RFID-Leser ([RFID-Leser](../hardware/readers.md)) |
 | `kiosk` | die Webseite auf einem angeschlossenen Bildschirm ([Bildschirm](../hardware/screen.md)) |
 | `autohotspot` | das eigene WLAN der Box ([Unterwegs](../using/wifi-hotspot.md)) |
-| `boot` | ruhiger Start, Bluetooth optional aus |
+| `boot` | ruhiger Start, Bluetooth optional aus (Gerät Raspberry Pi) |
 | `welcome` | die Meldung bei der Anmeldung |
 | `extra_plugins` | installiert Plugins von PyPI, GitHub (`github:owner/repo@tag`) oder per URL, auch für eigene Hardware |
 | `peripherals` | was angeschlossen ist: pHAT BEAT, Ein-Aus-Taste, Akkuüberwachung, Tasten und Drehregler, und deine eigene |
 | `peripheral_options` | die Optionen des Angeschlossenen (z. B. der Akku-Sensor) |
-| `raspi` | schreibt Soundkarte und Pins in die Startkonfiguration (danach neu starten) |
+| `raspi` | schreibt Soundkarte und Pins in die Startkonfiguration (danach neu starten; Gerät Raspberry Pi) |
+
+Schritte mit dem Vermerk *Gerät Raspberry Pi* bringt das Geräte-Plugin mit, nicht `lauschctl`: Ein Geräte-Plugin liefert die
+Schritte, die zu seiner Maschine passen, sie gibt es also nur für dieses Gerät (auf einem anderen sagt `lauschctl setup raspi`,
+dass der Schritt nicht zutrifft). Die eigenen Optionen des Geräts kommen gleich nach der Geräte-Frage, seine
+Startkonfiguration (`raspi`) zuletzt.
 
 ## `lauschkiste`: der Server
 

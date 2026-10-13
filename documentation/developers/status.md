@@ -27,7 +27,7 @@ the [roadmap](roadmap-core-architecture.md).
 
 - **Tidy up** (in progress): the code is grouped by purpose and the oldest legacy is gone; the documentation grew by
   adapting and should still be rebuilt from how the system is used, for users and developers alike.
-- **Device plugins**: done except that a device cannot yet add whole setup steps of its own; see
+- **Device plugins**: done, including the setup steps a device plugin brings; open points are in
   [Device plugins](device-plugins.md).
 - **Playlists**: create, show and change playlists in the web app (a topic of its own).
 - **Card management**, thought through as a whole: more than one behaviour per card (placed, removed, placed again),

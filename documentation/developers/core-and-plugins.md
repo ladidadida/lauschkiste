@@ -378,7 +378,7 @@ The basic extension points:
 - **Player backends** (`player.backends`) - `local_audio` is registered by the core, others come from
   plugins. The `player.backend` setting selects the active one; the backend surface is an explicit protocol.
 - **RFID reader drivers** (`rfid.readers`) - every bundled driver is a plugin (`rfid_<driver>`,
-  all shipped in the `rfid-readers` package) that registers a reader factory. The reader framework keeps owning threads, timing and
+  all shipped in the `lauschkiste-plugins` package) that registers a reader factory. The reader framework keeps owning threads, timing and
   dispatch.
 - **Library sources** (`library.sources`) - the core index is the local source; streaming services can be further ones.
 

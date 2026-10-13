@@ -24,7 +24,7 @@ attached to it (the peripherals) and their options. Each step looks first and on
 | --- | --- |
 | `device` | which kind of machine this is; decides what the other steps offer |
 | `packages` | the system packages Lauschkiste needs (and, if you want, an upgrade of the system) |
-| `hardware` | the sound card on the header (Raspberry Pi) |
+| `hardware` | the sound card on the header (Raspberry Pi device) |
 | `plugins` | enables the plugins the answers call for |
 | `service` | Lauschkiste as a service that starts with the box |
 | `port` | the web page on port 80, so the address needs no `:5556` |
@@ -33,12 +33,16 @@ attached to it (the peripherals) and their options. Each step looks first and on
 | `rfid` | the RFID reader ([RFID readers](../hardware/readers.md)) |
 | `kiosk` | the web page on an attached screen ([A screen](../hardware/screen.md)) |
 | `autohotspot` | the box's own WiFi ([Away from home](../using/wifi-hotspot.md)) |
-| `boot` | quiet boot, Bluetooth optionally off |
+| `boot` | quiet boot, Bluetooth optionally off (Raspberry Pi device) |
 | `welcome` | the message when you log in |
 | `extra_plugins` | installs plugins from PyPI, GitHub (`github:owner/repo@tag`) or a URL, also for hardware of your own |
 | `peripherals` | what is attached: pHAT BEAT, power button, battery monitor, buttons and knobs, and your own |
 | `peripheral_options` | the options of what is attached (e.g. the battery sensor) |
-| `raspi` | writes the sound card and the pins to the boot configuration (restart afterwards) |
+| `raspi` | writes the sound card and the pins to the boot configuration (restart afterwards; Raspberry Pi device) |
+
+Steps marked *Raspberry Pi device* come from the device plugin, not from `lauschctl`: a device plugin brings the steps that
+fit its machine, so they exist only for that device (on another one `lauschctl setup raspi` says it does not apply).
+The device's own options come right after the device question, its boot configuration (`raspi`) last.
 
 ## `lauschkiste`: the server
 
