@@ -27,6 +27,9 @@ the [roadmap](roadmap-core-architecture.md).
 
 - **Tidy up** (in progress): the code is grouped by purpose and the oldest legacy is gone; the documentation grew by
   adapting and should still be rebuilt from how the system is used, for users and developers alike.
+- **Device plugins** as the foundation of the setup: the machine (Raspberry Pi, PC, a third party's) is chosen first and
+  decides which questions, system changes and plugins apply; plugins check their own compatibility. Plan:
+  [Device plugins](device-plugins.md).
 - **Playlists**: create, show and change playlists in the web app (a topic of its own).
 - **Card management**, thought through as a whole: more than one behaviour per card (placed, removed, placed again),
   perhaps a card that changes what the buttons do, and how second swipe fits in. Part of it: the Toniebox way, where

@@ -1,5 +1,8 @@
 # Hardware: boards, devices and pins
 
+The board plugin described here is to become the *device* plugin, and today's device plugins *peripheral* plugins: see
+[Device plugins (plan)](device-plugins.md).
+
 Lauschkiste runs on different single-board computers. Hardware support is split so that nothing
 except one plugin knows which board it runs on.
 
