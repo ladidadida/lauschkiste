@@ -148,13 +148,8 @@ jobs:
         package:
           - lauschkiste
           - lauschkiste-core
-          - lauschkiste-plugin-device-raspberry-pi
-          - lauschkiste-plugin-device-pc
-          - lauschkiste-plugin-peripherals
-          - lauschkiste-plugin-rfid-readers
-          - lauschkiste-plugin-samba
-          - lauschkiste-plugin-audiobookshelf
-          - lauschkiste-plugin-directories
+          - lauschkiste-plugins
+          - lauschkiste-plugins-raspberry-pi
     permissions:
       id-token: write
     steps:
@@ -197,13 +192,8 @@ jobs:
         package:
           - lauschkiste
           - lauschkiste-core
-          - lauschkiste-plugin-device-raspberry-pi
-          - lauschkiste-plugin-device-pc
-          - lauschkiste-plugin-peripherals
-          - lauschkiste-plugin-rfid-readers
-          - lauschkiste-plugin-samba
-          - lauschkiste-plugin-audiobookshelf
-          - lauschkiste-plugin-directories
+          - lauschkiste-plugins
+          - lauschkiste-plugins-raspberry-pi
     permissions:
       id-token: write
     steps:

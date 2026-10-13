@@ -48,13 +48,8 @@ lauschctl update           # newer version
 | --- | --- |
 | `lauschkiste` | this package: the commands |
 | `lauschkiste-core` | the player, library, cards, volume, timers, web API and web app |
-| `lauschkiste-plugin-device-raspberry-pi` | the Raspberry Pi as the device (pins, boot configuration, power) |
-| `lauschkiste-plugin-device-pc` | an ordinary computer as the device (changes nothing) |
-| `lauschkiste-plugin-peripherals` | GPIO buttons, rotary encoders, LEDs, battery monitor, power button, pHAT BEAT |
-| `lauschkiste-plugin-rfid-readers` | RFID reader drivers |
-| `lauschkiste-plugin-samba` | share the library on the network |
-| `lauschkiste-plugin-audiobookshelf` | audiobooks from an Audiobookshelf server |
-| `lauschkiste-plugin-directories` | find podcasts and radio stations (Apple, fyyd, Podcast Index, radio-browser) |
+| `lauschkiste-plugins` | PC devices, RFID reader drivers, Samba share, Audiobookshelf, podcast and radio directories |
+| `lauschkiste-plugins-raspberry-pi` | the Raspberry Pi as the device (pins, boot configuration, power) and its peripherals (GPIO buttons, LEDs, battery monitor, power button, pHAT BEAT) |
 
 Plugins are installed next to this package and switched on in the web app or with
 `lauschctl plugin enable <name>`.

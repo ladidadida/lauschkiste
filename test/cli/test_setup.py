@@ -269,7 +269,7 @@ def test_missing_extras_of_enabled_plugins_are_reinstalled(tmp_path, home, extra
     plugin.add_to_config(home / 'settings' / 'lauschkiste.yaml', ['rfid_rc522_spi'])
     failed, _ = setup_run(system, home, names=['plugins'])
     assert failed == 0
-    assert extras == ['lauschkiste-plugin-rfid-readers[rc522-spi]']
+    assert extras == ['lauschkiste-plugins[rc522-spi]']
 
 
 def test_samba_asks_for_a_password_and_never_sets_a_default(tmp_path, home, extras, monkeypatch):

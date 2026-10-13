@@ -1,7 +1,7 @@
 [project]
-name = "lauschkiste-plugin-rfid-readers"
+name = "lauschkiste-plugins"
 version = "0.1.0a6"
-description = "Lauschkiste plugins: RFID reader drivers (one plugin per driver)"
+description = "Lauschkiste plugins: computers as devices, RFID readers, Samba, Audiobookshelf, podcast and radio directories"
 license = "MIT"
 requires-python = ">=3.11"
 readme = "README.md"
@@ -11,6 +11,8 @@ keywords = [
   "plugin",
   "rfid",
   "nfc",
+  "audiobookshelf",
+  "samba",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -27,6 +29,8 @@ classifiers = [
 license-files = ["LICENSE"]
 dependencies = [
   "lauschkiste-core==0.1.0a6",
+  "lauschkiste==0.1.0a6",
+  "requests",
 ]
 
 [project.urls]
@@ -36,7 +40,7 @@ Issues = "https://github.com/ladidadida/lauschkiste/issues"
 Changelog = "https://github.com/ladidadida/lauschkiste/releases"
 
 [project.optional-dependencies]
-# Dependencies of the individual drivers; generic_usb needs none beyond the core.
+# Dependencies of the individual RFID drivers; generic_usb needs none beyond the core.
 # rc522_spi includes pi-rc522-gpiozero (no PyPI release); these are its dependencies.
 rc522-spi = [
   "gpiozero",
@@ -56,13 +60,26 @@ rfid_rc522_spi = "lauschkiste_plugin_rfid_readers:Rc522Spi"
 rfid_mfrc522_i2c = "lauschkiste_plugin_rfid_readers:Mfrc522I2c"
 rfid_pn532_i2c_py532 = "lauschkiste_plugin_rfid_readers:Pn532I2cPy532"
 rfid_generic_nfcpy = "lauschkiste_plugin_rfid_readers:GenericNfcpy"
+device_pc_test = "lauschkiste_plugin_device_pc:DevicePcTest"
+device_pc_box = "lauschkiste_plugin_device_pc:DevicePcBox"
+samba = "lauschkiste_plugin_samba:Samba"
+audiobookshelf = "lauschkiste_plugin_audiobookshelf:Audiobookshelf"
+podcast_directories = "lauschkiste_plugin_directories:PodcastDirectories"
+radio_directories = "lauschkiste_plugin_directories:RadioDirectories"
 
 [tool.uv.sources]
 lauschkiste-core = { workspace = true }
+lauschkiste = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lauschkiste_plugin_rfid_readers"]
+packages = [
+  "src/lauschkiste_plugin_audiobookshelf",
+  "src/lauschkiste_plugin_device_pc",
+  "src/lauschkiste_plugin_directories",
+  "src/lauschkiste_plugin_rfid_readers",
+  "src/lauschkiste_plugin_samba",
+]

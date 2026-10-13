@@ -3,7 +3,7 @@
 The drivers that exist and their wiring are in the [guide](../en/hardware/readers.md).
 
 Readers are plugins: a driver registers at the `rfid.readers` extension point. The bundled drivers live in
-`packages/plugins/rfid-readers/src/lauschkiste_plugin_rfid_readers/`; each is its own plugin (`rfid_<driver>`),
+`packages/plugins/general/src/lauschkiste_plugin_rfid_readers/`; each is its own plugin (`rfid_<driver>`),
 declared in that package's `pyproject.toml` and `__init__.py`. A driver in a package of its own does the same with
 its own entry point.
 

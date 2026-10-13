@@ -1,6 +1,6 @@
 # Audiobookshelf
 
-The plugin `audiobookshelf` (package `lauschkiste-plugin-audiobookshelf`) shows the books of an
+The plugin `audiobookshelf` (package `lauschkiste-plugins`) shows the books of an
 [Audiobookshelf](https://www.audiobookshelf.org) (ABS) server in the Audiobooks tab next to the local ones and
 shares the listening position with the ABS apps: a book started on the phone continues on the box and the other way
 round. Setup and use for builders: [Audiobooks](../en/using/audiobooks.md#audiobookshelf).

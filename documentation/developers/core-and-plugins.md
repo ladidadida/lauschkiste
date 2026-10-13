@@ -288,8 +288,9 @@ plugins:
 
 - Installed but not listed: not loaded (not even imported).
 - Listed but not installed: logged as an error, everything else starts.
-- Bundled plugins live under `packages/plugins/<name>/` as uv workspace members, each with its own
-  dependencies. The installer installs them and pre-fills `plugins:` for the ones the user selected.
+- Bundled plugins live in two packages under `packages/plugins/` (`general` = `lauschkiste-plugins`, `raspberry-pi` =
+  `lauschkiste-plugins-raspberry-pi`) as uv workspace members; the extras of a package carry the dependencies of single
+  plugins. The installer installs them and pre-fills `plugins:` for the ones the user selected.
 - Plugins of other authors are installed with `lauschctl plugin install <spec> --enable` or in the setup step
   `extra_plugins` (`lauschctl setup extra_plugins`): a package name (`name==1.2`), `github:owner/repo@tag` or a URL.
   The setup installs the package, enables the plugins it provides and remembers what it installed in
@@ -409,7 +410,7 @@ ctx.modules.podcasts.directories.register("mine", MyDirectory())
 ```
 
 Every directory has its own interface (some need a key, some need a second request), which is why a new
-one is code and not a setting. `lauschkiste-plugin-directories` shows four examples (Apple Podcasts, fyyd,
+one is code and not a setting. the directories plugins in `lauschkiste-plugins` show four examples (Apple Podcasts, fyyd,
 Podcast Index, radio-browser.info). Directories send what people type to a third party; a plugin should say so in its documentation.
 
 Further extension points ("powerful plugins": e.g. a playback filter that can veto or rewrite what

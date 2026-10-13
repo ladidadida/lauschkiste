@@ -28,7 +28,7 @@ def test_list_shows_bundled_plugins(home):
     result = runner.invoke(app, ['plugin', 'list'])
     assert result.exit_code == 0, result.output
     assert 'rfid_generic_usb' in result.output
-    assert 'lauschkiste-plugin-rfid-readers' in result.output
+    assert 'lauschkiste-plugins' in result.output
 
 
 def test_enable_and_disable(home):
@@ -60,5 +60,5 @@ def test_enable_with_extras_installs_them(home, monkeypatch):
     assert runner.invoke(app, ['plugin', 'enable', 'device_raspberry_pi']).exit_code == 0
     result = runner.invoke(app, ['plugin', 'enable', 'rfid_rc522_spi', '--with-extras'])
     assert result.exit_code == 0, result.output
-    assert installed == ['lauschkiste-plugin-rfid-readers[rc522-spi]']
+    assert installed == ['lauschkiste-plugins[rc522-spi]']
     assert 'rfid_rc522_spi' in enabled(home)

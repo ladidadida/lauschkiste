@@ -101,18 +101,18 @@ ci/                CI helper scripts: build_wheels.sh, test_install.sh (install.
   served from `api.webapp_dir` / `$LAUSCHKISTE_WEBAPP_DIR`, else from the package, else (source checkout) from
   `packages/webapp/build`.
   See `documentation/developers/packaging-and-setup.md`.
-- **Bundled plugins** live in `packages/plugins/*` (uv workspace members, installed by `uv sync`
-  but only loaded when enabled under `plugins:`): `device-raspberry-pi` (device plugin: pins,
-  interfaces, sound cards, power, firmware health; `lauschctl setup` enables it on a Pi), `device-pc` (device plugin of an
-  ordinary computer, changes nothing), `peripherals`
-  (`gpio_controls`, `battery`, `power_button`, `phat_beat`, device-independent, see
-  `documentation/developers/hardware.md`) and `rfid-readers`
-  (one plugin per reader driver, `rfid_<driver>`; each driver's dependencies are an extra of that
-  package -- `uv sync --inexact --extra <driver-extra>`, e.g. `rc522-spi`) and `samba` (the
-  library's network share and Samba password from the web app; `lauschctl setup samba` enables it) and
-  `audiobookshelf` (books of an Audiobookshelf server at `audiobooks.sources`, resolver at
-  `player.resolvers`; `documentation/developers/audiobookshelf.md`) and `directories` (podcast and radio
-  search services at `podcasts.directories` and `radio.directories`). `devices` also holds `phat_beat`.
+- **Bundled plugins** live in two packages under `packages/plugins/` (uv workspace members, installed by `uv sync`
+  but only loaded when enabled under `plugins:`; the import packages `lauschkiste_plugin_*` keep their names, the
+  entry points name the plugins, so a new plugin needs no entry in the installer or the setup):
+  - `general` (`lauschkiste-plugins`): `device_pc_test` / `device_pc_box` (device plugins of an ordinary computer),
+    the RFID readers (one plugin per driver, `rfid_<driver>`; each driver's dependencies are an extra of the package,
+    e.g. `rc522-spi`: `uv sync --inexact --extra rc522-spi`), `samba` (the library's network share and Samba
+    password from the web app; `lauschctl setup samba` enables it), `audiobookshelf` (books of an Audiobookshelf
+    server at `audiobooks.sources`, resolver at `player.resolvers`; `documentation/developers/audiobookshelf.md`) and
+    the directories (podcast and radio search services at `podcasts.directories` and `radio.directories`).
+  - `raspberry-pi` (`lauschkiste-plugins-raspberry-pi`): `device_raspberry_pi` (pins, interfaces, sound cards, power,
+    firmware health, and its setup steps; `lauschctl setup` enables it on a Pi) and the peripherals (`gpio_controls`,
+    `battery`, `power_button`, `phat_beat`, see `documentation/developers/hardware.md`).
 - **Settings:** modules and plugins describe their config section as a pydantic model
   (`settings = ...`); the web app renders forms from its schema
   (`/api/v1/settings/modules/<name>`), see "Settings" in `documentation/developers/core-and-plugins.md`.

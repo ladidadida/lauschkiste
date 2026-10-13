@@ -1,7 +1,7 @@
 [project]
-name = "lauschkiste-plugin-audiobookshelf"
+name = "lauschkiste-plugins-raspberry-pi"
 version = "0.1.0a6"
-description = "Lauschkiste plugin: audiobooks from an Audiobookshelf server"
+description = "Lauschkiste plugins for the Raspberry Pi: the device and its peripherals (buttons, LEDs, battery, power button, pHAT BEAT)"
 license = "MIT"
 requires-python = ">=3.11"
 readme = "README.md"
@@ -9,8 +9,7 @@ authors = [{ name = "the Lauschkiste contributors" }]
 keywords = [
   "lauschkiste",
   "plugin",
-  "audiobookshelf",
-  "audiobooks",
+  "raspberry pi",
 ]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -21,13 +20,12 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
-  "Topic :: Multimedia :: Sound/Audio :: Players",
+  "Topic :: System :: Hardware",
   "Topic :: Home Automation",
 ]
 license-files = ["LICENSE"]
 dependencies = [
   "lauschkiste-core==0.1.0a6",
-  "requests",
 ]
 
 [project.urls]
@@ -36,8 +34,20 @@ Documentation = "https://github.com/ladidadida/lauschkiste/tree/main/documentati
 Issues = "https://github.com/ladidadida/lauschkiste/issues"
 Changelog = "https://github.com/ladidadida/lauschkiste/releases"
 
+[project.optional-dependencies]
+gpio = [
+  "gpiozero",
+  # gpiozero's backend for Linux GPIO chips (any board, Raspberry Pi kernels >= 6.6)
+  "lgpio; platform_machine == 'armv6l' or platform_machine == 'armv7l' or platform_machine == 'aarch64'",
+]
+battery = ["pi-ina219", "smbus2"]
+
 [project.entry-points."lauschkiste.plugins"]
-audiobookshelf = "lauschkiste_plugin_audiobookshelf:Audiobookshelf"
+device_raspberry_pi = "lauschkiste_plugin_device_raspberry_pi:DeviceRaspberryPi"
+gpio_controls = "lauschkiste_plugin_peripherals.gpio_controls:GpioControls"
+battery = "lauschkiste_plugin_peripherals.battery:Battery"
+power_button = "lauschkiste_plugin_peripherals.power_button:PowerButton"
+phat_beat = "lauschkiste_plugin_peripherals.phat_beat:PhatBeat"
 
 [tool.uv.sources]
 lauschkiste-core = { workspace = true }
@@ -47,4 +57,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lauschkiste_plugin_audiobookshelf"]
+packages = ["src/lauschkiste_plugin_device_raspberry_pi", "src/lauschkiste_plugin_peripherals"]

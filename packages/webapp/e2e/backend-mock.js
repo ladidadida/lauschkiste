@@ -178,10 +178,10 @@ export async function mockBackend(
       conflicts: ['GPIO17'], unknown: [], boot_pending: ['i2c on'],
     }),
     '/api/v1/plugins': () => [
-      { name: 'battery', enabled: false, running: false, package: 'lauschkiste-plugin-peripherals', version: '0.1.0',
+      { name: 'battery', enabled: false, running: false, package: 'lauschkiste-plugins-raspberry-pi', version: '0.1.0',
         summary: 'Battery monitor.', problem: null, missing_extras: [], needs: ['i2c'], provides: [],
         blocked: { missing: ['i2c'] }, detected: null },
-      { name: 'device_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugin-device-raspberry-pi',
+      { name: 'device_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugins-raspberry-pi',
         version: '0.1.0', summary: 'Raspberry Pi hardware.', problem: null, missing_extras: [], needs: [],
         provides: ['device', 'gpio', 'i2c'], blocked: null, detected: 'Raspberry Pi 3 Model B' },
     ],

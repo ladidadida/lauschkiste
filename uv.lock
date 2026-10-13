@@ -12,13 +12,8 @@ resolution-markers = [
 members = [
     "lauschkiste",
     "lauschkiste-core",
-    "lauschkiste-plugin-audiobookshelf",
-    "lauschkiste-plugin-device-pc",
-    "lauschkiste-plugin-device-raspberry-pi",
-    "lauschkiste-plugin-directories",
-    "lauschkiste-plugin-peripherals",
-    "lauschkiste-plugin-rfid-readers",
-    "lauschkiste-plugin-samba",
+    "lauschkiste-plugins",
+    "lauschkiste-plugins-raspberry-pi",
 ]
 
 [manifest.dependency-groups]
@@ -956,91 +951,13 @@ requires-dist = [
 ]
 
 [[package]]
-name = "lauschkiste-plugin-audiobookshelf"
+name = "lauschkiste-plugins"
 version = "0.1.0a6"
-source = { editable = "packages/plugins/audiobookshelf" }
+source = { editable = "packages/plugins/general" }
 dependencies = [
+    { name = "lauschkiste" },
     { name = "lauschkiste-core" },
     { name = "requests" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
-    { name = "requests" },
-]
-
-[[package]]
-name = "lauschkiste-plugin-device-pc"
-version = "0.1.0a6"
-source = { editable = "packages/plugins/device-pc" }
-dependencies = [
-    { name = "lauschkiste-core" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "lauschkiste-core", editable = "packages/lauschkiste" }]
-
-[[package]]
-name = "lauschkiste-plugin-device-raspberry-pi"
-version = "0.1.0a6"
-source = { editable = "packages/plugins/device-raspberry-pi" }
-dependencies = [
-    { name = "lauschkiste-core" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "lauschkiste-core", editable = "packages/lauschkiste" }]
-
-[[package]]
-name = "lauschkiste-plugin-directories"
-version = "0.1.0a6"
-source = { editable = "packages/plugins/directories" }
-dependencies = [
-    { name = "lauschkiste-core" },
-    { name = "requests" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
-    { name = "requests" },
-]
-
-[[package]]
-name = "lauschkiste-plugin-peripherals"
-version = "0.1.0a6"
-source = { editable = "packages/plugins/peripherals" }
-dependencies = [
-    { name = "lauschkiste-core" },
-]
-
-[package.optional-dependencies]
-battery = [
-    { name = "pi-ina219" },
-    { name = "smbus2" },
-]
-gpio = [
-    { name = "gpiozero" },
-    { name = "lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv6l' or platform_machine == 'armv7l'" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "gpiozero", marker = "extra == 'gpio'" },
-    { name = "lauschkiste-core", editable = "packages/lauschkiste" },
-    { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv6l' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
-    { name = "pi-ina219", marker = "extra == 'battery'" },
-    { name = "smbus2", marker = "extra == 'battery'" },
-]
-provides-extras = ["gpio", "battery"]
-
-[[package]]
-name = "lauschkiste-plugin-rfid-readers"
-version = "0.1.0a6"
-source = { editable = "packages/plugins/rfid-readers" }
-dependencies = [
-    { name = "lauschkiste-core" },
 ]
 
 [package.optional-dependencies]
@@ -1065,30 +982,45 @@ rdm6300-serial = [
 [package.metadata]
 requires-dist = [
     { name = "gpiozero", marker = "extra == 'rc522-spi'" },
+    { name = "lauschkiste", editable = "packages/cli" },
     { name = "lauschkiste-core", editable = "packages/lauschkiste" },
     { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'rc522-spi') or (platform_machine == 'armv6l' and extra == 'rc522-spi') or (platform_machine == 'armv7l' and extra == 'rc522-spi')" },
     { name = "mfrc522-i2c", marker = "extra == 'mfrc522-i2c'" },
     { name = "nfcpy", marker = "extra == 'generic-nfcpy'" },
     { name = "py532lib", marker = "extra == 'pn532-i2c-py532'" },
     { name = "pyserial", marker = "extra == 'rdm6300-serial'" },
+    { name = "requests" },
     { name = "spidev", marker = "extra == 'rc522-spi'" },
 ]
 provides-extras = ["rc522-spi", "mfrc522-i2c", "pn532-i2c-py532", "rdm6300-serial", "generic-nfcpy"]
 
 [[package]]
-name = "lauschkiste-plugin-samba"
+name = "lauschkiste-plugins-raspberry-pi"
 version = "0.1.0a6"
-source = { editable = "packages/plugins/samba" }
+source = { editable = "packages/plugins/raspberry-pi" }
 dependencies = [
-    { name = "lauschkiste" },
     { name = "lauschkiste-core" },
+]
+
+[package.optional-dependencies]
+battery = [
+    { name = "pi-ina219" },
+    { name = "smbus2" },
+]
+gpio = [
+    { name = "gpiozero" },
+    { name = "lgpio", marker = "platform_machine == 'aarch64' or platform_machine == 'armv6l' or platform_machine == 'armv7l'" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "lauschkiste", editable = "packages/cli" },
+    { name = "gpiozero", marker = "extra == 'gpio'" },
     { name = "lauschkiste-core", editable = "packages/lauschkiste" },
+    { name = "lgpio", marker = "(platform_machine == 'aarch64' and extra == 'gpio') or (platform_machine == 'armv6l' and extra == 'gpio') or (platform_machine == 'armv7l' and extra == 'gpio')" },
+    { name = "pi-ina219", marker = "extra == 'battery'" },
+    { name = "smbus2", marker = "extra == 'battery'" },
 ]
+provides-extras = ["gpio", "battery"]
 
 [[package]]
 name = "lgpio"

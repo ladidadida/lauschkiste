@@ -28,8 +28,15 @@ SERVICE = 'lauschkiste.service'
 #: Packages that no longer exist, and what took their place (None: nothing); an update swaps them
 OBSOLETE_PACKAGES: Dict[str, Optional[str]] = {
     'lauschkiste-plugin-mpd': None,
-    'lauschkiste-plugin-board-raspberry-pi': 'lauschkiste-plugin-device-raspberry-pi',
-    'lauschkiste-plugin-devices': 'lauschkiste-plugin-peripherals',
+    'lauschkiste-plugin-board-raspberry-pi': 'lauschkiste-plugins-raspberry-pi',
+    'lauschkiste-plugin-devices': 'lauschkiste-plugins-raspberry-pi',
+    'lauschkiste-plugin-device-raspberry-pi': 'lauschkiste-plugins-raspberry-pi',
+    'lauschkiste-plugin-peripherals': 'lauschkiste-plugins-raspberry-pi',
+    'lauschkiste-plugin-device-pc': 'lauschkiste-plugins',
+    'lauschkiste-plugin-rfid-readers': 'lauschkiste-plugins',
+    'lauschkiste-plugin-samba': 'lauschkiste-plugins',
+    'lauschkiste-plugin-audiobookshelf': 'lauschkiste-plugins',
+    'lauschkiste-plugin-directories': 'lauschkiste-plugins',
 }
 #: Plugins that were renamed, as they are called in the configuration
 RENAMED_PLUGINS = {'board_raspberry_pi': 'device_raspberry_pi'}
@@ -128,7 +135,9 @@ def enabled_extras(config_path: Path) -> Dict[str, List[str]]:
     for name in Context(System(), config_path).enabled_plugins():
         for requirement in plugin.plugin_extras(name):
             dist, _, rest = requirement.partition('[')
-            extras.setdefault(_dist_name(dist), []).extend(rest.rstrip(']').split(','))
+            dist = _dist_name(dist)
+            if OBSOLETE_PACKAGES.get(dist, dist):
+                extras.setdefault(OBSOLETE_PACKAGES.get(dist, dist), []).extend(rest.rstrip(']').split(','))
     return extras
 
 
@@ -157,8 +166,10 @@ def update_package(repo: str, tag: str, config_path: Path, check_only: bool = Fa
             response.raise_for_status()
             path.write_bytes(response.content)
             wheels.append(path)
-        plugin.install_requirements(wheel_requirements(wheels, enabled_extras(config_path)))
-    finish_install(config_path)
+        requirements = wheel_requirements(wheels, enabled_extras(config_path))
+        remove_obsolete()
+        plugin.install_requirements(requirements)
+    rename_plugins(config_path)
     return True
 
 
@@ -195,11 +206,16 @@ def installed_packages() -> List[str]:
                    if canonicalize_name(dist.metadata['Name']).startswith('lauschkiste')})
 
 
-def finish_install(config_path: Path) -> None:
-    """After new packages are in: the packages they replace go, and renamed plugins are renamed in the configuration."""
+def remove_obsolete() -> None:
+    """Before the new packages are installed: the packages they replace go. Their files must not be removed after the
+    new ones are in, because a plugin may have moved to another package under the same module name."""
     obsolete = [name for name in installed_packages() if name in OBSOLETE_PACKAGES]
     if obsolete:
         plugin.uninstall_packages(obsolete)
+
+
+def rename_plugins(config_path: Path) -> None:
+    """Plugins that were renamed are renamed in the configuration."""
     if config_path.exists():
         plugin.rename_in_config(config_path, RENAMED_PLUGINS)
 
@@ -224,8 +240,10 @@ def update_from_index(release: str, config_path: Path, check_only: bool = False)
     typer.echo(f"Updating Lauschkiste {current} -> {target}")
     if check_only:
         return True
-    plugin.install_requirements(index_requirements(config_path, target))
-    finish_install(config_path)
+    requirements = index_requirements(config_path, target)
+    remove_obsolete()
+    plugin.install_requirements(requirements)
+    rename_plugins(config_path)
     return True
 
 

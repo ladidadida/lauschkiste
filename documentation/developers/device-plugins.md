@@ -20,8 +20,8 @@ runs on.
 | **Peripheral plugin** | hardware attached to the machine, independent of which machine | `gpio_controls`, `battery`, `power_button`, `phat_beat`, RFID readers |
 | Core module | always there; may still ask the device what it may do | `display`, `hardware` |
 
-The peripheral plugins used to be called "device plugins" (package `lauschkiste-plugin-devices`, now
-`lauschkiste-plugin-peripherals`); they were renamed to avoid two meanings.
+The peripheral plugins used to be called "device plugins" (package `lauschkiste-plugin-devices`, now part of
+`lauschkiste-plugins-raspberry-pi`); they were renamed to avoid two meanings.
 
 ## The setup, step by step
 
@@ -98,8 +98,11 @@ plugins, the device plugin's among them.
   installed device plugins, *a device plugin of my own* (package, `github:owner/repo[@tag]` or URL, installed like
   *Plugins from other sources*) and *none*.
 - `device_pc_test` and `device_pc_box` for ordinary computers.
-- `lauschctl update` replaces the old packages (`lauschkiste-plugin-board-raspberry-pi`, `-devices`; the removed
-  `-mpd`) and renames `board_raspberry_pi` in the configuration to `device_raspberry_pi`.
+- The plugins are shipped in two packages: `lauschkiste-plugins` (PC devices, RFID readers, Samba, Audiobookshelf,
+  directories) and `lauschkiste-plugins-raspberry-pi` (the Pi device and the peripherals). A new plugin needs no entry
+  in the installer or the setup; the setup finds plugins by their entry points.
+- `lauschctl update` replaces all the old single packages (`lauschkiste-plugin-*`, including the removed
+  `-mpd`), removing them *before* the new ones are installed (module names moved between packages) and renames `board_raspberry_pi` in the configuration to `device_raspberry_pi`.
 
 - A device plugin brings setup steps (`Plugin.setup_steps()`, contract 3.2); the steps of the Raspberry Pi
   (`hardware`, `boot`, `raspi`) moved from the CLI into `device_raspberry_pi`. `lauschctl setup raspi` on another device

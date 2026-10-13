@@ -46,7 +46,7 @@ def reader_install_dependencies(reader_path: str, dependency_install: str) -> No
         reader_name = os.path.basename(reader_path.rstrip('/'))
         extra = BUNDLED_READER_EXTRAS.get(reader_name)
         if extra is not None:
-            requirements = [f'lauschkiste-plugin-rfid-readers[{extra}]']
+            requirements = [f'lauschkiste-plugins[{extra}]']
         elif os.path.exists(reader_path + '/requirements.txt'):
             requirements = ['-r', reader_path + '/requirements.txt']
         else:

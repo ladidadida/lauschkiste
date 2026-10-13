@@ -43,17 +43,11 @@ publishing"). What has to be done once, by the owner of the PyPI account:
    | --- | --- | --- |
    | `lauschkiste` | `testpypi-lauschkiste` | `pypi-lauschkiste` |
    | `lauschkiste-core` | `testpypi-lauschkiste-core` | `pypi-lauschkiste-core` |
-   | `lauschkiste-plugin-device-raspberry-pi` | `testpypi-lauschkiste-plugin-device-raspberry-pi` | `pypi-lauschkiste-plugin-device-raspberry-pi` |
-   | `lauschkiste-plugin-device-pc` | `testpypi-lauschkiste-plugin-device-pc` | `pypi-lauschkiste-plugin-device-pc` |
-   | `lauschkiste-plugin-peripherals` | `testpypi-lauschkiste-plugin-peripherals` | `pypi-lauschkiste-plugin-peripherals` |
-   | `lauschkiste-plugin-rfid-readers` | `testpypi-lauschkiste-plugin-rfid-readers` | `pypi-lauschkiste-plugin-rfid-readers` |
-   | `lauschkiste-plugin-samba` | `testpypi-lauschkiste-plugin-samba` | `pypi-lauschkiste-plugin-samba` |
-   | `lauschkiste-plugin-audiobookshelf` | `testpypi-lauschkiste-plugin-audiobookshelf` | `pypi-lauschkiste-plugin-audiobookshelf` |
-   | `lauschkiste-plugin-directories` | `testpypi-lauschkiste-plugin-directories` | `pypi-lauschkiste-plugin-directories` |
+   | `lauschkiste-plugins` | `testpypi-lauschkiste-plugins` | `pypi-lauschkiste-plugins` |
+   | `lauschkiste-plugins-raspberry-pi` | `testpypi-lauschkiste-plugins-raspberry-pi` | `pypi-lauschkiste-plugins-raspberry-pi` |
 
    PyPI allows **three pending publishers at a time** (an entry no longer counts once its first upload
-   has created the project). So register three, upload, register the next three and upload again; see
-   "Packages in rounds" below.
+   has created the project). A package that exists on PyPI already needs none; see "Packages in rounds" below.
 
 3. In the GitHub repository (Settings → Environments) create the environment `pypi` and give it **required
    reviewers** (yourself): it is the gate before the upload to PyPI, which cannot be undone. The other
@@ -68,7 +62,7 @@ The workflow has one job per package. A job whose package has no trusted publish
 1. Register the next (up to three) pending publishers of the packages that failed.
 2. In the workflow run on GitHub choose **Re-run failed jobs**: only those uploads run again.
 
-Repeat until all nine jobs are green (three rounds: 3 + 3 + 3). This is needed once per registry (TestPyPI,
+Repeat until all four jobs are green (the four fit in two rounds). This is needed once per registry (TestPyPI,
 PyPI); later uploads need no pending publishers any more.
 
 ## Test on TestPyPI
