@@ -235,6 +235,14 @@ class AutohotspotStep(Step):
             raise SetupError(f'{self.TIMER} could not be enabled')
 
 
+def _detected_hat(ctx):
+    try:
+        from lauschkiste_plugin_device_raspberry_pi import hat
+    except ImportError:
+        return None
+    return hat.read_hat(ctx.system.read)
+
+
 class AudioStep(Step):
     name = 'audio'
     title = 'Audio outputs'
@@ -263,7 +271,6 @@ class AudioStep(Step):
 
     def _sinks(self, ctx):
         import pulsectl
-        from .hardware import _detected_hat
         hat = _detected_hat(ctx)
         try:
             with pulsectl.Pulse('lauschkiste-setup') as pulse:

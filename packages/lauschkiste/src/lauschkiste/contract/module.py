@@ -153,6 +153,12 @@ class Plugin(Module):
     setup_kind: ClassVar[str] = ''
 
     @classmethod
+    def setup_steps(cls) -> list:
+        """Steps of `lauschctl setup` this plugin brings (``lauschkiste_cli.setup.base.Step`` objects); a device plugin
+        offers its catalog of options this way. Import the CLI inside the method: the service runs without it."""
+        return []
+
+    @classmethod
     def detect(cls, read: Callable[[str], Optional[str]]) -> Optional[str]:
         """The hardware of this plugin found on this machine (e.g. a device model), or None.
 

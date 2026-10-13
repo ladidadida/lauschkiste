@@ -7,7 +7,7 @@ import typer
 
 import lauschkiste.common.paths
 from lauschkiste_cli.setup.base import Answers, Context, Step, ask
-from lauschkiste_cli.setup.steps import all_steps
+from lauschkiste_cli.setup.steps import all_steps, device
 from lauschkiste_cli.setup.steps.lauschkiste import public_port
 from lauschkiste_cli.setup.system import SetupError, StepSkipped, System
 
@@ -16,7 +16,7 @@ def _select(names: Optional[List[str]], steps: List[Step]) -> List[Step]:
     if not names:
         return steps
     by_name = {step.name: step for step in steps}
-    unknown = [name for name in names if name not in by_name]
+    unknown = [name for name in names if name not in by_name and name not in device.all_step_names()]
     if unknown:
         typer.echo(f"Unknown step(s): {', '.join(unknown)}. Steps: {', '.join(by_name)}", err=True)
         raise typer.Exit(2)
@@ -86,16 +86,27 @@ def _run_step(step: Step, ctx: Context, check_only: bool, force: bool) -> bool:
 def run_setup(names: Optional[List[str]], ctx: Context, answers: Answers, check_only: bool = False,
               force: bool = False, steps: Optional[List[Step]] = None) -> int:
     """Returns the number of steps with remaining problems."""
-    selected = _select(names, steps or all_steps())
+    pool = steps or all_steps()
+    selected = _select(names, device.with_device_steps(pool, ctx))
+    for name in names or ():
+        if not any(step.name == name for step in selected):
+            typer.echo(f"Skipping '{name}': not applicable on this machine.")
     previous = answers.load()
     shown: List[str] = []
     relevant = []
-    for step in selected:
+    index = 0
+    while index < len(selected):
+        step = selected[index]
+        index += 1
         if step.applies(ctx):
             relevant.append(step)
             _ask_questions(step, ctx, previous, ctx.assume_yes, shown)
         elif names:
             typer.echo(f"Skipping '{step.name}': not applicable on this machine.")
+        if step.name == 'device':
+            done = selected[:index]
+            selected = done + [s for s in _select(names, device.with_device_steps(pool, ctx))
+                               if not any(s is d for d in done)]
 
     if not check_only:
         answers.save(_stored_answers(relevant, ctx.answers, previous))
@@ -129,7 +140,8 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
     Answers are kept in $LAUSCHKISTE_HOME/settings/setup.yaml.
     """
     if list_steps:
-        for step in all_steps():
+        listing = Context(system=System(), config_path=conf or lauschkiste.common.paths.config_file())
+        for step in device.with_device_steps(all_steps(), listing):
             typer.echo(f"{step.name:12} {step.title}")
         return
     ctx = Context(system=System(), config_path=conf or lauschkiste.common.paths.config_file(),

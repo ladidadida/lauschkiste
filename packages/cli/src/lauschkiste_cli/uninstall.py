@@ -117,13 +117,16 @@ def _file_actions(system: System) -> List[Action]:
     return actions
 
 
+BOOT_MARKER = '## Lauschkiste Boot Config'
+
+
 def _block_actions(system: System) -> List[Action]:
     """Blocks Lauschkiste added to files that belong to the system or the user."""
     kiosk = extras.KioskStep
     boot_config = str(system.boot_file('config.txt'))
     blocks = [(kiosk.BASHRC, kiosk.MARKER, False, f'remove the kiosk mode from {kiosk.BASHRC}'),
               (kiosk.AUTOSTART, kiosk.MARKER, True, f'remove the kiosk mode from {kiosk.AUTOSTART}'),
-              (boot_config, system_steps.BootStep.MARKER, True, 'remove the splash setting from config.txt')]
+              (boot_config, BOOT_MARKER, True, 'remove the splash setting from config.txt')]
     actions = [Action(text, lambda p=path, m=marker, r=root: system.remove_marked(p, m, root=r))
                for path, marker, root, text in blocks if has_marker(system, path, marker)]
     if has_marker(system, samba.CONF, samba.MARKER):

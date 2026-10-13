@@ -54,8 +54,12 @@ Details of the first part:
 - `provides`: capabilities, as today (`gpio`, `i2c`, `spi`, `poweroff`, ...). New ones describe what the machine lets
   Lauschkiste do to it, for example `system_setup` (may change boot and network configuration), `autologin`, `screen`.
 - `detect(read)`: recognises the machine; only suggests, never enables silently.
-- **What the setup offers**: steps and questions are tied to capabilities (boot configuration, quiet boot, WiFi hotspot,
-  kiosk), and their defaults follow the device. A device that provides no `system_setup` offers none of them.
+- **What the setup offers**: the plugin brings its own steps with `setup_steps()` (`lauschkiste_cli.setup.base.Step`
+  objects; the method imports the CLI itself, because the service runs without it). `device_raspberry_pi` brings the
+  sound card, the quiet boot and the boot configuration. Generic steps that many devices can use (port 80, Samba, WiFi
+  hotspot, kiosk, login message) stay in the CLI and are tied to capabilities; a device that provides no `system_setup`
+  offers none of them. A step has `position`: `early` (asked right after the device, with its options) or `late`
+  (run after everything chosen, like the boot configuration).
 - Shutdown and reboot, if the machine should be switched off by a box (a laptop does not provide `poweroff`).
 
 Ordinary computers have two device plugins, in one package: `device_pc_test` is deliberately modest and changes nothing
@@ -97,10 +101,13 @@ plugins, the device plugin's among them.
 - `lauschctl update` replaces the old packages (`lauschkiste-plugin-board-raspberry-pi`, `-devices`; the removed
   `-mpd`) and renames `board_raspberry_pi` in the configuration to `device_raspberry_pi`.
 
+- A device plugin brings setup steps (`Plugin.setup_steps()`, contract 3.2); the steps of the Raspberry Pi
+  (`hardware`, `boot`, `raspi`) moved from the CLI into `device_raspberry_pi`. `lauschctl setup raspi` on another device
+  says the step does not apply.
+
 ## Not done yet
 
-- A device plugin does not yet contribute whole setup steps of its own (boot configuration, quiet boot, hotspot and
-  kiosk are still steps of the CLI, shown by capability); a third party can choose what the machine allows, not yet add
-  steps.
+- `device_pc_box` brings no steps of its own yet; the generic ones in the CLI (hotspot, kiosk, ...) could move into
+  plugins or be shared as building blocks, once a second device really needs different ones.
 - Shutdown and reboot for `device_pc_box` (it provides no `poweroff` yet).
 - `lauschctl setup --check` still asks the questions; it should only report.

@@ -82,6 +82,8 @@ class Step:
     needs: ClassVar[Tuple[str, ...]] = ()
     #: 'device' (the device and its options) or 'peripherals' (what is attached, and its options)
     phase: ClassVar[str] = 'device'
+    #: Only for steps of a device plugin: 'early' (after the device, with its options) or 'late' (after everything)
+    position: ClassVar[str] = 'early'
 
     def questions_for(self, ctx: Context) -> Sequence[Question]:
         """The questions to ask; most steps have fixed ones, a few depend on the machine and earlier answers."""

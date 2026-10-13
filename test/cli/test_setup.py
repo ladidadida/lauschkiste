@@ -481,7 +481,7 @@ def test_kiosk_step_repairs_an_outdated_chromium_command(tmp_path, home, extras)
 
 
 def test_hardware_step_offers_the_detected_sound_card(tmp_path, home, extras):
-    from lauschkiste_cli.setup.steps.hardware import HardwareStep
+    from lauschkiste_plugin_device_raspberry_pi.setup import HardwareStep
     system = FakeSystem(tmp_path / 'root', pi=True)
     ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml')
     question = {q.key: q for q in HardwareStep.questions}['hw_sound_card']
@@ -598,3 +598,45 @@ def test_a_peripheral_from_another_source_is_proposed_not_enabled(tmp_path, home
     questions = peripherals.PeripheralsStep().questions_for(ctx)
     assert [(q.key, q.default, q.help) for q in questions] == [('peripheral_knob', True, 'A rotary knob from a third party.')]
     assert 'knob' not in ctx.enabled_plugins()
+
+
+def test_the_device_plugin_brings_its_own_steps(tmp_path, home, extras, monkeypatch):
+    from lauschkiste.contract import Plugin
+    from lauschkiste_cli.setup.base import Question, Step
+    from lauschkiste_cli.setup.steps import device
+
+    class Tune(Step):
+        name = 'tune'
+        title = 'Tuning of my device'
+        questions = (Question('tune', 'Tune it?', default=True),)
+        applied = []
+
+        def wanted(self, ctx):
+            return bool(ctx.answer('tune'))
+
+        def check(self, ctx):
+            return [] if self.applied else ['not tuned']
+
+        def apply(self, ctx):
+            self.applied.append(ctx.answer('tune'))
+
+    class Mine(Plugin):
+        name = 'device_mine'
+        provides = ('device', 'system_setup')
+
+        @classmethod
+        def setup_steps(cls):
+            return [Tune()]
+
+    monkeypatch.setattr(device, '_device_classes', lambda: {'device_mine': Mine})
+    system = FakeSystem(tmp_path / 'root')
+    failed, ctx = setup_run(system, home, answers={'device': 'device_mine'})
+    assert failed == 0 and Tune.applied == [True] and ctx.answers['tune'] is True
+
+
+def test_steps_of_another_device_are_not_offered(tmp_path, home, extras, capsys):
+    system = FakeSystem(tmp_path / 'root')
+    failed, ctx = setup_run(system, home, answers={'device': 'device_pc_box'}, names=['raspi', 'hardware'])
+    assert failed == 0 and 'hw_sound_card' not in ctx.answers
+    out = capsys.readouterr().out
+    assert "Skipping 'raspi'" in out and "Skipping 'hardware'" in out

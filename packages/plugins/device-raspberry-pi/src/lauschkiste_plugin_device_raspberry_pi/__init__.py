@@ -79,6 +79,11 @@ class DeviceRaspberryPi(Plugin):
         model = (read('/proc/device-tree/model') or '').strip('\x00\n ')
         return model if 'Raspberry Pi' in model else None
 
+    @classmethod
+    def setup_steps(cls):
+        from lauschkiste_plugin_device_raspberry_pi import setup
+        return setup.steps()
+
     def __init__(self):
         self._ctx: Any = None
 

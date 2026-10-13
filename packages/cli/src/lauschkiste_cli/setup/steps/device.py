@@ -44,6 +44,23 @@ def resolve(ctx: Context) -> Optional[str]:
     return detected[0]['name'] if detected else None
 
 
+def all_step_names() -> Set[str]:
+    """The steps of every installed device plugin, also of those that do not fit this machine."""
+    return {step.name for cls in _device_classes().values() for step in cls.setup_steps()}
+
+
+def with_device_steps(steps: List[Step], ctx: Context) -> List[Step]:
+    """``steps`` plus those of the device plugin: its options after the device step, the rest at the end."""
+    base = [step for step in steps if not getattr(step, 'from_device', False)]
+    cls = _device_classes().get(resolve(ctx) or '')
+    brought = list(cls.setup_steps()) if cls is not None else []
+    for step in brought:
+        step.from_device = True
+    after = next((index for index, step in enumerate(base) if step.name == 'device'), -1) + 1
+    return [*base[:after], *(s for s in brought if s.position == 'early'), *base[after:],
+            *(s for s in brought if s.position != 'early')]
+
+
 def capabilities(ctx: Context) -> Set[str]:
     cls = _device_classes().get(resolve(ctx) or '')
     return set(getattr(cls, 'provides', ())) if cls is not None else set()
