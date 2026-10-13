@@ -607,6 +607,14 @@
       "installing": "Installing packages, this can take a few minutes …",
       "install-error": "Installation failed: {{error}}",
       "detected": "Detected: {{model}}",
+      "device-title": "Device",
+      "device-help": "What kind of machine this is. The other plugins check against it what they can do here.",
+      "device-label": "This machine",
+      "device-none": "None of these: change nothing on the system",
+      "groups": {
+        "hardware": { "title": "Hardware", "help": "Buttons, LEDs, battery, RFID readers: what is attached to the machine." },
+        "feature": { "title": "Functions", "help": "Sources and services: audiobooks, search for podcasts and radio, file sharing." }
+      },
       "blocked-device": "Only one device can be active. Switch off “{{name}}” first.",
       "blocked-needs": "Needs {{needs}}. Switch on the device plugin of your machine first.",
       "capabilities": {

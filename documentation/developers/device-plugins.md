@@ -49,6 +49,13 @@ Details of the first part:
 4. Only then come the plugins. Each one checks *"am I compatible with this device?"* and is offered, hidden or greyed out
    with its reason.
 
+## Order of the setup
+
+All questions are asked first (device, its options, peripherals, their options), then the plan is shown and confirmed,
+then packages and steps are applied. A step with `interactive = True` (audio outputs, RFID reader wizard) needs what the
+other steps installed and runs last. Secrets (the Samba password) are asked with the other questions and not stored.
+The directories plugins (`podcast_directories`, `radio_directories`) are enabled by every setup.
+
 ## What a device plugin provides
 
 - `provides`: capabilities, as today (`gpio`, `i2c`, `spi`, `poweroff`, ...). New ones describe what the machine lets

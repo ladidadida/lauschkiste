@@ -106,7 +106,8 @@ def _service_actions(system: System) -> List[Action]:
 def _file_actions(system: System) -> List[Action]:
     actions: List[Action] = []
     for path, text in ((lauschkiste_steps.WebPortStep.OLD_SYSCTL, 'remove the old port setting'),
-                       (system_steps.WelcomeStep.TARGET, 'remove the login message')):
+                       (system_steps.WelcomeStep.TARGET, 'remove the login message'),
+                       (extras.KioskStep.LOADING, 'remove the loading page of the kiosk')):
         if system.exists(path):
             actions.append(Action(text, lambda p=path: system.remove(p, root=True)))
     kiosk = extras.KioskStep

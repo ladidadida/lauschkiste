@@ -80,8 +80,6 @@ def install_spec(ctx: Context, spec: str) -> List[str]:
     """Install ``spec`` unless an earlier run did (asking first unless ``--yes``); the plugins it provides."""
     state = _state()
     if spec not in state:
-        if not ctx.assume_yes and not typer.confirm(f"Install '{spec}'? It runs with your user's rights."):
-            return []
         typer.echo(f"    installing {spec}")
         before = set(plugins.installed())
         try:

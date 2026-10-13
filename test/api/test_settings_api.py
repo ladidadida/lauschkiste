@@ -95,7 +95,7 @@ def test_plugins_list_and_enable(client, monkeypatch):
                        'package': 'lauschkiste-plugin-gadget',
                        'version': '1.2', 'summary': 'Does things.', 'problem': None, 'author': None, 'license': None,
                        'homepage': None, 'documentation': None, 'issues': None, 'missing_extras': [],
-                       'provides': [], 'needs': [], 'blocked': None, 'detected': None,
+                       'provides': [], 'needs': [], 'blocked': None, 'detected': None, 'kind': 'feature',
                        'installing': False, 'install_error': None}]
     assert client.put('/api/v1/plugins/gadget', json={'enabled': True}).json()['enabled'] is True
     assert client.modules.settings.cfg.getn('plugins') == {'gadget': {}}

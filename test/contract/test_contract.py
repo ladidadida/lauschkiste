@@ -487,3 +487,21 @@ def test_a_module_can_say_it_is_not_compatible():
     assert plugins.blocker(Picky, []) == {'incompatible': 'needs a machine with GPIO pins'}
     assert plugins.blocker_text(plugins.blocker(Picky, [])) == 'needs a machine with GPIO pins'
     assert plugins.blocker(Picky, [Gpio]) is None
+
+
+def test_plugins_have_a_kind_for_the_plugin_list():
+    from lauschkiste.contract.plugins import kind_of
+
+    class Machine(Plugin):
+        name = 'device_x'
+        provides = ('device',)
+
+    class Knob(Plugin):
+        name = 'knob'
+        setup_kind = 'peripheral'
+
+    class Plain(Plugin):
+        name = 'plain'
+
+    assert kind_of(Machine, 'device_x') == 'device' and kind_of(Knob, 'knob') == 'hardware'
+    assert kind_of(Plain, 'rfid_x') == 'hardware' and kind_of(Plain, 'plain') == 'feature'

@@ -13,6 +13,10 @@ from lauschkiste_cli.setup.base import Question, Step
 from lauschkiste_cli.setup.system import SetupError, StepSkipped
 
 
+def _validate_samba_password(value):
+    return None if len(value) >= samba.MIN_PASSWORD else f'The password needs at least {samba.MIN_PASSWORD} characters.'
+
+
 class SambaStep(Step):
     name = 'samba'
     title = 'Samba share of the library'
@@ -22,6 +26,13 @@ class SambaStep(Step):
                  default=False,
                  help='Not needed for uploading music: the web app can do that too.'),
     )
+
+    def questions_for(self, ctx):
+        if samba.has_user(ctx.system):
+            return self.questions
+        return (*self.questions, Question('samba_password', f'Samba password for {ctx.system.user} (at least '
+                                          f'{samba.MIN_PASSWORD} characters)', kind='secret', default='',
+                                          when=lambda answers: answers.get('samba'), validate=_validate_samba_password))
 
     def wanted(self, ctx):
         return bool(ctx.answer('samba'))
@@ -56,10 +67,11 @@ class SambaStep(Step):
 
     def apply(self, ctx):
         if not samba.has_user(ctx.system):
-            if ctx.assume_yes:
+            password = ctx.answer('samba_password')
+            if not password and ctx.assume_yes:
                 raise StepSkipped("choosing the Samba password is interactive; run 'lauschctl setup samba' later "
                                   "or set it in the web app")
-            samba.set_password(ctx.system, self._ask_password(ctx))
+            samba.set_password(ctx.system, password or self._ask_password(ctx))
         samba.share(ctx.system, self._library_folder(ctx))
         plugin.add_to_config(ctx.config_path, ['samba'])
 
@@ -76,6 +88,7 @@ class KioskStep(Step):
     BASHRC = '~/.bashrc'
     AUTOSTART = '/etc/xdg/openbox/autostart'
     AUTOLOGIN = '/etc/systemd/system/getty@tty1.service.d/autologin.conf'
+    LOADING = '/etc/xdg/openbox/lauschkiste-loading.html'
 
     def relevant(self, ctx):
         return ctx.system.architecture() != 'armv6' and ctx.system.is_debian()
@@ -100,8 +113,18 @@ class KioskStep(Step):
 
     STARTX = '[[ -z $DISPLAY && $XDG_VTNR -eq 1 ]] && startx -- -nocursor'
 
-    def _autostart(self, ctx) -> str:
+    def _loading_page(self, ctx) -> str:
         port = ctx.load_config().getn('api', 'port', default=5556)
+        return (
+            '<!doctype html><meta charset="utf-8"><title>Lauschkiste</title>\n'
+            '<style>body{margin:0;height:100vh;display:grid;place-items:center;background:#111;color:#eee;'
+            'font:600 2.5rem sans-serif}</style>\n<p>Lauschkiste &hellip;</p>\n'
+            f'<script>const target = "http://localhost:{port}/";\n'
+            '(function wait() {\n'
+            '  fetch(target, {mode: "no-cors"}).then(() => location.replace(target), () => setTimeout(wait, 1000));\n'
+            '})();</script>\n')
+
+    def _autostart(self, ctx) -> str:
         return (
             'xset s off\n'
             'xset s noblank\n'
@@ -109,7 +132,7 @@ class KioskStep(Step):
             "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/' ~/.config/chromium/'Local State'\n"
             "sed -i 's/\"exited_cleanly\":false/\"exited_cleanly\":true/; "
             "s/\"exit_type\":\"[^\"]\\+\"/\"exit_type\":\"Normal\"/' ~/.config/chromium/Default/Preferences\n"
-            f'{self._chromium(ctx)} http://localhost:{port} --disable-infobars --disable-pinch --disable-translate '
+            f'{self._chromium(ctx)} file://{self.LOADING} --disable-infobars --disable-pinch --disable-translate '
             '--kiosk --noerrdialogs --no-first-run')
 
     def check(self, ctx):
@@ -120,6 +143,8 @@ class KioskStep(Step):
                     if system.read_marked(path, self.MARKER) != block]
         if self.MARKER not in (system.read(self._update_check_file(ctx)) or ''):
             problems.append(f'{self._update_check_file(ctx)} is not set up')
+        if system.read(self.LOADING) != self._loading_page(ctx):
+            problems.append(f'{self.LOADING} is not set up')
         if ctx.provides('autologin') and not system.exists(self.AUTOLOGIN):
             problems.append('console autologin is not enabled')
         return problems
@@ -128,6 +153,7 @@ class KioskStep(Step):
         system = ctx.system
         system.replace_marked(self.BASHRC, self.MARKER, self.STARTX)
         system.replace_marked(self.AUTOSTART, self.MARKER, self._autostart(ctx), root=True)
+        system.write(self.LOADING, self._loading_page(ctx), root=True)
         system.write(self._update_check_file(ctx),
                      f'{self.MARKER}\nCHROMIUM_FLAGS="${{CHROMIUM_FLAGS}} --check-for-update-interval=31536000"\n',
                      root=True)
@@ -246,6 +272,7 @@ def _detected_hat(ctx):
 class AudioStep(Step):
     name = 'audio'
     title = 'Audio outputs'
+    interactive = True
     questions = (
         Question('audio', 'Choose the audio outputs now (otherwise the system default output is used)?',
                  default=False, help='A second output (e.g. Bluetooth headphones) can be switched to in the web app.'),

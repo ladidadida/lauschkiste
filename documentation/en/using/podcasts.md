@@ -7,7 +7,7 @@ internet unless you download them.
 
 In the library open **Podcasts** and tap **Subscribe to podcast**:
 
-- **Search.** With the plugin *Podcast directories* (Settings → Plugins) the dialog searches Apple Podcasts, fyyd (a
+- **Search.** With the plugin *Podcast directories* (on from the setup; Settings → Plugins switches it off) the dialog searches Apple Podcasts, fyyd (a
   German directory) and, with a free key, Podcast Index. Type a name, or leave the field empty to see the popular
   ones, and subscribe with one tap. Every directory has a switch in the plugin's settings, and what you type is sent to
   the directories that are on.

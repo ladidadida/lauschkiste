@@ -58,6 +58,10 @@ lauschctl setup
 nicht sicher, nimm ihn: Du kannst `lauschctl setup` jederzeit noch einmal starten, um etwas zu ändern. Ist deine
 Verbindung wackelig, starte es in `screen` oder `tmux`.
 
+Alle Fragen kommen zuerst. Danach zeigt `lauschctl setup`, was es tun wird, und fragt *Go ahead?* (Weitermachen?); erst nach
+deinem Ja installiert es, das dauert eine Weile, und du kannst weggehen. Ganz am Ende kommen noch ein oder zwei Fragen
+zurück, die das Installierte brauchen (der Audioausgang, der RFID-Leser); die beantwortest du, wenn du zurück bist.
+
 | Frage | Auf Deutsch | Antwort |
 | --- | --- | --- |
 | What kind of machine is this? | Welche Art Maschine ist das? | *Raspberry Pi* auf einem Pi. Auf einem Computer: [Auf PC, Laptop oder Mini-PC](other-computers.md). |

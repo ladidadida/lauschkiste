@@ -264,6 +264,15 @@ def set_enabled(cfg, name: str, on: bool) -> bool:
     return True
 
 
+def kind_of(cls, name: str) -> str:
+    """'device' (the machine), 'hardware' (attached to it, readers included) or 'feature' (everything else)."""
+    if 'device' in _provides(cls):
+        return 'device'
+    if getattr(cls, 'setup_kind', '') == 'peripheral' or name.startswith('rfid_'):
+        return 'hardware'
+    return 'feature'
+
+
 def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> List[Dict[str, Any]]:
     """Installed (and enabled but missing) plugins: package, summary, enabled, running, problem, missing extras."""
     available = installed()
@@ -278,7 +287,7 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
                                  'author': None, 'license': None, 'homepage': None, 'documentation': None,
                                  'issues': None,
                                  'missing_extras': [], 'provides': [], 'needs': [], 'blocked': None,
-                                 'detected': None}
+                                 'detected': None, 'kind': 'hardware' if name.startswith('rfid_') else 'feature'}
         if ep is None:
             entry['problem'] = 'not installed'
         else:
@@ -293,6 +302,7 @@ def describe(cfg, manager=None, installer: Optional[ExtrasInstaller] = None) -> 
             if cls is not None:
                 entry['provides'], entry['needs'] = list(_provides(cls)), list(getattr(cls, 'needs', ()))
                 entry['detected'] = detect(cls) if hasattr(cls, 'detect') else None
+                entry['kind'] = kind_of(cls, name)
                 if name not in on:
                     entry['blocked'] = blocker(cls, active)
         entry.update(installer.state(name) if installer else {'installing': False, 'install_error': None})

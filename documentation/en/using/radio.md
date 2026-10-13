@@ -6,7 +6,7 @@ Internet radio stations have a name, an address and optionally a picture. Each c
 
 In the library open **Radio** and tap **Add station**:
 
-- **Search.** With the plugin *Radio directories* (Settings → Plugins) the dialog searches
+- **Search.** With the plugin *Radio directories* (on from the setup; Settings → Plugins switches it off) the dialog searches
   [radio-browser.info](https://www.radio-browser.info), an open directory. Type a name or a topic such as "kinder";
   stations are listed with logo, country and bitrate. Without a search term, the popular stations of your country
   appear. One tap adds a station. What you type is sent to radio-browser.info.

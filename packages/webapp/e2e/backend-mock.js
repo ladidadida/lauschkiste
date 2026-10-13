@@ -180,10 +180,10 @@ export async function mockBackend(
     '/api/v1/plugins': () => [
       { name: 'battery', enabled: false, running: false, package: 'lauschkiste-plugins-raspberry-pi', version: '0.1.0',
         summary: 'Battery monitor.', problem: null, missing_extras: [], needs: ['i2c'], provides: [],
-        blocked: { missing: ['i2c'] }, detected: null },
+        blocked: { missing: ['i2c'] }, detected: null, kind: 'hardware' },
       { name: 'device_raspberry_pi', enabled: false, running: false, package: 'lauschkiste-plugins-raspberry-pi',
         version: '0.1.0', summary: 'Raspberry Pi hardware.', problem: null, missing_extras: [], needs: [],
-        provides: ['device', 'gpio', 'i2c'], blocked: null, detected: 'Raspberry Pi 3 Model B' },
+        provides: ['device', 'gpio', 'i2c'], blocked: null, detected: 'Raspberry Pi 3 Model B', kind: 'device' },
     ],
     '/api/v1/system/ip-addresses': () => ({ addresses: ['192.168.1.42'] }),
     '/api/v1/timers': () => [

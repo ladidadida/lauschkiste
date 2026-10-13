@@ -39,9 +39,25 @@ def _ask_questions(step: Step, ctx: Context, stored: Dict, assume_yes: bool, sho
         ctx.answers[question.key] = ask(question, ctx, stored, assume_yes)
 
 
-def _stored_answers(steps: List[Step], answers: Dict, previous: Dict) -> Dict:
-    secret = {q.key for step in steps for q in step.questions if q.kind == 'secret'}
+def _stored_answers(steps: List[Step], ctx: Context, previous: Dict) -> Dict:
+    answers = ctx.answers
+    secret = {q.key for step in steps for q in step.questions_for(ctx) if q.kind == 'secret'}
     return {key: value for key, value in {**previous, **answers}.items() if key not in secret}
+
+
+def _confirm(steps: List[Step], ctx: Context) -> None:
+    """What is going to happen, before anything is changed."""
+    todo = [step for step in steps if step.check(ctx) or step.packages(ctx)]
+    if not todo:
+        return
+    typer.echo(typer.style("\n== Everything is asked. Now this machine is set up:", bold=True))
+    for step in todo:
+        typer.echo(f"  - {step.title}")
+    if any(step.interactive for step in todo):
+        typer.echo("  (at the end a few questions come back that need what was installed before: "
+                   f"{', '.join(step.title for step in todo if step.interactive)})")
+    if not typer.confirm("Go ahead?", default=True):
+        raise typer.Exit(0)
 
 
 def _install_packages(steps: List[Step], ctx: Context) -> None:
@@ -114,9 +130,12 @@ def run_setup(names: Optional[List[str]], ctx: Context, answers: Answers, check_
                                if not any(s is d for d in done)]
 
     if not check_only:
-        answers.save(_stored_answers(relevant, ctx.answers, previous))
+        answers.save(_stored_answers(relevant, ctx, previous))
 
     wanted = [step for step in relevant if step.wanted(ctx)]
+    wanted = [*(s for s in wanted if not s.interactive), *(s for s in wanted if s.interactive)]
+    if not check_only and not ctx.assume_yes:
+        _confirm(wanted, ctx)
     if not check_only and ctx.system.is_debian():
         _install_packages(wanted, ctx)
 

@@ -6,7 +6,7 @@ Internetradio-Sender haben einen Namen, eine Adresse und optional ein Bild. Jede
 
 Öffne in der Bibliothek **Radio** und tippe auf **Sender hinzufügen**:
 
-- **Suchen.** Mit dem Plugin *Radio-Verzeichnisse* (Einstellungen → Plugins) durchsucht der Dialog
+- **Suchen.** Mit dem Plugin *Radio-Verzeichnisse* (nach dem Setup eingeschaltet; Einstellungen → Plugins schaltet es aus) durchsucht der Dialog
   [radio-browser.info](https://www.radio-browser.info), ein offenes Verzeichnis. Tippe einen Namen oder ein Thema wie
   „kinder“ ein; die Sender erscheinen mit Logo, Land und Bitrate. Ohne Suchbegriff siehst du die beliebten Sender deines
   Landes. Ein Tipp fügt einen Sender hinzu. Was du eintippst, geht an radio-browser.info.

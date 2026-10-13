@@ -7,7 +7,7 @@ Internet, außer du lädst sie herunter.
 
 Öffne in der Bibliothek **Podcasts** und tippe auf **Podcast abonnieren**:
 
-- **Suchen.** Mit dem Plugin *Podcast-Verzeichnisse* (Einstellungen → Plugins) durchsucht der Dialog Apple Podcasts,
+- **Suchen.** Mit dem Plugin *Podcast-Verzeichnisse* (nach dem Setup eingeschaltet; Einstellungen → Plugins schaltet es aus) durchsucht der Dialog Apple Podcasts,
   fyyd (ein deutsches Verzeichnis) und, mit einem kostenlosen Schlüssel, Podcast Index. Tippe einen Namen ein oder lass das
   Feld leer, um die beliebten zu sehen, und abonniere mit einem Tipp. Jedes Verzeichnis hat in den Einstellungen des
   Plugins einen Schalter; was du eintippst, geht an die eingeschalteten Verzeichnisse.

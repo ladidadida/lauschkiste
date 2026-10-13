@@ -4,12 +4,15 @@ from typing import List
 
 import lauschkiste.common.cfghandler
 import lauschkiste.common.paths
+import lauschkiste.contract.plugins as plugins
 from lauschkiste_cli import plugin
 from lauschkiste_cli.environment import checkout, executable
 from lauschkiste_cli.setup.base import Context, Question, Step
 from lauschkiste_cli.setup.system import SetupError, StepSkipped
 
 SERVICE = 'lauschkiste.service'
+#: Switched on with every setup (they cost nothing); the web app can switch them off
+DEFAULT_PLUGINS = ('podcast_directories', 'radio_directories')
 
 
 def wanted_plugins(ctx: Context) -> List[str]:
@@ -17,6 +20,7 @@ def wanted_plugins(ctx: Context) -> List[str]:
     names = [device] if device else []
     if ctx.answer('samba'):
         names.append('samba')
+    names += [name for name in DEFAULT_PLUGINS if name in plugins.installed()]
     return names
 
 
@@ -233,6 +237,7 @@ class RfidStep(Step):
     name = 'rfid'
     title = 'RFID reader'
     phase = 'peripherals'
+    interactive = True
     questions = (
         Question('rfid', 'Configure an RFID reader now?', default=lambda ctx: ctx.provides('system_setup')),
     )

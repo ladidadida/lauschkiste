@@ -84,6 +84,8 @@ class Step:
     phase: ClassVar[str] = 'device'
     #: Only for steps of a device plugin: 'early' (after the device, with its options) or 'late' (after everything)
     position: ClassVar[str] = 'early'
+    #: Asks questions while it is applied (it needs what the other steps installed): runs after all the others
+    interactive: ClassVar[bool] = False
 
     def questions_for(self, ctx: Context) -> Sequence[Question]:
         """The questions to ask; most steps have fixed ones, a few depend on the machine and earlier answers."""
@@ -128,7 +130,8 @@ def ask(question: Question, ctx: Context, stored: Dict[str, Any], assume_yes: bo
         return _choose(question, ctx, default)
     while True:
         value = typer.prompt(question.text, default=default, hide_input=question.kind == 'secret',
-                             show_default=question.kind != 'secret')
+                             show_default=question.kind != 'secret',
+                             confirmation_prompt=question.kind == 'secret')
         problem = question.validate(value) if question.validate else None
         if not problem:
             return value

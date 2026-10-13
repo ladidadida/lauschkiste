@@ -607,6 +607,14 @@
       "installing": "Pakete werden installiert, das kann einige Minuten dauern …",
       "install-error": "Installation fehlgeschlagen: {{error}}",
       "detected": "Erkannt: {{model}}",
+      "device-title": "Gerät",
+      "device-help": "Welche Art Maschine das ist. Die anderen Plugins prüfen daran, was sie hier können.",
+      "device-label": "Diese Maschine",
+      "device-none": "Keines davon: am System nichts ändern",
+      "groups": {
+        "hardware": { "title": "Hardware", "help": "Tasten, LEDs, Akku, RFID-Leser: was an der Maschine angeschlossen ist." },
+        "feature": { "title": "Funktionen", "help": "Quellen und Dienste: Hörbücher, Suche nach Podcasts und Radio, Dateifreigabe." }
+      },
       "blocked-device": "Es kann nur ein Gerät aktiv sein. Schalte zuerst „{{name}}“ aus.",
       "blocked-needs": "Braucht {{needs}}. Schalte zuerst das Geräte-Plugin deiner Maschine ein.",
       "capabilities": {

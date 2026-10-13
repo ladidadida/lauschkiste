@@ -55,6 +55,10 @@ lauschctl setup
 are not sure, accept it: you can run `lauschctl setup` again at any time to change something. If the connection is
 unreliable, run it in `screen` or `tmux`.
 
+All questions come first. Then `lauschctl setup` shows what it is going to do and asks *Go ahead?*; only after your yes
+it installs, which takes a while, and you can leave. At the very end one or two questions come back that need what was
+installed (the audio output, the RFID reader); you answer them when you come back.
+
 | Question | What to answer |
 | --- | --- |
 | What kind of machine is this? | *Raspberry Pi* on a Pi. On a computer: [On a PC, laptop or mini PC](other-computers.md). |

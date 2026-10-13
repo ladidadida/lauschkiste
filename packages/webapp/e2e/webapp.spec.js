@@ -299,8 +299,9 @@ test('plugins can be switched on', async ({ page }) => {
 
   await expect(page.getByRole('switch', { name: 'battery on/off' })).toBeDisabled();
   await expect(page.getByText('Needs I²C. Switch on the device plugin of your machine first.')).toBeVisible();
-  await expect(page.getByText('Detected: Raspberry Pi 3 Model B')).toBeVisible();
-  await page.getByRole('switch', { name: 'device_raspberry_pi on/off' }).click();
+  await expect(page.getByRole('switch', { name: 'device_raspberry_pi on/off' })).toHaveCount(0);
+  await page.getByRole('combobox', { name: 'This machine' }).click();
+  await page.getByRole('option', { name: /Detected: Raspberry Pi 3 Model B/ }).click();
   await expect.poll(() => (
     apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/plugins/device_raspberry_pi')?.body
   )).toEqual({ enabled: true });

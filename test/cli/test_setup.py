@@ -106,7 +106,7 @@ def test_pc_setup_installs_packages_and_service(tmp_path, home, extras):
     assert f'Environment=LAUSCHKISTE_HOME={home}' in unit
     assert 'lauschkiste.service' in system.enabled_user
     assert not system.exists('/var/lib/systemd/linger/pi')
-    assert ctx.enabled_plugins() == {'device_pc_test': {}}
+    assert ctx.enabled_plugins() == {'device_pc_test': {}, 'podcast_directories': {}, 'radio_directories': {}}
     assert extras == []
     assert not system.exists('/etc/systemd/system/lauschkiste-http.socket')
 
@@ -472,7 +472,8 @@ def test_kiosk_step_repairs_an_outdated_chromium_command(tmp_path, home, extras)
     failed, _ = setup_run(system, home, names=['kiosk'], answers=answers)
     assert failed == 0
     autostart = system.read('/etc/xdg/openbox/autostart')
-    assert 'chromium http://localhost:5556' in autostart and 'chromium-browser' not in autostart
+    assert 'chromium file:///etc/xdg/openbox/lauschkiste-loading.html' in autostart and 'chromium-browser' not in autostart
+    assert 'localhost:5556' in system.read('/etc/xdg/openbox/lauschkiste-loading.html')
     assert autostart.count('## Lauschkiste Kiosk Mode') == 1 and autostart.startswith('keep\n') and 'other' in autostart
     assert 'xset -dpms' in autostart and 'dpms 0 0' not in autostart
     assert system.read('~/.bashrc').count('startx') == 1
@@ -673,3 +674,48 @@ def test_setup_says_that_it_needs_sudo_and_stops_without_it(monkeypatch, capsys)
         with pytest.raises(typer.Exit):
             setup_module.ensure_root_access(Sudo(state))
         assert 'administrator rights' in capsys.readouterr().out
+
+
+def test_interactive_steps_run_last_and_the_plan_is_shown_first(tmp_path, home, extras, monkeypatch, capsys):
+    import typer
+    from lauschkiste_cli.setup.base import Step
+    order = []
+
+    class Chat(Step):
+        name, title, interactive = 'chat', 'A chat', True
+
+        def check(self, ctx):
+            return [] if 'chat' in order else ['todo']
+
+        def apply(self, ctx):
+            order.append('chat')
+
+    class Work(Step):
+        name, title = 'work', 'Some work'
+
+        def check(self, ctx):
+            return [] if 'work' in order else ['todo']
+
+        def apply(self, ctx):
+            order.append('work')
+
+    asked = []
+    monkeypatch.setattr(typer, 'confirm', lambda text, default=False: asked.append(text) or True)
+    ctx = Context(system=FakeSystem(tmp_path / 'root'), config_path=home / 'settings' / 'lauschkiste.yaml')
+    run_setup(None, ctx, Answers(home / 'settings' / 'setup.yaml'), steps=[Chat(), Work()])
+    assert order == ['work', 'chat'] and asked == ['Go ahead?']
+    out = capsys.readouterr().out
+    assert 'Everything is asked' in out and 'Some work' in out
+
+
+def test_the_samba_password_is_asked_with_the_questions_and_not_stored(tmp_path, home, extras):
+    from lauschkiste_cli.setup.steps.extras import SambaStep
+    system = FakeSystem(tmp_path / 'root')
+    ctx = Context(system=system, config_path=home / 'settings' / 'lauschkiste.yaml', assume_yes=True)
+    keys = [q.key for q in SambaStep().questions_for(ctx)]
+    assert keys == ['samba', 'samba_password']
+    question = SambaStep().questions_for(ctx)[1]
+    assert question.kind == 'secret' and question.validate('short') and question.validate('long enough password') is None
+    ctx.answers.update({'samba': True, 'samba_password': 'long enough password'})
+    from lauschkiste_cli.setup import _stored_answers
+    assert 'samba_password' not in _stored_answers([SambaStep()], ctx, {})
