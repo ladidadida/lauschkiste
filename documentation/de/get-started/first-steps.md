@@ -1,8 +1,19 @@
-# Deine erste Karte
+# Die Box läuft: und jetzt?
 
-Die Box läuft. Jetzt bekommt sie Musik und eine Karte.
+Die Box spielt. Was sie spielt und wie du es startest, entscheidest du. Karten sind ein Weg, nicht der einzige.
 
-## 1. Musik auf die Box bringen
+## 1. Auswählen, was gehört werden soll
+
+Such dir eins oder mehrere aus; alles funktioniert nebeneinander.
+
+| Ich möchte | So geht es |
+| --- | --- |
+| eigene **Musik oder Hörbücher** | Ordner auf der Webseite hochladen (unten). |
+| **Radiosender** aus dem Internet | Auf der Webseite hinzufügen: [Radio](../using/radio.md). Dazu braucht es keine Dateien. |
+| **Podcasts** | Auf der Webseite suchen und abonnieren: [Podcasts](../using/podcasts.md). |
+| Bücher von meinem **Audiobookshelf**-Server | [Hörbücher](../using/audiobooks.md#audiobookshelf). |
+
+### Musik auf die Box bringen
 
 1. Öffne die Webseite der Box: `http://<name>.local`.
 2. Öffne **Bibliothek**, dann **Musik** und die Ansicht **Ordner**.
@@ -14,30 +25,23 @@ seine Kapitel und werden in der Reihenfolge ihrer Namen gespielt (`2.mp3` kommt 
 <img src="../../assets/screenshots/de/upload.png" alt="Bibliothek, Musik, Ordner mit dem Knopf Hochladen" width="260">
 
 Die Bibliothek bemerkt die neuen Dateien nach wenigen Sekunden von selbst. Mehr dazu unter
-[Musik und Bibliothek](../using/music.md).
+[Musik und Bibliothek](../using/music.md). Statt hochzuladen kannst du die Dateien auch über das Netzwerk kopieren.
 
-## 2. Abspielen
+### Abspielen
 
-Tippe auf das Album oder Buch. Der Player auf der **Start**-Seite zeigt, was läuft. Tippe auf Play und stell die
-Lautstärke mit dem Regler ein. Hörst du nichts, prüfe, ob die Lautsprecher an sind und die Lautstärke hoch ist; dann
-siehe [Ton und Bluetooth](../using/sound.md).
+Tippe auf das Album, das Buch, den Sender oder den Podcast. Der Player auf der **Start**-Seite zeigt, was läuft. Tippe auf
+Play und stell die Lautstärke mit dem Regler ein. Hörst du nichts, prüfe, ob die Lautsprecher an sind und die Lautstärke
+hoch ist; dann siehe [Ton und Bluetooth](../using/sound.md).
 
 <img src="../../assets/screenshots/de/player.png" alt="Der Player mit dem Karten-Symbol" width="260">
 
-## 3. Auf eine Karte legen
+## 2. Auswählen, wie es gestartet wird
 
-1. Tippe, während das Album läuft, im Player auf das **Karten-Symbol**.
-2. Halte eine Karte auf das Lesegerät.
-3. Die Karte ist jetzt registriert. Nimm sie weg und leg sie wieder auf: Das Album startet.
+| Ich möchte | So geht es |
+| --- | --- |
+| die **Webseite** auf Handy oder Tablet | Die hast du schon: `http://<name>.local`. Nichts einzurichten. |
+| **Karten**, die das Kind auf die Box legt | Braucht einen RFID-Leser: [Deine erste Karte](first-card.md). |
+| **Tasten und Drehregler** an der Box | [Tasten und Drehregler](../hardware/buttons.md). |
+| einen **Bildschirm** an der Box, der den Player zeigt | [Ein Bildschirm an der Box](../hardware/screen.md). |
 
-Eine neue Karte, die die Box noch nicht kennt, zeigt im Player **Registrieren**. Alle Karten stehen unter
-Einstellungen → Karten.
-
-## 4. Übergeben
-
-Gib die Karte deinem Kind. Das ist die ganze Idee: Karte drauf, Musik läuft.
-
-Weitere Karten funktionieren genauso. Außer Alben kann eine Karte einen Podcast, einen Radiosender oder ein Hörbuch
-starten oder Dinge tun wie *lauter*, *Pause* oder *ausschalten*: siehe [Karten](../using/cards.md).
-
-Weiter: [Was als Nächstes?](../what-next.md).
+Zeitlimits, Bluetooth, eine Ein-Aus-Taste und mehr stehen unter [Was als Nächstes?](../what-next.md).

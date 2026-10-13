@@ -8,10 +8,12 @@ Karten.
 
 ## Hier anfangen
 
-1. [Was du brauchst](get-started/what-you-need.md): die Teile und was sie ungefähr kosten.
-2. [Installieren](get-started/install.md): von der leeren SD-Karte zur laufenden Box.
-3. [Deine erste Karte](get-started/first-steps.md): Musik auf die Box bringen und eine Karte damit belegen.
-4. [Was als Nächstes?](what-next.md): alles, was du ergänzen kannst, sortiert nach dem, was du möchtest.
+1. [Was du brauchst](get-started/what-you-need.md): die Teile, welchen Raspberry Pi du nimmst, oder gar keinen.
+2. [Installieren](get-started/install.md): von der leeren SD-Karte zur laufenden Box. Auf einem PC oder Laptop statt eines
+   Pi: [Auf PC, Laptop oder Mini-PC](get-started/other-computers.md).
+3. [Die Box läuft: und jetzt?](get-started/first-steps.md): Musik, Radio und Podcasts, und wie du sie startest.
+4. [Deine erste Karte](get-started/first-card.md): wenn du RFID-Karten möchtest.
+5. [Was als Nächstes?](what-next.md): alles, was du ergänzen kannst, sortiert nach dem, was du möchtest.
 
 ## Die Box benutzen
 

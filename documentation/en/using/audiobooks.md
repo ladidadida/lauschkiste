@@ -9,7 +9,7 @@ finished and starts from the beginning next time. Chapters always play in order,
 
 ## On a card
 
-Play the book and tap the card button in the player, as in [Your first card](../get-started/first-steps.md), or
+Play the book and tap the card button in the player, as in [Your first card](../get-started/first-card.md), or
 choose *Play audiobook* when registering a card in the card list. Placing the card for the book that is already playing changes nothing; a
 paused book continues. With a reader that notices the card staying on the box, taking the card off pauses and putting it
 back continues ([Cards](cards.md#cards-that-stay-on-the-box)).

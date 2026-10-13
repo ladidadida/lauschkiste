@@ -7,10 +7,12 @@ belongs to the card starts. Grown-ups set it up in a web page; the children only
 
 ## Start here
 
-1. [What you need](get-started/what-you-need.md): the parts and what they cost roughly.
-2. [Install](get-started/install.md): from an empty SD card to a running box.
-3. [Your first card](get-started/first-steps.md): put music on the box and make a card play it.
-4. [What next?](what-next.md): the things you can add, sorted by what you want.
+1. [What you need](get-started/what-you-need.md): the parts, which Raspberry Pi to take, or none at all.
+2. [Install](get-started/install.md): from an empty SD card to a running box. On a PC or laptop instead:
+   [On a PC, laptop or mini PC](get-started/other-computers.md).
+3. [The box is running: what now?](get-started/first-steps.md): music, radio and podcasts, and how to start them.
+4. [Your first card](get-started/first-card.md): if you want RFID cards.
+5. [What next?](what-next.md): the things you can add, sorted by what you want.
 
 ## Using the box
 

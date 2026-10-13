@@ -1,6 +1,7 @@
 # Install
 
-This takes about half an hour, most of it waiting. Every step says what you should see when it worked.
+This takes about half an hour, most of it waiting. Every step says what you should see when it worked. This page describes a Raspberry Pi; on a PC or laptop see
+[On a PC, laptop or mini PC](other-computers.md).
 
 ## 1. Write the SD card
 
@@ -74,4 +75,4 @@ web page with the player. If you did not choose port 80, add `:5556` to the addr
 If it does not work, run `lauschctl setup --check`: it lists what is missing. More in
 [When something does not work](../maintenance/troubleshooting.md).
 
-Next: [Your first card](first-steps.md).
+Next: [The box is running: what now?](first-steps.md).

@@ -1,7 +1,8 @@
 # Installieren
 
 Das dauert etwa eine halbe Stunde, das meiste davon Warten. Bei jedem Schritt steht, was du sehen solltest, wenn es
-geklappt hat.
+geklappt hat. Diese Seite beschreibt einen Raspberry Pi; auf einem PC oder Laptop siehe
+[Auf PC, Laptop oder Mini-PC](other-computers.md).
 
 ## 1. Die SD-Karte beschreiben
 
@@ -78,4 +79,4 @@ Lauschkiste-Webseite mit dem Player sehen. Hast du Port 80 nicht gewählt, häng
 Klappt es nicht, führ `lauschctl setup --check` aus: Es zeigt, was fehlt. Mehr unter
 [Wenn etwas nicht klappt](../maintenance/troubleshooting.md).
 
-Weiter: [Deine erste Karte](first-steps.md).
+Weiter: [Die Box läuft: und jetzt?](first-steps.md).

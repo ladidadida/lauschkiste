@@ -10,7 +10,7 @@ egal was bei „zufällig“ und „wiederholen“ eingestellt ist.
 
 ## Auf einer Karte
 
-Spiel das Buch ab und tippe im Player auf das Karten-Symbol, wie in [Deine erste Karte](../get-started/first-steps.md),
+Spiel das Buch ab und tippe im Player auf das Karten-Symbol, wie in [Deine erste Karte](../get-started/first-card.md),
 oder wähle beim Registrieren in der Kartenliste *Hörbuch abspielen*. Wird die Karte des Buchs aufgelegt, das schon läuft,
 ändert sich nichts; ein pausiertes Buch geht weiter. Mit einem Lesegerät, das die aufliegende Karte bemerkt, pausiert das
 Wegnehmen der Karte, und das Wiederauflegen setzt fort ([Karten](cards.md#karten-die-auf-der-box-liegen-bleiben)).

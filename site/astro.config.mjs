@@ -24,7 +24,9 @@ export default defineConfig({
         group('Get started', 'Einstieg', [
           page('get-started/what-you-need', 'What you need', 'Was du brauchst'),
           page('get-started/install', 'Install', 'Installieren'),
-          page('get-started/first-steps', 'Your first card', 'Deine erste Karte'),
+          page('get-started/other-computers', 'On a PC or laptop', 'Auf PC oder Laptop'),
+          page('get-started/first-steps', 'The box is running', 'Die Box läuft'),
+          page('get-started/first-card', 'Your first card', 'Deine erste Karte'),
           page('what-next', 'What next?', 'Was als Nächstes?'),
         ]),
         group('Using the box', 'Die Box benutzen', [
