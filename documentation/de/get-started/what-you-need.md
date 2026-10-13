@@ -34,7 +34,7 @@ Bildschirm willst. Die Preise schwanken stark, schau also in die Shops, bevor du
 Ohne Leser spielst du die Box über die Webseite auf Handy oder Tablet, mit Tasten oder mit einem Bildschirm: Karten sind
 eine Möglichkeit, die Box zu bedienen, kein Muss. Siehe [Die Box läuft](first-steps.md).
 
-Dazu brauchst du einen Computer, ein Tablet oder ein Handy im selben WLAN, um die Webseite zu öffnen, die die Box steuert,
+An der Box selbst brauchst du einen Benutzer mit Administratorrechten (`sudo`), siehe [Installieren](install.md). Dazu brauchst du einen Computer, ein Tablet oder ein Handy im selben WLAN, um die Webseite zu öffnen, die die Box steuert,
 und bei einem Pi eine Möglichkeit, die SD-Karte zu beschreiben (ein Computer mit Kartenschacht oder ein Kartenleser).
 
 ## Was du nicht brauchst

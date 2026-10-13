@@ -43,6 +43,15 @@ class System:
         #: The sudo command; ``['sudo', '-n']`` fails instead of asking for a password (no terminal)
         self.sudo = ['sudo']
 
+    def sudo_state(self) -> str:
+        """'root' (already), 'passwordless', 'password' (sudo asks) or 'missing' (no sudo command)."""
+        if not self.use_sudo:
+            return 'root'
+        if not self.which('sudo'):
+            return 'missing'
+        asks = subprocess.run(['sudo', '-n', 'true'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return 'passwordless' if asks.returncode == 0 else 'password'
+
     # --- files -----------------------------------------------------------------------------------
 
     def path(self, path: PathLike) -> Path:

@@ -331,6 +331,16 @@ choose_home() {
     add_to_shell_profile "export LAUSCHKISTE_HOME=\"${HOME_DIR}\""
 }
 
+# The installer and `lauschctl setup` change the system (packages, services, boot configuration) with sudo
+check_sudo() {
+    [[ -n "$SUDO" ]] || return 0
+    command -v sudo >/dev/null || die "sudo is needed for the system packages and not installed: install it as root (apt install sudo, add your user to the group sudo) or run this script as root"
+    sudo -n true 2>/dev/null && return 0
+    log "Lauschkiste needs administrator rights (sudo) for system packages, services and the boot configuration"
+    echo "sudo asks for the password of this user now; it is not stored."
+    sudo -v || die "no administrator rights: ask for sudo rights for this user"
+}
+
 # Everything runs from main, so a partially downloaded script does nothing
 main() {
     parse_args "$@"
@@ -342,6 +352,7 @@ main() {
         warn "running as root; Lauschkiste will run as root too"
     fi
 
+    check_sudo
     install_system_packages
     choose_installer
     if [[ "$INSTALLER" == uv ]]; then

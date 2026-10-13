@@ -34,7 +34,7 @@ lot, so look at the shops before you decide.
 Without a reader the box is played from the web page on a phone or tablet, with buttons or with a screen: cards are one
 way to control the box, not a must. See [The box is running](first-steps.md).
 
-You also need a computer, tablet or phone in the same WiFi to open the web page that controls the box, and, for a Pi, a
+On the box itself you need a user with administrator rights (`sudo`); see [Install](install.md). You also need a computer, tablet or phone in the same WiFi to open the web page that controls the box, and, for a Pi, a
 way to write the SD card (a computer with a card slot or a card reader).
 
 ## What you do not need

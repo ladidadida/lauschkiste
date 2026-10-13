@@ -1,5 +1,7 @@
 """`lauschctl setup`: prepare this machine for Lauschkiste, step by step and idempotent."""
 
+import subprocess
+import sys
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -130,6 +132,30 @@ def _summary(ctx: Context) -> None:
     typer.echo(f"The web app is at http://{host}{'' if port == 80 else f':{port}'}")
 
 
+ROOT_NOTE = ("`lauschctl setup` changes the system (packages, services, boot configuration) and uses sudo for that, "
+             "so your user needs administrator rights.")
+
+
+def ensure_root_access(system: System) -> None:
+    """Say that sudo is needed; ask for the password once, up front, if sudo wants one."""
+    state = system.sudo_state()
+    if state in ('root', 'passwordless'):
+        return
+    typer.echo(typer.style(ROOT_NOTE, bold=True))
+    if state == 'missing':
+        typer.echo("There is no sudo command. Install it as root (apt install sudo, add your user to the group sudo) "
+                   "or run `lauschctl setup` as root.", err=True)
+        raise typer.Exit(1)
+    if not sys.stdin.isatty():
+        typer.echo("sudo asks for a password and there is no terminal to type it in: log in with SSH in a terminal, "
+                   "or run `sudo -v` first.", err=True)
+        raise typer.Exit(1)
+    typer.echo("sudo will ask for your password now (the one of this user); it is not stored.")
+    if subprocess.run(['sudo', '-v']).returncode != 0:
+        typer.echo("No administrator rights: setup stops. Ask for sudo rights for this user.", err=True)
+        raise typer.Exit(1)
+
+
 def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (default: all)"),
           check: bool = typer.Option(False, "--check", help="Only report what is missing, change nothing"),
           yes: bool = typer.Option(False, "--yes", "-y", help="Don't ask; reuse earlier answers or defaults"),
@@ -149,6 +175,8 @@ def setup(steps: Optional[List[str]] = typer.Argument(None, help="Steps to run (
         return
     ctx = Context(system=System(), config_path=conf or lauschkiste.common.paths.config_file(),
                   assume_yes=yes)
+    if not check:
+        ensure_root_access(ctx.system)
     if not steps and not check and not yes:
         typer.echo("This sets up the machine step by step: hardware, system packages, the service and the "
                    "extras you choose. Every question has a default; run it again at any time to change something.")

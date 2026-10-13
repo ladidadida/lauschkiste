@@ -32,6 +32,13 @@ Antworte auf die Frage nach dem Fingerabdruck mit *yes* und gib dann dein Passwo
 
 ## 3. Installieren
 
+> [!IMPORTANT]
+> **Administratorrechte (`sudo`) sind nötig.** Der Installer und `lauschctl setup` installieren Systempakete, richten Dienste
+> ein und ändern die Boot-Konfiguration, und dafür nutzen sie `sudo`. Der Benutzer, mit dem du dich anmeldest, muss es
+> verwenden dürfen; auf Raspberry Pi OS ist das beim Benutzer aus dem Imager so. Verlangt `sudo` ein Passwort, fragen der
+> Installer und das Setup einmal am Anfang danach (es ist das Passwort dieses Benutzers und wird nicht gespeichert). Ohne
+> `sudo`-Rechte brechen sie mit einer Meldung ab, bevor sie etwas ändern.
+
 Füge diese Zeile ein und drücke Enter:
 
 ```bash

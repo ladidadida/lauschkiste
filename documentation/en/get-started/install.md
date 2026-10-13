@@ -29,6 +29,13 @@ Answer *yes* when it asks about the fingerprint, then type your password. You se
 
 ## 3. Install
 
+> [!IMPORTANT]
+> **Administrator rights (`sudo`) are needed.** The installer and `lauschctl setup` install system packages, set up
+> services and change the boot configuration, and they use `sudo` for that. The user you log in with must be allowed to
+> use it; on Raspberry Pi OS the user created in the Imager is. If `sudo` asks for a password, the installer and the setup
+> ask for it once at the start (it is the password of that user and is not stored). Without `sudo` rights they stop with a message,
+> before they change anything.
+
 Paste this line and press Enter:
 
 ```bash

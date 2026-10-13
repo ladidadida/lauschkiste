@@ -651,3 +651,25 @@ def test_setup_renames_plugins_of_older_versions_in_the_configuration(tmp_path, 
     assert failed == 0
     enabled = ctx.enabled_plugins()
     assert 'board_raspberry_pi' not in enabled and enabled['device_raspberry_pi']['sound_card'] == 'max98357a'
+
+
+def test_setup_says_that_it_needs_sudo_and_stops_without_it(monkeypatch, capsys):
+    import pytest
+    import typer
+    from lauschkiste_cli import setup as setup_module
+
+    class Sudo:
+        def __init__(self, state):
+            self.state = state
+
+        def sudo_state(self):
+            return self.state
+
+    setup_module.ensure_root_access(Sudo('root'))
+    setup_module.ensure_root_access(Sudo('passwordless'))
+    assert capsys.readouterr().out == ''
+    for state in ('missing', 'password'):
+        monkeypatch.setattr('sys.stdin.isatty', lambda: False)
+        with pytest.raises(typer.Exit):
+            setup_module.ensure_root_access(Sudo(state))
+        assert 'administrator rights' in capsys.readouterr().out
