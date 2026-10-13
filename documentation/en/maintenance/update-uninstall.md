@@ -21,8 +21,7 @@ Lauschkiste is restarted. Music, settings and cards are in the Lauschkiste home 
 > (`lauschkiste-plugins`, `lauschkiste-plugins-raspberry-pi`), and the old program does not know that. Run the
 > installer once instead (`curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash`),
 > then `lauschctl setup`. Settings, cards and library stay. From 0.1.0a7 on `lauschctl update` works as described.
-
-> [!NOTE]
+>
 > There is no way to carry over settings or cards from Phoniebox 2.x; install Lauschkiste on a fresh SD card.
 
 ## Remove

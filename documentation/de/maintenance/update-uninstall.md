@@ -23,8 +23,7 @@ Lauschkiste-Home und werden nicht angefasst.
 > Führe stattdessen einmal den Installer aus (`curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash`)
 > und danach `lauschctl setup`. Einstellungen, Karten und Bibliothek bleiben. Ab 0.1.0a7 funktioniert `lauschctl update`
 > wie beschrieben.
-
-> [!NOTE]
+>
 > Einstellungen oder Karten aus Phoniebox 2.x lassen sich nicht übernehmen; installiere Lauschkiste auf einer frischen SD-Karte.
 
 ## Entfernen
