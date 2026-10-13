@@ -898,7 +898,7 @@ wheels = [
 
 [[package]]
 name = "lauschkiste"
-version = "0.1.0a6"
+version = "0.1.0a7"
 source = { editable = "packages/cli" }
 dependencies = [
     { name = "lauschkiste-core" },
@@ -915,7 +915,7 @@ requires-dist = [
 
 [[package]]
 name = "lauschkiste-core"
-version = "0.1.0a6"
+version = "0.1.0a7"
 source = { editable = "packages/lauschkiste" }
 dependencies = [
     { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
@@ -952,7 +952,7 @@ requires-dist = [
 
 [[package]]
 name = "lauschkiste-plugins"
-version = "0.1.0a6"
+version = "0.1.0a7"
 source = { editable = "packages/plugins/general" }
 dependencies = [
     { name = "lauschkiste" },
@@ -996,7 +996,7 @@ provides-extras = ["rc522-spi", "mfrc522-i2c", "pn532-i2c-py532", "rdm6300-seria
 
 [[package]]
 name = "lauschkiste-plugins-raspberry-pi"
-version = "0.1.0a6"
+version = "0.1.0a7"
 source = { editable = "packages/plugins/raspberry-pi" }
 dependencies = [
     { name = "lauschkiste-core" },
