@@ -640,3 +640,14 @@ def test_steps_of_another_device_are_not_offered(tmp_path, home, extras, capsys)
     assert failed == 0 and 'hw_sound_card' not in ctx.answers
     out = capsys.readouterr().out
     assert "Skipping 'raspi'" in out and "Skipping 'hardware'" in out
+
+
+def test_setup_renames_plugins_of_older_versions_in_the_configuration(tmp_path, home, extras):
+    config = home / 'settings' / 'lauschkiste.yaml'
+    config.parent.mkdir(parents=True, exist_ok=True)
+    config.write_text('plugins:\n  board_raspberry_pi:\n    sound_card: max98357a\n')
+    system = FakeSystem(tmp_path / 'root', pi=True)
+    failed, ctx = setup_run(system, home, names=['device'])
+    assert failed == 0
+    enabled = ctx.enabled_plugins()
+    assert 'board_raspberry_pi' not in enabled and enabled['device_raspberry_pi']['sound_card'] == 'max98357a'

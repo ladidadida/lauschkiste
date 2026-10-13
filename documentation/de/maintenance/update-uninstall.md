@@ -18,6 +18,13 @@ aktualisieren), und ein laufendes Lauschkiste wird neu gestartet. Musik, Einstel
 Lauschkiste-Home und werden nicht angefasst.
 
 > [!NOTE]
+> Boxen mit einer Version vor 0.1.0a7 lassen sich nicht mit `lauschctl update` aktualisieren: Die Plugins sind in zwei
+> Pakete umgezogen (`lauschkiste-plugins`, `lauschkiste-plugins-raspberry-pi`), und das alte Programm kennt das nicht.
+> Führe stattdessen einmal den Installer aus (`curl -fsSL https://raw.githubusercontent.com/ladidadida/lauschkiste/main/install.sh | bash`)
+> und danach `lauschctl setup`. Einstellungen, Karten und Bibliothek bleiben. Ab 0.1.0a7 funktioniert `lauschctl update`
+> wie beschrieben.
+
+> [!NOTE]
 > Einstellungen oder Karten aus Phoniebox 2.x lassen sich nicht übernehmen; installiere Lauschkiste auf einer frischen SD-Karte.
 
 ## Entfernen

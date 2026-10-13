@@ -6,6 +6,7 @@ from typing import Dict, List, Optional
 import typer
 
 import lauschkiste.common.paths
+from lauschkiste_cli import plugin
 from lauschkiste_cli.setup.base import Answers, Context, Step, ask
 from lauschkiste_cli.setup.steps import all_steps, device
 from lauschkiste_cli.setup.steps.lauschkiste import public_port
@@ -86,6 +87,8 @@ def _run_step(step: Step, ctx: Context, check_only: bool, force: bool) -> bool:
 def run_setup(names: Optional[List[str]], ctx: Context, answers: Answers, check_only: bool = False,
               force: bool = False, steps: Optional[List[Step]] = None) -> int:
     """Returns the number of steps with remaining problems."""
+    if not check_only and ctx.config_path.exists():
+        plugin.rename_in_config(ctx.config_path, plugin.RENAMED_PLUGINS)
     pool = steps or all_steps()
     selected = _select(names, device.with_device_steps(pool, ctx))
     for name in names or ():

@@ -62,6 +62,10 @@ def uninstall_packages(names: List[str]) -> None:
     subprocess.run(command, check=False)
 
 
+#: Plugins that were renamed, as they are called in the configuration
+RENAMED_PLUGINS = {'board_raspberry_pi': 'device_raspberry_pi'}
+
+
 def rename_in_config(path: Path, renamed: dict) -> List[str]:
     """Rename enabled plugins (``{old: new}``), keeping their settings; returns the old names that were found."""
     cfg, _ = _config(path)

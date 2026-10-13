@@ -38,8 +38,6 @@ OBSOLETE_PACKAGES: Dict[str, Optional[str]] = {
     'lauschkiste-plugin-audiobookshelf': 'lauschkiste-plugins',
     'lauschkiste-plugin-directories': 'lauschkiste-plugins',
 }
-#: Plugins that were renamed, as they are called in the configuration
-RENAMED_PLUGINS = {'board_raspberry_pi': 'device_raspberry_pi'}
 
 
 class UpdateError(Exception):
@@ -217,7 +215,7 @@ def remove_obsolete() -> None:
 def rename_plugins(config_path: Path) -> None:
     """Plugins that were renamed are renamed in the configuration."""
     if config_path.exists():
-        plugin.rename_in_config(config_path, RENAMED_PLUGINS)
+        plugin.rename_in_config(config_path, plugin.RENAMED_PLUGINS)
 
 
 def index_requirements(config_path: Path, version: Version) -> List[str]:
