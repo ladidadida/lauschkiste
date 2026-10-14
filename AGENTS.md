@@ -25,7 +25,7 @@ packages/          uv workspace members
                      player/    the player module and its backends, plus volume, audio_output and jingle
                      content/   what is played: library, audiobooks, podcasts/ and radio/ (module, models, feed or
                                 playlist, OPML), directories, cache, resume (continue lists), playlistgenerator
-                     box/       the box itself: hardware, input_devices, system, timers, time_limits
+                     box/       the box itself: hardware, input_devices, system, timers, time_limits, display, kiosk (module and the standard kiosk app)
                      rfid/      cards and the reader module
                      daemon.py, core_modules.py (the modules the daemon always starts), startup.py
                    What is platform-specific lives in plugins -- see documentation/developers/core-and-plugins.md.

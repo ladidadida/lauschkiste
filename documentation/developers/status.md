@@ -19,6 +19,7 @@ the [roadmap](roadmap-core-architecture.md).
 | Volume and timers | volume with soft maximum and outputs, fade-out, named timers (stop, fade, shutdown), startup and shutdown sound |
 | Input | evdev devices (USB buttons, media keys, Bluetooth headset buttons) |
 | Web app | player, library, cards, settings of all modules and plugins, plugin management, hardware and pin overview, help, German and English |
+| Screen on the box | Chromium in kiosk mode; on-screen keyboard; the kiosk (a reduced view for children, kiosk apps as plugins, themes) and switching the screen off; see [Kiosk](kiosk.md) |
 | API | REST and WebSocket, typed operations and events generated from the modules ([Core and plugins](core-and-plugins.md)) |
 | Platforms | Raspberry Pi (Zero W, 3 tested) and any Linux computer; pin hardware only with a device plugin that has pins ([Installation](installer.md#other-linux-computers)) |
 | Installation | install script, `lauschctl setup` steps (re-runnable), updates, plugins from the command line, port 80, WiFi hotspot, kiosk mode; packages for PyPI ([Releasing](releasing.md)) |
@@ -48,8 +49,8 @@ the [roadmap](roadmap-core-architecture.md).
 - An MQTT plugin (Home Assistant and other home automation).
 - Bluetooth headphones paired by holding them against an NFC tag on the box (and a way to unpair again), next to
   the phone sink above.
-- A reduced kiosk app for the screen on the box, so that children cannot change settings: a core module `kiosk` with
-  kiosk apps as plugins, the first one in the core, themes as settings of the app ([plan](kiosk.md)).
+- More kiosk apps (other layouts, other screens), measured on a real screen; a numeric layout for the on-screen
+  keyboard ([Kiosk](kiosk.md#open-points)).
 
 ## Not carried over from Phoniebox 2.x and the first future3 versions
 

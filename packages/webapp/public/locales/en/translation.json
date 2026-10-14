@@ -360,6 +360,12 @@
       "download-again": "Download again"
     }
   },
+  "kiosk": {
+    "now-playing": "Playing",
+    "empty": "Nothing here yet.",
+    "back": "Back",
+    "play-next": "Play"
+  },
   "navigation": {
     "start": "Start",
     "library": "Library",

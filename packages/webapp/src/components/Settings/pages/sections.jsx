@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -13,6 +13,8 @@ import {
 
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
+import PubSubContext from '../../../context/pubsub/context';
+import { KIOSK_TOPIC } from '../../../config';
 import request from '../../../utils/request';
 import Outputs from '../audio/outputs';
 import CliHint from '../cli-hint';
@@ -89,6 +91,7 @@ const LibrarySettings = () => {
 
 const ScreenSettings = () => {
   const { t } = useTranslation();
+  const { state: { [KIOSK_TOPIC]: kiosk } = {} } = useContext(PubSubContext);
   return (
     <SettingsPage title={t('settings.sections.screen.title')}>
       <Card>
@@ -97,6 +100,8 @@ const ScreenSettings = () => {
         <CardContent><AppSwitch name="on_screen_keyboard" texts="settings.screen" /></CardContent>
       </Card>
       <ModuleSettings module="display" />
+      <ModuleSettings module="kiosk" />
+      {kiosk?.app && <ModuleSettings module={kiosk.app} />}
       <CliHint commands={['lauschctl setup kiosk']} section="kiosk" text={t('settings.cli.kiosk')} />
     </SettingsPage>
   );

@@ -66,7 +66,19 @@ export const socketEvents = {
     track: null,
   },
   'volume.level': { mute: false, volume: 42, soft_max_volume: 80 },
+  'kiosk.state': { enabled: false, app: 'kiosk_standard', apps: [{ value: 'kiosk_standard', label: 'Standard' }] },
+  'kiosk_standard.settings': {
+    show_audiobooks: true, show_continue: true, show_music: true, show_podcasts: true, show_radio: true,
+    show_volume: true, start_page: 'player', text_size: 'large', theme: 'night',
+  },
 };
+
+const kioskModule = (name, title, properties, values) => ({
+  name, kind: 'core', title, restart_required: false, schema: { properties }, values,
+});
+
+export const kioskTheme = `:root { --kiosk-mode: dark; --kiosk-background: #101418; --kiosk-surface: #1b2229;
+  --kiosk-text: #f2f5f7; --kiosk-muted: #9aa7b2; --kiosk-accent: #4db6ac; --kiosk-accent-text: #06201d; }`;
 
 export async function mockBackend(
   page,
@@ -158,6 +170,22 @@ export async function mockBackend(
     '/api/v1/player/status': () => socketEvents['player.status'],
     '/api/v1/actions': () => [{ id: 'player.play', description: '', args: {} }],
     '/api/v1/settings': () => ({ show_covers: showCovers, on_screen_keyboard: true }),
+    '/api/v1/settings/modules/kiosk': () => kioskModule('kiosk', 'The reduced view for the screen on the box', {
+      enabled: { type: 'boolean', default: false, title: 'Show the kiosk app on the screen' },
+    }, { enabled: false }),
+    '/api/v1/settings/modules/kiosk_standard': () => kioskModule('kiosk_standard', 'The standard kiosk app', {
+      show_radio: { type: 'boolean', default: true, title: 'Offer radio' },
+    }, { show_radio: true }),
+    '/api/v1/audiobooks': () => [
+      { book: 'bear', source: 'local', title: 'The Little Bear', chapters: 3, chapter: 1, duration: 600, listened: 300,
+        finished: false, hidden: false, cover_url: null },
+    ],
+    '/api/v1/radio/stations': () => [{ id: 'kids', name: 'Kinderradio', url: 'https://example.org/kids', logo: null,
+      last_played: null }],
+    '/api/v1/podcasts': () => [{ id: 'pod1', name: 'Maus Podcast', unheard: 2, image: null, hidden: false }],
+    '/api/v1/podcasts/pod1/episodes': () => [
+      { id: 'e1', title: 'Der erste Tag', published: '2026-01-01T00:00:00', duration: 600, heard: false },
+    ],
     '/api/v1/settings/modules/audiobooks': () => ({
       name: 'audiobooks', kind: 'core', title: 'Audiobooks', restart_required: false,
       schema: { properties: { rewind_sec: { type: 'number', minimum: 0, maximum: 120, default: 10,
@@ -220,6 +248,11 @@ export async function mockBackend(
           contentType: 'application/json',
           status: 503,
         });
+        return;
+      }
+
+      if (url.pathname.endsWith('.css')) {
+        await route.fulfill({ body: kioskTheme, contentType: 'text/css', status: 200 });
         return;
       }
 

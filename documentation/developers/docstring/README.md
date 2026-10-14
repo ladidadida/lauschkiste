@@ -98,6 +98,17 @@
   * [log\_active\_threads](#lauschkiste.daemon.log_active_threads)
   * [Daemon](#lauschkiste.daemon.Daemon)
     * [signal\_handler](#lauschkiste.daemon.Daemon.signal_handler)
+* [lauschkiste.box.kiosk.standard](#lauschkiste.box.kiosk.standard)
+  * [KioskStandard](#lauschkiste.box.kiosk.standard.KioskStandard)
+    * [list\_themes](#lauschkiste.box.kiosk.standard.KioskStandard.list_themes)
+* [lauschkiste.box.kiosk.module](#lauschkiste.box.kiosk.module)
+  * [HASHED\_ASSETS\_DIR](#lauschkiste.box.kiosk.module.HASHED_ASSETS_DIR)
+  * [KioskApp](#lauschkiste.box.kiosk.module.KioskApp)
+    * [directory](#lauschkiste.box.kiosk.module.KioskApp.directory)
+  * [Kiosk](#lauschkiste.box.kiosk.module.Kiosk)
+    * [get\_state](#lauschkiste.box.kiosk.module.Kiosk.get_state)
+    * [list\_apps](#lauschkiste.box.kiosk.module.Kiosk.list_apps)
+* [lauschkiste.box.kiosk](#lauschkiste.box.kiosk)
 * [lauschkiste.box.display](#lauschkiste.box.display)
   * [Backlight](#lauschkiste.box.display.Backlight)
   * [Evdev](#lauschkiste.box.display.Evdev)
@@ -251,6 +262,7 @@
   * [ExtrasInstaller](#lauschkiste.contract.plugins.ExtrasInstaller)
     * [start](#lauschkiste.contract.plugins.ExtrasInstaller.start)
   * [set\_enabled](#lauschkiste.contract.plugins.set_enabled)
+  * [kind\_of](#lauschkiste.contract.plugins.kind_of)
   * [describe](#lauschkiste.contract.plugins.describe)
   * [translations](#lauschkiste.contract.plugins.translations)
 * [lauschkiste.content.library.index](#lauschkiste.content.library.index)
@@ -1713,6 +1725,128 @@ Signal handler for orderly shutdown
 On first Ctrl-C (or SIGTERM) orderly shutdown procedure is embarked upon. It gets allocated a time-out!
 On third Ctrl-C (or SIGTERM), this is interrupted and there will be a hard exit!
 
+
+<a id="lauschkiste.box.kiosk.standard"></a>
+
+# lauschkiste.box.kiosk.standard
+
+The kiosk app that ships with Lauschkiste: the player and the library as big tiles, without settings.
+
+Its themes are CSS files of variables (see ``resources/kiosk-themes/``). More of them can be put in
+``kiosk-themes/`` in the data directory; a file there replaces a built-in theme of the same name.
+
+
+<a id="lauschkiste.box.kiosk.standard.KioskStandard"></a>
+
+## KioskStandard Objects
+
+```python
+class KioskStandard(CoreModule)
+```
+
+The standard kiosk app.
+
+
+<a id="lauschkiste.box.kiosk.standard.KioskStandard.list_themes"></a>
+
+#### list\_themes
+
+```python
+@query(path='/themes')
+def list_themes() -> List[Choice]
+```
+
+The themes to choose from.
+
+
+<a id="lauschkiste.box.kiosk.module"></a>
+
+# lauschkiste.box.kiosk.module
+
+The kiosk core module: what the screen on the box shows.
+
+The browser on the box always opens ``/kiosk/``. When the kiosk is on, that serves the chosen kiosk app, a reduced
+view a child can use; otherwise it forwards to the normal web app. Kiosk apps are modules that register at
+``kiosk.apps`` (the key is the module's name, which is also where the app's settings live)::
+
+    class MyKioskApp:
+        title = 'My kiosk'               # shown in the choice, optional
+        entry = 'index.html'             # the page served at /kiosk/, optional
+
+        def directory(self) -> Path:     # the folder with the built web files
+            ...
+
+Files are served below ``/kiosk/`` relative to that folder, so a build with relative paths works as it is.
+An app learns about changes of the kiosk from the event ``kiosk.state``.
+
+
+<a id="lauschkiste.box.kiosk.module.HASHED_ASSETS_DIR"></a>
+
+#### HASHED\_ASSETS\_DIR
+
+Build tools put content-hashed files here; a new build gives them new names.
+
+
+<a id="lauschkiste.box.kiosk.module.KioskApp"></a>
+
+## KioskApp Objects
+
+```python
+class KioskApp(Protocol)
+```
+
+A frontend for the screen on the box, registered at ``kiosk.apps``.
+
+
+<a id="lauschkiste.box.kiosk.module.KioskApp.directory"></a>
+
+#### directory
+
+```python
+def directory() -> Path
+```
+
+The folder with the app's built web files.
+
+
+<a id="lauschkiste.box.kiosk.module.Kiosk"></a>
+
+## Kiosk Objects
+
+```python
+class Kiosk(CoreModule)
+```
+
+The reduced view for the screen on the box.
+
+
+<a id="lauschkiste.box.kiosk.module.Kiosk.get_state"></a>
+
+#### get\_state
+
+```python
+@query(path='/state')
+def get_state() -> KioskState
+```
+
+Whether the kiosk is on, which app the screen shows and which apps are installed.
+
+
+<a id="lauschkiste.box.kiosk.module.Kiosk.list_apps"></a>
+
+#### list\_apps
+
+```python
+@query(path='/apps')
+def list_apps() -> List[Choice]
+```
+
+The installed kiosk apps.
+
+
+<a id="lauschkiste.box.kiosk"></a>
+
+# lauschkiste.box.kiosk
 
 <a id="lauschkiste.box.display"></a>
 
@@ -3347,6 +3481,17 @@ def set_enabled(cfg, name: str, on: bool) -> bool
 ```
 
 Enable or disable ``name`` in the config (disabling drops its settings); True if it changed.
+
+
+<a id="lauschkiste.contract.plugins.kind_of"></a>
+
+#### kind\_of
+
+```python
+def kind_of(cls, name: str) -> str
+```
+
+'device' (the machine), 'hardware' (attached to it, readers included) or 'feature' (everything else).
 
 
 <a id="lauschkiste.contract.plugins.describe"></a>

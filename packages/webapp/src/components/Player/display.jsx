@@ -42,7 +42,8 @@ const lines = (status, t) => {
   ];
 };
 
-const Display = () => {
+// Without `linkToLibrary` (the kiosk app has no library pages to link to) the title is plain text.
+const Display = ({ linkToLibrary = true }) => {
   const { t } = useTranslation();
   const { state: { [PLAYER_STATUS_TOPIC]: playerstatus } } = useContext(PlayerContext);
   const hasSong = playerstatus?.position != null;
@@ -61,16 +62,20 @@ const Display = () => {
 
   return (
     <Grid container>
-      <MuiLink
-        color="inherit"
-        component={Link}
-        sx={dontBreak}
-        title={t('player.display.show-in-library')}
-        to={libraryLink(playerstatus.context)}
-        underline="hover"
-      >
-        <Typography sx={dontBreak} component="h5" variant="h5">{title}</Typography>
-      </MuiLink>
+      {linkToLibrary
+        ? (
+          <MuiLink
+            color="inherit"
+            component={Link}
+            sx={dontBreak}
+            title={t('player.display.show-in-library')}
+            to={libraryLink(playerstatus.context)}
+            underline="hover"
+          >
+            <Typography sx={dontBreak} component="h5" variant="h5">{title}</Typography>
+          </MuiLink>
+        )
+        : <Typography sx={dontBreak} component="h5" variant="h5">{title}</Typography>}
       {subtitle &&
         <Typography sx={dontBreak} variant="subtitle1" color="textSecondary">{subtitle}</Typography>
       }

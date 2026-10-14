@@ -1,8 +1,8 @@
 # Ein Bildschirm an der Box
 
 Ein kleiner Bildschirm (ein Raspberry-Pi-Display, ein HDMI-Bildschirm) kann die Webseite des Players an der Box zeigen,
-sodass kein Handy nötig ist. Es ist dieselbe Webseite im Vollbild. Eine reduzierte Ansicht für Kinder ist geplant (siehe
-[Plan](../../developers/kiosk.md)); vorerst zeigt der Bildschirm alles, auch die Einstellungen.
+sodass kein Handy nötig ist. Es ist dieselbe Webseite im Vollbild oder, in den Einstellungen eingeschaltet, eine reduzierte Ansicht für Kinder (siehe
+[Der Kiosk](#der-kiosk-eine-reduzierte-ansicht-für-kinder)).
 
 ## Einschalten
 
@@ -23,6 +23,21 @@ Schließt du eine echte Tastatur an, schalte sie unter *Einstellungen → Bildsc
 
 Eine Box, die mit einer älteren Version eingerichtet wurde, braucht einmal `lauschctl setup kiosk`, damit der Bildschirm
 weiß, dass er der an der Box ist.
+
+## Der Kiosk: eine reduzierte Ansicht für Kinder
+
+Die normale Webseite zeigt alles, auch die Einstellungen. Der Kiosk ist eine reduzierte Ansicht für den Bildschirm an
+der Box: der Player und die Bibliothek als große Kacheln (Weiter, Musik, Hörbücher, Radio, Podcasts), ohne Einstellungen
+und ohne Kartenverwaltung. Schalte ihn in der Web-App unter *Einstellungen → Bildschirm* ein (*Kiosk-App auf dem
+Bildschirm zeigen*); der Bildschirm wechselt von selbst, ein Neustart ist nicht nötig. Darunter stehen die
+Einstellungen der Kiosk-App: das Aussehen (*Night*, *Day*, *Meadow*, *Candy*), die Textgröße, welche Seiten angeboten
+werden und ob der Lautstärkeregler erscheint. Nach zwei Minuten ohne Berührung kehrt der Bildschirm zur Startseite
+zurück.
+
+Das ist eine Vereinfachung, keine Sperre: Wer die Webseite am Handy oder Computer öffnet, kann weiter alles ändern. Willst
+du die normale Webseite wieder auf dem Bildschirm haben, schalte den Kiosk in den Einstellungen aus, vom Handy aus. Eigene
+Aussehen sind CSS-Dateien im Ordner `kiosk-themes` des Datenverzeichnisses; siehe
+[Kiosk](../../developers/kiosk.md#the-standard-kiosk-app).
 
 ## Den Bildschirm ausschalten, wenn ihn niemand benutzt
 

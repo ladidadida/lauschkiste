@@ -290,6 +290,50 @@ test('the on-screen keyboard types into a text field on the kiosk display only',
   await expect(keyboard).toHaveCount(0);
 });
 
+test('the kiosk app plays from big tiles and follows its settings', async ({ page }) => {
+  const consoleErrors = collectConsoleErrors(page);
+  const { apiCalls, publishEvent } = await mockBackend(page);
+  await page.goto('/kiosk.html');
+
+  await expect(page.getByText('One More Time')).toBeVisible();
+  for (const name of ['Playing', 'Continue', 'Music', 'Audiobooks', 'Radio', 'Podcasts']) {
+    await expect(page.getByRole('button', { name })).toBeVisible();
+  }
+  await expect(page.getByRole('button', { name: 'Settings' })).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Music' }).click();
+  await page.getByRole('button', { name: /Discovery/ }).click();
+  await expect.poll(() => apiCalls.find(call => call.path === '/api/v1/player/album')?.body)
+    .toMatchObject({ album: 'Discovery', albumartist: 'Daft Punk' });
+  await expect(page.getByTestId('kiosk-player')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Radio' }).click();
+  await page.getByRole('button', { name: /Kinderradio/ }).click();
+  await expect.poll(() => apiCalls.find(call => call.path === '/api/v1/radio/play')?.body)
+    .toEqual({ station: 'kids' });
+
+  await page.getByRole('button', { name: 'Podcasts' }).click();
+  await page.getByRole('button', { name: /Maus Podcast/ }).click();
+  await page.getByRole('button', { name: /Der erste Tag/ }).click();
+  await expect.poll(() => apiCalls.find(call => call.path === '/api/v1/podcasts/play')?.body)
+    .toEqual({ podcast: 'pod1', episode: 'e1' });
+
+  publishEvent('kiosk_standard.settings', {
+    show_audiobooks: true, show_continue: false, show_music: true, show_podcasts: true, show_radio: false,
+    show_volume: false, start_page: 'player', text_size: 'huge', theme: 'night',
+  });
+  await expect(page.getByRole('button', { name: 'Radio' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Continue' })).toHaveCount(0);
+  expect(consoleErrors).toEqual([]);
+});
+
+test('the screen settings offer the kiosk and its app', async ({ page }) => {
+  await mockBackend(page);
+  await page.goto('/#/settings/screen');
+  await expect(page.getByText('Show the kiosk app on the screen')).toBeVisible();
+  await expect(page.getByText('Offer radio')).toBeVisible();
+});
+
 test('playback settings switch audio outputs and save module settings', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   const { apiCalls } = await mockBackend(page);

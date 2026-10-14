@@ -360,6 +360,12 @@
       "download-again": "Erneut laden"
     }
   },
+  "kiosk": {
+    "now-playing": "Läuft",
+    "empty": "Hier ist noch nichts.",
+    "back": "Zurück",
+    "play-next": "Abspielen"
+  },
   "navigation": {
     "start": "Start",
     "library": "Bibliothek",
@@ -644,6 +650,8 @@
     },
     "modules": {
       "volume": "Lautstärke",
+      "kiosk": "Kiosk auf dem Bildschirm",
+      "kiosk_standard": "Standard-Kiosk-App",
       "player": "Player",
       "audiobooks": "Hörbücher",
       "podcasts": "Podcasts",
@@ -683,6 +691,56 @@
       "fire": "Feuer"
     },
     "fields": {
+      "kiosk": {
+        "enabled": {
+          "label": "Kiosk-App auf dem Bildschirm zeigen",
+          "help": "An: Der Bildschirm an der Box zeigt die reduzierte Ansicht der gewählten App. Aus: die normale Web-App. Den Browser richtest du mit `lauschctl setup kiosk` ein."
+        },
+        "app": {
+          "label": "Kiosk-App",
+          "help": "Welche der installierten Kiosk-Apps der Bildschirm zeigt; ihre eigenen Einstellungen folgen darunter."
+        }
+      },
+      "kiosk_standard": {
+        "theme": {
+          "label": "Aussehen",
+          "help": "Eigene Aussehen sind CSS-Dateien im Ordner „kiosk-themes“ des Datenverzeichnisses."
+        },
+        "text_size": {
+          "label": "Textgröße",
+          "values": {
+            "normal": "Normal",
+            "large": "Groß",
+            "huge": "Sehr groß"
+          }
+        },
+        "start_page": {
+          "label": "Startseite",
+          "help": "Was der Bildschirm zuerst zeigt und wohin er zurückkehrt.",
+          "values": {
+            "player": "Läuft gerade",
+            "library": "Bibliothek"
+          }
+        },
+        "show_continue": {
+          "label": "„Weiter“ anbieten"
+        },
+        "show_music": {
+          "label": "Musik anbieten"
+        },
+        "show_audiobooks": {
+          "label": "Hörbücher anbieten"
+        },
+        "show_radio": {
+          "label": "Radio anbieten"
+        },
+        "show_podcasts": {
+          "label": "Podcasts anbieten"
+        },
+        "show_volume": {
+          "label": "Lautstärkeregler zeigen"
+        }
+      },
       "volume": {
         "mixer": {
           "label": "Lautstärkeregelung",

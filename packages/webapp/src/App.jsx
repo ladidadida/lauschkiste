@@ -7,6 +7,7 @@ import Grid from '@mui/material/Grid';
 import AppSettingsProvider from './context/appsettings';
 import PubSubProvider from './context/pubsub';
 import PlayerProvider from './context/player';
+import KioskRedirect from './components/OnScreenKeyboard/kiosk-redirect';
 import OnScreenKeyboard from './components/OnScreenKeyboard';
 import Router from './router';
 
@@ -25,6 +26,7 @@ function App() {
           >
             <Router />
           </Grid>
+          <KioskRedirect />
           <OnScreenKeyboard />
         </AppSettingsProvider>
       </PlayerProvider>

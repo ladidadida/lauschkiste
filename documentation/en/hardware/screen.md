@@ -1,8 +1,8 @@
 # A screen on the box
 
 A small screen (a Raspberry Pi display, an HDMI screen) can show the web page of the player on the box, so it needs no
-phone. It is the same web page, full screen. A reduced view for children is planned (see the
-[plan](../../developers/kiosk.md)); for now the screen shows everything including the settings.
+phone. It is the same web page, full screen, or, switched on in the settings, a reduced view for children (see
+[The kiosk](#the-kiosk-a-reduced-view-for-children)).
 
 ## Switch it on
 
@@ -22,6 +22,19 @@ key with the arrow hides it again. It appears only on the screen on the box, not
 attach a physical keyboard, switch it off in *Settings → Screen → On-screen keyboard*.
 
 A box set up with an older version needs `lauschctl setup kiosk` once, so that the screen knows it is the one on the box.
+
+## The kiosk: a reduced view for children
+
+The normal web page shows everything, including the settings. The kiosk is a reduced view for the screen on the box:
+the player and the library as big tiles (continue, music, audiobooks, radio, podcasts), with no settings and no card
+management. Switch it on in the web app under *Settings → Screen* (*Show the kiosk app on the screen*); the screen
+changes by itself, no restart is needed. Below it you find the settings of the kiosk app: the look (*Night*, *Day*,
+*Meadow*, *Candy*), the text size, which pages are offered and whether the volume control is shown. After two minutes
+without a touch the screen returns to its start page.
+
+It is a simplification, not a lock: whoever opens the web page on a phone or computer can still change everything. To get
+the normal web page back on the screen, switch the kiosk off in the settings, from a phone. Your own looks are CSS
+files in the folder `kiosk-themes` of the data directory; see [Kiosk](../../developers/kiosk.md#the-standard-kiosk-app).
 
 ## Switch the screen off when nobody uses it
 

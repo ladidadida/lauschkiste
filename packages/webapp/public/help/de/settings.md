@@ -10,6 +10,7 @@ Alles, was nur Lauschkiste selbst betrifft, stellst du in der Web-App ein. Ände
 | Bibliothek | Cover, Einlesen, Netzlaufwerk (Samba) |
 | Plugins | Erweiterungen an- und ausschalten und einstellen, z. B. Raspberry Pi, GPIO-Tasten und Drehregler, Akku, Ein-/Aus-Taster |
 | Hardware | Platine, belegte Pins und Schnittstellen, Pin-Konflikte |
+| Bildschirm | Bildschirmtastatur, Bildschirm ausschalten, der Kiosk (eine reduzierte Ansicht für den Bildschirm an der Box) und sein Aussehen |
 | System | Ansagen, Neustart, Herunterfahren |
 
 ## Plugins
