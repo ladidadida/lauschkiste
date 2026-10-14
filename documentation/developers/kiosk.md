@@ -1,8 +1,8 @@
 # Kiosk app (reduced view on the box's screen)
 
-Status: plan, nothing implemented yet. Two parts already exist in the core: the screen switches off after a time
-without a touch (module `display`), and settings with fixed limits are sliders (see
-[Input on a touch screen](#input-on-a-touch-screen)).
+Status: the on-screen keyboard and the settings page *Screen* exist; the kiosk module and the kiosk app are a plan.
+Two parts live in the core: the screen switches off after a time without a touch (module `display`), and settings with
+fixed limits are sliders (see [Input on a touch screen](#input-on-a-touch-screen)).
 
 A box with a screen should show something a child can use without changing settings. Today `lauschctl setup kiosk`
 starts Chromium full screen on the normal web app, which offers everything. The plan: a **separate, small web app
@@ -11,16 +11,26 @@ without themes or elaborate looks, it only has to work.
 
 ## Decisions so far
 
-- **Two web apps.** The normal web app is unchanged. The kiosk app is its own frontend with its own build, in the
-  plugin package `lauschkiste-plugin-kiosk`, served by the core under `/kiosk` while the plugin is enabled.
+- **Two web apps.** The normal web app is unchanged: the administration and the fallback. The kiosk app is its own
+  frontend with its own build, served by the core under `/kiosk/`.
+- **The core provides the kiosk, plugins provide kiosk apps.** The core module `kiosk` has the settings `enabled` and
+  `app` (the id of the chosen kiosk app, the built-in one by default). The browser on the box always opens `/kiosk/`:
+  the core serves the chosen app there, or forwards to the normal web app when the kiosk is off.
+- **Kiosk apps are plugins.** A plugin provides a capability (`kiosk_app`, name to be settled), names the folder with
+  its built web files and has settings like any plugin. Other layouts, or apps for other kinds of screen, are further
+  plugins. The first app ships with the core and uses the same contract, so it can be switched off and replaced.
+- **Themes belong to the app.** A theme is a setting of the kiosk app (a file of CSS variables), not a plugin of its
+  own. The app ships a few and reads more from a folder in `LAUSCHKISTE_HOME`.
+- **Where the settings are:** *Settings → Screen*: on-screen keyboard (applies to every app on the screen, including the
+  normal web app), switching off (`display`), the kiosk on or off, the choice of the app and below it the form of the
+  chosen app. Everything that changes the operating system stays with `lauschctl`: `lauschctl setup kiosk` installs
+  the graphics system and the browser and sets up the autologin; the web app only chooses what the browser shows.
 - **Same technology (React, MUI) and shared components.** Components that both need (player display, cover, library
   lists) move to a shared place in `packages/webapp` or a package of its own, so nothing is written twice. The kiosk
   bundle contains only what it needs.
 - **Touch only** to begin with.
 - **What a child sees:** the player (cover, title, controls, volume), the library to tap through (music, audiobooks,
   radio, podcasts) and "Continue". No settings, no card management. Which parts are shown becomes configurable.
-- **Settings and themes belong to the plugin.** The plugin has a settings model, so the normal web app shows a form
-  for it like for any plugin; the kiosk app reads the values through the API.
 - **No new rights.** The kiosk app uses the same API and event stream as the normal one. It is a simplification, not
   a lock: anyone who can open the normal web app in a browser can still change everything. A real lock (a PIN for the
   normal web app, or reachable from the box only) is a separate decision.
@@ -29,16 +39,16 @@ without themes or elaborate looks, it only has to work.
 
 | Part | Content |
 | --- | --- |
-| Plugin `kiosk` | settings (theme, visible parts, text size, idle behaviour), serves the built kiosk app at `/kiosk`, a query that returns the settings |
-| Core | an extension point or helper to serve the static files of a plugin (today only the normal web app and the logs are served) |
-| Kiosk app | React app: player page, library page, "Continue"; reads the settings; German and English like the normal web app |
-| Themes | a theme is a set of CSS variables (colours, radii, font, spacing) in a file; the plugin ships a few, the settings pick one |
-| `lauschctl setup kiosk` | opens `/kiosk` when the plugin is enabled, otherwise the normal web app |
+| Core module `kiosk` | settings `enabled` and `app`, serves the chosen app at `/kiosk/` (or forwards), lists the installed kiosk apps |
+| Core | an extension point to serve the static files of a plugin (today only the normal web app and the logs are served) |
+| Kiosk app (first one in the core) | React app: player page, library page, "Continue"; reads its settings; German and English like the normal web app |
+| Themes | a set of CSS variables (colours, radii, font, spacing) in a file; the app ships a few, its settings pick one |
+| `lauschctl setup kiosk` | installs the browser and opens `/kiosk/` |
 
-## Settings of the plugin (first idea)
+## Settings of the first kiosk app (first idea)
 
 `theme`, `sections` (which of player, music, audiobooks, radio, podcasts are offered), `text_size`, `show_volume`,
-`start_page`. Switching the screen off is not part of it: the core module `display` does that for every box.
+`start_page`. Switching the screen off and the keyboard are not part of it: they apply to every app and live in the *Screen* settings.
 
 ## Input on a touch screen
 
@@ -53,15 +63,15 @@ sensible upper limit (voltages, rates, sizes). The plan:
   component of the web app that opens when a text field gets the focus and moves the page up so the field stays
   visible. A library (for example `react-simple-keyboard`) is the first choice over an own implementation. Layouts
   for German and English, a numeric layout for number fields, a show/hide switch for passwords.
-- **Detecting the kiosk screen:** the kiosk start page gets a marker (a query parameter or a setting of the kiosk
-  plugin), since a browser cannot tell a touch screen with a keyboard from one without.
+- **Detecting the kiosk screen:** the start page of the kiosk opens the web app with `?kiosk`; the browser remembers
+  it. A switch in *Settings → Screen* turns the keyboard off for boxes with a physical keyboard.
 - **Less typing:** wherever the backend can offer a list (audio devices, library folders, known actions), the field
   becomes a selection list; big numbers get a stepper with large buttons instead of the keyboard.
 - **Phone first:** the phone keyboard already works, so nothing may get worse for phones.
 
-Open: whether the keyboard belongs to the kiosk app (phase 2) only. The normal web app on the screen needs it
-at once, since it is the only app there until the kiosk app exists. Phase 0 should include trying the keyboard on the
-real screen.
+The keyboard is a component of the normal web app, since that is the only app on the screen until a kiosk app exists;
+a kiosk app can reuse it. Done: the keyboard (`react-simple-keyboard`, German and English letters, symbols), the
+marker and the switch. Open: a numeric layout for number fields and a show/hide switch for passwords.
 
 ## Phases and estimate
 
@@ -73,7 +83,7 @@ Rough working days of focused work; the first look on a real screen decides the 
 | 1 | Core: serve the static files of a plugin; plugin skeleton with settings; `/kiosk` shows a page | 1 |
 | 2 | Shared components out of the normal web app; kiosk app with player and library | 3 to 4 |
 | 3 | Themes (variables, 2 or 3 themes, picker in the settings), configurable sections, screen-off | 1 to 2 |
-| 4 | `lauschctl setup kiosk` points at `/kiosk`; documentation, help pages, translations; tests (unit and Playwright) | 1 |
+| 4 | `lauschctl setup kiosk` points at `/kiosk/`; documentation, help pages, translations; tests (unit and Playwright) | 1 |
 
 About 6 to 9 days.
 

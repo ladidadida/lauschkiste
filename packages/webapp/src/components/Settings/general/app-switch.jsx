@@ -11,11 +11,11 @@ import {
 import AppSettingsContext from '../../../context/appsettings/context';
 import request from '../../../utils/request';
 
-// A switch for one boolean web app setting; `name` is the setting and the key below `settings.general` in the texts.
-const AppSwitch = ({ name }) => {
+// A switch for one boolean web app setting; `name` is the setting and the key below `texts` in the translations.
+const AppSwitch = ({ name, texts = 'settings.general' }) => {
   const { t } = useTranslation();
   const { settings, setSettings } = useContext(AppSettingsContext);
-  const hint = t(`settings.general.${name}.hint`, { defaultValue: '' });
+  const hint = t(`${texts}.${name}.hint`, { defaultValue: '' });
 
   const handleSwitch = (event) => {
     const { checked } = event.target;
@@ -26,7 +26,7 @@ const AppSwitch = ({ name }) => {
   return (
     <Grid container sx={{ flexDirection: 'column', justifyContent: 'center' }}>
       <Grid container sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography>{t(`settings.general.${name}.title`)}</Typography>
+        <Typography>{t(`${texts}.${name}.title`)}</Typography>
         <Box sx={{ alignItems: 'center', display: 'flex', marginLeft: '0' }}>
           <Switch checked={Boolean(settings[name])} onChange={handleSwitch} />
         </Box>

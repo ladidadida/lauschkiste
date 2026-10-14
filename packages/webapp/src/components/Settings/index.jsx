@@ -6,7 +6,7 @@ import HardwareSettings from './pages/hardware';
 import SettingsOverview from './pages/overview';
 import { PluginSettings, PluginsSettings } from './pages/plugins';
 import {
-  CardSettings, LibrarySettings, PlaybackSettings, StatusSettings, SystemSettings,
+  CardSettings, LibrarySettings, PlaybackSettings, ScreenSettings, StatusSettings, SystemSettings,
 } from './pages/sections';
 import { RestartProvider } from './restart';
 
@@ -22,6 +22,7 @@ const Settings = () => (
         <Route path="plugins" element={<PluginsSettings />} />
         <Route path="plugins/:name" element={<PluginSettings />} />
         <Route path="hardware" element={<HardwareSettings />} />
+        <Route path="screen" element={<ScreenSettings />} />
         <Route path="system" element={<SystemSettings />} />
       </Routes>
     </Grid>

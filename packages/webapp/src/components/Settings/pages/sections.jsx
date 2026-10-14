@@ -18,6 +18,7 @@ import Outputs from '../audio/outputs';
 import CliHint from '../cli-hint';
 import ModuleSettings from '../form/module-settings';
 import SettingsGeneral from '../general';
+import AppSwitch from '../general/app-switch';
 import SettingsStatus from '../status';
 import SystemControls from '../systemcontrols';
 import SambaSettings from './samba';
@@ -86,13 +87,27 @@ const LibrarySettings = () => {
   );
 };
 
+const ScreenSettings = () => {
+  const { t } = useTranslation();
+  return (
+    <SettingsPage title={t('settings.sections.screen.title')}>
+      <Card>
+        <CardHeader title={t('settings.screen.keyboard')} />
+        <Divider />
+        <CardContent><AppSwitch name="on_screen_keyboard" texts="settings.screen" /></CardContent>
+      </Card>
+      <ModuleSettings module="display" />
+      <CliHint commands={['lauschctl setup kiosk']} text={t('settings.cli.kiosk')} />
+    </SettingsPage>
+  );
+};
+
 const SystemSettings = () => {
   const { t } = useTranslation();
   const [restarting, setRestarting] = useState(false);
   return (
     <SettingsPage title={t('settings.sections.system.title')}>
       <ModuleSettings module="system" />
-      <ModuleSettings module="display" />
       <Card>
         <CardHeader title={t('settings.system.service')} />
         <Divider />
@@ -112,10 +127,10 @@ const SystemSettings = () => {
       </Card>
       <SystemControls />
       <CliHint commands={['lauschctl update']} section="update" text={t('settings.cli.update')} />
-      <CliHint commands={['lauschctl setup autohotspot', 'lauschctl setup boot', 'lauschctl setup kiosk']}
+      <CliHint commands={['lauschctl setup autohotspot', 'lauschctl setup boot']}
         text={t('settings.cli.system')} />
     </SettingsPage>
   );
 };
 
-export { CardSettings, LibrarySettings, PlaybackSettings, StatusSettings, SystemSettings };
+export { CardSettings, LibrarySettings, PlaybackSettings, ScreenSettings, StatusSettings, SystemSettings };

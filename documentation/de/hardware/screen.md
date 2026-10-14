@@ -19,7 +19,7 @@ Box neu. Ein Raspberry Pi 3 oder besser wird empfohlen; auf einer Zero ist ein B
 
 Tippe auf ein Textfeld (zum Beispiel die Suche nach Radiosendern), und unten erscheint eine Tastatur. Mit der Taste mit
 dem Pfeil unten verschwindet sie wieder. Sie erscheint nur auf dem Bildschirm an der Box, nicht auf Handy oder Computer.
-Schließt du eine echte Tastatur an, schalte sie unter *Einstellungen → Allgemein → Bildschirmtastatur* aus.
+Schließt du eine echte Tastatur an, schalte sie unter *Einstellungen → Bildschirm → Bildschirmtastatur* aus.
 
 Eine Box, die mit einer älteren Version eingerichtet wurde, braucht einmal `lauschctl setup kiosk`, damit der Bildschirm
 weiß, dass er der an der Box ist.
@@ -30,7 +30,7 @@ Nach 5 Minuten ohne Berührung wird der Bildschirm dunkel. Eine Berührung schal
 Bildschirm: In der Webseite wird dadurch nichts gedrückt. Die Musik spielt weiter; nur der Bildschirm schläft. Das spart
 Strom und schont den Bildschirm bei einer Box, die den ganzen Tag läuft.
 
-Die Zeit änderst du auf der Webseite unter Einstellungen → System → *Switch the screen off after (minutes)*; bei `0`
+Die Zeit änderst du auf der Webseite unter Einstellungen → Bildschirm → *Switch the screen off after (minutes)*; bei `0`
 bleibt der Bildschirm an. Die Änderung gilt sofort. Das geht bei Bildschirmen, deren Hintergrundbeleuchtung Lauschkiste
 steuern darf, etwa dem offiziellen Raspberry-Pi-Touch-Display. Die meisten HDMI-Bildschirme haben das nicht und bleiben an.
 

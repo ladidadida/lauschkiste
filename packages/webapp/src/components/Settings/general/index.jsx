@@ -31,7 +31,6 @@ const SettingsGeneral = () => {
           }}
         >
           <AppSwitch name="show_covers" />
-          <AppSwitch name="on_screen_keyboard" />
         </Grid>
       </CardContent>
     </Card>

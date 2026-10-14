@@ -19,7 +19,7 @@ or better is advised; a Zero is slow with a browser.
 
 Tap a text field (for example the search for radio stations) and a keyboard appears at the bottom of the screen. The
 key with the arrow hides it again. It appears only on the screen on the box, not on your phone or computer. If you
-attach a physical keyboard, switch it off in *Settings → General → On-screen keyboard*.
+attach a physical keyboard, switch it off in *Settings → Screen → On-screen keyboard*.
 
 A box set up with an older version needs `lauschctl setup kiosk` once, so that the screen knows it is the one on the box.
 
@@ -29,7 +29,7 @@ After 5 minutes without a touch the screen goes dark. A touch switches it on aga
 screen: it does not press anything in the web app. The music keeps playing; only the screen sleeps. This saves power and
 keeps the screen from burning in on a box that runs all day.
 
-Change the time in the web app under Settings → System → *Switch the screen off after (minutes)*; `0` keeps the screen
+Change the time in the web app under Settings → Screen → *Switch the screen off after (minutes)*; `0` keeps the screen
 on. It takes effect at once. This works for screens whose backlight Lauschkiste may control, like the official Raspberry
 Pi touch display. Most HDMI monitors have no such backlight and stay on.
 

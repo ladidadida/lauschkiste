@@ -487,10 +487,6 @@
       "title": "Allgmeine Einstellungen",
       "show_covers": {
         "title": "Cover anzeigen"
-      },
-      "on_screen_keyboard": {
-        "title": "Bildschirmtastatur",
-        "hint": "Wird auf dem an der Box angeschlossenen Bildschirm gezeigt, wenn ein Textfeld ausgewählt ist. Schalte sie aus, wenn eine echte Tastatur angeschlossen ist."
       }
     },
     "status": {
@@ -552,6 +548,10 @@
         "title": "Plugins",
         "subtitle": "Erweiterungen an- und ausschalten, GPIO, Akku"
       },
+      "screen": {
+        "title": "Bildschirm",
+        "subtitle": "Bildschirm an der Box: Tastatur, Ausschalten, Kiosk"
+      },
       "system": {
         "title": "System",
         "subtitle": "Neustart, Herunterfahren, Sprache der Ansagen"
@@ -592,6 +592,13 @@
     },
     "library": {
       "share": "Netzwerkfreigabe (Samba)"
+    },
+    "screen": {
+      "keyboard": "Tastatur",
+      "on_screen_keyboard": {
+        "title": "Bildschirmtastatur",
+        "hint": "Wird auf dem an der Box angeschlossenen Bildschirm gezeigt, wenn ein Textfeld ausgewählt ist. Schalte sie aus, wenn eine echte Tastatur angeschlossen ist."
+      }
     },
     "system": {
       "service": "Lauschkiste neu starten",
@@ -909,11 +916,12 @@
       "login-mac": "macOS-Finder (Gehe zu → Mit Server verbinden) und Linux: {{address}}"
     },
     "cli": {
+      "kiosk": "Der Browser auf der Box (Kiosk-Modus) wird auf der Box eingerichtet:",
       "more": "Mehr dazu in der Hilfe",
       "audio": "Soundkarte (z. B. HiFiBerry) und die angebotenen Ausgänge richtest du auf der Box ein:",
       "reader": "Ein Lesegerät richtest du einmalig auf der Box ein:",
       "update": "Lauschkiste aktualisierst du auf der Box:",
-      "system": "WLAN-Hotspot, schnellerer Start und Kiosk-Modus ändern das Betriebssystem und laufen auf der Box:"
+      "system": "WLAN-Hotspot und schnellerer Start ändern das Betriebssystem und laufen auf der Box:"
     },
     "hardware": {
       "pin": "Pin",

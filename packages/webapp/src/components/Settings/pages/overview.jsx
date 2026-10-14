@@ -14,6 +14,7 @@ import BookmarksIcon from '@mui/icons-material/Bookmarks';
 import DeveloperBoardIcon from '@mui/icons-material/DeveloperBoard';
 import ExtensionIcon from '@mui/icons-material/Extension';
 import InfoIcon from '@mui/icons-material/Info';
+import MonitorIcon from '@mui/icons-material/Monitor';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import TuneIcon from '@mui/icons-material/Tune';
@@ -29,6 +30,7 @@ const SECTIONS = [
   ['library', LibraryMusicIcon],
   ['plugins', ExtensionIcon],
   ['hardware', DeveloperBoardIcon],
+  ['screen', MonitorIcon],
   ['system', PowerSettingsNewIcon],
 ];
 

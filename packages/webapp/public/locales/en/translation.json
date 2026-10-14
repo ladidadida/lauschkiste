@@ -487,10 +487,6 @@
       "title": "General Settings",
       "show_covers": {
         "title": "Show Cover Art"
-      },
-      "on_screen_keyboard": {
-        "title": "On-screen keyboard",
-        "hint": "Shown on the display attached to the box when a text field is selected. Switch it off if a physical keyboard is attached."
       }
     },
     "status": {
@@ -552,6 +548,10 @@
         "title": "Plugins",
         "subtitle": "Switch extensions on and off, GPIO, battery"
       },
+      "screen": {
+        "title": "Screen",
+        "subtitle": "Screen on the box: keyboard, switching off, kiosk"
+      },
       "system": {
         "title": "System",
         "subtitle": "Restart, shut down, voice of announcements"
@@ -592,6 +592,13 @@
     },
     "library": {
       "share": "Network share (Samba)"
+    },
+    "screen": {
+      "keyboard": "Keyboard",
+      "on_screen_keyboard": {
+        "title": "On-screen keyboard",
+        "hint": "Shown on the display attached to the box when a text field is selected. Switch it off if a physical keyboard is attached."
+      }
     },
     "system": {
       "service": "Restart Lauschkiste",
@@ -782,11 +789,12 @@
       "login-mac": "macOS Finder (Go → Connect to Server) and Linux: {{address}}"
     },
     "cli": {
+      "kiosk": "The browser on the box (kiosk mode) is set up on the box:",
       "more": "More in the help",
       "audio": "A sound card (e.g. HiFiBerry) and the outputs offered are set up on the box:",
       "reader": "A reader is set up once on the box:",
       "update": "Lauschkiste is updated on the box:",
-      "system": "WiFi hotspot, faster start and kiosk mode change the operating system and run on the box:"
+      "system": "WiFi hotspot and faster start change the operating system and run on the box:"
     },
     "hardware": {
       "pin": "Pin",
