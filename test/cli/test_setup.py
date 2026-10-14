@@ -474,7 +474,7 @@ def test_kiosk_step_repairs_an_outdated_chromium_command(tmp_path, home, extras)
     autostart = system.read('/etc/xdg/openbox/autostart')
     assert 'chromium file:///etc/xdg/openbox/lauschkiste-loading.html' in autostart and 'chromium-browser' not in autostart
     assert 'localhost:5556' in system.read('/etc/xdg/openbox/lauschkiste-loading.html')
-    assert 'location.replace(target + "?kiosk")' in system.read('/etc/xdg/openbox/lauschkiste-loading.html')
+    assert 'location.replace(target + "kiosk/")' in system.read('/etc/xdg/openbox/lauschkiste-loading.html')
     assert autostart.count('## Lauschkiste Kiosk Mode') == 1 and autostart.startswith('keep\n') and 'other' in autostart
     assert 'xset -dpms' in autostart and 'dpms 0 0' not in autostart
     assert system.read('~/.bashrc').count('startx') == 1

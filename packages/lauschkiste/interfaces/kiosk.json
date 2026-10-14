@@ -1,0 +1,121 @@
+{
+  "events": {
+    "state": {
+      "properties": {
+        "app": {
+          "type": "string"
+        },
+        "apps": {
+          "items": {
+            "properties": {
+              "label": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "value",
+              "label"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "enabled": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled",
+        "app",
+        "apps"
+      ],
+      "type": "object"
+    }
+  },
+  "extension_points": {
+    "apps": {
+      "directory": "(self) -> pathlib.Path"
+    }
+  },
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "kiosk",
+  "operations": {
+    "get_state": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/kiosk/state",
+      "returns": {
+        "properties": {
+          "app": {
+            "type": "string"
+          },
+          "apps": {
+            "items": {
+              "properties": {
+                "label": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "value",
+                "label"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "app",
+          "apps"
+        ],
+        "type": "object"
+      }
+    },
+    "list_apps": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/kiosk/apps",
+      "returns": {
+        "items": {
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "label"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    }
+  },
+  "requires": {}
+}

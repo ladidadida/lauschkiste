@@ -1,0 +1,12 @@
+/* Light and friendly. */
+:root {
+  --kiosk-mode: light;
+  --kiosk-background: #fff9ef;
+  --kiosk-surface: #ffffff;
+  --kiosk-text: #2b2a33;
+  --kiosk-muted: #6b6a75;
+  --kiosk-accent: #f57c00;
+  --kiosk-accent-text: #ffffff;
+  --kiosk-radius: 22px;
+  --kiosk-font: system-ui, sans-serif;
+}

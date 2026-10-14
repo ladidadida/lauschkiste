@@ -121,7 +121,8 @@ class KioskStep(Step):
             'font:600 2.5rem sans-serif}</style>\n<p>Lauschkiste &hellip;</p>\n'
             f'<script>const target = "http://localhost:{port}/";\n'
             '(function wait() {\n'
-            '  fetch(target, {mode: "no-cors"}).then(() => location.replace(target + "?kiosk"), () => setTimeout(wait, 1000));\n'
+            '  fetch(target, {mode: "no-cors"}).then(() => location.replace(target + "kiosk/"),\n'
+            '    () => setTimeout(wait, 1000));\n'
             '})();</script>\n')
 
     def _autostart(self, ctx) -> str:

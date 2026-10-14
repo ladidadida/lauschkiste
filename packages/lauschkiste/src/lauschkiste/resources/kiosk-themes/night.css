@@ -1,0 +1,12 @@
+/* Dark, calm. Colours are written as #rrggbb. */
+:root {
+  --kiosk-mode: dark;
+  --kiosk-background: #101418;
+  --kiosk-surface: #1b2229;
+  --kiosk-text: #f2f5f7;
+  --kiosk-muted: #9aa7b2;
+  --kiosk-accent: #4db6ac;
+  --kiosk-accent-text: #06201d;
+  --kiosk-radius: 18px;
+  --kiosk-font: system-ui, sans-serif;
+}

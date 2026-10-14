@@ -5,6 +5,8 @@ from lauschkiste.content.cache.module import Cache
 from lauschkiste.box.display import Display
 from lauschkiste.box.hardware import Hardware
 from lauschkiste.box.input_devices import InputDevices
+from lauschkiste.box.kiosk.module import Kiosk
+from lauschkiste.box.kiosk.standard import KioskStandard
 from lauschkiste.player.jingle import Jingle
 from lauschkiste.content.library.module import Library
 from lauschkiste.player.module import Player
@@ -21,6 +23,8 @@ CORE_MODULES = [
     System,
     Hardware,
     Display,
+    Kiosk,
+    KioskStandard,
     Library,
     Player,
     Audiobooks,

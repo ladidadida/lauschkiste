@@ -97,7 +97,7 @@ const ScreenSettings = () => {
         <CardContent><AppSwitch name="on_screen_keyboard" texts="settings.screen" /></CardContent>
       </Card>
       <ModuleSettings module="display" />
-      <CliHint commands={['lauschctl setup kiosk']} text={t('settings.cli.kiosk')} />
+      <CliHint commands={['lauschctl setup kiosk']} section="kiosk" text={t('settings.cli.kiosk')} />
     </SettingsPage>
   );
 };

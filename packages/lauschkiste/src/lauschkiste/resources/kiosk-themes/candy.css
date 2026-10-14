@@ -1,0 +1,12 @@
+/* Dark purple with a bright accent. */
+:root {
+  --kiosk-mode: dark;
+  --kiosk-background: #1e1233;
+  --kiosk-surface: #2d1d4a;
+  --kiosk-text: #fff4fb;
+  --kiosk-muted: #c3a8dd;
+  --kiosk-accent: #ff6fb5;
+  --kiosk-accent-text: #2a0a1c;
+  --kiosk-radius: 28px;
+  --kiosk-font: system-ui, sans-serif;
+}

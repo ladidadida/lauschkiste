@@ -52,6 +52,14 @@ lauschctl update
 
 Fetches the newest version, installs it and restarts Lauschkiste. Settings, cards and library stay.
 
+## Kiosk {#kiosk}
+
+```bash
+lauschctl setup kiosk
+```
+
+Installs a minimal graphics system and the Chromium browser, logs in by itself and shows the web app full screen on the attached display after the start. Restart the box afterwards. What the screen shows and the on-screen keyboard are set in Settings → Screen.
+
 ## Hotspot {#hotspot}
 
 ```bash

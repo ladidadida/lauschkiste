@@ -1,0 +1,12 @@
+/* Light with green. */
+:root {
+  --kiosk-mode: light;
+  --kiosk-background: #eef7e8;
+  --kiosk-surface: #ffffff;
+  --kiosk-text: #1f3324;
+  --kiosk-muted: #5a7360;
+  --kiosk-accent: #2e9e4f;
+  --kiosk-accent-text: #ffffff;
+  --kiosk-radius: 26px;
+  --kiosk-font: system-ui, sans-serif;
+}

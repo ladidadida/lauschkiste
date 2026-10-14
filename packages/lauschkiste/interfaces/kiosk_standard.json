@@ -1,0 +1,92 @@
+{
+  "events": {
+    "settings": {
+      "properties": {
+        "show_audiobooks": {
+          "default": true,
+          "type": "boolean"
+        },
+        "show_continue": {
+          "default": true,
+          "type": "boolean"
+        },
+        "show_music": {
+          "default": true,
+          "type": "boolean"
+        },
+        "show_podcasts": {
+          "default": true,
+          "type": "boolean"
+        },
+        "show_radio": {
+          "default": true,
+          "type": "boolean"
+        },
+        "show_volume": {
+          "default": true,
+          "type": "boolean"
+        },
+        "start_page": {
+          "default": "player",
+          "enum": [
+            "player",
+            "library"
+          ],
+          "type": "string"
+        },
+        "text_size": {
+          "default": "large",
+          "enum": [
+            "normal",
+            "large",
+            "huge"
+          ],
+          "type": "string"
+        },
+        "theme": {
+          "default": "night",
+          "options": "/api/v1/kiosk_standard/themes",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "kiosk_standard",
+  "operations": {
+    "list_themes": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/kiosk_standard/themes",
+      "returns": {
+        "items": {
+          "properties": {
+            "label": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "value",
+            "label"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    }
+  },
+  "requires": {
+    "kiosk": null
+  }
+}

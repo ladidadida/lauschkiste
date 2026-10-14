@@ -52,6 +52,14 @@ lauschctl update
 
 Holt die neueste Version, installiert sie und startet Lauschkiste neu. Einstellungen, Karten und Bibliothek bleiben erhalten.
 
+## Kiosk {#kiosk}
+
+```bash
+lauschctl setup kiosk
+```
+
+Installiert ein minimales Grafiksystem und den Browser Chromium, meldet sich selbst an und zeigt nach dem Start die Web-App im Vollbild auf dem angeschlossenen Bildschirm. Starte die Box danach neu. Was der Bildschirm zeigt und die Bildschirmtastatur stellst du unter Einstellungen → Bildschirm ein.
+
 ## Hotspot {#hotspot}
 
 ```bash
