@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import AppSettingsContext from './context';
+import i18n from '../../i18n';
 import request from '../../utils/request';
 
 const AppSettingsProvider = ({ children }) => {
@@ -17,6 +18,10 @@ const AppSettingsProvider = ({ children }) => {
 
     loadAppSettings();
   }, []);
+
+  useEffect(() => {
+    if (settings.language && settings.language !== 'auto') i18n.changeLanguage(settings.language);
+  }, [settings.language]);
 
   const context = {
     setSettings,

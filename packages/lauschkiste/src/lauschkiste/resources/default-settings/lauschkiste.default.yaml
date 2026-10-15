@@ -119,3 +119,7 @@ webapp:
   # Switch off if a physical keyboard is attached.
   # Defaults to true
   on_screen_keyboard: true
+  # Language of the web app: auto (the browser's language), de or en. Set it where the browser has no
+  # language of its own, e.g. the display on the box.
+  # Defaults to auto
+  language: auto

@@ -21,6 +21,7 @@ import CliHint from '../cli-hint';
 import ModuleSettings from '../form/module-settings';
 import SettingsGeneral from '../general';
 import AppSwitch from '../general/app-switch';
+import LanguageSelect from '../general/language-select';
 import SettingsStatus from '../status';
 import SystemControls from '../systemcontrols';
 import SambaSettings from './samba';
@@ -112,7 +113,6 @@ const SystemSettings = () => {
   const [restarting, setRestarting] = useState(false);
   return (
     <SettingsPage title={t('settings.sections.system.title')}>
-      <ModuleSettings module="system" />
       <Card>
         <CardHeader title={t('settings.system.service')} />
         <Divider />
@@ -131,6 +131,12 @@ const SystemSettings = () => {
         </CardContent>
       </Card>
       <SystemControls />
+      <Card>
+        <CardHeader title={t('settings.language.section')} />
+        <Divider />
+        <CardContent><LanguageSelect /></CardContent>
+      </Card>
+      <ModuleSettings module="system" />
       <CliHint commands={['lauschctl update']} section="update" text={t('settings.cli.update')} />
       <CliHint commands={['lauschctl setup autohotspot', 'lauschctl setup boot']}
         text={t('settings.cli.system')} />

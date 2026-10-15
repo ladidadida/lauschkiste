@@ -11,7 +11,7 @@ Everything that only concerns Lauschkiste itself is set in the web app. Changes 
 | Plugins | switch extensions on and off and set them up, e.g. Raspberry Pi, GPIO buttons and rotary encoders, battery, power button |
 | Hardware | device, pins and interfaces in use, pin conflicts |
 | Screen | on-screen keyboard, switching the screen off, the kiosk (a reduced view for the screen on the box) and its look |
-| System | announcements, restart, shut down |
+| System | restart, shut down, language, announcements |
 
 ## Plugins
 

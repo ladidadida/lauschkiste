@@ -334,6 +334,18 @@ test('the screen settings offer the kiosk and its app', async ({ page }) => {
   await expect(page.getByText('Offer radio')).toBeVisible();
 });
 
+test('the system page offers restart first and a language that switches the web app', async ({ page }) => {
+  const { apiCalls } = await mockBackend(page);
+  await page.goto('/#/settings/system');
+  await expect(page.getByText('Restart Lauschkiste')).toBeVisible();
+  await page.getByLabel('Language of the web app').click();
+  await page.getByRole('option', { name: 'Deutsch' }).click();
+  await expect.poll(() => (
+    apiCalls.find(call => call.method === 'PUT' && call.path === '/api/v1/settings')?.body
+  )).toEqual({ settings: { language: 'de' } });
+  await expect(page.getByText('Lauschkiste neu starten')).toBeVisible();
+});
+
 test('playback settings switch audio outputs and save module settings', async ({ page }) => {
   const consoleErrors = collectConsoleErrors(page);
   const { apiCalls } = await mockBackend(page);

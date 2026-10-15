@@ -629,8 +629,14 @@
       "device-label": "Diese Maschine",
       "device-none": "Keines davon: am System nichts ändern",
       "groups": {
-        "hardware": { "title": "Hardware", "help": "Tasten, LEDs, Akku, RFID-Leser: was an der Maschine angeschlossen ist." },
-        "feature": { "title": "Funktionen", "help": "Quellen und Dienste: Hörbücher, Suche nach Podcasts und Radio, Dateifreigabe." }
+        "hardware": {
+          "title": "Hardware",
+          "help": "Tasten, LEDs, Akku, RFID-Leser: was an der Maschine angeschlossen ist."
+        },
+        "feature": {
+          "title": "Funktionen",
+          "help": "Quellen und Dienste: Hörbücher, Suche nach Podcasts und Radio, Dateifreigabe."
+        }
       },
       "blocked-device": "Es kann nur ein Gerät aktiv sein. Schalte zuerst „{{name}}“ aus.",
       "blocked-needs": "Braucht {{needs}}. Schalte zuerst das Geräte-Plugin deiner Maschine ein.",
@@ -1004,6 +1010,14 @@
     },
     "time-limits": {
       "title": "Zeitbegrenzung"
+    },
+    "language": {
+      "section": "Sprache",
+      "title": "Sprache der Web-App",
+      "auto": "Automatisch (Sprache des Browsers)",
+      "de": "Deutsch",
+      "en": "English",
+      "hint": "Gilt für alle Geräte. Stelle hier eine Sprache ein, wenn der Browser, etwa der Bildschirm an der Box, keine eigene hat."
     }
   },
   "help": {

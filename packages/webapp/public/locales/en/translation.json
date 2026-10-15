@@ -629,8 +629,14 @@
       "device-label": "This machine",
       "device-none": "None of these: change nothing on the system",
       "groups": {
-        "hardware": { "title": "Hardware", "help": "Buttons, LEDs, battery, RFID readers: what is attached to the machine." },
-        "feature": { "title": "Functions", "help": "Sources and services: audiobooks, search for podcasts and radio, file sharing." }
+        "hardware": {
+          "title": "Hardware",
+          "help": "Buttons, LEDs, battery, RFID readers: what is attached to the machine."
+        },
+        "feature": {
+          "title": "Functions",
+          "help": "Sources and services: audiobooks, search for podcasts and radio, file sharing."
+        }
       },
       "blocked-device": "Only one device can be active. Switch off “{{name}}” first.",
       "blocked-needs": "Needs {{needs}}. Switch on the device plugin of your machine first.",
@@ -825,6 +831,14 @@
     },
     "time-limits": {
       "title": "Time limits"
+    },
+    "language": {
+      "section": "Language",
+      "title": "Language of the web app",
+      "auto": "Automatic (language of the browser)",
+      "de": "Deutsch",
+      "en": "English",
+      "hint": "Applies to every device. Choose a language here if the browser, e.g. the screen on the box, has none of its own."
     }
   },
   "help": {

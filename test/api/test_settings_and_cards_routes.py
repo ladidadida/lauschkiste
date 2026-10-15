@@ -57,14 +57,14 @@ def client(api_client, mocked_player, cards_file, main_cfg):
 def test_get_settings(client, main_cfg):
     response = client.get('/api/v1/settings')
     assert response.status_code == 200
-    assert response.json() == {'show_covers': True, 'on_screen_keyboard': True}
+    assert response.json() == {'show_covers': True, 'on_screen_keyboard': True, 'language': 'auto'}
 
 
 def test_set_settings(client, main_cfg):
     response = client.put('/api/v1/settings', json={'settings': {'show_covers': False}})
     assert response.status_code == 204
     assert main_cfg.getn('webapp', 'show_covers') is False
-    assert client.get('/api/v1/settings').json() == {'show_covers': False, 'on_screen_keyboard': True}
+    assert client.get('/api/v1/settings').json() == {'show_covers': False, 'on_screen_keyboard': True, 'language': 'auto'}
 
 
 def test_set_settings_rejects_unknown_keys(client):
@@ -122,3 +122,9 @@ def test_card_action_runs_through_the_catalog(client):
     card = client.modules.handle('cards').invoke('get_card', '0001')
     client.modules.catalog.call(card.action, card.args)
     client.ctrl.play_folder.assert_called_once_with('Rock', False)
+
+
+def test_set_language(client, main_cfg):
+    assert client.put('/api/v1/settings', json={'settings': {'language': 'de'}}).status_code == 204
+    assert main_cfg.getn('webapp', 'language') == 'de'
+    assert client.put('/api/v1/settings', json={'settings': {'language': 'xx'}}).status_code == 422

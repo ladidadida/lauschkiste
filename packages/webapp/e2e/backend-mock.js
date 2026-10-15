@@ -169,7 +169,7 @@ export async function mockBackend(
     '/api/v1/library/songs': () => backendData.list_songs_by_artist_and_album,
     '/api/v1/player/status': () => socketEvents['player.status'],
     '/api/v1/actions': () => [{ id: 'player.play', description: '', args: {} }],
-    '/api/v1/settings': () => ({ show_covers: showCovers, on_screen_keyboard: true }),
+    '/api/v1/settings': () => ({ show_covers: showCovers, on_screen_keyboard: true, language: 'auto' }),
     '/api/v1/settings/modules/kiosk': () => kioskModule('kiosk', 'The reduced view for the screen on the box', {
       enabled: { type: 'boolean', default: false, title: 'Show the kiosk app on the screen' },
     }, { enabled: false }),
