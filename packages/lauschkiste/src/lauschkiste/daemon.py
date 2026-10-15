@@ -10,6 +10,7 @@ import atexit
 from typing import (Optional)
 
 import lauschkiste.common.paths
+from lauschkiste import startup
 import lauschkiste.common.gitstate
 import lauschkiste.common.publishing as publishing
 from lauschkiste.api import FastApiServer
@@ -138,6 +139,7 @@ class Daemon:
 
     def run(self):
         time_start = time.time_ns()
+        startup.mark('configuration')
 
         # Imported lazily: core modules import lauschkiste.daemon.get_daemon at module level.
         from lauschkiste.contract.manager import ModuleManager
@@ -147,6 +149,7 @@ class Daemon:
             started = time.perf_counter()
             func()
             logger.debug(f"Start-up phase '{name}': {(time.perf_counter() - started) * 1000:.0f} ms")
+            startup.mark(name)
 
         self.modules = ModuleManager(CORE_MODULES, cfg, publishing.get_bus())
         phase('load modules', self.modules.load)
@@ -157,6 +160,7 @@ class Daemon:
         phase('ready modules', self.modules.ready)
 
         logger.info(f"Start-up time: {((time.time_ns() - time_start) / 1000000.0):.3f} ms")
+        logger.info(startup.timeline())
 
         if self.write_artifacts:
             artifacts_dir = lauschkiste.common.paths.home() / 'artifacts'

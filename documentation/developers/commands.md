@@ -23,6 +23,7 @@ the log goes there and `-v`/`-vv` raise the log level ([Troubleshooting](../en/m
 | `lauschctl plugin list\|enable\|disable\|install` | manages plugins |
 | `lauschctl home` | prints the home directory and the configuration file in use |
 | `lauschctl debug sniff` | prints the events of the running server (see below) |
+| `lauschctl debug boot` | shows what happened since boot and when (see below) |
 
 Setup steps worth knowing: `audio` chooses the audio outputs ([Sound](../en/using/sound.md)), `rfid` configures
 the RFID readers and enables their driver plugins ([RFID readers](../en/hardware/readers.md); it writes a new reader
@@ -38,3 +39,14 @@ client; `GET /api/v1/modules` lists the active modules with their operations and
 
 `lauschctl debug sniff` connects to the WebSocket `/api/v1/events` and prints every event the server publishes
 (`player.status`, `rfid.card_detected`, ...). It is a plain client: any WebSocket client can do the same.
+
+## Debugging the start
+
+`lauschctl debug boot` lists, in seconds after boot: when the network came online, when the service started, when
+Lauschkiste was ready (the API listens), when the screen's X server and browser started, and what the kernel and
+systemd needed (`systemd-analyze`). It needs Linux with systemd and no administrator rights.
+
+At every start Lauschkiste writes one line to the log with its steps and their duration: Python and logging, the web
+framework and its own code (imports, which take seconds on a Pi Zero), the configuration, loading and starting the
+modules, the API server. Look for `Start-up:` in `journalctl --user -u lauschkiste`; the line ends with the time after
+boot at which the box was ready.

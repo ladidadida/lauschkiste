@@ -16,3 +16,16 @@ assert Later.__pydantic_complete__ is True
 """
     result = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
+
+
+def test_timeline_lists_the_steps_with_their_durations(monkeypatch):
+    from lauschkiste import startup
+
+    monkeypatch.setattr(startup, '_marks', [])
+    assert startup.timeline() == ''
+    startup.mark('logging')
+    startup.mark('fastapi')
+    startup.mark('daemon code')
+    text = startup.timeline()
+    assert text.startswith('Start-up: ')
+    assert 'fastapi ' in text and 'daemon code ' in text and 'total ' in text
