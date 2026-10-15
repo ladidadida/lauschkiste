@@ -76,7 +76,7 @@ def _format_type(tp) -> str:
     if origin is not None and args:
         name = getattr(tp, '_name', None) or inspect.formatannotation(origin)
         return f"{name}[{', '.join(_format_type(a) for a in args)}]"
-    return inspect.formatannotation(tp)
+    return inspect.formatannotation(tp).replace('pathlib._local.', 'pathlib.')
 
 
 def format_signature(func) -> str:
