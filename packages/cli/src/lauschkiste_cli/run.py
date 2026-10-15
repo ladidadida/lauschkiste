@@ -64,12 +64,9 @@ def run(
         logger = loggingext.configure_from_file(str(logger_conf))
 
     logger.info(f"Home '{lauschkiste.common.paths.home()}', configuration file '{conf}'")
-    from lauschkiste import startup
-    startup.mark('logging')
-    startup.import_fastapi()
-    startup.mark('fastapi')
+    from lauschkiste.startup import import_fastapi
+    import_fastapi()
     from lauschkiste.daemon import get_daemon  # heavy (web server); only `run` needs it
-    startup.mark('daemon code')
 
     daemon = get_daemon(str(conf), artifacts)
     daemon.run()
