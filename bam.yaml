@@ -67,6 +67,107 @@ tasks:
     outputs:
       - .reports/junit.xml
 
+  test-py311:
+    # As in CI: its own Python in a container. The tests run in a copy, so nothing is written into the checkout.
+    command: >-
+      sh -c "apt-get update -qq && apt-get install -y -qq libportaudio2 libpulse0 > /dev/null &&
+      mkdir /work && tar -c --exclude=node_modules --exclude=.venv --exclude=.git --exclude=.bam --exclude=dist
+      --exclude=scratch --exclude=site --exclude=pi-test -f - . | tar -x -C /work && cd /work &&
+      uv sync --locked --group dev --quiet && uv run pytest -q"
+    stage: test
+    runner:
+      type: docker
+      user: root
+      image: ghcr.io/astral-sh/uv:python3.11-bookworm
+    inputs:
+      - "packages/**/*.py"
+      - "packages/**/pyproject.toml"
+      - "packages/lauschkiste/interfaces/**"
+      - "packages/plugins/*/interfaces/**"
+      - "packages/lauschkiste/src/lauschkiste/resources/**"
+      - "test/**"
+      - pyproject.toml
+      - uv.lock
+
+  test-py313:
+    # As in CI: its own Python in a container. The tests run in a copy, so nothing is written into the checkout.
+    command: >-
+      sh -c "apt-get update -qq && apt-get install -y -qq libportaudio2 libpulse0 > /dev/null &&
+      mkdir /work && tar -c --exclude=node_modules --exclude=.venv --exclude=.git --exclude=.bam --exclude=dist
+      --exclude=scratch --exclude=site --exclude=pi-test -f - . | tar -x -C /work && cd /work &&
+      uv sync --locked --group dev --quiet && uv run pytest -q"
+    stage: test
+    runner:
+      type: docker
+      user: root
+      image: ghcr.io/astral-sh/uv:python3.13-bookworm
+    inputs:
+      - "packages/**/*.py"
+      - "packages/**/pyproject.toml"
+      - "packages/lauschkiste/interfaces/**"
+      - "packages/plugins/*/interfaces/**"
+      - "packages/lauschkiste/src/lauschkiste/resources/**"
+      - "test/**"
+      - pyproject.toml
+      - uv.lock
+
+  test-py314:
+    # As in CI: its own Python in a container. The tests run in a copy, so nothing is written into the checkout.
+    command: >-
+      sh -c "apt-get update -qq && apt-get install -y -qq libportaudio2 libpulse0 > /dev/null &&
+      mkdir /work && tar -c --exclude=node_modules --exclude=.venv --exclude=.git --exclude=.bam --exclude=dist
+      --exclude=scratch --exclude=site --exclude=pi-test -f - . | tar -x -C /work && cd /work &&
+      uv sync --locked --group dev --quiet && uv run pytest -q"
+    stage: test
+    runner:
+      type: docker
+      user: root
+      image: ghcr.io/astral-sh/uv:python3.14-bookworm
+    inputs:
+      - "packages/**/*.py"
+      - "packages/**/pyproject.toml"
+      - "packages/lauschkiste/interfaces/**"
+      - "packages/plugins/*/interfaces/**"
+      - "packages/lauschkiste/src/lauschkiste/resources/**"
+      - "test/**"
+      - pyproject.toml
+      - uv.lock
+
+  # ── Web app ───────────────────────────────────────────────────────────────────
+
+  webapp-lint:
+    command: npm --prefix packages/webapp run lint
+    stage: lint
+    inputs: &webapp_inputs
+      - "packages/webapp/src/**"
+      - "packages/webapp/e2e/**"
+      - "packages/webapp/public/**"
+      - "packages/webapp/index.html"
+      - "packages/webapp/kiosk.html"
+      - "packages/webapp/package.json"
+      - "packages/webapp/package-lock.json"
+      - "packages/webapp/vite.config.js"
+      - "packages/webapp/eslint.config.*"
+
+  webapp-test:
+    # After the containers: the timeouts of these tests do not survive a loaded machine.
+    command: npm --prefix packages/webapp test
+    stage: test
+    depends_on:
+      - test-py311
+      - test-py313
+      - test-py314
+    inputs: *webapp_inputs
+
+  webapp-e2e:
+    # Needs a Playwright browser (`npx playwright install chromium`). The run rewrites the documentation
+    # screenshots; they are restored afterwards.
+    command: sh -c 'npm --prefix packages/webapp run test:e2e -- --workers=2; rc=$?; git checkout -q documentation/assets; exit $rc'
+    stage: test
+    depends_on:
+      - webapp-test
+    inputs: *webapp_inputs
+
   # ── Docs ──────────────────────────────────────────────────────────────────────
 
   wheels:
@@ -125,9 +226,13 @@ tasks:
     stage: build
     depends_on:
       - lint
-      - format-check
-      - typecheck
-      - test
+      - markdownlint
+      - test-py311
+      - test-py313
+      - test-py314
+      - webapp-lint
+      - webapp-test
+      - webapp-e2e
 
 ci:
   provider: github-actions

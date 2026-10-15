@@ -7,7 +7,7 @@ import { backendData, mockBackend, socketEvents } from './backend-mock.js';
 const OUTPUT = '../../documentation/assets/screenshots';
 const LANGUAGES = ['en', 'de'];
 
-Object.assign(backendData, {
+const madeUpData = {
   get_folder_content: [
     { name: 'Gute-Nacht-Lieder', relpath: 'music/Gute-Nacht-Lieder', type: 'directory' },
     { name: 'Sing mit mir', relpath: 'music/Sing mit mir', type: 'directory' },
@@ -25,10 +25,23 @@ Object.assign(backendData, {
     '0004213379': { action: 'player.toggle', args: {}, description: '',
       error: null, ignore_card_removal_action: false, ignore_same_id_delay: false },
   },
-});
-Object.assign(socketEvents['player.status'], {
+};
+const madeUpStatus = {
   album: 'Sing mit mir', artist: 'Die Sing-Gruppe', title: 'Der Mond ist aufgegangen', elapsed: 42, duration: 168,
   file: 'Sing mit mir/01 Der Mond ist aufgegangen.mp3',
+};
+const realData = structuredClone(backendData);
+const realStatus = structuredClone(socketEvents['player.status']);
+
+// The mock's data is shared by the specs run in one worker: use the made-up content only here.
+test.beforeEach(() => {
+  Object.assign(backendData, madeUpData);
+  Object.assign(socketEvents['player.status'], madeUpStatus);
+});
+
+test.afterEach(() => {
+  Object.assign(backendData, realData);
+  Object.assign(socketEvents['player.status'], realStatus);
 });
 
 const pages = [

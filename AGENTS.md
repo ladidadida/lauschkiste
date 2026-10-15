@@ -155,7 +155,10 @@ bam typecheck                   # pyright (informational only)
 bam test                        # pytest, writes .reports/junit.xml
 bam docs                        # regenerate API docs (pydoc-markdown)
 bam markdownlint                # lint markdown docs (needs packages/webapp/node_modules)
-bam ci-checks                   # everything CI runs, in one command
+bam ci-checks                   # what CI runs, in one command: ruff, markdownlint, pytest on Python 3.11/3.13/3.14 in
+                                 # Docker (a copy of the checkout, nothing written into it), eslint, vitest, Playwright.
+                                 # Run it before every commit; cached, so unchanged parts are instant.
+                                 # Needs Docker and `npx playwright install chromium` once.
 bam build                       # build the webapp into packages/webapp/build/, so `lauschkiste`
                                  # alone serves both the API and the UI on :5556 -- no npm start
                                  # needed just to use the app (no hot-reload though; for active
