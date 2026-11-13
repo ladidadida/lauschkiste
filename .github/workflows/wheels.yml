@@ -128,7 +128,7 @@ jobs:
           path: dist
 
       - name: Attach the wheels to the release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/*.whl
           # Pre-release tags have the form v0.1.0-alpha.1
