@@ -2,7 +2,7 @@
 VERSION_MAJOR = 0
 VERSION_MINOR = 1
 VERSION_PATCH = 0
-VERSION_EXTRA = "alpha.8"
+VERSION_EXTRA = "alpha.9"
 
 # build a version string in compliance with the SemVer specification
 # https://semver.org/#semantic-versioning-specification-semver
