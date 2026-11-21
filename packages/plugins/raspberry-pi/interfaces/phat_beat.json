@@ -1,7 +1,7 @@
 {
   "events": {},
   "extension_points": {},
-  "interface_version": "1.4",
+  "interface_version": "1.5",
   "kind": "plugin",
   "name": "phat_beat",
   "needs": [

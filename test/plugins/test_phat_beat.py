@@ -184,6 +184,40 @@ def test_status_mode_ignores_levels():
     assert state.pixels() == [OFF] * 2 * BAR
 
 
+def at(hour, minute=0):
+    from datetime import datetime
+    return datetime(2026, 11, 21, hour, minute)
+
+
+def test_night_is_a_range_that_may_run_past_midnight():
+    assert phat_beat.is_night('19:00', '07:00', at(19)) and phat_beat.is_night('19:00', '07:00', at(6, 59))
+    assert not phat_beat.is_night('19:00', '07:00', at(7)) and not phat_beat.is_night('19:00', '07:00', at(12))
+    assert phat_beat.is_night('01:00', '05:00', at(3)) and not phat_beat.is_night('01:00', '05:00', at(5))
+
+
+def test_night_modes_darken_or_dim_the_leds():
+    clock = Clock()
+    state = LedState(vu=True, clock=clock)
+    state.volume(100)
+    state.set_mode('status', 0.5)
+    assert state.pixels() == [tuple(round(c * 0.5) for c in VOLUME_COLOR)] * 2 * BAR
+    state.level(1.0, 1.0, delay=0)
+    state.set_mode('off')
+    assert state.pixels() == [OFF] * 2 * BAR
+    state.set_mode('vu')
+    assert state.pixels() == [VOLUME_COLOR] * 2 * BAR
+
+
+def test_leds_stay_dark_at_night_when_switched_off(mock_pins, monkeypatch):
+    monkeypatch.setattr(phat_beat, 'is_night', lambda start, end, now: True)
+    manager, bus = start({'leds': 'status', 'night_leds': 'off', 'animations': False}, monkeypatch)
+    bus.publish('volume.level', {'volume': 100, 'mute': False, 'soft_max_volume': 100})
+    time.sleep(0.3)
+    assert frame([VOLUME_COLOR] * 2 * BAR, 3) not in Writer.frames
+    assert 'phat_beat' not in manager.handle('player').instance.level_meters.names()
+    manager.stop()
+
+
 def test_buttons_run_actions_leds_show_volume_and_pins_are_claimed(mock_pins, monkeypatch):
     manager, bus = start({'leds': 'vu'}, monkeypatch)
     mock_pins.add(6)

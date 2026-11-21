@@ -5,6 +5,7 @@
     plugins:
       phat_beat:
         leds: vu                     # vu, status or off
+        night_leds: off              # same (no night mode), vu, status or off; from night_start to night_end
         volume_up: {action: volume.change_volume, args: {step: 5}}
 
 The DAC is a sound card of the board (Raspberry Pi: hifiberry-dac); the board plugin's boot
@@ -17,6 +18,7 @@ import math
 import threading
 import time
 from collections import deque
+from datetime import datetime
 from typing import Any, Callable, Deque, Dict, List, Literal, Optional, Tuple
 
 from pydantic import BaseModel, Field
@@ -33,6 +35,7 @@ BUTTONS = {'play_pause': 'GPIO6', 'next': 'GPIO5', 'previous': 'GPIO13',
            'volume_up': 'GPIO16', 'volume_down': 'GPIO26', 'power': 'GPIO12'}
 REPEATING = ('volume_up', 'volume_down')
 LED_DATA, LED_CLOCK = 'GPIO23', 'GPIO24'
+TIME_PATTERN = r'^([01]?\d|2[0-3]):[0-5]\d$'
 BAR = 8
 OFF: Color = (0, 0, 0)
 VOLUME_COLOR: Color = (0, 80, 255)
@@ -94,6 +97,24 @@ class PhatBeatSettings(BaseModel):
         'Colors of the level meter and the animations, bottom to top'))
     animations: bool = Field(True, title='Start and shutdown animation')
     brightness: int = Field(3, ge=1, le=31, title='LED brightness')
+    night_leds: Literal['same', 'vu', 'status', 'off'] = Field('same', title='LEDs at night', description=(
+        'What the LEDs show between the times below; same: no night mode'))
+    night_start: str = Field('19:00', pattern=TIME_PATTERN, title='Night from')
+    night_end: str = Field('07:00', pattern=TIME_PATTERN, title='Night until')
+    night_dim: int = Field(30, ge=5, le=100, title='Brightness at night (percent)')
+
+
+def _minutes(text: str) -> int:
+    hours, _, minutes = text.partition(':')
+    return int(hours) * 60 + int(minutes)
+
+
+def is_night(start: str, end: str, now: datetime) -> bool:
+    """Whether ``now`` lies between ``start`` and ``end`` (a range past midnight runs into the next day)."""
+    begin, finish, minute = _minutes(start), _minutes(end), now.hour * 60 + now.minute
+    if begin <= finish:
+        return begin <= minute < finish
+    return minute >= begin or minute < finish
 
 
 def _bar(count: float, colors: List[Color]) -> List[Color]:
@@ -155,6 +176,17 @@ class LedState:
         self._overlay: Optional[Tuple[float, Frames]] = None
         self._levels: Deque[Tuple[float, float, float]] = deque(maxlen=50)
         self._left = self._right = 0.0
+        self._dark = False
+        self._dim = 1.0
+
+    def set_mode(self, mode: str, dim: float = 1.0) -> None:
+        """Switch between 'vu', 'status' and 'off' (dark: nothing shows), at ``dim`` of the brightness."""
+        with self._lock:
+            self._vu = mode == 'vu'
+            self._dark = mode == 'off'
+            self._dim = dim
+            if not self._vu:
+                self._levels.clear()
 
     def volume(self, volume: int) -> None:
         bar = _bar(BAR * max(0, min(100, volume)) / 100, [VOLUME_COLOR] * BAR)
@@ -194,6 +226,12 @@ class LedState:
         return None
 
     def pixels(self) -> List[Color]:
+        pixels = self._pixels()
+        if self._dark:
+            return [OFF] * 2 * BAR
+        return pixels if self._dim >= 1.0 else _scaled(pixels, self._dim)
+
+    def _pixels(self) -> List[Color]:
         now = self._clock()
         with self._lock:
             target_left = target_right = 0.0
@@ -213,8 +251,9 @@ class Leds:
     """Draws the LED state about ten times a second while it changes; writes only changed frames."""
 
     def __init__(self, state: LedState, write: Callable[[bytes], None], brightness: int, animations: bool = True,
-                 reverse: bool = False):
+                 reverse: bool = False, mode: Optional[Callable[[], Tuple[str, float]]] = None):
         self._state = state
+        self._mode = mode
         self._reverse = reverse
         self._animations = animations
         self._write = write
@@ -241,6 +280,8 @@ class Leds:
     def _run(self) -> None:
         last: Optional[List[Color]] = None
         while not self._stop.is_set() or self._state.animating():
+            if self._mode is not None:
+                self._state.set_mode(*self._mode())
             pixels = self._state.pixels()
             if pixels != last:
                 try:
@@ -356,6 +397,10 @@ def settings_of(ctx) -> Dict[str, Any]:
         return PhatBeatSettings().model_dump()
 
 
+def led_modes(config: Dict[str, Any]) -> set:
+    return {config['leds'], config['night_leds']} - {'same'}
+
+
 class PhatBeatClaims:
     def __init__(self, ctx):
         self._ctx = ctx
@@ -363,7 +408,7 @@ class PhatBeatClaims:
     def claims(self) -> List[Claim]:
         config = settings_of(self._ctx)
         result = [Claim(resource=pin, owner='phat_beat', purpose=f'button {name}') for name, pin in BUTTONS.items()]
-        if config['leds'] != 'off':
+        if led_modes(config) != {'off'}:
             result += [Claim(resource=LED_DATA, owner='phat_beat', purpose='LED data'),
                        Claim(resource=LED_CLOCK, owner='phat_beat', purpose='LED clock')]
         result.append(Claim(resource='i2s', owner='phat_beat', purpose='DAC', shared=True))
@@ -376,7 +421,7 @@ class PhatBeat(Plugin):
     name = 'phat_beat'
     setup_kind = 'peripheral'
     title = 'Pimoroni pHAT BEAT'
-    interface_version = '1.4'
+    interface_version = '1.5'
     needs = ('gpio', 'i2s')
     requires = {'hardware': '>=2.0,<3', 'player': '>=8.0,<9'}
     extras = ('gpio',)
@@ -390,15 +435,17 @@ class PhatBeat(Plugin):
         self._button_lines: Any = None
         self._state: Optional[LedState] = None
         self._leds: Optional[Leds] = None
+        self._config: Dict[str, Any] = PhatBeatSettings().model_dump()
 
     def start(self, ctx) -> None:
         self._ctx = ctx
         ctx.modules.hardware.claims.register('phat_beat', PhatBeatClaims(ctx))
-        config = settings_of(ctx)
-        mode = config['leds']
-        if mode != 'off':
-            self._state = LedState(vu=mode == 'vu', colors=PALETTES[config['colors']])
-            if mode == 'vu':
+        config = self._config = settings_of(ctx)
+        modes = led_modes(config)
+        if modes != {'off'}:
+            self._state = LedState(vu=config['leds'] == 'vu', colors=PALETTES[config['colors']])
+            self._state.set_mode(*self._mode())
+            if 'vu' in modes:
                 ctx.modules.player.level_meters.register('phat_beat', self)
             ctx.subscribe('volume.level', self._on_volume)
             ctx.subscribe('rfid.card_detected', self._on_card)
@@ -423,7 +470,8 @@ class PhatBeat(Plugin):
                 logger.error(f"LEDs not available: {error.__class__.__name__}: {error}")
                 return
             logger.info(f"LEDs through {type(leds).__name__}")
-            self._leds = Leds(self._state, leds.write, config['brightness'], config['animations'], config['reverse'])
+            self._leds = Leds(self._state, leds.write, config['brightness'], config['animations'], config['reverse'],
+                              self._mode)
             self._leds.start()
 
     def stop(self):
@@ -436,6 +484,13 @@ class PhatBeat(Plugin):
 
     def settings_changed(self, changed) -> bool:
         return False
+
+    def _mode(self, now: Optional[datetime] = None) -> Tuple[str, float]:
+        """What the LEDs show now: the night mode between night_start and night_end."""
+        config = self._config
+        if config['night_leds'] == 'same' or not is_night(config['night_start'], config['night_end'], now or datetime.now()):
+            return config['leds'], 1.0
+        return config['night_leds'], config['night_dim'] / 100
 
     def _bind(self, entry):
         return self._ctx.actions.bind(entry, 'phat_beat', logger)

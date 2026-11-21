@@ -81,4 +81,11 @@ Each button can run any other action instead. The LEDs show the volume after a c
 and red for an unknown one. With `leds: vu` they also show the level of the music while it plays. `leds: off` leaves them
 dark and frees their pins; `animations: false` switches off the animation at start and shutdown; `colors` picks
 `classic`, `rainbow`, `ocean`, `sunset`, `unicorn`, `forest` or `fire`; `reverse: true` turns the bars round if the HAT
-sits the other way. The on/off button only shuts the system down; the Pirate Radio has no circuit that cuts the power.
+sits the other way.
+
+At night the LEDs can show something else: `night_leds` is `off` (dark), `status` (only volume and cards) or `vu`
+between `night_start` and `night_end` (default 19:00 to 07:00), at `night_dim` percent of the brightness (default 30).
+`same`, the default, keeps them as by day. The night follows the clock of the box, which takes the time from the
+network. In the web app: Settings → Plugins → Pimoroni pHAT BEAT.
+
+The on/off button only shuts the system down; the Pirate Radio has no circuit that cuts the power.

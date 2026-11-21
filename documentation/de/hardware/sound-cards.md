@@ -82,5 +82,12 @@ Jede Taste kann stattdessen eine andere Aktion ausführen. Die LEDs zeigen nach 
 für eine bekannte und rot für eine unbekannte Karte. Mit `leds: vu` zeigen sie beim Abspielen auch den Pegel der Musik.
 `leds: off` lässt sie dunkel und gibt ihre Pins frei; `animations: false` schaltet die Animation beim Start und Herunterfahren aus;
 `colors` wählt `classic`, `rainbow`, `ocean`, `sunset`, `unicorn`, `forest` oder `fire`; `reverse: true` dreht die Balken um,
-wenn die HAT andersherum sitzt. Die Ein/Aus-Taste fährt das System nur herunter; das Pirate Radio hat keine Schaltung, die danach
+wenn die HAT andersherum sitzt.
+
+Nachts können die LEDs etwas anderes zeigen: `night_leds` ist `off` (dunkel), `status` (nur Lautstärke und Karten) oder
+`vu` zwischen `night_start` und `night_end` (Standard 19:00 bis 07:00), mit `night_dim` Prozent der Helligkeit (Standard 30).
+`same`, der Standard, lässt sie wie am Tag. Die Nacht richtet sich nach der Uhr der Box, die ihre Zeit aus dem Netzwerk
+bezieht. In der Web-App: Einstellungen → Plugins → Pimoroni pHAT BEAT.
+
+Die Ein/Aus-Taste fährt das System nur herunter; das Pirate Radio hat keine Schaltung, die danach
 den Strom trennt.
