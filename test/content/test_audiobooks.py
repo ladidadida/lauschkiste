@@ -261,6 +261,78 @@ def test_set_title_of_unknown_or_invalid_books(setup, book, status):
     assert error.value.status == status
 
 
+PNG = bytes.fromhex('89504e470d0a1a0a0000000d4948445200000001000000010806000000'
+                    '1f15c4890000000d49444154789c6360000002000154a24f5d0000000049454e44ae426082')
+
+
+def test_chapters_can_be_reordered_and_renamed(setup, library_dir):
+    start, ctrl, _, _ = setup
+    audiobooks = start()
+    details = audiobooks.invoke('edit_book', 'Pippi', 'Pippi', 'Astrid Lindgren', [
+        {'file': '11.flac', 'title': 'Das Ende'}, {'file': '2.flac', 'title': ''}])
+    assert [(c.file, c.title) for c in details.chapters] == [('11.flac', 'Das Ende'), ('2.flac', '2'), ('10.flac', '10')]
+    assert (details.title, details.author) == ('Pippi', 'Astrid Lindgren')
+    pippi = next(b for b in audiobooks.invoke('list_books') if b.book == 'Pippi')
+    assert (pippi.title, pippi.author, pippi.custom_title) == ('Pippi', 'Astrid Lindgren', True)
+
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.play_files.assert_called_once_with([BOOK[2], BOOK[0], BOOK[1]], 0, 0.0, True)
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': str(library_dir / BOOK[2]), 'song': '0'}
+    assert start.managers[-1].handle('player').invoke('playerstatus').title == 'Das Ende'
+
+    audiobooks.invoke('edit_book', 'Pippi', '', '', [])
+    assert not (library_dir / 'audiobooks' / 'Pippi' / 'book.json').exists()
+    details = audiobooks.invoke('get_book', 'Pippi')
+    assert [c.file for c in details.chapters] == ['2.flac', '10.flac', '11.flac']
+    assert (details.title, details.author) == ('Pippi Langstrumpf', None)
+
+
+def test_editing_without_chapters_keeps_their_order(setup, library_dir):
+    start, _, _, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('edit_book', 'Pippi', chapters=[{'file': '10.flac'}])
+    audiobooks.invoke('edit_book', 'Pippi', author='Lindgren')
+    assert [c.file for c in audiobooks.invoke('get_book', 'Pippi').chapters] == ['10.flac', '2.flac', '11.flac']
+
+
+@pytest.mark.parametrize('chapters', [[{'file': 'nope.flac'}], [{'file': '2.flac'}, {'file': '2.flac'}]])
+def test_unknown_or_repeated_chapters_are_refused(setup, chapters):
+    start, _, _, _ = setup
+    with pytest.raises(OperationError) as error:
+        start().invoke('edit_book', 'Pippi', chapters=chapters)
+    assert error.value.status == 422
+
+
+def test_a_cover_can_be_uploaded_and_removed(setup, library_dir):
+    start, _, _, _ = setup
+    audiobooks = start()
+    module = start.managers[-1].handle('audiobooks').instance
+    saved = module._save_cover('Emil', 'Titel.PNG', PNG)
+    assert saved.cover_url and saved.cover_url.endswith('.png')
+    assert (library_dir / 'audiobooks' / 'Emil' / 'book-cover.png').read_bytes() == PNG
+    emil = next(b for b in audiobooks.invoke('list_books') if b.book == 'Emil')
+    assert emil.cover_url == saved.cover_url
+    assert audiobooks.invoke('get_book', 'Emil').custom_cover
+
+    audiobooks.invoke('play', 'Emil')
+    status = start.managers[-1].handle('player').invoke('playerstatus')
+    assert status.cover_url == saved.cover_url
+
+    audiobooks.invoke('remove_cover', 'Emil')
+    assert not (library_dir / 'audiobooks' / 'Emil' / 'book-cover.png').exists()
+    assert not (library_dir / 'audiobooks' / 'Emil' / 'book.json').exists()
+    assert not audiobooks.invoke('get_book', 'Emil').custom_cover
+
+
+def test_only_images_are_taken_as_cover(setup):
+    start, _, _, _ = setup
+    start()
+    module = start.managers[-1].handle('audiobooks').instance
+    with pytest.raises(OperationError) as error:
+        module._save_cover('Emil', 'cover.txt', b'x')
+    assert error.value.status == 415
+
+
 class FakeSource:
     def __init__(self):
         self.saved = []

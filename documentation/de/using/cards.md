@@ -61,7 +61,7 @@ bearbeiten. Die Kartennummer muss in Anführungszeichen stehen:
 ```
 
 Alle Aktionen mit ihren Argumenten listet die laufende Box unter `http://<name>/api/v1/actions` auf. Häufige:
-`player.play_card`, `player.play_album`, `audiobooks.play`, `radio.play`, `podcasts.play`, `player.toggle`,
+`player.play_card`, `player.play_album`, `audiobooks.play`, `playlists.play`, `radio.play`, `podcasts.play`, `player.toggle`,
 `player.next`, `player.prev`, `player.shuffle`, `player.repeat`, `volume.change_volume`, `system.say_my_ip`,
 `hardware.shutdown`.
 

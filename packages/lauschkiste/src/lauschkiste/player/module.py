@@ -7,6 +7,7 @@ from typing import Any, Dict, List, Literal, Mapping, Optional
 
 from pydantic import BaseModel, Field
 
+import lauschkiste.content.resume
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.player.backend import LevelMeter, PlayerBackend, Resolver
 from lauschkiste.player.coordinator import PlayerCoordinator
@@ -54,7 +55,7 @@ class Player(CoreModule):
     """Playback of folders, songs and albums; backends plug in at ``player.backends``."""
 
     name = 'player'
-    interface_version = '7.0'
+    interface_version = '8.0'
     concurrency = 'threadsafe'
     requires = ('library',)
 
@@ -145,6 +146,12 @@ class Player(CoreModule):
             update['context'] = self._context
         if self._context and self._context.image and not update.get('cover_url') and not status.cover_url:
             update['cover_url'] = self._context.image
+        if self._context and self._context.cover:
+            update['cover_url'] = self._context.cover
+        if self._context and self._context.titles:
+            title = self._context.titles.get(lauschkiste.content.resume.relative(status.file) or '')
+            if title:
+                update['title'] = title
         return status.model_copy(update=update)
 
     def _set_context(self, kind: ContentKind, title: Optional[str], action: str, args: Dict[str, Any]) -> None:

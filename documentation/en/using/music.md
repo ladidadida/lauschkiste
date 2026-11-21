@@ -48,8 +48,18 @@ Settings → General → *Show cover art*.
 
 ## Playlists
 
-An album is played in the order of its files. For a list of your own, write a plain text file with the extension
-`.m3u`: one file name per line, in the order you want. Put it into a folder of its own:
+An album is played in the order of its files. For a list of your own, open Library → Music → **Playlists** and create
+one. Add songs there with the search, or from an album: the button next to *Play* adds the whole album, the menu of a
+song just that one. In the playlist the arrows change the order and the bin removes a song; *Save* keeps the changes.
+Shuffle and repeat work as for albums. To put a playlist on a card choose *Play playlist* when registering the card. A
+renamed playlist stays on its cards; a song deleted from the library is skipped.
+
+These playlists are kept in `playlists` in the Lauschkiste home, as `.m3u` files.
+
+### Playlist files in a folder
+
+You can also write a plain text file with the extension `.m3u`: one file name per line, in the order you want. Put it
+into a folder of its own:
 
 ```text
 library/music/Wake-up songs/
@@ -64,8 +74,6 @@ Bibi und Tina/Soundtrack/07 - Ordinary Girl.mp3
 
 Paths are relative to `library/music`. The folder then shows the songs of the list instead of the file itself, and you
 put it on a card like any folder. If a folder has more than one `.m3u`, only the first (by name) counts.
-
-A web page to create and change playlists is planned.
 
 ## Where the data lives
 

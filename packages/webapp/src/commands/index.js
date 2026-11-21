@@ -136,9 +136,47 @@ const commands = {
     rest: { method: 'POST', path: '/api/v1/audiobooks/set_finished' },
     argKeys: ['book', 'finished'],
   },
-  audiobookSetTitle: {
-    rest: { method: 'POST', path: '/api/v1/audiobooks/set_title' },
-    argKeys: ['book', 'title'],
+  audiobookGet: {
+    rest: { method: 'GET', path: '/api/v1/audiobooks/book' },
+    argKeys: ['book'],
+  },
+  audiobookEdit: {
+    rest: { method: 'POST', path: '/api/v1/audiobooks/edit_book' },
+    argKeys: ['book', 'title', 'author', 'chapters'],
+  },
+  audiobookRemoveCover: {
+    rest: { method: 'POST', path: '/api/v1/audiobooks/remove_cover' },
+    argKeys: ['book'],
+  },
+
+  // Playlists
+  playlistsList: {
+    rest: { method: 'GET', path: '/api/v1/playlists' },
+  },
+  playlistGet: {
+    rest: { method: 'GET', path: '/api/v1/playlists/playlist' },
+    argKeys: ['playlist'],
+  },
+  playlistCreate: {
+    rest: { method: 'POST', path: '/api/v1/playlists' },
+    argKeys: ['title', 'files'],
+  },
+  playlistSave: {
+    rest: { method: 'PUT', path: '/api/v1/playlists/{playlist}' },
+    argKeys: ['playlist', 'title', 'files'],
+  },
+  playlistAdd: {
+    rest: { method: 'POST', path: '/api/v1/playlists/add' },
+    argKeys: ['playlist', 'files'],
+  },
+  playlistDelete: {
+    rest: { method: 'DELETE', path: '/api/v1/playlists/{playlist}' },
+    argKeys: ['playlist'],
+  },
+  playlist_play: {
+    rest: { method: 'POST', path: '/api/v1/playlists/play' },
+    cardAction: 'playlists.play',
+    argKeys: ['playlist'],
   },
 
   // Downloads to the box (core cache) and the state of the Audiobookshelf server

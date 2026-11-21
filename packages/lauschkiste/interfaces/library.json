@@ -34,7 +34,7 @@
       "refresh": "(self) -> None"
     }
   },
-  "interface_version": "1.1",
+  "interface_version": "1.2",
   "kind": "core",
   "name": "library",
   "operations": {
@@ -159,6 +159,39 @@
       "kind": "query",
       "method": "GET",
       "path": "/api/v1/library/cover/album",
+      "returns": {
+        "properties": {
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "type": "object"
+      }
+    },
+    "get_image_cover": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/library/cover/image",
       "returns": {
         "properties": {
           "cover_url": {

@@ -33,7 +33,8 @@
           "audiobook_play": "Continue where it stopped",
           "audiobook_restart": "Play from the beginning",
           "radio_play": "Play station",
-          "podcast_play": "Play episode"
+          "podcast_play": "Play episode",
+          "playlist_play": "Play playlist"
         }
       },
       "controls-selector": {
@@ -50,7 +51,8 @@
           "synchronisation": "Synchronisation",
           "audiobooks": "Play audiobook",
           "radio": "Play radio",
-          "podcasts": "Play podcast"
+          "podcasts": "Play podcast",
+          "playlists": "Play playlist"
         }
       },
       "actions": {
@@ -114,6 +116,10 @@
           "episode": "Episode",
           "newest-unheard": "Newest unheard episode",
           "none": "No podcasts subscribed"
+        },
+        "playlists": {
+          "playlist": "Playlist",
+          "none": "No playlists yet"
         }
       },
       "item-select": {
@@ -270,10 +276,17 @@
       "server-down": "Audiobookshelf is not reachable ({{error}}). Downloaded books still play.",
       "waiting": "{{count}} saved position will be sent when the server is back.",
       "waiting_other": "{{count}} saved positions will be sent when the server is back.",
-      "edit-title": "Change title",
       "title-label": "Title",
-      "title-help": "Leave empty to use the title from the files.",
-      "reset-title": "Use the title from the files"
+      "title-help": "Leave empty for the title from the files ({{title}}).",
+      "edit": "Edit",
+      "author-label": "Author",
+      "author-help": "Leave empty for the author from the files ({{author}}).",
+      "choose-cover": "Choose picture",
+      "reset-cover": "Use the cover from the files",
+      "chapters-label": "Chapters",
+      "chapter-label": "Title of chapter {{number}}",
+      "move-up": "Move chapter {{number}} up",
+      "move-down": "Move chapter {{number}} down"
     },
     "radio": {
       "empty": "No stations yet. Add a station with its stream address.",
@@ -362,6 +375,36 @@
       "download-error": "The download failed",
       "update-available": "Changed on the server",
       "download-again": "Download again"
+    },
+    "playlists": {
+      "new": "New playlist",
+      "new-title": "New playlist",
+      "empty": "No playlists yet. Create one or add songs from an album.",
+      "edit": "Edit",
+      "menu": "Actions for {{title}}",
+      "tracks_one": "{{count}} song",
+      "tracks_other": "{{count}} songs",
+      "create": "Create",
+      "title-label": "Name",
+      "delete-title": "Delete \"{{title}}\"?",
+      "delete-text": "Cards playing this playlist stop working.",
+      "back": "Back to the playlists",
+      "play": "Play",
+      "saved": "Saved",
+      "no-songs": "No songs yet. Search for songs below and add them.",
+      "move-up": "Move {{title}} up",
+      "move-down": "Move {{title}} down",
+      "remove": "Remove {{title}}",
+      "missing": "No longer in the library, skipped",
+      "search-label": "Search songs",
+      "search-help": "Title, artist, album or folder",
+      "add-song": "Add {{title}}",
+      "added_one": "Added {{count}} song to \"{{title}}\"",
+      "added_other": "Added {{count}} songs to \"{{title}}\"",
+      "add-to_one": "Add to playlist",
+      "add-to_other": "Add {{count}} songs to a playlist",
+      "add-song-to": "Add to playlist",
+      "add-album-to": "Add album to playlist"
     }
   },
   "kiosk": {

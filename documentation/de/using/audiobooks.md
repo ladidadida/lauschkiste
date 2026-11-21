@@ -8,12 +8,20 @@ Position wird beim Abspielen, beim Pausieren und beim Herunterfahren der Box ges
 Ende gespielt, gilt das Buch als beendet und beginnt beim nächsten Mal von vorn. Kapitel laufen immer der Reihe nach,
 egal was bei „zufällig“ und „wiederholen“ eingestellt ist.
 
-## Titel
+## Ein Buch bearbeiten
 
-Der Titel kommt aus dem Album-Tag der Dateien, ohne Tag aus dem Ordnernamen. Ändern lässt er sich in der Weboberfläche im
-Menü des Buchs mit **Titel ändern**. Der neue Titel steht in `book.json` im Ordner des Buchs; Audiodateien und Ordnername
-bleiben unverändert, Position und Karten funktionieren also weiter. *Titel aus den Dateien verwenden* macht es rückgängig.
-Bücher eines Audiobookshelf-Servers behalten den Titel vom Server.
+Titel, Autor und Cover kommen aus den Tags der Dateien (der Titel aus dem Album-Tag, ohne Tag aus dem Ordnernamen). Das
+Menü eines Buchs in der Weboberfläche hat **Bearbeiten**:
+
+- **Titel** und **Autor**: Ein leeres Feld nimmt wieder den Wert aus den Dateien.
+- **Cover**: *Bild wählen* lädt ein Bild hoch (JPEG, PNG, WebP oder GIF, bis 10 MB), das die Cover der Dateien ersetzt;
+  *Cover aus den Dateien verwenden* macht es rückgängig.
+- **Kapitel**: Reihenfolge mit den Pfeilen ändern und Namen vergeben. Die Namen erscheinen im Player, während das Kapitel
+  läuft.
+
+Die Änderungen stehen in `book.json` (das Bild als `book-cover.*`) im Ordner des Buchs. Audiodateien und Ordnername
+bleiben unverändert, Position und Karten funktionieren also weiter. Bücher eines Audiobookshelf-Servers behalten, was der
+Server sagt.
 
 ## Auf einer Karte
 

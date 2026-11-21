@@ -27,7 +27,7 @@ import request from '../../../utils/request';
 import { downloadMenuItems, downloadStatus, useDownloads } from './downloads';
 import { coverSrc, toHHMMSS } from '../../../utils/utils';
 import { LIBRARY_SCANNED_TOPIC } from '../../../config';
-import FormDialog from './form-dialog';
+import AudiobookEditor from './audiobook-editor';
 import ItemMenu from './item-menu';
 
 export const progressOf = ({ duration, finished, listened }) => {
@@ -72,21 +72,12 @@ export const AudiobookItem = ({ book, download, onChanged, onHide, showCovers, s
     ? []
     : downloadMenuItems(t, { source: book.source, item: book.book, download, onChanged });
 
-  const setTitle = (title) => request('audiobookSetTitle', { book: book.book, title });
-
-  const titleItems = isLocal
-    ? [
-      { label: t('library.audiobooks.edit-title'), onClick: () => setIsEditing(true) },
-      ...(book.custom_title
-        ? [{ label: t('library.audiobooks.reset-title'), onClick: () => setTitle('').then(onChanged) }]
-        : []),
-    ]
-    : [];
+  const editItems = isLocal ? [{ label: t('library.audiobooks.edit'), onClick: () => setIsEditing(true) }] : [];
 
   const menuItems = [
     ...(onHide ? [{ label: t('library.continue.remove'), onClick: onHide }] : []),
     ...downloadItems,
-    ...titleItems,
+    ...editItems,
     {
       label: t('library.audiobooks.restart'),
       onClick: () => request('audiobook_restart', { book: book.book, ...sourceArg(book) }).then(onChanged),
@@ -120,6 +111,7 @@ export const AudiobookItem = ({ book, download, onChanged, onHide, showCovers, s
           }
           secondary={
             <Box component="span" sx={{ display: 'block' }}>
+              {book.author && <Box component="span" sx={{ display: 'block' }}>{book.author}</Box>}
               <Box component="span" sx={{ display: 'block' }}>{`${status}${duration}`}</Box>
               {downloadText && <Box component="span" sx={{ display: 'block' }}>{downloadText}</Box>}
               {origin && <Box component="span" sx={{ color: 'text.disabled', display: 'block', fontSize: '0.8em' }}>{origin}</Box>}
@@ -137,17 +129,17 @@ export const AudiobookItem = ({ book, download, onChanged, onHide, showCovers, s
         />
       </ListItemButton>
       {isLocal &&
-        <FormDialog
-          fields={[{ name: 'title', label: t('library.audiobooks.title-label'), helperText: t('library.audiobooks.title-help') }]}
-          initialValues={{ title: book.title }}
-          onClose={() => setIsEditing(false)}
+        <AudiobookEditor
+          book={book.book}
+          onClose={() => {
+            setIsEditing(false);
+            onChanged();
+          }}
           onSaved={() => {
             setIsEditing(false);
             onChanged();
           }}
-          onSubmit={({ title }) => setTitle(title)}
           open={isEditing}
-          title={t('library.audiobooks.edit-title')}
         />
       }
     </ListItem>

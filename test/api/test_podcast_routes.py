@@ -123,7 +123,8 @@ def test_play_newest_unheard_then_continue(podcasts):
     ctrl.playerstatus.return_value = {'state': 'play', 'file': 'https://example.org/2.mp3', 'song': '0'}
     assert client.get('/api/v1/player/status').json()['context'] == {
         'kind': 'podcast', 'title': 'Kakadu: Newer', 'action': 'podcasts.play',
-        'args': {'podcast': 'kakadu', 'episode': newer}, 'image': 'https://example.org/kakadu.jpg'}
+        'args': {'podcast': 'kakadu', 'episode': newer}, 'image': 'https://example.org/kakadu.jpg',
+        'cover': None, 'titles': {}}
     ctrl.playerstatus.return_value = {'state': 'stop'}
 
     client.post('/api/v1/podcasts/set_heard', json={'podcast': 'kakadu', 'episode': newer})

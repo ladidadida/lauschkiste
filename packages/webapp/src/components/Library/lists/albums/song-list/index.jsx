@@ -66,6 +66,7 @@ const SongList = ({
         albumartist={decodeURIComponent(artist)}
         contentUri={contentUri}
         disabled={songs.length === 0}
+        files={songs.map(({ file }) => file)}
         isSelecting={isSelecting}
         provider={provider}
         registerMusicToCard={registerMusicToCard}

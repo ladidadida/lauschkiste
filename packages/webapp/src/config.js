@@ -55,6 +55,12 @@ const ACTIONS_MAP = {
     },
   },
 
+  playlists: {
+    commands: {
+      playlist_play: {},
+    },
+  },
+
   radio: {
     commands: {
       radio_play: {},

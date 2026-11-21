@@ -10,6 +10,7 @@ from lauschkiste.box.kiosk.standard import KioskStandard
 from lauschkiste.player.jingle import Jingle
 from lauschkiste.content.library.module import Library
 from lauschkiste.player.module import Player
+from lauschkiste.content.playlists import Playlists
 from lauschkiste.content.podcasts.module import Podcasts
 from lauschkiste.content.radio.module import Radio
 from lauschkiste.rfid.cards import Cards
@@ -28,6 +29,7 @@ CORE_MODULES = [
     Library,
     Player,
     Audiobooks,
+    Playlists,
     Cache,
     Radio,
     Podcasts,

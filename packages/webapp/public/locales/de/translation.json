@@ -33,7 +33,8 @@
           "audiobook_play": "Fortsetzen, wo es aufgehört hat",
           "audiobook_restart": "Von vorn abspielen",
           "radio_play": "Sender abspielen",
-          "podcast_play": "Folge abspielen"
+          "podcast_play": "Folge abspielen",
+          "playlist_play": "Playlist abspielen"
         }
       },
       "controls-selector": {
@@ -50,7 +51,8 @@
           "synchronisation": "Synchronisation",
           "audiobooks": "Hörbuch abspielen",
           "radio": "Radio abspielen",
-          "podcasts": "Podcast abspielen"
+          "podcasts": "Podcast abspielen",
+          "playlists": "Playlist abspielen"
         }
       },
       "actions": {
@@ -114,6 +116,10 @@
           "episode": "Folge",
           "newest-unheard": "Neueste ungehörte Folge",
           "none": "Keine Podcasts abonniert"
+        },
+        "playlists": {
+          "playlist": "Playlist",
+          "none": "Keine Playlists vorhanden"
         }
       },
       "item-select": {
@@ -270,10 +276,17 @@
       "server-down": "Audiobookshelf ist nicht erreichbar ({{error}}). Heruntergeladene Bücher spielen weiter.",
       "waiting": "{{count}} gemerkte Position wird gesendet, sobald der Server wieder da ist.",
       "waiting_other": "{{count}} gemerkte Positionen werden gesendet, sobald der Server wieder da ist.",
-      "edit-title": "Titel ändern",
       "title-label": "Titel",
-      "title-help": "Leer lassen, um den Titel aus den Dateien zu verwenden.",
-      "reset-title": "Titel aus den Dateien verwenden"
+      "title-help": "Leer lassen für den Titel aus den Dateien ({{title}}).",
+      "edit": "Bearbeiten",
+      "author-label": "Autor",
+      "author-help": "Leer lassen für den Autor aus den Dateien ({{author}}).",
+      "choose-cover": "Bild wählen",
+      "reset-cover": "Cover aus den Dateien verwenden",
+      "chapters-label": "Kapitel",
+      "chapter-label": "Titel von Kapitel {{number}}",
+      "move-up": "Kapitel {{number}} nach oben",
+      "move-down": "Kapitel {{number}} nach unten"
     },
     "radio": {
       "empty": "Noch keine Sender. Füge einen Sender mit seiner Stream-Adresse hinzu.",
@@ -362,6 +375,36 @@
       "download-error": "Der Download ist fehlgeschlagen",
       "update-available": "Auf dem Server geändert",
       "download-again": "Erneut laden"
+    },
+    "playlists": {
+      "new": "Neue Playlist",
+      "new-title": "Neue Playlist",
+      "empty": "Noch keine Playlists. Lege eine an oder füge in einem Album Titel hinzu.",
+      "edit": "Bearbeiten",
+      "menu": "Aktionen für {{title}}",
+      "tracks_one": "{{count}} Titel",
+      "tracks_other": "{{count}} Titel",
+      "create": "Anlegen",
+      "title-label": "Name",
+      "delete-title": "„{{title}}“ löschen?",
+      "delete-text": "Karten, die diese Playlist spielen, funktionieren danach nicht mehr.",
+      "back": "Zurück zu den Playlists",
+      "play": "Abspielen",
+      "saved": "Gespeichert",
+      "no-songs": "Noch keine Titel. Suche unten nach Titeln und füge sie hinzu.",
+      "move-up": "{{title}} nach oben",
+      "move-down": "{{title}} nach unten",
+      "remove": "{{title}} entfernen",
+      "missing": "Nicht mehr in der Bibliothek, wird übersprungen",
+      "search-label": "Titel suchen",
+      "search-help": "Titel, Künstler, Album oder Ordner",
+      "add-song": "{{title}} hinzufügen",
+      "added_one": "{{count}} Titel zu „{{title}}“ hinzugefügt",
+      "added_other": "{{count}} Titel zu „{{title}}“ hinzugefügt",
+      "add-to_one": "Zur Playlist hinzufügen",
+      "add-to_other": "{{count}} Titel zur Playlist hinzufügen",
+      "add-song-to": "Zur Playlist hinzufügen",
+      "add-album-to": "Album zur Playlist hinzufügen"
     }
   },
   "kiosk": {

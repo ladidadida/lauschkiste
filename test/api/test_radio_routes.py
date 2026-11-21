@@ -68,7 +68,8 @@ def test_play_station(radio):
     ctrl.get_active_backend.return_value = 'local_audio'
     ctrl.playerstatus.return_value = {'state': 'play', 'file': 'https://example.org/live.mp3', 'song': '0'}
     assert client.get('/api/v1/player/status').json()['context'] == {
-        'kind': 'radio', 'title': 'Stream', 'action': 'radio.play', 'args': {'station': station}, 'image': None}
+        'kind': 'radio', 'title': 'Stream', 'action': 'radio.play', 'args': {'station': station}, 'image': None,
+        'cover': None, 'titles': {}}
     assert client.post('/api/v1/radio/play', json={'station': 'nope'}).status_code == 404
 
 

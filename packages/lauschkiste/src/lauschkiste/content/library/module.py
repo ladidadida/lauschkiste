@@ -13,7 +13,7 @@ from starlette.requests import Request
 import lauschkiste.common.paths
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.content.library.covers import CoverCache
-from lauschkiste.content.library.files import MAX_UPLOAD_SIZE, LibraryError, MusicLibrary
+from lauschkiste.content.library.files import MAX_UPLOAD_SIZE, LibraryError, MusicLibrary, resolve_library_path
 from lauschkiste.content.library.index import LibraryIndex
 from lauschkiste.content.library.watch import FolderWatcher
 
@@ -136,7 +136,7 @@ class Library(CoreModule):
     """Music library: files, index with metadata, cover art; further sources plug in at ``library.sources``."""
 
     name = 'library'
-    interface_version = '1.1'
+    interface_version = '1.2'
     concurrency = 'threadsafe'
 
     settings = LibrarySettings
@@ -385,6 +385,16 @@ class Library(CoreModule):
         if not songs:
             return CoverArt()
         return self.get_song_cover(songs[0].file, provider)
+
+    @query(path='/cover/image')
+    def get_image_cover(self, path: str) -> CoverArt:
+        """Cover art URL of an image file in the local library (e.g. a chosen audiobook cover)."""
+        try:
+            image = resolve_library_path(self._root_provider(), path, allow_root=False, require_exists=True)
+        except (OSError, LibraryError):
+            return CoverArt()
+        name = self._covers.image_for(image)
+        return CoverArt(cover_url=f'{COVER_ROUTE}/{name}' if name else None)
 
     @action(path='/covers/flush')
     def flush_covers(self) -> None:

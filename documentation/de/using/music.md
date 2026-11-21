@@ -48,8 +48,19 @@ Einstellungen → Allgemein → *Cover anzeigen* aus.
 
 ## Playlists
 
-Ein Album wird in der Reihenfolge seiner Dateien gespielt. Für eine eigene Liste schreibst du eine einfache Textdatei mit
-der Endung `.m3u`: ein Dateiname pro Zeile, in der gewünschten Reihenfolge. Leg sie in einen eigenen Ordner:
+Ein Album wird in der Reihenfolge seiner Dateien gespielt. Für eine eigene Liste öffne Bibliothek → Musik →
+**Playlists** und lege eine an. Lieder fügst du dort über die Suche hinzu oder aus einem Album: Der Knopf neben
+*Abspielen* nimmt das ganze Album, das Menü eines Lieds nur dieses. In der Playlist ändern die Pfeile die Reihenfolge, der
+Mülleimer entfernt ein Lied; *Speichern* übernimmt die Änderungen. Zufall und Wiederholen gelten wie bei Alben. Auf eine
+Karte kommt eine Playlist mit *Playlist abspielen* beim Anlernen der Karte. Eine umbenannte Playlist bleibt auf ihren
+Karten; ein aus der Bibliothek gelöschtes Lied wird übersprungen.
+
+Diese Playlists liegen als `.m3u`-Dateien in `playlists` im Lauschkiste-Verzeichnis.
+
+### Playlist-Dateien in einem Ordner
+
+Du kannst auch selbst eine einfache Textdatei mit der Endung `.m3u` schreiben: ein Dateiname pro Zeile, in der
+gewünschten Reihenfolge. Leg sie in einen eigenen Ordner:
 
 ```text
 library/music/Aufwach-Lieder/
@@ -64,8 +75,6 @@ Bibi und Tina/Soundtrack/07 - Ordinary Girl.mp3
 
 Die Pfade gelten ab `library/music`. Der Ordner zeigt dann die Lieder der Liste statt der Datei selbst, und du legst ihn
 wie jeden Ordner auf eine Karte. Liegen mehrere `.m3u` in einem Ordner, zählt nur die erste (nach Namen).
-
-Eine Webseite zum Erstellen und Ändern von Playlists ist geplant.
 
 ## Wo die Daten liegen
 

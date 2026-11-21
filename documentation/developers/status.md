@@ -13,6 +13,7 @@ the [roadmap](roadmap-core-architecture.md).
 | Downloads | a [cache in the core](caching.md) for audiobooks and podcast episodes: low priority, space limit, removal of old items |
 | Time limits | quiet hours and a daily listening time with extra time for parents (core module, off by default; [Time limits](../en/using/time-limits.md)) |
 | Library | one folder with `music/` and `audiobooks/`, index with tags and cover art, folder watching, upload and file management in the web app, optional Samba share |
+| Editing | playlists of library songs (create, order, play, on a card), audiobooks (title, author, cover, chapter order and names) in the web app |
 | Cards | RFID cards with actions (play, volume, timers, shutdown, ...), learning mode, second swipe, card database in the web app |
 | Readers | RC522 (SPI), MFRC522 and PN532 (I²C), USB readers, RDM6300, NFC (nfcpy) as plugins |
 | Hardware | the Raspberry Pi as a device plugin, GPIO buttons and rotary encoders, status LED, battery monitor (MAX17048, INA219), power button (OnOff SHIM), Pimoroni pHAT BEAT with LED level meter, I²S sound cards; see [Hardware](hardware.md) |
@@ -30,7 +31,6 @@ the [roadmap](roadmap-core-architecture.md).
   adapting and should still be rebuilt from how the system is used, for users and developers alike.
 - **Device plugins**: done, including the setup steps a device plugin brings; open points are in
   [Device plugins](device-plugins.md).
-- **Playlists**: create, show and change playlists in the web app (a topic of its own).
 - **Card management**, thought through as a whole: more than one behaviour per card (placed, removed, placed again),
   perhaps a card that changes what the buttons do, and how second swipe fits in. Part of it: the Toniebox way, where
   the content plays only as long as the card is on the box. Today a place-capable reader can run one action for all

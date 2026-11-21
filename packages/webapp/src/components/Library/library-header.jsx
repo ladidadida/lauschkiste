@@ -46,7 +46,7 @@ const TAB_PATHS = {
   podcasts: 'podcasts',
 };
 const VIEWS = {
-  music: [['albums', 'music/albums'], ['folders', 'music/folders']],
+  music: [['albums', 'music/albums'], ['folders', 'music/folders'], ['playlists', 'music/playlists']],
   audiobooks: [['books', 'audiobooks'], ['folders', 'audiobooks/folders']],
 };
 
@@ -54,7 +54,7 @@ const VIEWS = {
 export const activeTabAndView = (pathname) => {
   const [, tab, view] = pathname.split('/').filter(Boolean);
   if (TABS.includes(tab)) {
-    if (tab === 'music') return ['music', view === 'folders' ? 'folders' : 'albums'];
+    if (tab === 'music') return ['music', ['folders', 'playlists'].includes(view) ? view : 'albums'];
     if (tab === 'audiobooks') return ['audiobooks', view === 'folders' ? 'folders' : 'books'];
     return [tab, undefined];
   }

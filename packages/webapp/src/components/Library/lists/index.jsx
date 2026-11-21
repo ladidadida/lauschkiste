@@ -15,6 +15,8 @@ import SongList from './albums/song-list';
 import Folders from './folders';
 import Audiobooks from '../content/audiobooks';
 import Continue from '../content/continue';
+import PlaylistEditor from '../content/playlist-editor';
+import Playlists from '../content/playlists';
 import PodcastEpisodes from '../content/podcast-episodes';
 import Podcasts from '../content/podcasts';
 import Radio from '../content/radio';
@@ -101,6 +103,8 @@ const LibraryLists = () => {
               element={<RedirectWithSearch to="/library/music/folders/music" />}
             />
             <Route path="music/folders/:dir" element={<FolderView root="music" {...folderProps} />} />
+            <Route path="music/playlists" element={<Playlists musicFilter={musicFilter} />} />
+            <Route path="music/playlists/:playlist" element={<PlaylistEditor />} />
             <Route path="audiobooks" element={<Audiobooks musicFilter={musicFilter} />} />
             <Route
               path="audiobooks/folders"

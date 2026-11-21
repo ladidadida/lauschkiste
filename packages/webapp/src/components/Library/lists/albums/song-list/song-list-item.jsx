@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -9,6 +9,9 @@ import {
 
 import { toHHMMSS } from '../../../../../utils/utils';
 import request from '../../../../../utils/request'
+import { LOCAL_LIBRARY_SOURCE } from '../../../../../config';
+import AddToPlaylist from '../../../content/add-to-playlist';
+import ItemMenu from '../../../content/item-menu';
 
 const SongListItem = ({
   isSelecting,
@@ -16,6 +19,7 @@ const SongListItem = ({
   song,
 }) => {
   const { t } = useTranslation();
+  const [isAdding, setIsAdding] = useState(false);
 
   const command = 'play_single';
   const {
@@ -34,8 +38,18 @@ const SongListItem = ({
     registerMusicToCard(command, { song_url: file, provider })
   );
 
+  const canAdd = !isSelecting && (!provider || provider === LOCAL_LIBRARY_SOURCE);
+
   return (
-    <ListItem disablePadding>
+    <ListItem
+      disablePadding
+      secondaryAction={canAdd &&
+        <ItemMenu
+          items={[{ label: t('library.playlists.add-song-to'), onClick: () => setIsAdding(true) }]}
+          label={t('library.content.more')}
+        />
+      }
+    >
       <ListItemButton
         role={undefined}
         onClick={() => (isSelecting ? registerSongToCard() : playSingle())}
@@ -45,6 +59,7 @@ const SongListItem = ({
           secondary={`${artist || t('library.albums.unknown-artist')} • ${toHHMMSS(duration)}`}
         />
       </ListItemButton>
+      {canAdd && <AddToPlaylist files={[file]} onClose={() => setIsAdding(false)} open={isAdding} />}
     </ListItem>
   );
 }

@@ -14,6 +14,7 @@ import SelectHost from './actions/host';
 import SelectAudiobooks from './actions/audiobooks';
 import SelectPodcasts from './actions/podcasts';
 import SelectRadio from './actions/radio';
+import SelectPlaylists from './actions/playlists';
 
 const ControlsSelector = ({
   actionData,
@@ -72,6 +73,13 @@ const ControlsSelector = ({
 
         {actionData.action === 'audiobooks' &&
           <SelectAudiobooks
+            actionData={actionData}
+            handleActionDataChange={handleActionDataChange}
+          />
+        }
+
+        {actionData.action === 'playlists' &&
+          <SelectPlaylists
             actionData={actionData}
             handleActionDataChange={handleActionDataChange}
           />

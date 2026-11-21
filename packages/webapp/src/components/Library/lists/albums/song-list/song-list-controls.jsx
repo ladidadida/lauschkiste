@@ -1,25 +1,34 @@
 import { useTranslation } from 'react-i18next';
 
+import { useState } from 'react';
+
 import {
   Button,
   Grid,
   IconButton,
 } from '@mui/material';
 
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+
 import PlayCircleFilledRoundedIcon from '@mui/icons-material/PlayCircleFilledRounded';
 import request from '../../../../../utils/request';
+import { LOCAL_LIBRARY_SOURCE } from '../../../../../config';
+import AddToPlaylist from '../../../content/add-to-playlist';
 
 const SongListControls = ({
   albumartist,
   album,
   contentUri,
   disabled,
+  files = [],
   registerMusicToCard,
   isSelecting,
   provider,
 }) => {
   const { t } = useTranslation();
   const command = 'play_album';
+  const [isAdding, setIsAdding] = useState(false);
+  const canAdd = !isSelecting && (!provider || provider === LOCAL_LIBRARY_SOURCE);
 
   const playAlbum = () => (
     request(command, {
@@ -47,6 +56,17 @@ const SongListControls = ({
           justifyContent: 'right',
         }}
       >
+        {canAdd &&
+          <IconButton
+            aria-label={t('library.playlists.add-album-to')}
+            disabled={disabled}
+            onClick={() => setIsAdding(true)}
+            size="large"
+            title={t('library.playlists.add-album-to')}
+          >
+            <PlaylistAddIcon style={{ fontSize: 40 }} />
+          </IconButton>
+        }
         {
           !isSelecting
             ? <IconButton
@@ -66,6 +86,7 @@ const SongListControls = ({
               </Button>
         }
       </Grid>
+      {canAdd && <AddToPlaylist files={files} onClose={() => setIsAdding(false)} open={isAdding} />}
     </Grid>
   );
 };

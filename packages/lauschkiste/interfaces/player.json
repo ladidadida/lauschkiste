@@ -55,6 +55,17 @@
                   "default": {},
                   "type": "object"
                 },
+                "cover": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
                 "image": {
                   "anyOf": [
                     {
@@ -85,6 +96,13 @@
                     }
                   ],
                   "default": null
+                },
+                "titles": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "default": {},
+                  "type": "object"
                 }
               },
               "required": [
@@ -276,7 +294,7 @@
       "resolve": "(self, url: str) -> Tuple[str, Dict[str, str]]"
     }
   },
-  "interface_version": "7.0",
+  "interface_version": "8.0",
   "kind": "core",
   "name": "player",
   "operations": {
@@ -577,6 +595,17 @@
                     "default": {},
                     "type": "object"
                   },
+                  "cover": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
                   "image": {
                     "anyOf": [
                       {
@@ -607,6 +636,13 @@
                       }
                     ],
                     "default": null
+                  },
+                  "titles": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "default": {},
+                    "type": "object"
                   }
                 },
                 "required": [
@@ -770,6 +806,17 @@
                     "default": {},
                     "type": "object"
                   },
+                  "cover": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "default": null
+                  },
                   "image": {
                     "anyOf": [
                       {
@@ -800,6 +847,13 @@
                       }
                     ],
                     "default": null
+                  },
+                  "titles": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "default": {},
+                    "type": "object"
                   }
                 },
                 "required": [

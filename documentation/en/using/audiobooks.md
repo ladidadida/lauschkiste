@@ -7,12 +7,20 @@ A book **continues where it stopped**, a few seconds earlier so the listener fin
 playing, when pausing and when the box shuts down. When the last chapter has played to the end, the book counts as
 finished and starts from the beginning next time. Chapters always play in order, whatever shuffle and repeat say.
 
-## Title
+## Editing a book
 
-The title comes from the album tag of the files, or the folder name when there is none. To change it, open the menu of
-the book in the web app and choose **Change title**. The new title is saved in `book.json` in the book's folder; the audio
-files and the folder name stay as they are, so the position and the cards keep working. *Use the title from the files*
-goes back. Books of an Audiobookshelf server keep the title from the server.
+Title, author and cover come from the tags of the files (the title from the album tag, or the folder name when there is
+none). The menu of a book in the web app has **Edit**:
+
+- **Title** and **author**: an empty field goes back to the value from the files.
+- **Cover**: *Choose picture* uploads an image (JPEG, PNG, WebP or GIF, up to 10 MB) that replaces the covers of the
+  files; *Use the cover from the files* goes back.
+- **Chapters**: change their order with the arrows and give them names. The names show in the player while the chapter
+  plays.
+
+The changes are saved in `book.json` (and the picture as `book-cover.*`) in the book's folder. The audio files and the
+folder name stay as they are, so the position and the cards keep working. Books of an Audiobookshelf server keep what
+the server says.
 
 ## On a card
 

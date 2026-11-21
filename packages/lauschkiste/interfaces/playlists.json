@@ -1,0 +1,562 @@
+{
+  "events": {
+    "changed": {
+      "properties": {
+        "playlists": {
+          "items": {
+            "properties": {
+              "cover_url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "duration": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null
+              },
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "tracks": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "tracks"
+            ],
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "playlists"
+      ],
+      "type": "object"
+    }
+  },
+  "extension_points": {},
+  "interface_version": "1.0",
+  "kind": "core",
+  "name": "playlists",
+  "operations": {
+    "add": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "playlist": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "playlist",
+          "files"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/playlists/add",
+      "returns": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "album": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "artist": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "duration": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "file": {
+                  "type": "string"
+                },
+                "missing": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "entries"
+        ],
+        "type": "object"
+      }
+    },
+    "create": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "files": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/playlists",
+      "returns": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "album": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "artist": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "duration": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "file": {
+                  "type": "string"
+                },
+                "missing": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "entries"
+        ],
+        "type": "object"
+      }
+    },
+    "delete": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "playlist": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "playlist"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "DELETE",
+      "path": "/api/v1/playlists/{playlist}",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "get_playlist": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "playlist": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "playlist"
+        ],
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/playlists/playlist",
+      "returns": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "album": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "artist": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "duration": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "file": {
+                  "type": "string"
+                },
+                "missing": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "entries"
+        ],
+        "type": "object"
+      }
+    },
+    "list_playlists": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/playlists",
+      "returns": {
+        "items": {
+          "properties": {
+            "cover_url": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "duration": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
+            "id": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "tracks": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "id",
+            "title",
+            "tracks"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "play": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "playlist": {
+            "type": "string"
+          },
+          "start": {
+            "default": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "playlist"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/playlists/play",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "save": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "files": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "playlist": {
+            "type": "string"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          }
+        },
+        "required": [
+          "playlist"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "PUT",
+      "path": "/api/v1/playlists/{playlist}",
+      "returns": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "album": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "artist": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "duration": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "file": {
+                  "type": "string"
+                },
+                "missing": {
+                  "default": false,
+                  "type": "boolean"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "entries"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "requires": {
+    "library": null,
+    "player": null
+  }
+}

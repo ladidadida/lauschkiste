@@ -60,7 +60,7 @@ must be written in quotes:
 ```
 
 All actions, with their arguments, are listed by the running box at `http://<name>/api/v1/actions`.
-Frequent ones: `player.play_card`, `player.play_album`, `audiobooks.play`, `radio.play`, `podcasts.play`,
+Frequent ones: `player.play_card`, `player.play_album`, `audiobooks.play`, `playlists.play`, `radio.play`, `podcasts.play`,
 `player.toggle`, `player.next`, `player.prev`, `player.shuffle`, `player.repeat`, `volume.change_volume`,
 `system.say_my_ip`, `hardware.shutdown`.
 

@@ -108,6 +108,17 @@ class CoverCache:
             (self._dir / name).write_bytes(data)
             return name
 
+    def image_for(self, image: Path) -> Optional[str]:
+        """File name in the cache of an image file, or None when it is missing."""
+        suffix = image.suffix.lower().lstrip('.').replace('jpeg', 'jpg')
+        if f'.{suffix}' not in IMAGE_SUFFIXES or not image.is_file():
+            return None
+        name = f'{self._key(image)}.{suffix}'
+        with self._lock:
+            if not (self._dir / name).is_file():
+                (self._dir / name).write_bytes(image.read_bytes())
+        return name
+
     def path(self, name: str) -> Optional[Path]:
         if not CACHE_NAME_RE.match(name):
             return None

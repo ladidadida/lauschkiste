@@ -145,6 +145,16 @@ const uploadLibraryFile = ({
   request.send(file);
 });
 
+const uploadAudiobookCover = async (book, file) => {
+  const query = new URLSearchParams({ book, name: file.name });
+  const response = await fetch(`/api/v1/audiobooks/cover?${query.toString()}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': file.type || 'application/octet-stream' },
+    body: file,
+  });
+  return responseData(response);
+};
+
 const translateLibraryError = (t, error) => t(
   `library.folders.manager.errors.${error.code}`,
   { defaultValue: error.message },
@@ -158,5 +168,6 @@ export {
   listLibraryEntries,
   refreshLibrary,
   translateLibraryError,
+  uploadAudiobookCover,
   uploadLibraryFile,
 };

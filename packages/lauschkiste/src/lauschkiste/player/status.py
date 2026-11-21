@@ -16,6 +16,10 @@ class PlaybackContext(BaseModel):
     args: Dict[str, Any] = {}
     #: A picture of what plays (a station's logo, a podcast's artwork); shown when the file has no cover of its own
     image: Optional[str] = None
+    #: A picture shown instead of the files' own covers (a cover chosen for an audiobook)
+    cover: Optional[str] = None
+    #: Titles of single files (library paths), shown instead of their tags (renamed audiobook chapters)
+    titles: Dict[str, str] = {}
 
 
 class PlayerStatus(BaseModel):

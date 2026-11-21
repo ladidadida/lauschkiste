@@ -13,6 +13,282 @@
   "kind": "core",
   "name": "audiobooks",
   "operations": {
+    "edit_book": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "author": {
+            "default": "",
+            "type": "string"
+          },
+          "book": {
+            "type": "string"
+          },
+          "chapters": {
+            "anyOf": [
+              {
+                "items": {
+                  "properties": {
+                    "file": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "default": "",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "file"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "title": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobooks/edit_book",
+      "returns": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "book": {
+            "type": "string"
+          },
+          "chapters": {
+            "items": {
+              "properties": {
+                "duration": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "file": {
+                  "type": "string"
+                },
+                "tag_title": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "custom_cover": {
+            "default": false,
+            "type": "boolean"
+          },
+          "tag_author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "tag_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book",
+          "title",
+          "chapters"
+        ],
+        "type": "object"
+      }
+    },
+    "get_book": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "query",
+      "method": "GET",
+      "path": "/api/v1/audiobooks/book",
+      "returns": {
+        "properties": {
+          "author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "book": {
+            "type": "string"
+          },
+          "chapters": {
+            "items": {
+              "properties": {
+                "duration": {
+                  "anyOf": [
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "file": {
+                  "type": "string"
+                },
+                "tag_title": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file",
+                "title"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "cover_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "custom_cover": {
+            "default": false,
+            "type": "boolean"
+          },
+          "tag_author": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "tag_title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book",
+          "title",
+          "chapters"
+        ],
+        "type": "object"
+      }
+    },
     "hide_from_continue": {
       "args": {
         "additionalProperties": false,
@@ -49,6 +325,17 @@
       "returns": {
         "items": {
           "properties": {
+            "author": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": null
+            },
             "availability": {
               "default": "local",
               "type": "string"
@@ -143,6 +430,26 @@
       "kind": "action",
       "method": "POST",
       "path": "/api/v1/audiobooks/play",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "remove_cover": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobooks/remove_cover",
       "returns": {
         "type": "null"
       }
