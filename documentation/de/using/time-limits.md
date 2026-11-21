@@ -26,6 +26,14 @@ Die Minuten, in denen etwas spielt, werden pro Tag gezählt (Pausieren zählt ni
 Ist die Zeit aufgebraucht, blendet der Ton aus und der Player hält an. Spielt man am selben Tag noch einmal, hört es sofort
 wieder auf.
 
+## Einschlaf-Timer bei jedem Start
+
+Unabhängig von den Zeitlimits oben (die müssen dafür nicht eingeschaltet sein): Im Player startet der Mond-Knopf →
+*Bei jedem Start* den Einschlaf-Timer von selbst, sobald etwas zu spielen beginnt und gerade kein Einschlaf-Timer läuft.
+Danach kann man wieder starten, es hört aber immer nach dieser Zeit auf. Pausieren startet den Timer nicht neu. Dasselbe
+steht unter Einstellungen → Wiedergabe und Audio → Einschlaf-Timer (`timers.every_start_minutes`, 0 für aus, und
+`timers.every_start_fade`).
+
 ## Extra-Zeit für Erwachsene
 
 Die Aktion `time_limits.allow` gibt für heute Minuten dazu und hebt die Ruhezeit für diese Zeit auf. Du rufst sie auf der

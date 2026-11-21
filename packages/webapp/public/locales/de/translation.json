@@ -474,7 +474,12 @@
         "audiobook": "Kapitelende",
         "podcast": "Folgenende",
         "radio": ""
-      }
+      },
+      "every-start": "Bei jedem Start",
+      "every-start-help": "Läuft bei jedem Abspielen von selbst los. Danach kann wieder gestartet werden.",
+      "every-start-off": "Aus",
+      "after_one": "Nach {{count}} Minute",
+      "after_other": "Nach {{count}} Minuten"
     },
     "search": {
       "title": "Musik suchen",
@@ -712,7 +717,8 @@
       "input": "Tasten von Eingabegeräten",
       "library": "Bibliothek",
       "system": "System",
-      "rfid": "Lesegeräte"
+      "rfid": "Lesegeräte",
+      "timers": "Einschlaf-Timer"
     },
     "values": {
       "auto": "Automatisch",
@@ -1002,6 +1008,16 @@
         "blocked_sound": {
           "label": "Ton, wenn die Wiedergabe gesperrt ist",
           "help": "Eine Tondatei im Heimatverzeichnis; leer: keiner"
+        }
+      },
+      "timers": {
+        "every_start_minutes": {
+          "label": "Einschlaf-Timer bei jedem Start (Minuten)",
+          "help": "Läuft bei jedem Abspielen von selbst los, wenn gerade kein Einschlaf-Timer läuft. 0: aus"
+        },
+        "every_start_fade": {
+          "label": "Am Ende langsam ausblenden",
+          "help": "Sonst stoppt die Wiedergabe sofort"
         }
       }
     },

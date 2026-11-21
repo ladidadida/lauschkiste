@@ -25,6 +25,13 @@ The minutes that something plays are counted per day (pausing does not count), s
 
 When the time is used up, the sound fades out and the player stops. Playing again the same day stops at once.
 
+## Sleep timer at every start
+
+Independent of the time limits above (they need not be switched on): in the player, the moon button → *At every start*
+starts the sleep timer by itself whenever playback starts and no sleep timer runs. Playback can be started again
+afterwards, but it always stops after that time. Pausing does not restart the timer. The same is under Settings →
+Playback and audio → Sleep timer (`timers.every_start_minutes`, 0 for off, and `timers.every_start_fade`).
+
 ## Extra time for grown-ups
 
 The action `time_limits.allow` adds minutes for today and lifts quiet hours for that time. You can call it from the web

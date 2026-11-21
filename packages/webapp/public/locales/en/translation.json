@@ -474,7 +474,12 @@
         "audiobook": "End of chapter",
         "podcast": "End of episode",
         "radio": ""
-      }
+      },
+      "every-start": "At every start",
+      "every-start-help": "Starts by itself whenever playback starts. Playback can be started again afterwards.",
+      "every-start-off": "Off",
+      "after_one": "After {{count}} minute",
+      "after_other": "After {{count}} minutes"
     },
     "search": {
       "title": "Search music",
@@ -710,7 +715,8 @@
       "input": "Keys of input devices",
       "library": "Library",
       "system": "System",
-      "rfid": "Readers"
+      "rfid": "Readers",
+      "timers": "Sleep timer"
     },
     "values": {
       "auto": "Automatic",
@@ -823,6 +829,16 @@
         "blocked_sound": {
           "label": "Sound when playback is blocked",
           "help": "A sound file in the home directory; empty: none"
+        }
+      },
+      "timers": {
+        "every_start_minutes": {
+          "label": "Sleep timer at every start (minutes)",
+          "help": "Starts by itself whenever playback starts and no sleep timer runs. 0: off"
+        },
+        "every_start_fade": {
+          "label": "Fade out slowly at the end",
+          "help": "Otherwise playback stops at once"
         }
       }
     },

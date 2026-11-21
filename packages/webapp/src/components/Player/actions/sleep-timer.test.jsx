@@ -57,3 +57,19 @@ test('shows the running timer and switches it off', async () => {
   await userEvent.click(screen.getByRole('button', { name: 'player.sleep.off' }));
   await waitFor(() => expect(request).toHaveBeenCalledWith('cancelTimer', { timer: 'stop_player' }));
 });
+
+test('sets the timer for every start', async () => {
+  request.mockImplementation(async (command) => {
+    if (command === 'listTimers') return { result: idle };
+    if (command === 'moduleSettings') return { result: { values: { every_start_minutes: 0, every_start_fade: false } } };
+    return { result: null };
+  });
+  renderTimer();
+  await userEvent.click(screen.getByRole('button', { name: 'player.sleep.title' }));
+  await waitFor(() => expect(screen.getByLabelText('player.sleep.fade')).not.toBeChecked());
+  await userEvent.click(screen.getByRole('combobox', { name: 'player.sleep.every-start' }));
+  await userEvent.click(screen.getByRole('option', { name: 'player.sleep.after:45' }));
+  expect(request).toHaveBeenCalledWith('updateModuleSettings', {
+    name: 'timers', values: { every_start_minutes: 45, every_start_fade: false },
+  });
+});

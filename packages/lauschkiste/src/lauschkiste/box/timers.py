@@ -3,6 +3,9 @@
 Timers are configured under ``timers:``; each runs an action (``action``/``args``) after
 ``default_timeout_sec`` unless started with another duration. A timer whose action is not available
 (e.g. its plugin is disabled) is listed, but can't be started.
+
+With ``every_start_minutes`` set, the sleep timer starts by itself whenever playback starts and no sleep timer
+runs: playback can be started again after it, but always stops after that time.
 """
 
 import logging
@@ -10,7 +13,7 @@ import threading
 import time
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from lauschkiste.contract import ActionError, CoreModule, OperationError, action, event, query
 
@@ -21,6 +24,14 @@ DEFAULT_TIMERS: Dict[str, Dict[str, Any]] = {
     'fade_volume': {'action': 'volume.fade_out', 'args': {'seconds': 30}, 'default_timeout_sec': 600},
     'shutdown': {'action': 'hardware.shutdown', 'default_timeout_sec': 3600},
 }
+SLEEP_TIMERS = ('fade_volume', 'stop_player')
+
+
+class TimersSettings(BaseModel):
+    every_start_minutes: int = Field(
+        0, ge=0, le=240, json_schema_extra={'step': 5}, title='Sleep timer at every start (minutes)',
+        description='Starts whenever playback starts and no sleep timer runs; 0: off')
+    every_start_fade: bool = Field(True, title='Fade out at the end')
 
 
 class TimerState(BaseModel):
@@ -50,13 +61,15 @@ class Timers(CoreModule):
     """Countdown timers that run an action when they expire."""
 
     name = 'timers'
-    interface_version = '1.0'
+    interface_version = '1.1'
+    settings = TimersSettings
 
     changed = event('changed', TimerState)
 
     def __init__(self):
         self._ctx = None
         self._timers: Dict[str, _Timer] = {}
+        self._playing = False
 
     def start(self, ctx) -> None:
         self._ctx = ctx
@@ -69,6 +82,8 @@ class Timers(CoreModule):
                 continue
             self._timers[name] = _Timer(name, values['action'], dict(values.get('args') or {}),
                                         float(values.get('default_timeout_sec', 3600)))
+        self._auto = ctx.executor('every-start')
+        ctx.subscribe('player.status', self._on_status)
 
     def ready(self) -> None:
         for timer in self._timers.values():
@@ -79,6 +94,29 @@ class Timers(CoreModule):
             if timer.thread is not None:
                 timer.thread.cancel()
         return []
+
+    def settings_changed(self, changed) -> bool:
+        return True
+
+    def _on_status(self, _topic, status) -> None:
+        playing = bool(status) and status.get('state') == 'play'
+        started, self._playing = playing and not self._playing, playing
+        if started:
+            self._auto.submit(self._start_every_start)
+
+    def _start_every_start(self) -> None:
+        minutes = int(self._ctx.config.get('every_start_minutes', default=0) or 0)
+        if minutes <= 0:
+            return
+        name = 'fade_volume' if self._ctx.config.get('every_start_fade', default=True) else 'stop_player'
+        try:
+            with self._ctx.lock:
+                if name not in self._timers or any(
+                        self._timers[timer].deadline is not None for timer in SLEEP_TIMERS if timer in self._timers):
+                    return
+                self.start_timer(name, minutes * 60)
+        except OperationError as error:
+            logger.warning(f"Could not start the sleep timer: {error.message}")
 
     def _available(self, timer: _Timer) -> bool:
         try:

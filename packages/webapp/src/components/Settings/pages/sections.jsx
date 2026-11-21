@@ -49,6 +49,7 @@ const PlaybackSettings = () => {
       <ModuleSettings exclude={['second_swipe_action']} module="player" />
       <ModuleSettings module="audiobooks" />
       <ModuleSettings module="podcasts" />
+      <ModuleSettings module="timers" />
       <ModuleSettings module="time_limits" title={t('settings.time-limits.title')} />
       <ModuleSettings module="jingle" />
       <ModuleSettings module="input" />

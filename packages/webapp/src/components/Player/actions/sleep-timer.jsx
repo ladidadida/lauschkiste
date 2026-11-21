@@ -7,10 +7,13 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
   FormControlLabel,
   IconButton,
+  MenuItem,
   Stack,
   Switch,
+  TextField,
   Typography,
 } from '@mui/material';
 
@@ -25,12 +28,13 @@ import { TIMERS_TOPIC } from '../../../config';
 const MINUTES = [15, 30, 45, 60, 90];
 const TIMERS = ['stop_player', 'fade_volume'];
 
-// The sleep timer: stop (optionally fading out) after some minutes, or after the current entry.
+// The sleep timer: stop (optionally fading out) after some minutes, or after the current entry; or at every start.
 const SleepTimer = ({ kind, stopAfterCurrent }) => {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [fade, setFade] = useState(true);
   const [timers, setTimers] = useState({});
+  const [everyStart, setEveryStart] = useState(0);
   const { state: { [TIMERS_TOPIC]: published } = {} } = useContext(PubSubContext);
 
   const load = useCallback(async () => {
@@ -42,6 +46,27 @@ const SleepTimer = ({ kind, stopAfterCurrent }) => {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!open) return;
+    request('moduleSettings', { name: 'timers' }).then(({ result }) => {
+      if (!result) return;
+      setEveryStart(result.values.every_start_minutes || 0);
+      setFade(result.values.every_start_fade !== false);
+    });
+  }, [open]);
+
+  const saveEveryStart = async (minutes, fadeOut) => {
+    setEveryStart(minutes);
+    await request('updateModuleSettings', {
+      name: 'timers', values: { every_start_minutes: minutes, every_start_fade: fadeOut },
+    });
+  };
+
+  const changeFade = (checked) => {
+    setFade(checked);
+    if (everyStart) saveEveryStart(everyStart, checked);
+  };
 
   useEffect(() => {
     if (published && TIMERS.includes(published.name)) {
@@ -108,9 +133,23 @@ const SleepTimer = ({ kind, stopAfterCurrent }) => {
               </Button>
             ))}
             <FormControlLabel
-              control={<Switch checked={fade} onChange={(event) => setFade(event.target.checked)} />}
+              control={<Switch checked={fade} onChange={(event) => changeFade(event.target.checked)} />}
               label={t('player.sleep.fade')}
             />
+            <Divider />
+            <TextField
+              helperText={t('player.sleep.every-start-help')}
+              label={t('player.sleep.every-start')}
+              onChange={(event) => saveEveryStart(Number(event.target.value), fade)}
+              select
+              size="small"
+              value={everyStart}
+            >
+              <MenuItem value={0}>{t('player.sleep.every-start-off')}</MenuItem>
+              {[...new Set([...MINUTES, everyStart])].filter(Boolean).sort((a, b) => a - b).map((minutes) => (
+                <MenuItem key={minutes} value={minutes}>{t('player.sleep.after', { count: minutes })}</MenuItem>
+              ))}
+            </TextField>
           </Stack>
         </DialogContent>
         <DialogActions>
