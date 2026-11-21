@@ -8,6 +8,13 @@ Position wird beim Abspielen, beim Pausieren und beim Herunterfahren der Box ges
 Ende gespielt, gilt das Buch als beendet und beginnt beim nächsten Mal von vorn. Kapitel laufen immer der Reihe nach,
 egal was bei „zufällig“ und „wiederholen“ eingestellt ist.
 
+## Titel
+
+Der Titel kommt aus dem Album-Tag der Dateien, ohne Tag aus dem Ordnernamen. Ändern lässt er sich in der Weboberfläche im
+Menü des Buchs mit **Titel ändern**. Der neue Titel steht in `book.json` im Ordner des Buchs; Audiodateien und Ordnername
+bleiben unverändert, Position und Karten funktionieren also weiter. *Titel aus den Dateien verwenden* macht es rückgängig.
+Bücher eines Audiobookshelf-Servers behalten den Titel vom Server.
+
 ## Auf einer Karte
 
 Spiel das Buch ab und tippe im Player auf das Karten-Symbol, wie in [Deine erste Karte](../get-started/first-card.md),

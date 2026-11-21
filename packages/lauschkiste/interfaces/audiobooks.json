@@ -9,7 +9,7 @@
       "title": "(self, book: str) -> str"
     }
   },
-  "interface_version": "4.0",
+  "interface_version": "5.0",
   "kind": "core",
   "name": "audiobooks",
   "operations": {
@@ -73,6 +73,10 @@
                 }
               ],
               "default": null
+            },
+            "custom_title": {
+              "default": false,
+              "type": "boolean"
             },
             "duration": {
               "anyOf": [
@@ -191,6 +195,30 @@
       "kind": "action",
       "method": "POST",
       "path": "/api/v1/audiobooks/set_finished",
+      "returns": {
+        "type": "null"
+      }
+    },
+    "set_title": {
+      "args": {
+        "additionalProperties": false,
+        "properties": {
+          "book": {
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "type": "string"
+          }
+        },
+        "required": [
+          "book"
+        ],
+        "type": "object"
+      },
+      "kind": "action",
+      "method": "POST",
+      "path": "/api/v1/audiobooks/set_title",
       "returns": {
         "type": "null"
       }

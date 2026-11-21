@@ -1,17 +1,22 @@
 """The audiobooks core module: audiobooks in ``library/audiobooks``, continued where they stopped.
 
 Each folder directly below ``audiobooks`` is one audiobook, its files are the chapters in file name
-order. The position is kept per audiobook in ``audiobooks.state_file``; chapters play in order,
-regardless of shuffle and repeat.
+order. Its title is the album tag, unless the folder has a ``book.json`` with a ``title``. The position
+is kept per audiobook in ``audiobooks.state_file``; chapters play in order, regardless of shuffle and repeat.
 """
 
+import json
 import logging
+import os
 import re
+import tempfile
+from pathlib import Path
 from typing import Any, Dict, List, Optional, Protocol
 
 from pydantic import BaseModel, Field
 
 import lauschkiste.common.paths
+import lauschkiste.content.library
 from lauschkiste.contract import CoreModule, OperationError, action, extension_point, query
 from lauschkiste.content.dismissed import Dismissed
 from lauschkiste.content.resume import ResumeTracker
@@ -22,6 +27,7 @@ LOCAL = 'local'
 
 DEFAULT_STATE_FILE = 'settings/audiobooks.json'
 DEFAULT_HIDDEN_FILE = 'settings/audiobooks_hidden.json'
+BOOK_FILE = 'book.json'
 
 
 class AudiobookSource(Protocol):
@@ -63,6 +69,8 @@ class Audiobook(BaseModel):
     availability: str = 'local'
     #: taken off the "continue" list; it comes back when the book is played on
     hidden: bool = False
+    #: the title was set in the web app (``book.json``), not taken from the tags
+    custom_title: bool = False
 
 
 def natural_key(text: str):
@@ -80,7 +88,7 @@ class Audiobooks(CoreModule):
     """Audiobooks: play, continue, start over, mark as finished."""
 
     name = 'audiobooks'
-    interface_version = '4.0'
+    interface_version = '5.0'
     concurrency = 'threadsafe'
     requires = ('library', 'player', 'cache')
     settings = AudiobookSettings
@@ -114,6 +122,24 @@ class Audiobooks(CoreModule):
     def _songs(self, book: Optional[str] = None):
         folder = lauschkiste.common.paths.AUDIOBOOKS_DIR + (f'/{book}' if book else '')
         return self._ctx.modules.library.list_folder_songs(folder)
+
+    def _book_file(self, book: str) -> Path:
+        root = Path(lauschkiste.content.library.root()).expanduser()
+        return root / lauschkiste.common.paths.AUDIOBOOKS_DIR / book / BOOK_FILE
+
+    def _book_info(self, book: str) -> Dict[str, Any]:
+        try:
+            info = json.loads(self._book_file(book).read_text(encoding='utf-8'))
+        except FileNotFoundError:
+            return {}
+        except (OSError, ValueError) as error:
+            logger.warning(f"Ignoring {BOOK_FILE} of audiobook '{book}': {error}")
+            return {}
+        return info if isinstance(info, dict) else {}
+
+    def _custom_title(self, book: str) -> Optional[str]:
+        title = self._book_info(book).get('title')
+        return (title.strip() or None) if isinstance(title, str) else None
 
     def _chapter_files(self, book: str) -> List[str]:
         if not book or '/' in book or book in ('.', '..'):
@@ -150,9 +176,10 @@ class Audiobooks(CoreModule):
                 cover_url = self._ctx.modules.library.get_song_cover(files[0]).cover_url
             except Exception:
                 cover_url = None
-            result.append(Audiobook(book=book, title=songs[0].album or book, chapters=len(files), duration=total,
-                                    chapter=chapter, elapsed=elapsed, listened=listened, finished=finished,
-                                    cover_url=cover_url))
+            custom_title = self._custom_title(book)
+            result.append(Audiobook(book=book, title=custom_title or songs[0].album or book, chapters=len(files),
+                                    duration=total, chapter=chapter, elapsed=elapsed, listened=listened,
+                                    finished=finished, cover_url=cover_url, custom_title=custom_title is not None))
         for source, implementation in self.sources.items():
             try:
                 cached = {entry.item for entry in self._ctx.modules.cache.cached(source)} \
@@ -175,7 +202,7 @@ class Audiobooks(CoreModule):
             image = getattr(implementation, 'cover_url', lambda _book: None)(book)
         else:
             songs = self._songs(book)
-            title = next((song.album for song in songs if song.album), None) or book
+            title = self._custom_title(book) or next((song.album for song in songs if song.album), None) or book
         return {'kind': 'audiobook', 'title': title, 'action': 'audiobooks.play', 'args': args, 'image': image}
 
     def _source(self, source: str):
@@ -217,3 +244,29 @@ class Audiobooks(CoreModule):
             self._resume.set_finished(book, finished)
         else:
             self._source(source).set_finished(book, finished)
+
+    @action()
+    def set_title(self, book: str, title: str = '') -> None:
+        """Give a local audiobook its own title; an empty title goes back to the one from the tags."""
+        self._chapter_files(book)
+        path = self._book_file(book)
+        info = self._book_info(book)
+        title = title.strip()
+        if title:
+            info['title'] = title
+        else:
+            info.pop('title', None)
+        try:
+            if not info:
+                path.unlink(missing_ok=True)
+                return
+            fd, temporary = tempfile.mkstemp(dir=path.parent, prefix='.book-', suffix='.json')
+            try:
+                with os.fdopen(fd, 'w', encoding='utf-8') as file:
+                    json.dump(info, file, ensure_ascii=False, indent=2)
+                os.replace(temporary, path)
+            except BaseException:
+                Path(temporary).unlink(missing_ok=True)
+                raise
+        except OSError as error:
+            raise OperationError(500, 'write_failed', f"Cannot save the title of '{book}': {error}") from error

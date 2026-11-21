@@ -136,6 +136,10 @@ const commands = {
     rest: { method: 'POST', path: '/api/v1/audiobooks/set_finished' },
     argKeys: ['book', 'finished'],
   },
+  audiobookSetTitle: {
+    rest: { method: 'POST', path: '/api/v1/audiobooks/set_title' },
+    argKeys: ['book', 'title'],
+  },
 
   // Downloads to the box (core cache) and the state of the Audiobookshelf server
   audiobookshelfStatus: {

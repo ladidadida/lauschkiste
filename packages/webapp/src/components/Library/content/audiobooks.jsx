@@ -27,6 +27,7 @@ import request from '../../../utils/request';
 import { downloadMenuItems, downloadStatus, useDownloads } from './downloads';
 import { coverSrc, toHHMMSS } from '../../../utils/utils';
 import { LIBRARY_SCANNED_TOPIC } from '../../../config';
+import FormDialog from './form-dialog';
 import ItemMenu from './item-menu';
 
 export const progressOf = ({ duration, finished, listened }) => {
@@ -40,6 +41,7 @@ const sourceArg = (book) => (book.source && book.source !== 'local' ? { source: 
 
 export const AudiobookItem = ({ book, download, onChanged, onHide, showCovers, showOrigin = false }) => {
   const { t } = useTranslation();
+  const [isEditing, setIsEditing] = useState(false);
   const progress = progressOf(book);
   const started = progress > 0 && !book.finished;
 
@@ -70,9 +72,21 @@ export const AudiobookItem = ({ book, download, onChanged, onHide, showCovers, s
     ? []
     : downloadMenuItems(t, { source: book.source, item: book.book, download, onChanged });
 
+  const setTitle = (title) => request('audiobookSetTitle', { book: book.book, title });
+
+  const titleItems = isLocal
+    ? [
+      { label: t('library.audiobooks.edit-title'), onClick: () => setIsEditing(true) },
+      ...(book.custom_title
+        ? [{ label: t('library.audiobooks.reset-title'), onClick: () => setTitle('').then(onChanged) }]
+        : []),
+    ]
+    : [];
+
   const menuItems = [
     ...(onHide ? [{ label: t('library.continue.remove'), onClick: onHide }] : []),
     ...downloadItems,
+    ...titleItems,
     {
       label: t('library.audiobooks.restart'),
       onClick: () => request('audiobook_restart', { book: book.book, ...sourceArg(book) }).then(onChanged),
@@ -122,6 +136,20 @@ export const AudiobookItem = ({ book, download, onChanged, onHide, showCovers, s
           }
         />
       </ListItemButton>
+      {isLocal &&
+        <FormDialog
+          fields={[{ name: 'title', label: t('library.audiobooks.title-label'), helperText: t('library.audiobooks.title-help') }]}
+          initialValues={{ title: book.title }}
+          onClose={() => setIsEditing(false)}
+          onSaved={() => {
+            setIsEditing(false);
+            onChanged();
+          }}
+          onSubmit={({ title }) => setTitle(title)}
+          open={isEditing}
+          title={t('library.audiobooks.edit-title')}
+        />
+      }
     </ListItem>
   );
 };

@@ -6,6 +6,7 @@ from unittest.mock import Mock
 import av
 import pytest
 
+import lauschkiste.content.library
 import lauschkiste.content.resume
 from lauschkiste.content.audiobooks import Audiobooks
 from lauschkiste.content.cache.module import Cache
@@ -63,6 +64,7 @@ def library_dir(tmp_path):
 @pytest.fixture
 def setup(tmp_path, library_dir, monkeypatch):
     monkeypatch.setattr(lauschkiste.content.resume, 'ACTIVATION_GRACE_SEC', 0)
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(library_dir))
     ctrl = Mock()
     ctrl.get_active_backend.return_value = 'local_audio'
     ctrl.playerstatus.return_value = {'state': 'play', 'file': 'music/Rock/01.flac', 'random': '1', 'repeat': '0'}
@@ -214,6 +216,48 @@ def test_unknown_or_invalid_books(setup, book, status):
     start, _, _, _ = setup
     with pytest.raises(OperationError) as error:
         start().invoke('play', book)
+    assert error.value.status == status
+
+
+def test_a_title_set_in_the_web_app_replaces_the_tag_until_it_is_cleared(setup, library_dir):
+    start, ctrl, _, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('set_title', 'Pippi', '  Pippi in Taka-Tuka-Land ')
+    assert json.loads((library_dir / 'audiobooks' / 'Pippi' / 'book.json').read_text()) == {
+        'title': 'Pippi in Taka-Tuka-Land'}
+    pippi = next(b for b in audiobooks.invoke('list_books') if b.book == 'Pippi')
+    assert (pippi.title, pippi.custom_title) == ('Pippi in Taka-Tuka-Land', True)
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.playerstatus.return_value = {'state': 'play', 'file': BOOK[0], 'song': '0'}
+    assert start.managers[-1].handle('player').invoke('playerstatus').context.title == 'Pippi in Taka-Tuka-Land'
+
+    audiobooks.invoke('set_title', 'Pippi', '')
+    assert not (library_dir / 'audiobooks' / 'Pippi' / 'book.json').exists()
+    pippi = next(b for b in audiobooks.invoke('list_books') if b.book == 'Pippi')
+    assert (pippi.title, pippi.custom_title) == ('Pippi Langstrumpf', False)
+
+
+def test_clearing_the_title_keeps_other_entries_of_book_json(setup, library_dir):
+    start, _, _, _ = setup
+    book_file = library_dir / 'audiobooks' / 'Emil' / 'book.json'
+    book_file.write_text(json.dumps({'title': 'Emil und die Detektive', 'author': 'Kästner'}))
+    audiobooks = start()
+    assert [b.title for b in audiobooks.invoke('list_books') if b.book == 'Emil'] == ['Emil und die Detektive']
+    audiobooks.invoke('set_title', 'Emil', '')
+    assert json.loads(book_file.read_text()) == {'author': 'Kästner'}
+
+
+def test_a_broken_book_json_is_ignored(setup, library_dir):
+    start, _, _, _ = setup
+    (library_dir / 'audiobooks' / 'Emil' / 'book.json').write_text('{nope')
+    assert [b.title for b in start().invoke('list_books') if b.book == 'Emil'] == ['Emil']
+
+
+@pytest.mark.parametrize('book, status', [('Nope', 404), ('../music', 422)])
+def test_set_title_of_unknown_or_invalid_books(setup, book, status):
+    start, _, _, _ = setup
+    with pytest.raises(OperationError) as error:
+        start().invoke('set_title', book, 'X')
     assert error.value.status == status
 
 

@@ -21,7 +21,8 @@ Unchanged behaviour: folder or album, shuffle and repeat as set by the user.
 
 ### Audiobooks
 
-- One folder per audiobook; tracks in file name order (chapters).
+- One folder per audiobook; tracks in file name order (chapters). Title from the album tag, overridden by `title` in
+  an optional `book.json` in the folder (`audiobooks.set_title`).
 - Position (track and seconds) is stored per audiobook: periodically while playing, on pause,
   stop, switching to something else, and shutdown. Playing the audiobook again continues there.
 - On resume, go back a few seconds (configurable, e.g. 10 s) so the listener finds back in.

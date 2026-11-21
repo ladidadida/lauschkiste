@@ -269,7 +269,11 @@
       "progress-label": "Progress of {{title}}",
       "server-down": "Audiobookshelf is not reachable ({{error}}). Downloaded books still play.",
       "waiting": "{{count}} saved position will be sent when the server is back.",
-      "waiting_other": "{{count}} saved positions will be sent when the server is back."
+      "waiting_other": "{{count}} saved positions will be sent when the server is back.",
+      "edit-title": "Change title",
+      "title-label": "Title",
+      "title-help": "Leave empty to use the title from the files.",
+      "reset-title": "Use the title from the files"
     },
     "radio": {
       "empty": "No stations yet. Add a station with its stream address.",

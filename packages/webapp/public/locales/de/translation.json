@@ -269,7 +269,11 @@
       "progress-label": "Fortschritt von {{title}}",
       "server-down": "Audiobookshelf ist nicht erreichbar ({{error}}). Heruntergeladene Bücher spielen weiter.",
       "waiting": "{{count}} gemerkte Position wird gesendet, sobald der Server wieder da ist.",
-      "waiting_other": "{{count}} gemerkte Positionen werden gesendet, sobald der Server wieder da ist."
+      "waiting_other": "{{count}} gemerkte Positionen werden gesendet, sobald der Server wieder da ist.",
+      "edit-title": "Titel ändern",
+      "title-label": "Titel",
+      "title-help": "Leer lassen, um den Titel aus den Dateien zu verwenden.",
+      "reset-title": "Titel aus den Dateien verwenden"
     },
     "radio": {
       "empty": "Noch keine Sender. Füge einen Sender mit seiner Stream-Adresse hinzu.",
