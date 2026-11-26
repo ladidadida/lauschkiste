@@ -1,7 +1,9 @@
 """Protocol a player backend implements to register at the ``player.backends`` extension point.
 
 Optional capabilities (library browsing, cover art, rewind, ...) are looked up by name at call
-time; a backend without them makes the corresponding operation answer 501.
+time; a backend without them makes the corresponding operation answer 501. One of them is
+``load_files(paths, start, position, ordered)``: like ``play_files``, but paused there; with it the player loads
+what played before a restart.
 """
 
 from typing import Any, Callable, Dict, List, Mapping, Protocol, Tuple

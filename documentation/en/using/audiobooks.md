@@ -5,7 +5,11 @@ the chapters and play in the order of their names (`2.mp3` before `10.mp3`).
 
 A book **continues where it stopped**, a few seconds earlier so the listener finds back in. The position is saved while
 playing, when pausing and when the box shuts down. When the last chapter has played to the end, the book counts as
-finished and starts from the beginning next time. Chapters always play in order, whatever shuffle and repeat say.
+finished; it stays loaded, back at its beginning, so play starts it again. Chapters always play in order, whatever
+shuffle and repeat say.
+
+After a restart the box loads what played last (a book, but also music, a playlist, a podcast or a station), paused
+where it stopped: play continues.
 
 ## Editing a book
 

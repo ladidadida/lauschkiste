@@ -200,6 +200,12 @@ class PlayerCoordinator:
             backend = self._content_backend()
             return self._call_backend(backend, 'play_files', list(paths), start, position, ordered)
 
+    def load_files(self, paths, start=0, position=0.0, ordered=False):
+        """Queue songs paused at ``position``; NotImplementedError if the backend can't."""
+        with self._lock:
+            backend = self._content_backend()
+            return self._call_backend(backend, 'load_files', list(paths), start, position, ordered)
+
     def play_album(
             self,
             albumartist: str,

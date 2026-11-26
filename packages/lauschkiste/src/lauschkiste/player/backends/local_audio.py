@@ -118,25 +118,7 @@ class PlayerLocalAudio:
                     # Interrupted by an external control call (stop/pause/next/prev/seek/new
                     # play_folder) -- it already set _index/_position/_state to what it wants.
                     continue
-                repeat_mode = 'off' if self._ordered else self._repeat_mode
-                if self._stop_after_current:
-                    self._stop_after_current = False
-                    self._state = 'stop'
-                    self._position = 0.0
-                elif repeat_mode == 'single':
-                    self._position = 0.0
-                elif self._random and not self._ordered and len(self._queue) > 1:
-                    self._index = random.randrange(len(self._queue))
-                    self._position = 0.0
-                elif index + 1 < len(self._queue):
-                    self._index = index + 1
-                    self._position = 0.0
-                elif repeat_mode == 'repeat':
-                    self._index = 0
-                    self._position = 0.0
-                else:
-                    self._state = 'stop'
-                    self._position = 0.0
+                self._track_ended(index)
 
     def _decode_track(self, path: str, start_position: float) -> bool:
         """Decode+play `path` from `start_position`. Returns True if it ran to completion (or
@@ -278,6 +260,25 @@ class PlayerLocalAudio:
                     if self._state == 'pause':
                         self._position = max(0.0, self._position - dropped * speed)
 
+    def _track_ended(self, index: int):
+        """Go on after the entry at ``index`` played to its end; after the last one the queue stops at its
+        beginning. Call with ``_cv`` held."""
+        repeat_mode = 'off' if self._ordered else self._repeat_mode
+        stop = self._stop_after_current
+        self._stop_after_current = False
+        self._position = 0.0
+        if repeat_mode == 'single':
+            pass
+        elif self._random and not self._ordered and len(self._queue) > 1:
+            self._index = random.randrange(len(self._queue))
+        elif index + 1 < len(self._queue):
+            self._index = index + 1
+        else:
+            self._index = 0
+            stop = stop or repeat_mode != 'repeat'
+        if stop:
+            self._state = 'stop'
+
     def _jump_to(self, index: int, position: float = 0.0):
         with self._cv:
             self._index = index
@@ -368,8 +369,9 @@ class PlayerLocalAudio:
     def pause(self, state: int = 1):
         with self._cv:
             if state:
-                self._state = 'pause'
-                self._abort.set()
+                if self._state == 'play':
+                    self._state = 'pause'
+                    self._abort.set()
             else:
                 self._state = 'play'
                 self._cv.notify_all()
@@ -490,6 +492,7 @@ class PlayerLocalAudio:
             self._ordered = bool(ordered)
             self._queue = queue
             self._last_played_folder = ''
+            self._status_store['last_played_folder'] = ''
             if queue:
                 self._index = min(max(int(start), 0), len(queue) - 1)
                 self._position = max(float(position), 0.0)
@@ -499,6 +502,19 @@ class PlayerLocalAudio:
             else:
                 self._index = -1
                 self._state = 'stop'
+        self._status_store.save()
+
+    def load_files(self, paths, start=0, position=0.0, ordered=False):
+        """Like ``play_files``, but paused there; ``play`` continues."""
+        queue = [self._absolute(p) for p in paths]
+        with self._cv:
+            self._ordered = bool(ordered)
+            self._queue = queue
+            self._index = min(max(int(start), 0), len(queue) - 1) if queue else -1
+            self._position = max(float(position), 0.0) if queue else 0.0
+            self._duration = None
+            self._state = 'pause' if queue else 'stop'
+            self._abort.set()
 
     def playerstatus(self):
         return self._status_dict()

@@ -119,10 +119,10 @@ class Daemon:
         # (1) Stop taking commands
         if self.api_server is not None:
             self.api_server.terminate()
-        # (2) Stop the music, then the modules in reverse start order
+        # (2) Pause the music (keeping its position), then stop the modules in reverse start order
         thread_list = []
         if self.modules is not None:
-            self.modules.catalog.call_ignore_errors('player.stop')
+            self.modules.catalog.call_ignore_errors('player.pause')
             thread_list = self.modules.stop()
         # (3) Save the configuration
         cfg.save(only_if_changed=True)

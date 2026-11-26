@@ -2,11 +2,14 @@
 
 import logging
 import threading
+import time
 from functools import partial
 from typing import Any, Dict, List, Literal, Mapping, Optional
 
 from pydantic import BaseModel, Field
 
+import lauschkiste.common.paths
+import lauschkiste.common.statefile as statefile
 import lauschkiste.content.resume
 from lauschkiste.contract import CoreModule, OperationError, action, event, extension_point, query
 from lauschkiste.player.backend import LevelMeter, PlayerBackend, Resolver
@@ -16,6 +19,10 @@ from lauschkiste.player.status import ContentKind, PlaybackContext, PlayerStatus
 logger = logging.getLogger('lauschkiste.player')
 
 DEFAULT_BACKEND = 'local_audio'
+SESSION_FILE = 'settings/player_session.json'
+SESSION_SAVE_SEC = 30.0
+#: Content whose module keeps its own position: restored through its action
+TRACKED_KINDS = ('audiobook', 'podcast')
 
 
 SECOND_SWIPE_ACTIONS = {'toggle': 'player.toggle', 'play': 'player.play', 'skip': 'player.next',
@@ -73,12 +80,24 @@ class Player(CoreModule):
         self._metadata_file: Optional[str] = None
         self._metadata: Dict[str, Any] = {}
         self._context: Optional[PlaybackContext] = None
+        self._ordered = False
+        self._session_path: Any = None
+        self._session: Dict[str, Any] = {}
+        self._session_lock = threading.Lock()
+        self._session_restored = False
+        self._session_key: Any = None
+        self._session_saved_at = 0.0
+        self._session_worker: Any = None
+        self._loading_thread: Optional[int] = None
 
     # -- lifecycle ------------------------------------------------------------------------------
 
     def start(self, ctx) -> None:
         self._ctx = ctx
         self._configured_backend = ctx.config.get('backend', default=DEFAULT_BACKEND)
+        self._session_path = lauschkiste.common.paths.resolve(SESSION_FILE)
+        self._session = statefile.read_json(self._session_path)
+        self._session_worker = ctx.executor('session')
         self.backends.on_register(self._add_backend)
         self.level_meters.on_register(lambda name, meter: self._connect_levels())
 
@@ -117,7 +136,9 @@ class Player(CoreModule):
                 logger.debug(f"Level meter '{name}' failed: {error}")
 
     def _publish_status(self, provider: str, raw: Mapping[str, Any]) -> None:
-        self._ctx.publish(self.status, self._with_metadata(status_from_backend(raw, provider)))
+        status = self._with_metadata(status_from_backend(raw, provider))
+        self._ctx.publish(self.status, status)
+        self._note_session(status)
 
     def _song_metadata(self, file: str) -> Dict[str, Any]:
         """Library metadata and cover of ``file``, looked up once per song."""
@@ -159,12 +180,14 @@ class Player(CoreModule):
                                   args={key: value for key, value in args.items() if value is not None})
         with self._metadata_lock:
             self._context = context
+            self._ordered = False
 
     def ready(self) -> None:
         if self._configured_backend not in self.backends:
             logger.error(f"Configured player backend '{self._configured_backend}' is not available "
                          f"(registered: {self.backends.names()}); is its plugin enabled?")
         self._configure_second_swipe()
+        self._session_worker.submit(self._restore_session)
 
     def _configure_second_swipe(self) -> None:
         entry = self._ctx.config.get('second_swipe_action', default=None)
@@ -180,6 +203,11 @@ class Player(CoreModule):
             self._coordinator.set_second_swipe_action(action)
 
     def stop(self) -> List[threading.Thread]:
+        if self._session_restored:
+            try:
+                self._session_worker.submit(self._save_session, self.playerstatus()).result(timeout=5)
+            except Exception as error:
+                logger.error(f"Could not save what plays: {error}")
         results = self._coordinator.exit()
         return [r for r in results if isinstance(r, threading.Thread)]
 
@@ -322,7 +350,63 @@ class Player(CoreModule):
             raise OperationError(422, 'no_files', 'No files to play')
         with self._metadata_lock:
             self._context = PlaybackContext.model_validate(context) if context else PlaybackContext(kind='music')
-        self._coordinator.play_files(files, start, position, ordered)
+            self._ordered = ordered
+        if self._loading_thread == threading.get_ident():
+            self._coordinator.load_files(files, start, position, ordered)
+        else:
+            self._coordinator.play_files(files, start, position, ordered)
+
+    # -- session: what plays is loaded again after a restart ------------------------------------
+
+    def _note_session(self, status: PlayerStatus) -> None:
+        """Save what plays when it changed, and every SESSION_SAVE_SEC while it plays."""
+        with self._session_lock:
+            if not self._session_restored:
+                return
+            key = (status.state, status.file, status.context)
+            due = status.state == 'play' and time.monotonic() - self._session_saved_at >= SESSION_SAVE_SEC
+            if key == self._session_key and not due:
+                return
+            self._session_key = key
+            self._session_saved_at = time.monotonic()
+        self._session_worker.submit(self._save_session, status)
+
+    def _save_session(self, status: PlayerStatus) -> None:
+        with self._metadata_lock:
+            ordered = self._ordered
+        files = [str(item.get('file') or '') for item in self._coordinator.playlistinfo() or []]
+        session = {'context': status.context.model_dump(mode='json') if status.context else None,
+                   'files': files, 'index': status.position or 0, 'elapsed': status.elapsed, 'ordered': ordered}
+        try:
+            statefile.write_json(self._session_path, session)
+        except OSError as error:
+            logger.error(f"Could not save what plays to '{self._session_path}': {error}")
+
+    def _restore_session(self) -> None:
+        """Load what played before the restart, paused; content with its own position through its action."""
+        session, self._session = self._session, {}
+        try:
+            files = [str(file) for file in session.get('files') or []]
+            if not files or self._coordinator.playerstatus().get('state') != 'stop' \
+                    or self._coordinator.playlistinfo():
+                return
+            context = PlaybackContext.model_validate(session['context']) if session.get('context') else None
+            self._loading_thread = threading.get_ident()
+            if context and context.kind in TRACKED_KINDS and context.action:
+                self._ctx.actions.call(context.action, context.args)
+            else:
+                elapsed = 0.0 if context and context.kind == 'radio' else float(session.get('elapsed') or 0.0)
+                self.play_files(files, int(session.get('index') or 0), elapsed, bool(session.get('ordered')),
+                                context)
+            logger.info(f"Loaded what played before: {context.title if context and context.title else files[0]}")
+        except NotImplementedError:
+            logger.debug('The player backend cannot load without playing')
+        except Exception as error:
+            logger.warning(f"Could not load what played before: {error.__class__.__name__}: {error}")
+        finally:
+            self._loading_thread = None
+            with self._session_lock:
+                self._session_restored = True
 
     # -- status and volume ----------------------------------------------------------------------
 

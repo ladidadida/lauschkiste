@@ -192,6 +192,53 @@ def test_reaching_the_end_marks_the_book_finished(setup):
         'audiobook', 'Pippi Langstrumpf', 'audiobooks.play', {'book': 'Pippi'})
 
 
+def test_a_finished_book_played_again_from_the_box_is_followed(setup):
+    start, _, status, state_file = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    status(file=BOOK[2], elapsed='295', duration='300')
+    status(file=BOOK[0], state='stop', elapsed='0', duration='300')
+    assert [b.finished for b in audiobooks.invoke('list_books') if b.book == 'Pippi'] == [True]
+
+    status(file=BOOK[0], state='stop', elapsed='0', duration='300')
+    assert [b.finished for b in audiobooks.invoke('list_books') if b.book == 'Pippi'] == [True]
+
+    status(file=BOOK[0], elapsed='30', duration='300')
+    book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
+    assert (book.finished, book.chapter, book.elapsed) == (False, 0, 30.0)
+
+
+def test_stopping_after_a_chapter_continues_with_the_next(setup):
+    start, ctrl, status, _ = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    status(file=BOOK[0], elapsed='298', duration='300')
+    status(file=BOOK[1], state='stop', elapsed='0', duration='300')
+    book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
+    assert (book.finished, book.chapter, book.elapsed) == (False, 1, 0.0)
+
+
+def test_a_book_loaded_paused_keeps_its_saved_position(setup):
+    start, ctrl, status, state_file = setup
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    status(file=BOOK[1], state='pause', elapsed='75', duration='300')
+    assert wait_for(lambda: state_file.exists() and json.loads(state_file.read_text())['Pippi']['elapsed'] == 75)
+
+    start.managers.pop().stop()
+    ctrl.playerstatus.return_value = {'state': 'stop'}
+    audiobooks = start()
+    audiobooks.invoke('play', 'Pippi')
+    ctrl.play_files.assert_called_with(BOOK, 1, 65.0, True)
+    status(file=BOOK[1], state='pause', elapsed='65.000', duration='300')
+    book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
+    assert (book.chapter, book.elapsed) == (1, 75.0)
+
+    status(file=BOOK[1], elapsed='66', duration='300')
+    book = [b for b in audiobooks.invoke('list_books') if b.book == 'Pippi'][0]
+    assert (book.chapter, book.elapsed) == (1, 66.0)
+
+
 def test_stopping_in_the_middle_keeps_the_position(setup):
     start, _, status, _ = setup
     audiobooks = start()

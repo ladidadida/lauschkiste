@@ -62,6 +62,7 @@ class ResumeTracker:
         self._names: Dict[str, str] = {}
         self._activated_at = 0.0
         self._last: Optional[Dict[str, float]] = None
+        self._start_point: Optional[tuple] = None
         self._worker = ctx.executor('resume')
         self._store: Optional[PositionStore] = None
         self._store_entry: Optional[Dict[str, Any]] = None
@@ -151,6 +152,7 @@ class ResumeTracker:
         with self._lock:
             self._flush_store()
             self._key, self._files, self._last = key, list(files), None
+            self._start_point = (files[start], position)
             self._names = dict(zip(files, names))
             self._store, self._store_entry, self._store_saved_at = store, None, 0.0
             self._store_sent = None
@@ -191,7 +193,7 @@ class ResumeTracker:
             elif state in ('play', 'pause'):
                 save = self._playing(file, state, status)
             elif state == 'stop':
-                save = self._stopped()
+                save = self._stopped(file)
             else:
                 save = False
         if save:
@@ -212,6 +214,10 @@ class ResumeTracker:
         entry = {'file': self._names.get(file, file), 'elapsed': elapsed, 'finished': False}
         self._last = {'index': self._files.index(file), 'elapsed': elapsed,
                       'duration': _number(status.get('duration'))}
+        if self._start_point is not None:
+            if state == 'pause' and self._at_start_point(file, elapsed):
+                return False
+            self._start_point = None
         if self._store is None:
             self._entries[self._key] = entry
             self._dirty = True
@@ -221,16 +227,30 @@ class ResumeTracker:
             self._flush_store()
         return False
 
-    def _stopped(self) -> bool:
-        """Playback stopped; call with the lock held. The item counts as finished after its last file."""
+    def _at_start_point(self, file: str, elapsed: float) -> bool:
+        """Loaded paused where :meth:`play` started it and not played yet."""
+        start_file, position = self._start_point or ('', 0.0)
+        return file == start_file and abs(elapsed - position) < 0.01
+
+    def _stopped(self, file: str) -> bool:
+        """Playback stopped; call with the lock held. The item counts as finished after its last file; it stays
+        attached, so playing it again from the beginning is followed."""
         last = self._last
         if (last and last['index'] == len(self._files) - 1 and last['duration']
                 and last['elapsed'] >= last['duration'] - FINISHED_MARGIN_SEC):
-            if self._store is None:
-                self._entries[self._key] = {'finished': True}
-                self._dirty = True
-            else:
-                self._store_entry = {'finished': True}
-            self._release()
+            self._set_entry({'finished': True})
+            self._last = None
+        elif last and self._files.index(file) > last['index']:
+            self._set_entry({'file': self._names.get(file, file), 'elapsed': 0.0, 'finished': False})
+            self._last = None
         self._flush_store()
         return True
+
+    def _set_entry(self, entry: Dict[str, Any]) -> None:
+        if self._key is None:
+            return
+        if self._store is None:
+            self._entries[self._key] = entry
+            self._dirty = True
+        else:
+            self._store_entry = entry

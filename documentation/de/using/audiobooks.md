@@ -5,8 +5,11 @@ die Kapitel und werden in der Reihenfolge ihrer Namen gespielt (`2.mp3` vor `10.
 
 Ein Buch **macht dort weiter, wo es aufgehört hat**, ein paar Sekunden früher, damit man wieder hineinfindet. Die
 Position wird beim Abspielen, beim Pausieren und beim Herunterfahren der Box gespeichert. Hat das letzte Kapitel bis zum
-Ende gespielt, gilt das Buch als beendet und beginnt beim nächsten Mal von vorn. Kapitel laufen immer der Reihe nach,
-egal was bei „zufällig“ und „wiederholen“ eingestellt ist.
+Ende gespielt, gilt das Buch als beendet; es bleibt geladen und steht wieder am Anfang, Abspielen startet es neu.
+Kapitel laufen immer der Reihe nach, egal was bei „zufällig“ und „wiederholen“ eingestellt ist.
+
+Nach einem Neustart lädt die Box, was zuletzt lief (ein Buch, aber auch Musik, eine Playlist, einen Podcast oder einen
+Sender), pausiert an der Stelle, wo es aufgehört hat: Abspielen macht weiter.
 
 ## Ein Buch bearbeiten
 

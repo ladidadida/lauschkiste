@@ -416,6 +416,60 @@ def test_jump_within_the_queue(tmp_path, monkeypatch):
     assert backend._index == 2
 
 
+def test_after_the_last_entry_the_queue_stops_at_its_beginning():
+    backend = local_audio_backend(_queue=['a', 'b', 'c'], _index=2, _position=12.0, _state='play', _ordered=True)
+    backend._track_ended(2)
+    assert (backend._index, backend._position, backend._state) == (0, 0.0, 'stop')
+
+    backend = local_audio_backend(_queue=['a', 'b'], _index=1, _state='play', _repeat_mode='repeat')
+    backend._track_ended(1)
+    assert (backend._index, backend._state) == (0, 'play')
+
+
+def test_stop_after_current_stops_at_the_next_entry():
+    backend = local_audio_backend(_queue=['a', 'b'], _index=0, _position=5.0, _state='play', _ordered=True,
+                                  _stop_after_current=True)
+    backend._track_ended(0)
+    assert (backend._index, backend._position, backend._state, backend._stop_after_current) == (1, 0.0, 'stop', False)
+    backend._state = 'play'
+    backend._track_ended(1)
+    assert (backend._index, backend._state) == (0, 'stop')
+
+
+def test_load_files_queues_paused_and_play_continues(tmp_path, monkeypatch):
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
+    backend = local_audio_backend()
+    backend.load_files(['a/01.mp3', 'a/02.mp3'], 1, 42.5, ordered=True)
+    status = backend.playerstatus()
+    assert (status['state'], status['song'], status['elapsed']) == ('pause', '1', '42.500')
+    assert status['file'] == str(tmp_path / 'a' / '02.mp3')
+
+    backend.play()
+    assert (backend._state, backend._index, backend._position) == ('play', 1, 42.5)
+
+    backend.load_files([])
+    assert (backend._state, backend._index) == ('stop', -1)
+
+
+def test_pause_leaves_a_stopped_player_stopped():
+    backend = local_audio_backend(_queue=['a'], _index=0)
+    backend.pause(1)
+    assert backend._state == 'stop'
+    backend.pause(0)
+    assert backend._state == 'play'
+    backend.pause(1)
+    assert backend._state == 'pause'
+
+
+def test_play_files_forgets_the_last_folder_also_in_the_status_file(tmp_path, monkeypatch):
+    monkeypatch.setattr(lauschkiste.content.library, 'root', lambda: str(tmp_path))
+    backend = local_audio_backend(_last_played_folder='x')
+    backend._status_store['last_played_folder'] = 'x'
+    backend.play_files(['a/01.mp3'])
+    assert backend._status_store['last_played_folder'] == ''
+    assert not backend.is_second_swipe('x')
+
+
 def test_decode_track_at_higher_speed_writes_less_audio(tmp_path):
     wav_path = tmp_path / 'tone.wav'
     write_wav(wav_path, duration_s=2.0)
