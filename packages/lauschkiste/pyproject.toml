@@ -36,7 +36,7 @@ dependencies = [
   "requests",
   "fastapi",
   "packaging",
-  "pydantic>=2",
+  "pydantic>=2.14.0",
   "uvicorn",
   # Default player backend (player.backend: local_audio): decode via ffmpeg-bundled wheels (no
   # system ffmpeg needed, wheels exist for x86_64/aarch64/armv7l), output via PortAudio.
