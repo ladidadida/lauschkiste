@@ -1,5 +1,7 @@
 import array
+import sys
 import threading
+import types
 import wave
 
 import pytest
@@ -245,13 +247,21 @@ def test_repeat_cycles_off_repeat_single():
     assert backend._repeat_mode == 'off'
 
 
+@pytest.fixture
+def fake_sounddevice(monkeypatch):
+    """Importing the real sounddevice starts PortAudio, which fails without an audio server."""
+    module = types.ModuleType('sounddevice')
+    monkeypatch.setitem(sys.modules, 'sounddevice', module)
+    return module
+
+
 # -- PortAudioSink falls back silently without a real device --------------------------------------
 
-def test_portaudio_sink_falls_back_when_no_device(monkeypatch):
+def test_portaudio_sink_falls_back_when_no_device(fake_sounddevice):
     def raise_error(*args, **kwargs):
         raise RuntimeError("no output device")
 
-    monkeypatch.setattr('sounddevice.RawOutputStream', raise_error)
+    fake_sounddevice.RawOutputStream = raise_error
     sink = PortAudioSink()
 
     sink.open(44100, 2)  # must not raise
@@ -283,9 +293,9 @@ class FakeStream:
         self.events.append('close')
 
 
-def test_portaudio_sink_starts_after_prefill(monkeypatch):
+def test_portaudio_sink_starts_after_prefill(fake_sounddevice):
     streams = []
-    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
+    fake_sounddevice.RawOutputStream = lambda **kw: streams.append(FakeStream()) or streams[-1]
     sink = PortAudioSink()
     sink.open(1000, 2)  # prefill: 300 frames = 1200 bytes
 
@@ -298,9 +308,9 @@ def test_portaudio_sink_starts_after_prefill(monkeypatch):
     assert streams[0].events == ['start', 1600, 400, 'stop', 'close']
 
 
-def test_portaudio_sink_plays_short_sounds_on_close(monkeypatch):
+def test_portaudio_sink_plays_short_sounds_on_close(fake_sounddevice):
     streams = []
-    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream()) or streams[-1])
+    fake_sounddevice.RawOutputStream = lambda **kw: streams.append(FakeStream()) or streams[-1]
     sink = PortAudioSink()
     sink.open(1000, 2)
     sink.write(b'\x00' * 100)
@@ -308,9 +318,9 @@ def test_portaudio_sink_plays_short_sounds_on_close(monkeypatch):
     assert streams[0].events == ['start', 100, 'stop', 'close']
 
 
-def test_portaudio_sink_collects_small_writes(monkeypatch):
+def test_portaudio_sink_collects_small_writes(fake_sounddevice):
     streams = []
-    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream(**kw)) or streams[-1])
+    fake_sounddevice.RawOutputStream = lambda **kw: streams.append(FakeStream(**kw)) or streams[-1]
     sink = PortAudioSink()
     sink.open(1000, 2)  # 4000 bytes/s: prefill 1200 bytes, chunks of 400 bytes
     sink.write(b'\x00' * 1200)
@@ -320,10 +330,10 @@ def test_portaudio_sink_collects_small_writes(monkeypatch):
     assert streams[0].events == ['start', 1200, 600]
 
 
-def test_portaudio_sink_reports_the_level_of_each_channel(monkeypatch):
+def test_portaudio_sink_reports_the_level_of_each_channel(fake_sounddevice):
     import struct
     streams, levels = [], []
-    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream(**kw)) or streams[-1])
+    fake_sounddevice.RawOutputStream = lambda **kw: streams.append(FakeStream(**kw)) or streams[-1]
     sink = PortAudioSink()
     sink.level_callback = lambda left, right, delay: levels.append((round(left, 2), right, delay))
     sink.open(1000, 2)
@@ -332,9 +342,9 @@ def test_portaudio_sink_reports_the_level_of_each_channel(monkeypatch):
     assert levels == [(0.5, 0.0, streams[0].latency)]
 
 
-def test_portaudio_sink_drops_buffered_audio_when_interrupted(monkeypatch):
+def test_portaudio_sink_drops_buffered_audio_when_interrupted(fake_sounddevice):
     streams = []
-    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: streams.append(FakeStream(**kw)) or streams[-1])
+    fake_sounddevice.RawOutputStream = lambda **kw: streams.append(FakeStream(**kw)) or streams[-1]
     sink = PortAudioSink()
     sink.open(1000, 2)
     sink.write(b'\x00' * 1600)
@@ -484,7 +494,7 @@ def test_decode_track_at_higher_speed_writes_less_audio(tmp_path):
     assert fast._position == pytest.approx(normal._position, rel=0.1)
 
 
-def test_portaudio_sink_starts_and_ends_softly(monkeypatch):
+def test_portaudio_sink_starts_and_ends_softly(monkeypatch, fake_sounddevice):
     import struct
     monkeypatch.setattr(PortAudioSink, 'LEAD_IN_SECONDS', 0.1)
     monkeypatch.setattr(PortAudioSink, 'FADE_IN_SECONDS', 0.1)
@@ -496,7 +506,7 @@ def test_portaudio_sink_starts_and_ends_softly(monkeypatch):
             super().write(data)
             written.append(bytes(data))
 
-    monkeypatch.setattr('sounddevice.RawOutputStream', lambda **kw: Stream(**kw))
+    fake_sounddevice.RawOutputStream = lambda **kw: Stream(**kw)
     sink = PortAudioSink()
     sink.open(1000, 2)  # 4 bytes per frame
     loud = struct.pack('<h', 20000) * 2 * 1200
