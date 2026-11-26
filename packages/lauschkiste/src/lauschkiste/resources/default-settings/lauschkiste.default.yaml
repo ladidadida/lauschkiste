@@ -5,6 +5,8 @@ system:
   health_interval_sec: 10
   # espeak voice for system.say_my_ip
   speech_voice: en
+  # Log files in logs/: off (spares the SD card), errors (warnings and errors only) or all
+  log_files: errors
 # Plugins to load, each with its settings. Installed plugins are only loaded when listed here.
 # See documentation/developers/core-and-plugins.md
 plugins: {}

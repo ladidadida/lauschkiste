@@ -16,6 +16,7 @@ from pydantic import BaseModel, Field
 import lauschkiste
 import lauschkiste.common.cfghandler
 import lauschkiste.content.library
+from lauschkiste.common import loggingext
 from lauschkiste.contract import CoreModule, OperationError, action, event, query
 from lauschkiste.daemon import get_daemon
 
@@ -30,6 +31,10 @@ class SystemSettings(BaseModel):
                               description='An espeak voice, e.g. en or de')
     health_interval_sec: float = Field(10, ge=0, le=3600, title='System status interval (seconds)',
                                        description='0 turns the periodic status off')
+    log_files: loggingext.LogFiles = Field(
+        loggingext.DEFAULT_LOG_FILES, title='Log files',
+        description="Which log files are written to the logs folder: 'off' spares the SD card, "
+                    "'errors' only warnings and errors, 'all' every message (for finding a fault)")
 
 
 class SystemInfo(BaseModel):
@@ -100,6 +105,11 @@ def _read_log(handler_name: str) -> str:
         content = f"No file handler with name {handler_name} configured"
         if h.name != handler_name:
             continue
+        if not loggingext.log_files_enabled(h):
+            mode = cfg.getn('system', 'log_files', default=loggingext.DEFAULT_LOG_FILES)
+            return f"This log file is not written (setting system.log_files is '{mode}')"
+        if not os.path.exists(h.baseFilename):
+            return f"Nothing written to {h.baseFilename} in this run"
         try:
             if os.path.getsize(h.baseFilename) == 0:
                 return (f"Log file {h.baseFilename} is empty. (Is the RotatingFileHandler configured as "
@@ -160,6 +170,8 @@ class System(CoreModule):
             self._health_thread.start()
 
     def settings_changed(self, changed):
+        if 'log_files' in changed:
+            loggingext.set_log_files(self._ctx.config.get('log_files', default=loggingext.DEFAULT_LOG_FILES))
         return 'health_interval_sec' not in changed
 
     def stop(self):

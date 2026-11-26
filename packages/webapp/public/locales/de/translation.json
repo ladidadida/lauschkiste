@@ -919,6 +919,15 @@
         "health_interval_sec": {
           "label": "Status-Intervall (Sekunden)",
           "help": "0 schaltet die regelmäßige Statusmeldung ab"
+        },
+        "log_files": {
+          "label": "Logdateien",
+          "help": "Was in den Ordner logs geschrieben wird. Jedes Schreiben nutzt die SD-Karte ab: „alles“ nur zur Fehlersuche.",
+          "values": {
+            "off": "aus",
+            "errors": "nur Warnungen und Fehler",
+            "all": "alles"
+          }
         }
       },
       "rfid": {

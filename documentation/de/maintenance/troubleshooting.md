@@ -47,6 +47,10 @@ Lauschkiste schreibt auch Dateien in den Ordner `logs` seines Home (`lauschctl h
 Der vorherige Lauf bleibt als `app.log.1` erhalten. Dieselben Logs kannst du im Browser unter `http://<name>/logs` lesen.
 Prüfe immer das Datum der Datei: Vielleicht liest du eine alte.
 
+Welche Dateien geschrieben werden, stellst du unter **Logdateien** in den Systemeinstellungen der Web-App ein
+(`system.log_files`): `errors` (Standard) schreibt nur `errors.log`, `all` beide Dateien, `off` keine. Jedes Schreiben
+nutzt die SD-Karte ein wenig ab; stelle `all` nur ein, solange du einen Fehler suchst. Die Änderung wirkt sofort.
+
 Um die Meldungen live zu sehen, halte den Dienst an und starte Lauschkiste in der Konsole:
 
 ```bash

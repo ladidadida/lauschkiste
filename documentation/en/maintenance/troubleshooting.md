@@ -47,6 +47,10 @@ Lauschkiste also writes files in the `logs` folder of its home (`lauschctl home`
 The previous run is kept as `app.log.1`. The same logs can be read in a browser at `http://<name>/logs`. Always check
 the date of the file: you may be looking at an old one.
 
+Which files are written is set by **Log files** in the system settings of the web app (`system.log_files`): `errors`
+(the default) writes only `errors.log`, `all` both files, `off` none. Every write wears the SD card a little; switch
+to `all` only while looking for a fault. The change takes effect at once.
+
 To watch the messages live, stop the service and start Lauschkiste in the console:
 
 ```bash

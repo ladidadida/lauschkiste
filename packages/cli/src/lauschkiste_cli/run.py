@@ -6,7 +6,15 @@ import typer
 
 import lauschkiste.common.cfghandler
 import lauschkiste.common.paths
+import lauschkiste.common.statefile
 from lauschkiste.common import loggingext
+
+
+def configured_log_files(conf: Path) -> str:
+    """``system.log_files`` of the configuration file, read before the configuration itself is loaded."""
+    system = lauschkiste.common.statefile.read_yaml(Path(conf)).get('system')
+    value = system.get('log_files') if isinstance(system, dict) else None
+    return value if value in ('off', 'errors', 'all') else loggingext.DEFAULT_LOG_FILES
 
 def run(
     conf: Optional[Path] = typer.Option(
@@ -61,7 +69,7 @@ def run(
     else:
         lauschkiste.common.cfghandler.ensure_default_config(
             str(logger_conf), str(lauschkiste.common.paths.resource('default-settings', 'logger.default.yaml')))
-        logger = loggingext.configure_from_file(str(logger_conf))
+        logger = loggingext.configure_from_file(str(logger_conf), configured_log_files(conf))
 
     logger.info(f"Home '{lauschkiste.common.paths.home()}', configuration file '{conf}'")
     from lauschkiste.startup import import_fastapi

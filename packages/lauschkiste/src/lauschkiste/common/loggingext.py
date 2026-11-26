@@ -30,6 +30,8 @@ Example: YAML snippet, setting WARNING as default level everywhere and DEBUG for
 > sense).
 > There can be multiple loggers per module, e.g. for special classes, to further control the amount of log output
 """
+import os
+import re
 import sys
 import logging
 import logging.config
@@ -37,9 +39,16 @@ import logging.handlers
 import lauschkiste.common.paths
 import lauschkiste.common.publishing as publishing
 import lauschkiste.common.simplecolors as sc
+from typing import Iterator, Literal
+
 from ruamel.yaml import YAML
 
 ROOT_LOGGER = 'lauschkiste'
+
+#: Which log files are written: none, the warnings and errors only, or everything
+LogFiles = Literal['off', 'errors', 'all']
+DEFAULT_LOG_FILES: LogFiles = 'errors'
+_OLD_MODULE = re.compile(r'^lauschkiste\.(common\.)?misc\.loggingext\.')
 
 
 class ColorFilter(logging.Filter):
@@ -153,26 +162,87 @@ def configure_default(level=logging.DEBUG, name=ROOT_LOGGER, with_publisher=Fals
     return logger
 
 
-def configure_from_file(filename=None):
+class FileSwitch(logging.Filter):
+    """Lets records through to a log file only while that file is switched on."""
+
+    def __init__(self):
+        super().__init__()
+        self.enabled = True
+
+    def filter(self, record):
+        return self.enabled
+
+
+def _current_module_names(value):
+    """Logger configurations from before the module moved name it by its old path."""
+    if isinstance(value, dict):
+        return {key: _current_module_names(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_current_module_names(item) for item in value]
+    if isinstance(value, str):
+        return _OLD_MODULE.sub('lauschkiste.common.loggingext.', value)
+    return value
+
+
+def _file_handlers() -> Iterator[logging.FileHandler]:
+    seen = set()
+    for logger in [logging.getLogger(), *logging.Logger.manager.loggerDict.values()]:
+        for handler in getattr(logger, 'handlers', []):
+            if isinstance(handler, logging.FileHandler) and id(handler) not in seen:
+                seen.add(id(handler))
+                yield handler
+
+
+def _switch(handler: logging.FileHandler) -> FileSwitch:
+    switch = next((f for f in handler.filters if isinstance(f, FileSwitch)), None)
+    if switch is None:
+        switch = FileSwitch()
+        handler.addFilter(switch)
+    return switch
+
+
+def set_log_files(mode: str) -> None:
+    """Switch the log files on or off: 'off', 'errors' (files of handlers at level WARNING or above) or 'all'."""
+    for handler in _file_handlers():
+        on = mode == 'all' or (mode == 'errors' and handler.level >= logging.WARNING)
+        _switch(handler).enabled = on
+        if not on:
+            handler.acquire()
+            try:
+                if handler.stream is not None:
+                    handler.stream.close()
+                    handler.stream = None  # type: ignore[assignment]
+            finally:
+                handler.release()
+
+
+def log_files_enabled(handler: logging.Handler) -> bool:
+    return all(f.enabled for f in handler.filters if isinstance(f, FileSwitch))
+
+
+def configure_from_file(filename=None, log_files: str = DEFAULT_LOG_FILES):
     if filename is None:
         return configure_default(level=logging.WARNING)
     yaml = YAML(typ='safe')
     try:
         with open(filename) as stream:
-            cfg = yaml.load(stream)
+            cfg = _current_module_names(yaml.load(stream))
         for handler in (cfg.get('handlers') or {}).values():
             if 'filename' in handler:
                 path = lauschkiste.common.paths.resolve(handler['filename'])
                 path.parent.mkdir(parents=True, exist_ok=True)
                 handler['filename'] = str(path)
+                handler['delay'] = True
         logging.config.dictConfig(cfg)
         logger = logging.getLogger(ROOT_LOGGER)
     except Exception as e:
         logger = configure_default(level=logging.DEBUG)
         logger.error(f"Using default fallback logger. Reason: while opening '{filename}' for logger configuration")
         logger.error(f"{e}")
-    # This enforces a fresh file for all RotatingFileHandlers at start of application
-    for h in logger.handlers:
-        if isinstance(h, logging.handlers.RotatingFileHandler):
-            h.doRollover()
+    set_log_files(log_files)
+    # A fresh file at every start; the last one written stays as .1
+    for handler in _file_handlers():
+        if (isinstance(handler, logging.handlers.RotatingFileHandler) and log_files_enabled(handler)
+                and os.path.exists(handler.baseFilename)):
+            handler.doRollover()
     return logger
